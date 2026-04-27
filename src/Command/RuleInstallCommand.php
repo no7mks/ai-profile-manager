@@ -13,7 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
-final class InstallCommand extends Command
+final class RuleInstallCommand extends Command
 {
     public function __construct(private readonly Installer $installer)
     {
@@ -23,9 +23,9 @@ final class InstallCommand extends Command
     protected function configure(): void
     {
         $this
-            ->setName('install')
-            ->setDescription('Install a preset into target IDE/CLI tools.')
-            ->addArgument('preset', InputArgument::REQUIRED, 'Preset name to install.')
+            ->setName('rule:install')
+            ->setDescription('Install rules into target IDE/CLI tools.')
+            ->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to install.')
             ->addOption(
                 'target',
                 't',
@@ -38,20 +38,12 @@ final class InstallCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        /** @var string $preset */
-        $preset = $input->getArgument('preset');
+        /** @var array<int, string> $rules */
+        $rules = $input->getArgument('rules');
         /** @var array<int, string> $targets */
         $targets = $input->getOption('target');
 
-        if (!in_array($preset, AppConfig::KNOWN_PRESETS, true)) {
-            $io->error(sprintf(
-                'Unknown preset: %s. Known presets: %s.',
-                $preset,
-                implode(', ', AppConfig::KNOWN_PRESETS)
-            ));
-            return Command::FAILURE;
-        }
-
+        $rules = $rules === [] ? AppConfig::DEFAULT_RULES : array_values(array_unique($rules));
         $targets = $targets === [] ? AppConfig::DEFAULT_TARGETS : array_values(array_unique($targets));
 
         $unknownTargets = array_values(array_diff($targets, AppConfig::KNOWN_TARGETS));
@@ -64,9 +56,11 @@ final class InstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $items = AppConfig::PRESET_ITEMS[$preset];
-        $io->writeln("Preset: {$preset}");
-        foreach ($this->installer->installTyped($items, $targets) as $line) {
+        foreach ($this->installer->installTyped([
+            'skills' => [],
+            'rules' => $rules,
+            'agents' => [],
+        ], $targets) as $line) {
             $io->writeln($line);
         }
 

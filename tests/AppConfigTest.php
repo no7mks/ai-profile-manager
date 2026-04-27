@@ -9,10 +9,34 @@ use PHPUnit\Framework\TestCase;
 
 final class AppConfigTest extends TestCase
 {
-    public function testDefaultAbilitiesAreKnown(): void
+    public function testDefaultSkillsAreNotEmpty(): void
     {
-        foreach (AppConfig::DEFAULT_ABILITIES as $ability) {
-            self::assertContains($ability, AppConfig::KNOWN_ABILITIES);
+        self::assertNotEmpty(AppConfig::DEFAULT_SKILLS);
+    }
+
+    public function testKnownPresetsHavePresetItems(): void
+    {
+        foreach (AppConfig::KNOWN_PRESETS as $preset) {
+            self::assertArrayHasKey($preset, AppConfig::PRESET_ITEMS);
+        }
+    }
+
+    public function testPresetItemsUseStringLists(): void
+    {
+        foreach (AppConfig::PRESET_ITEMS as $items) {
+            self::assertIsArray($items['skills']);
+            self::assertIsArray($items['rules']);
+            self::assertIsArray($items['agents']);
+
+            foreach ($items['skills'] as $skill) {
+                self::assertIsString($skill);
+            }
+            foreach ($items['rules'] as $rule) {
+                self::assertIsString($rule);
+            }
+            foreach ($items['agents'] as $agent) {
+                self::assertIsString($agent);
+            }
         }
     }
 

@@ -7,10 +7,19 @@ namespace AiProfileManager;
 final class KnowledgeBaseUpdater
 {
     /**
-     * @param array<int, string> $abilities
+     * @param array<int, string> $skills
+     * @param array<int, string> $rules
+     * @param array<int, string> $agents
+     * @param array<int, string> $presets
      * @param array<int, string> $targets
      */
-    public function update(array $abilities, array $targets): string
+    public function update(
+        array $skills,
+        array $rules,
+        array $agents,
+        array $presets,
+        array $targets
+    ): string
     {
         $baseDir = rtrim((string) getenv('HOME'), '/') . '/.config/aipm';
         if (!is_dir($baseDir)) {
@@ -20,9 +29,12 @@ final class KnowledgeBaseUpdater
         $payload = [
             'schema_version' => 1,
             'updated_at' => gmdate(DATE_ATOM),
-            'abilities' => $abilities,
+            'skills' => $skills,
+            'rules' => $rules,
+            'agents' => $agents,
+            'presets' => $presets,
             'targets' => $targets,
-            'notes' => 'Initial local knowledge base snapshot.',
+            'notes' => 'Typed local knowledge base snapshot.',
         ];
 
         $path = $baseDir . '/knowledge-base.json';

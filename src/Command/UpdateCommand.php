@@ -28,7 +28,13 @@ final class UpdateCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $path = $this->updater->update(AppConfig::KNOWN_ABILITIES, AppConfig::KNOWN_TARGETS);
+        $path = $this->updater->update(
+            AppConfig::DEFAULT_SKILLS,
+            AppConfig::DEFAULT_RULES,
+            AppConfig::DEFAULT_AGENTS,
+            AppConfig::KNOWN_PRESETS,
+            AppConfig::KNOWN_TARGETS
+        );
         $io->success("Knowledge base updated at: {$path}");
 
         return Command::SUCCESS;
