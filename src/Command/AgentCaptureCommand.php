@@ -29,6 +29,7 @@ final class AgentCaptureCommand extends Command
             ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.')
             ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
             ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
+            ->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Base version tag/commit for patch generation.', 'unknown')
             ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.')
             ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
     }
@@ -54,6 +55,7 @@ final class AgentCaptureCommand extends Command
             $result['results'],
             (string) $input->getOption('source-repo'),
             (string) $input->getOption('source-commit'),
+            (string) $input->getOption('base-ref'),
             (string) ($input->getOption('event-id') ?: ''),
             (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM))
         );

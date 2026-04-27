@@ -73,7 +73,7 @@ aipm rule:capture spec-core -t kiro
 aipm agent:capture gatekeeper -t cursor
 ```
 
-你可以通过 `--source-repo`、`--source-commit`、`--event-id`、`--captured-at` 覆盖 event metadata。
+你可以通过 `--source-repo`、`--source-commit`、`--base-ref`、`--event-id`、`--captured-at` 覆盖 event metadata。
 
 按 preset 进行 check 与 capture：
 
@@ -91,7 +91,7 @@ aipm capture kiro-spec -t kiro
 aipm update
 ```
 
-`ingest` 读取本机 `~/.aipm/events` 中的 capture event，并 write-back 到 `<aipm-repo>/abilities/{skills,rules,agents}`：
+`ingest` 读取本机 `~/.aipm/events` 中的 capture event，并 write-back 到 `<aipm-repo>/abilities/{skills,rules,agents}/{name}/{target}` 的原样文件结构：
 
 ```bash
 aipm ingest
@@ -101,7 +101,7 @@ aipm ingest
 
 - `--events-dir <dir>`：指定 events 目录（默认 `~/.aipm/events`）
 
-`ingest` 默认将 event 写回当前执行目录下的 `abilities/{skills,rules,agents}`。
+`ingest` 默认将 event 写回当前执行目录下的 `abilities/{skills,rules,agents}/{name}/{target}`。
 
 说明：`ingest` 只负责把 event 写回仓库文件并形成变更；后续 git 提交流程（hotfix/PR）由你的仓库流程决定。
 
@@ -147,6 +147,7 @@ Payload 结构：
   "event_id": "550e8400-e29b-41d4-a716-446655440000",
   "source_repo": "acme/external-repo",
   "source_commit": "abc123...",
+  "base_ref": "v1.2.3",
   "captured_at": "2026-04-27T12:00:00Z",
   "target": "cursor",
   "items": [
@@ -154,7 +155,14 @@ Payload 结构：
       "type": "skill",
       "name": "graphify",
       "status": "modified",
-      "content_hash": "sha256..."
+      "content_hash": "sha256...",
+      "files": [
+        {
+          "path": "SKILL.md",
+          "content": "# graphify\n\nskill content",
+          "patch": "--- a/SKILL.md\n+++ b/SKILL.md\n@@ -0,0 +1,3 @@\n+# graphify\n+\n+skill content"
+        }
+      ]
     }
   ]
 }

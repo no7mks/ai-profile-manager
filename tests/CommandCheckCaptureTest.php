@@ -76,7 +76,13 @@ final class CommandCheckCaptureTest extends TestCase
         self::assertSame(0, $exitCode);
         $output = $tester->getDisplay();
         self::assertStringContainsString('Event written to events dir', $output);
-        self::assertFileExists($tmpAipmHome . '/events/11111111-1111-4111-8111-111111111111.json');
+        $eventPath = $tmpAipmHome . '/events/11111111-1111-4111-8111-111111111111.json';
+        self::assertFileExists($eventPath);
+        $decoded = json_decode((string) file_get_contents($eventPath), true);
+        self::assertIsArray($decoded);
+        self::assertSame('unknown', $decoded['base_ref'] ?? null);
+        self::assertIsArray($decoded['items'][0]['files'] ?? null);
+        self::assertIsString($decoded['items'][0]['files'][0]['patch'] ?? null);
     }
 
     public function testIngestCaptureEventScansInboxAndIngestsEvent(): void
@@ -86,6 +92,7 @@ final class CommandCheckCaptureTest extends TestCase
             'event_id' => '22222222-2222-4222-8222-222222222222',
             'source_repo' => 'acme/project',
             'source_commit' => 'abc123',
+            'base_ref' => 'v1.2.3',
             'captured_at' => gmdate(DATE_ATOM),
             'target' => 'cursor',
             'items' => [[
@@ -93,6 +100,11 @@ final class CommandCheckCaptureTest extends TestCase
                 'name' => 'graphify',
                 'status' => 'unknown',
                 'content_hash' => hash('sha256', 'x'),
+                'files' => [[
+                    'path' => 'SKILL.md',
+                    'content' => "# graphify\n\nskill content\n",
+                    'patch' => "--- a/SKILL.md\n+++ b/SKILL.md\n@@ -0,0 +1,3 @@\n+# graphify\n+\n+skill content\n",
+                ]],
             ]],
         ], JSON_UNESCAPED_SLASHES);
         self::assertIsString($payload);
@@ -119,6 +131,6 @@ final class CommandCheckCaptureTest extends TestCase
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertStringContainsString('Found events: 1', $tester->getDisplay());
         self::assertStringContainsString('[ok] Ingested event', $tester->getDisplay());
-        self::assertFileExists($tmpConfigDir . '/abilities/skills/graphify/capture.json');
+        self::assertFileExists($tmpConfigDir . '/abilities/skills/graphify/cursor/SKILL.md');
     }
 }

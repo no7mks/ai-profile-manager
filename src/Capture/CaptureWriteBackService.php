@@ -11,6 +11,7 @@ final class CaptureWriteBackService
      *     event_id: string,
      *     source_repo: string,
      *     source_commit: string,
+     *     base_ref: string,
      *     captured_at: string
      * } $event
      * @return array<int, string>
@@ -37,25 +38,37 @@ final class CaptureWriteBackService
                 default => 'abilities/unknown-items',
             };
             $name = $this->sanitizePathSegment((string) ($item['name'] ?? 'unknown'));
-            $itemDir = $sourceDir . '/' . $typeDir . '/' . $name;
+            $target = $this->sanitizePathSegment((string) ($event['target'] ?? 'unknown'));
+            $itemDir = $sourceDir . '/' . $typeDir . '/' . $name . '/' . $target;
             if (!is_dir($itemDir)) {
                 mkdir($itemDir, 0775, true);
             }
 
-            $recordPath = $itemDir . '/capture.json';
-            $record = [
-                'event_id' => $event['event_id'],
-                'source_repo' => $event['source_repo'],
-                'source_commit' => $event['source_commit'],
-                'captured_at' => $event['captured_at'],
-                'target' => $event['target'] ?? 'unknown',
-                'type' => $item['type'] ?? 'unknown',
-                'name' => $item['name'] ?? 'unknown',
-                'status' => $item['status'] ?? 'unknown',
-                'content_hash' => $item['content_hash'] ?? '',
-            ];
-            file_put_contents($recordPath, json_encode($record, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
-            $lines[] = 'Write-back item file: ' . $recordPath;
+            $files = $item['files'] ?? [];
+            foreach ($files as $file) {
+                if (!is_array($file)) {
+                    continue;
+                }
+
+                $relativePath = (string) ($file['path'] ?? '');
+                $content = (string) ($file['content'] ?? '');
+                if ($relativePath === '') {
+                    continue;
+                }
+
+                $targetPath = $this->buildSafeTargetPath($itemDir, $relativePath);
+                if ($targetPath === null) {
+                    continue;
+                }
+
+                $targetParent = dirname($targetPath);
+                if (!is_dir($targetParent)) {
+                    mkdir($targetParent, 0775, true);
+                }
+
+                file_put_contents($targetPath, $content);
+                $lines[] = 'Write-back item file: ' . $targetPath;
+            }
         }
 
         return $lines;
@@ -71,5 +84,30 @@ final class CaptureWriteBackService
         $sanitized = preg_replace('/[^a-zA-Z0-9._-]+/', '-', $value);
 
         return $sanitized === null || $sanitized === '' ? 'unknown' : $sanitized;
+    }
+
+    private function buildSafeTargetPath(string $baseDir, string $relativePath): ?string
+    {
+        $normalized = str_replace('\\', '/', $relativePath);
+        $normalized = ltrim($normalized, '/');
+        if ($normalized === '') {
+            return null;
+        }
+
+        $segments = explode('/', $normalized);
+        $safeSegments = [];
+        foreach ($segments as $segment) {
+            if ($segment === '' || $segment === '.' || $segment === '..') {
+                continue;
+            }
+
+            $safeSegments[] = $segment;
+        }
+
+        if ($safeSegments === []) {
+            return null;
+        }
+
+        return $baseDir . '/' . implode('/', $safeSegments);
     }
 }
