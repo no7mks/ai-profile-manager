@@ -1,0 +1,16 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use AiProfileManager\Application;
+
+$autoload = __DIR__ . '/../vendor/autoload.php';
+if (!file_exists($autoload)) {
+    fwrite(STDERR, "Missing dependencies. Run: composer install\n");
+    exit(1);
+}
+require $autoload;
+
+$app = new Application();
+exit($app->run($argv));
