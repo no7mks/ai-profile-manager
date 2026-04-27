@@ -5,8 +5,30 @@
 
 ## 安装
 
+本地开发安装：
+
 ```bash
 composer install
+```
+
+全局安装（推荐终端直接调用）：
+
+```bash
+composer global require no7mks/ai-profile-manager
+```
+
+将 Composer 全局 bin 目录加入 `PATH`（macOS/zsh 示例）：
+
+```bash
+echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.zshrc
+source ~/.zshrc
+```
+
+验证：
+
+```bash
+which aipm
+aipm --help
 ```
 
 运行方式：

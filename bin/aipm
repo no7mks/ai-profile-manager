@@ -5,8 +5,21 @@ declare(strict_types=1);
 
 use AiProfileManager\Core\Application;
 
-$autoload = __DIR__ . '/../vendor/autoload.php';
-if (!file_exists($autoload)) {
+$autoloadCandidates = [
+    __DIR__ . '/../vendor/autoload.php', // Run from repository root during local development.
+    __DIR__ . '/../../../autoload.php', // Composer global bin proxy under vendor/bin.
+    __DIR__ . '/../../autoload.php', // Direct package bin execution under vendor/<vendor>/<package>/bin.
+];
+
+$autoload = null;
+foreach ($autoloadCandidates as $candidate) {
+    if (file_exists($candidate)) {
+        $autoload = $candidate;
+        break;
+    }
+}
+
+if ($autoload === null) {
     fwrite(STDERR, "Missing dependencies. Run: composer install\n");
     exit(1);
 }
