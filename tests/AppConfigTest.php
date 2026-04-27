@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\AppConfig;
+use AiProfileManager\Config\AppConfig;
 use PHPUnit\Framework\TestCase;
 
 final class AppConfigTest extends TestCase

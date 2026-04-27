@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Command;
 
-use AiProfileManager\AppConfig;
-use AiProfileManager\CheckService;
+use AiProfileManager\Config\AppConfig;
+use AiProfileManager\Service\CheckService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;

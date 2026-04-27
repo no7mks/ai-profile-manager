@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AiProfileManager;
+namespace AiProfileManager\Service;
 
 final class Installer
 {

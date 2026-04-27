@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Command;
 
-use AiProfileManager\AppConfig;
-use AiProfileManager\CaptureService;
+use AiProfileManager\Config\AppConfig;
+use AiProfileManager\Service\CaptureService;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -26,7 +26,11 @@ final class AgentCaptureCommand extends Command
             ->setName('agent:capture')
             ->setDescription('Capture modified agents from target IDE/CLI tools (placeholder).')
             ->addArgument('agents', InputArgument::IS_ARRAY, 'Agent names to capture.')
-            ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+            ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.')
+            ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
+            ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
+            ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.')
+            ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -46,6 +50,16 @@ final class AgentCaptureCommand extends Command
         }
 
         $result = $this->capture->captureTyped(['skills' => [], 'rules' => [], 'agents' => $agents], $targets);
+        $event = $this->capture->buildCaptureEvent(
+            $result['results'],
+            (string) $input->getOption('source-repo'),
+            (string) $input->getOption('source-commit'),
+            (string) ($input->getOption('event-id') ?: ''),
+            (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM))
+        );
+        $path = $this->capture->writeEventToEventsDir($event);
+        $io->writeln(sprintf('[ok] Event written to events dir: %s', $path));
+
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

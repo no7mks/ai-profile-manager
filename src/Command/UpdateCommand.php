@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Command;
 
-use AiProfileManager\AppConfig;
-use AiProfileManager\KnowledgeBaseUpdater;
+use AiProfileManager\Config\AppConfig;
+use AiProfileManager\Service\KnowledgeBaseUpdater;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\CheckService;
+use AiProfileManager\Service\CheckService;
 use PHPUnit\Framework\TestCase;
 
 final class CheckServiceTest extends TestCase

@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\CaptureService;
-use AiProfileManager\CheckService;
+use AiProfileManager\Capture\CaptureEventIngestor;
+use AiProfileManager\Service\CaptureService;
+use AiProfileManager\Service\CheckService;
 use AiProfileManager\Command\CheckCommand;
+use AiProfileManager\Command\IngestCaptureEventCommand;
+use AiProfileManager\Command\SkillCaptureCommand;
 use AiProfileManager\Command\SkillCheckCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -47,5 +50,75 @@ final class CommandCheckCaptureTest extends TestCase
 
         self::assertSame(0, $result['exit_code']);
         self::assertStringContainsString('No modified items to capture', implode("\n", $result['lines']));
+        self::assertArrayHasKey('content_hash', $result['results'][0]);
+    }
+
+    public function testSkillCaptureWritesEventToEventsDirByDefault(): void
+    {
+        $tmpAipmHome = sys_get_temp_dir() . '/aipm-capture-test-' . bin2hex(random_bytes(4));
+        mkdir($tmpAipmHome, 0775, true);
+        putenv('AIPM_HOME=' . $tmpAipmHome);
+
+        $command = new SkillCaptureCommand(new CaptureService(new CheckService()));
+        $tester = new CommandTester($command);
+
+        $exitCode = $tester->execute([
+            'skills' => ['graphify'],
+            '--target' => ['cursor'],
+            '--source-repo' => 'acme/project',
+            '--source-commit' => 'abc123',
+            '--event-id' => '11111111-1111-4111-8111-111111111111',
+            '--captured-at' => '2026-04-27T00:00:00Z',
+        ]);
+
+        putenv('AIPM_HOME');
+
+        self::assertSame(0, $exitCode);
+        $output = $tester->getDisplay();
+        self::assertStringContainsString('Event written to events dir', $output);
+        self::assertFileExists($tmpAipmHome . '/events/11111111-1111-4111-8111-111111111111.json');
+    }
+
+    public function testIngestCaptureEventScansInboxAndIngestsEvent(): void
+    {
+        $payload = json_encode([
+            'schema_version' => 1,
+            'event_id' => '22222222-2222-4222-8222-222222222222',
+            'source_repo' => 'acme/project',
+            'source_commit' => 'abc123',
+            'captured_at' => gmdate(DATE_ATOM),
+            'target' => 'cursor',
+            'items' => [[
+                'type' => 'skill',
+                'name' => 'graphify',
+                'status' => 'unknown',
+                'content_hash' => hash('sha256', 'x'),
+            ]],
+        ], JSON_UNESCAPED_SLASHES);
+        self::assertIsString($payload);
+
+        $tmpConfigDir = sys_get_temp_dir() . '/aipm-test-' . bin2hex(random_bytes(4));
+        mkdir($tmpConfigDir, 0775, true);
+        $eventsDir = $tmpConfigDir . '/events';
+        mkdir($eventsDir, 0775, true);
+        putenv('AIPM_HOME=' . $tmpConfigDir);
+        file_put_contents($eventsDir . '/22222222-2222-4222-8222-222222222222.json', $payload);
+        $originalCwd = getcwd();
+        self::assertNotFalse($originalCwd);
+        chdir($tmpConfigDir);
+
+        $command = new IngestCaptureEventCommand(new CaptureEventIngestor());
+        $tester = new CommandTester($command);
+        $exitCode = $tester->execute([
+            '--events-dir' => $eventsDir,
+        ]);
+
+        chdir($originalCwd);
+        putenv('AIPM_HOME');
+
+        self::assertSame(Command::SUCCESS, $exitCode);
+        self::assertStringContainsString('Found events: 1', $tester->getDisplay());
+        self::assertStringContainsString('[ok] Ingested event', $tester->getDisplay());
+        self::assertFileExists($tmpConfigDir . '/abilities/skills/graphify/capture.json');
     }
 }

@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace AiProfileManager;
+namespace AiProfileManager\Service;
 
 final class KnowledgeBaseUpdater
 {
@@ -19,8 +19,7 @@ final class KnowledgeBaseUpdater
         array $agents,
         array $presets,
         array $targets
-    ): string
-    {
+    ): string {
         $baseDir = rtrim((string) getenv('HOME'), '/') . '/.config/aipm';
         if (!is_dir($baseDir)) {
             mkdir($baseDir, 0775, true);

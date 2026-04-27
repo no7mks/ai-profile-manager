@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Installer;
+use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
 
 final class InstallerTest extends TestCase
