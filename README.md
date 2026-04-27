@@ -142,7 +142,7 @@ aipm ingest
 - Default skills: `graphify`
 - Default rules: `(none)`
 - Default agents: `(none)`
-- Default target: `cursor`
+- Default targets: `cursor`, `kiro`
 
 ## Check/Capture 状态模型
 

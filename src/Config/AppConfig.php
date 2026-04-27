@@ -38,10 +38,10 @@ final class AppConfig
     public const KNOWN_TARGETS = [
         'cursor',
         'kiro',
-        'claude-code',
     ];
 
     public const DEFAULT_TARGETS = [
         'cursor',
+        'kiro',
     ];
 }
