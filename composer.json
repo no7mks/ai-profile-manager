@@ -1,0 +1,36 @@
+{
+  "name": "no7mks/ai-profile-manager",
+  "description": "CLI tool to install and update AI IDE/CLI abilities.",
+  "type": "library",
+  "license": "MIT",
+  "keywords": [
+    "ai",
+    "cli",
+    "profile",
+    "cursor",
+    "kiro"
+  ],
+  "require": {
+    "php": "^8.5",
+    "symfony/console": "^7.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^13.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "AiProfileManager\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AiProfileManager\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": "phpunit"
+  },
+  "bin": [
+    "bin/aipm"
+  ]
+}
