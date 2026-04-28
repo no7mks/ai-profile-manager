@@ -102,7 +102,7 @@ ID 规则、文件规范、severity 定义、归档目录结构见 `issues/READM
 
 ## 注意事项
 
-执行任何 git 操作前，必须先读取 `.kiro/steering/git/git-conventions.md` 并严格遵循其中的规范。
+执行任何 git 操作前，必须先读取 `.cursor/rules/git/git-conventions.mdc` 并严格遵循其中的规范。
 
 ---
 
