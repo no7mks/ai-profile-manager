@@ -1,0 +1,17 @@
+---
+description: Git 分支、版本与发布最小流程规范
+alwaysApply: true
+---
+
+# Git Release Flow
+
+## 分支与发布约定
+
+- 日常开发在 `develop` 分支进行。
+- 正式发布在 `master` 分支进行。
+
+## 发布后同步要求
+
+- 每次发布后，`develop` 与 `master` 必须保持同步。
+- `develop` 与 `master` 都必须执行 `push` 到远端。
+- 完成发布流程后，切回 `develop` 继续开发工作。
