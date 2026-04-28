@@ -11,7 +11,7 @@ description: "通过 `/apm <command>` 统一入口执行初始化、安装、检
 
 | 用户命令 | 意图 | 后台是否调用 `apm` binary | 后台动作 |
 |---|---|---|---|
-| `/apm init` | 生成项目基础上下文（SSOT ready） | 否 | 生成/更新 `PROJECT.md`，并初始化 `docs/state`、`docs/manual` 的最小可用内容 |
+| `/apm init` | 生成项目基础上下文（SSOT ready） | 否 | 生成/更新 `PROJECT.md`，并按项目上下文在 `docs/state`、`docs/manual` 创建或补齐内容文件 |
 | `/apm install <preset>` | 按 preset 批量安装能力 | 是 | `apm install <preset> -t <target>` |
 | `/apm skill add <name>` | 安装单个 skill | 是 | `apm skill:install <name> -t <target>` |
 | `/apm rule add <name>` | 安装单个 rule/steering | 是 | `apm rule:install <name> -t <target>` |
@@ -53,8 +53,13 @@ description: "通过 `/apm <command>` 统一入口执行初始化、安装、检
 | 交付物 | 要求 |
 |---|---|
 | `PROJECT.md` | 按模板生成或补齐，未知内容写 `TODO`，不臆测 |
-| `docs/state/README.md` | 建立当前状态基线（当前版本、活跃分支、最近变更摘要、待确认风险） |
-| `docs/manual/README.md` | 建立人工操作手册基线（常用命令、发布/回滚、排障入口） |
+| `docs/state/` 下至少一个文件 | 建立当前状态基线（当前版本、活跃分支、最近变更摘要、待确认风险） |
+| `docs/manual/` 下至少一个文件 | 建立人工操作手册基线（常用命令、发布/回滚、排障入口） |
+
+约束：
+
+- `docs/state/` 与 `docs/manual/` 的文件名、拆分粒度由 AI 根据项目上下文决定，不预设固定名称。
+- 两个目录都必须有可用内容（各至少创建或更新 1 个业务文档）。
 
 ### `PROJECT.md` 模板
 

@@ -29,8 +29,10 @@ apm install gitflow -t cursor
 运行 `apm install`（无参数）后，使用 Agent skill 命令 `/apm init` 初始化 SSOT 基线，生成或补齐：
 
 - `PROJECT.md`
-- `docs/state/README.md`
-- `docs/manual/README.md`
+- `docs/state/` 下的项目状态文档（文件名由 AI 按项目上下文决定）
+- `docs/manual/` 下的项目手册文档（文件名由 AI 按项目上下文决定）
+
+`/apm init` 不预设 `manual/state` 的固定文件名，只要求在两个目录里形成可用的初始化内容。
 
 ## 文档边界
 
