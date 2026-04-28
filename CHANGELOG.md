@@ -1,10 +1,12 @@
 # Changelog
 
-本文件记录版本间的用户可见变更。**每次发布前**请对照 `git log` 自行整理并更新（例如相对上一 tag：`git log v0.1.1..HEAD --oneline`，将上一 tag 换成实际发布的基准）。
+本文件记录版本间的用户可见变更。**每次发布前**请对照 `git log` 自行整理并更新（例如相对上一 tag：`git log v0.2.0..HEAD --oneline`，将上一 tag 换成实际发布的基准）。
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
 ## [Unreleased]
+
+## [0.2.0] - 2026-04-28
 
 ### Added
 

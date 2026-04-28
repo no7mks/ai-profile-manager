@@ -33,7 +33,7 @@ final class Application
         $capture = new CaptureService($checker);
         $ingestor = new CaptureEventIngestor();
 
-        $app = new SymfonyApplication('aipm', '0.1.0');
+        $app = new SymfonyApplication('aipm', '0.2.0');
         $app->setDefaultCommand('list');
         ConsoleRegistration::register($app, $installer, $checker, $capture, $ingestor, $updater);
 
