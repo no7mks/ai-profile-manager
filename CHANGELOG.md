@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [0.4.4] - 2026-04-28
+
+### Changed
+
+- 在 scaffold 的 `docs/state`、`docs/manual`、`docs/proposals`、`docs/notes`、`docs/changes` 下补充 `.gitkeep`，确保初始化后目录稳定存在。
+- 恢复 init/bootstrap 测试中对 `docs/state` 目录存在性的断言，保持脚手架结构校验闭环。
+
 ## [0.4.3] - 2026-04-28
 
 ### Changed
