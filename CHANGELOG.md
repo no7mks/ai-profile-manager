@@ -8,6 +8,7 @@
 
 ### Added
 
+- **`aipm init`**：向指定目录（默认当前目录，不存在则创建）安装捆绑脚手架（包根 **`scaffold/`**：`docs/`、`issues/`、`AGENTS.md`、`PROJECT.md`），并按 `-t` 安装各平台 scope 规则（`abilities/rules`：`cursor-scope` → `.cursor/rules/cursor-scope.mdc`，`kiro-scope` → `.kiro/steering/kiro-scope.md`）。`-t` 省略时与 `skill:install` 等命令一致，使用默认目标 **cursor 与 kiro**；支持 `--force` / `-f` 覆盖已有文件。
 - Cursor 规则：Agent 开工入口与中文沟通约定（`.cursor/rules/agent-entry-point.mdc`）。
 - Cursor 规则：Git 分支与发布流程（`.cursor/rules/git-release-flow.mdc`）。
 - 根目录 `CHANGELOG.md` 与发布前更新约定。
@@ -17,6 +18,7 @@
 
 ### Changed
 
+- **`aipm init` 脚手架来源**：由 `sample/` 改为专用目录 **`scaffold/`**（`sample/` 仅作演示工作区，不再作为 init 模板来源）。
 - `ingest` 与 `CaptureEventSchema` 仅接受 **CaptureEvent schema v2**（不再校验 v1 事件）。
 - 默认安装目标调整为 Cursor 与 Kiro。
 - `install` / `check` / `capture <preset>` 的 preset 名称解析合并 **`abilities/_presets.json`**（存在则为权威来源）。

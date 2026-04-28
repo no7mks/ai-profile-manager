@@ -1,6 +1,6 @@
 ---
 name: aipm
-description: "当你想在本机 .cursor/.kiro 等目录安装或更新 skill、steering、agent，或用 capture 把本地改动反馈出来时，可使用本 skill 约定的 aipm 命令。"
+description: "当你想在新项目里用 aipm init 装脚手架与 scope 规则，或在本机 .cursor/.kiro 安装或更新 skill、steering、agent，或用 capture 反馈改动时，可使用本 skill 约定的 aipm 命令。"
 ---
 
 # aipm（AI Profile Manager）
@@ -33,6 +33,17 @@ source ~/.zshrc
 which aipm
 aipm --help
 ```
+
+## 新项目脚手架（`init`）
+
+在**业务仓库根目录**或 `[path]` 下安装捆绑脚手架（模板来自包内 **`scaffold/`**：`docs/`、`issues/`、`AGENTS.md`、`PROJECT.md`），并按 `-t` 写入对应平台的 **scope** 规则（`cursor-scope` / `kiro-scope`）。**不传 `-t` 时**与 `skill:install` 等一致，默认目标为 **cursor** 与 **kiro**。
+
+```bash
+aipm init
+aipm init path/to/project -t cursor
+```
+
+已存在脚手架文件且需覆盖时使用 `-f` / `--force`。
 
 ## 装进 `.cursor` / `.kiro`（日常主路径）
 

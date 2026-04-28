@@ -4,15 +4,17 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$SCRIPT_DIR"
 
+SCAFFOLD="$(cd "$SCRIPT_DIR/../scaffold" && pwd)"
+
 OUTPUT="agent-playbook.zip"
 
 FILES=(
   # this script itself
   .export-agent-playbook.sh
 
-  # root
-  AGENTS.md
-  PROJECT.md
+  # scaffold (bundled root docs / agent contract)
+  "$SCAFFOLD/AGENTS.md"
+  "$SCAFFOLD/PROJECT.md"
 
   # Cursor rules
   .cursor/rules/cursor-scope.mdc
@@ -72,22 +74,22 @@ FILES=(
   .kiro/steering/spec/gk-design.md
   .kiro/steering/spec/gk-tasks.md
 
-  # doc layer READMEs
-  docs/state/README.md
-  docs/proposals/README.md
-  docs/notes/README.md
-  docs/changes/README.md
-  docs/manual/README.md
-  issues/README.md
+  # doc layer READMEs (from scaffold bundle)
+  "$SCAFFOLD/docs/state/README.md"
+  "$SCAFFOLD/docs/proposals/README.md"
+  "$SCAFFOLD/docs/notes/README.md"
+  "$SCAFFOLD/docs/changes/README.md"
+  "$SCAFFOLD/docs/manual/README.md"
+  "$SCAFFOLD/issues/README.md"
 )
 
 rm -f "$OUTPUT"
 
-# Temporarily swap PROJECT.md with template version
-if [[ -f PROJECT.md ]]; then
-  mv PROJECT.md PROJECT.md.bak
+# Temporarily swap PROJECT.md with template version (scaffold copy)
+if [[ -f "$SCAFFOLD/PROJECT.md" ]]; then
+  mv "$SCAFFOLD/PROJECT.md" "$SCAFFOLD/PROJECT.md.bak"
 fi
-cat > PROJECT.md << 'EOF'
+cat > "$SCAFFOLD/PROJECT.md" << 'EOF'
 # Project Name
 
 <!-- 填写项目的技术栈、构建命令、运行入口、版本号位置、敏感文件清单 -->
@@ -103,8 +105,8 @@ done
 
 if [[ ${#missing[@]} -gt 0 ]]; then
   # Restore PROJECT.md before exiting
-  rm -f PROJECT.md
-  [[ -f PROJECT.md.bak ]] && mv PROJECT.md.bak PROJECT.md
+  rm -f "$SCAFFOLD/PROJECT.md"
+  [[ -f "$SCAFFOLD/PROJECT.md.bak" ]] && mv "$SCAFFOLD/PROJECT.md.bak" "$SCAFFOLD/PROJECT.md"
   echo "ERROR: missing files:"
   printf "  %s\n" "${missing[@]}"
   exit 1
@@ -113,7 +115,7 @@ fi
 zip -q "$OUTPUT" "${FILES[@]}"
 
 # Restore PROJECT.md
-rm -f PROJECT.md
-[[ -f PROJECT.md.bak ]] && mv PROJECT.md.bak PROJECT.md
+rm -f "$SCAFFOLD/PROJECT.md"
+[[ -f "$SCAFFOLD/PROJECT.md.bak" ]] && mv "$SCAFFOLD/PROJECT.md.bak" "$SCAFFOLD/PROJECT.md"
 
 echo "Exported ${#FILES[@]} files → $OUTPUT"

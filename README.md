@@ -39,6 +39,24 @@ php bin/aipm --help
 
 ## 使用方式
 
+### 新项目脚手架（`init`）
+
+在**业务项目根目录**（或指定路径）安装一份捆绑的脚手架，并可选写入各平台的 **scope** 规则（与包内 `abilities/rules` 中的 `cursor-scope` / `kiro-scope` 对应）：
+
+- **Scaffold**：`docs/`、`issues/`、`AGENTS.md`、`PROJECT.md`（**唯一**安装来源：包内 **`scaffold/`**）。演示目录 **`sample/`** 可保留同结构副本，维护时请从 `scaffold/` **`cp`**，勿 **`mv`**。
+- **Scope 规则**：`-t cursor` 时安装 `.cursor/rules/cursor-scope.mdc`；`-t kiro` 时安装 `.kiro/steering/kiro-scope.md`。
+- **`-t` / `--target`**：与 `skill:install` 等命令相同；**省略时**使用默认目标 **`cursor` 与 `kiro`**（见下文「当前默认值」）。
+- **`--force` / `-f`**：覆盖已存在的脚手架或 scope 文件。
+- **路径**：可选参数 `[path]`，默认当前目录；目录不存在时会创建。若目标已存在 `docs/`、`issues/`、`AGENTS.md` 或 `PROJECT.md` 之一且未加 `--force`，命令会失败。
+
+```bash
+aipm init
+```
+
+```bash
+aipm init path/to/project -t cursor
+```
+
 安装 `skill`：
 
 ```bash

@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
+use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\CaptureCommand;
 use AiProfileManager\Command\CheckCommand;
+use AiProfileManager\Command\InitCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
 use AiProfileManager\Command\PresetCreateCommand;
@@ -18,6 +20,7 @@ use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
+use AiProfileManager\Service\ProjectInitializer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -233,5 +236,32 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::FAILURE, $exit);
         self::assertStringContainsString('Unknown preset', $tester->getDisplay());
+    }
+
+    public function testInitCommandUnknownTargetFails(): void
+    {
+        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['not-a-target']]);
+
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('Unknown targets', $tester->getDisplay());
+    }
+
+    public function testInitCommandInstallsIntoPath(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-init-cli-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+
+        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['path' => $tmp]);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        self::assertFileExists($tmp . '/AGENTS.md');
+        self::assertFileExists($tmp . '/PROJECT.md');
+        foreach (AppConfig::DEFAULT_TARGETS as $t) {
+            self::assertStringContainsString($t, $tester->getDisplay());
+        }
     }
 }
