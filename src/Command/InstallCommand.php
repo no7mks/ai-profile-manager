@@ -6,6 +6,7 @@ namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\Installer;
+use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -43,12 +44,19 @@ final class InstallCommand extends Command
         /** @var array<int, string> $targets */
         $targets = $input->getOption('target');
 
-        if (!in_array($preset, AppConfig::KNOWN_PRESETS, true)) {
+        $registry = new PresetRegistry((string) getcwd());
+        $known = array_keys($registry->allPresets());
+        if (!in_array($preset, $known, true)) {
             $io->error(sprintf(
                 'Unknown preset: %s. Known presets: %s.',
                 $preset,
-                implode(', ', AppConfig::KNOWN_PRESETS)
+                implode(', ', $known)
             ));
+            return Command::FAILURE;
+        }
+
+        $presetSpec = $registry->getPreset($preset);
+        if ($presetSpec === null) {
             return Command::FAILURE;
         }
 
@@ -64,7 +72,7 @@ final class InstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $items = AppConfig::PRESET_ITEMS[$preset];
+        $items = $presetSpec;
         $io->writeln("Preset: {$preset}");
         foreach ($this->installer->installTyped($items, $targets) as $line) {
             $io->writeln($line);

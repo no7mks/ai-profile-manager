@@ -12,7 +12,8 @@ final class CaptureWriteBackService
      *     source_repo: string,
      *     source_commit: string,
      *     base_ref: string,
-     *     captured_at: string
+     *     captured_at: string,
+     *     items?: array<int, mixed>
      * } $event
      * @return array<int, string>
      */
@@ -31,18 +32,9 @@ final class CaptureWriteBackService
                 continue;
             }
 
-            $typeDir = match (($item['type'] ?? '')) {
-                'skill' => 'abilities/skills',
-                'rule' => 'abilities/rules',
-                'agent' => 'abilities/agents',
-                default => 'abilities/unknown-items',
-            };
+            $itemType = (string) ($item['type'] ?? '');
             $name = $this->sanitizePathSegment((string) ($item['name'] ?? 'unknown'));
             $target = $this->sanitizePathSegment((string) ($event['target'] ?? 'unknown'));
-            $itemDir = $sourceDir . '/' . $typeDir . '/' . $name . '/' . $target;
-            if (!is_dir($itemDir)) {
-                mkdir($itemDir, 0775, true);
-            }
 
             $files = $item['files'] ?? [];
             foreach ($files as $file) {
@@ -52,12 +44,39 @@ final class CaptureWriteBackService
 
                 $relativePath = (string) ($file['path'] ?? '');
                 $content = (string) ($file['content'] ?? '');
+                $deleted = !empty($file['deleted']);
+
                 if ($relativePath === '') {
                     continue;
                 }
 
-                $targetPath = $this->buildSafeTargetPath($itemDir, $relativePath);
+                if ($itemType === 'preset') {
+                    $targetPath = $this->buildSafeTargetPath($sourceDir, $relativePath);
+                } else {
+                    $typeDir = match ($itemType) {
+                        'skill' => 'abilities/skills',
+                        'rule' => 'abilities/rules',
+                        'agent' => 'abilities/agents',
+                        default => 'abilities/unknown-items',
+                    };
+                    $itemDir = $sourceDir . '/' . $typeDir . '/' . $name . '/' . $target;
+                    if (!is_dir($itemDir)) {
+                        mkdir($itemDir, 0775, true);
+                    }
+
+                    $targetPath = $this->buildSafeTargetPath($itemDir, $relativePath);
+                }
+
                 if ($targetPath === null) {
+                    continue;
+                }
+
+                if ($deleted) {
+                    if (is_file($targetPath)) {
+                        unlink($targetPath);
+                        $lines[] = 'Delete item file: ' . $targetPath;
+                    }
+
                     continue;
                 }
 

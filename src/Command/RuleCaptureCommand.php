@@ -24,12 +24,12 @@ final class RuleCaptureCommand extends Command
     {
         $this
             ->setName('rule:capture')
-            ->setDescription('Capture modified rules from target IDE/CLI tools (placeholder).')
+            ->setDescription('Capture rule changes vs Composer-installed baseline.')
             ->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to capture.')
             ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.')
             ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
             ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
-            ->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Base version tag/commit for patch generation.', 'unknown')
+            ->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Ignored; baseline comes from Composer (legacy option).', 'unknown')
             ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.')
             ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
     }
@@ -47,23 +47,33 @@ final class RuleCaptureCommand extends Command
         $unknownTargets = array_values(array_diff($targets, AppConfig::KNOWN_TARGETS));
         if ($unknownTargets !== []) {
             $io->error(sprintf('Unknown targets: %s. Known targets: %s.', implode(', ', $unknownTargets), implode(', ', AppConfig::KNOWN_TARGETS)));
+
             return Command::FAILURE;
         }
 
-        $result = $this->capture->captureTyped(['skills' => [], 'rules' => $rules, 'agents' => []], $targets);
-        $event = $this->capture->buildCaptureEvent(
-            $result['results'],
-            (string) $input->getOption('source-repo'),
-            (string) $input->getOption('source-commit'),
-            (string) $input->getOption('base-ref'),
-            (string) ($input->getOption('event-id') ?: ''),
-            (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM))
-        );
-        $path = $this->capture->writeEventToEventsDir($event);
-        $io->writeln(sprintf('[ok] Event written to events dir: %s', $path));
+        $cwd = (string) getcwd();
+        $result = $this->capture->captureTyped(['skills' => [], 'rules' => $rules, 'agents' => []], $targets, $cwd);
 
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
+        }
+
+        if ($result['baseline'] === null) {
+            $io->error('Could not resolve Composer baseline. Install aipm globally or set AIPM_BASELINE_ROOT for testing.');
+
+            return Command::FAILURE;
+        }
+
+        $persist = $this->capture->persistCaptureEvent(
+            $result,
+            (string) $input->getOption('source-repo'),
+            (string) $input->getOption('source-commit'),
+            (string) ($input->getOption('event-id') ?: ''),
+            (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM)),
+        );
+
+        if ($persist['path'] !== null) {
+            $io->writeln(sprintf('[ok] Event written to events dir: %s', $persist['path']));
         }
 
         return $result['exit_code'];

@@ -6,122 +6,277 @@ namespace AiProfileManager\Service;
 
 final class CaptureService
 {
-    public function __construct(private readonly CheckService $checker)
-    {
+    public function __construct(
+        private readonly CheckService $checker,
+        private readonly ComposerBaselineResolver $baselineResolver = new ComposerBaselineResolver(),
+        private readonly AbilityDirectoryDiff $directoryDiff = new AbilityDirectoryDiff(),
+    ) {
     }
 
     /**
      * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
      * @param array<int, string> $targets
      * @return array{
-     *     results: array<int, array{type: string, name: string, target: string, status: string, content_hash: string}>,
+     *     results: array<int, array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}>,
      *     lines: array<int, string>,
-     *     exit_code: int
+     *     exit_code: int,
+     *     baseline: array{package: string, version: string, install_path: string, reference?: string}|null
      * }
      */
-    public function captureTyped(array $items, array $targets): array
+    public function captureTyped(array $items, array $targets, string $workspaceRoot): array
     {
-        $results = array_map(
-            fn (array $result): array => [
-                'type' => $result['type'],
-                'name' => $result['name'],
-                'target' => $result['target'],
-                'status' => $result['status'],
-                'content_hash' => $this->buildContentHash($result),
-            ],
-            $this->checker->checkTyped($items, $targets)
-        );
+        $baseline = $this->baselineResolver->resolve();
+        if ($baseline === null) {
+            return [
+                'results' => [],
+                'lines' => ['[error] Could not resolve Composer baseline (global installed.json / package path).'],
+                'exit_code' => 1,
+                'baseline' => null,
+            ];
+        }
+
+        $results = [];
         $lines = [];
+
+        foreach ($targets as $target) {
+            foreach ($items['skills'] as $name) {
+                $results[] = $this->diffAbility('skill', $name, $target, $baseline['install_path'], $workspaceRoot);
+            }
+
+            foreach ($items['rules'] as $name) {
+                $results[] = $this->diffAbility('rule', $name, $target, $baseline['install_path'], $workspaceRoot);
+            }
+
+            foreach ($items['agents'] as $name) {
+                $results[] = $this->diffAbility('agent', $name, $target, $baseline['install_path'], $workspaceRoot);
+            }
+        }
 
         foreach ($results as $result) {
             if ($result['status'] === 'modified') {
-                $lines[] = sprintf('[todo] %s %s captured (placeholder)', $result['type'], $result['name']);
+                $lines[] = sprintf('[capture] %s %s on %s (%d file change(s))', $result['type'], $result['name'], $result['target'], count($result['files']));
             }
         }
 
         if ($lines === []) {
-            $lines[] = '[todo] No modified items to capture (placeholder).';
+            $lines[] = '[capture] No changes vs Composer baseline.';
         }
 
+        $filtered = array_values(array_filter($results, fn (array $r): bool => $r['status'] === 'modified'));
+
         return [
-            'results' => $results,
+            'results' => $filtered,
             'lines' => $lines,
-            'exit_code' => $this->checker->evaluateExitCode($results),
+            'exit_code' => $this->checker->evaluateExitCode($filtered),
+            'baseline' => $baseline,
         ];
     }
 
     /**
-     * @param array<int, array{type: string, name: string, target: string, status: string, content_hash: string}> $results
+     * Scan workspace abilities/* for subdirectory names.
+     *
+     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}
+     */
+    public function discoverWorkspaceAbilities(string $workspaceRoot): array
+    {
+        return [
+            'skills' => $this->listSubdirNames($workspaceRoot . '/abilities/skills'),
+            'rules' => $this->listSubdirNames($workspaceRoot . '/abilities/rules'),
+            'agents' => $this->listSubdirNames($workspaceRoot . '/abilities/agents'),
+        ];
+    }
+
+    /**
+     * Diff preset manifest file abilities/_presets.json vs baseline.
+     *
      * @return array{
-     *     schema_version: int,
-     *     event_id: string,
-     *     source_repo: string,
-     *     source_commit: string,
-     *     base_ref: string,
-     *     captured_at: string,
-     *     target: string,
-     *     items: array<int, array{
-     *         type: string,
-     *         name: string,
-     *         status: string,
-     *         content_hash: string,
-     *         files: array<int, array{path: string, content: string, patch: string}>
-     *     }>
+     *     result: array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}|null,
+     *     baseline: array{package: string, version: string, install_path: string, reference?: string}|null
      * }
+     */
+    public function capturePresetManifestDiff(string $workspaceRoot): array
+    {
+        $baseline = $this->baselineResolver->resolve();
+        if ($baseline === null) {
+            return ['result' => null, 'baseline' => null];
+        }
+
+        $rel = PresetRegistry::PRESETS_RELATIVE_PATH;
+        $bPath = $baseline['install_path'] . '/' . $rel;
+        $wPath = $workspaceRoot . '/' . $rel;
+
+        $files = $this->directoryDiff->diffOptionalFiles(
+            is_file($bPath) ? $bPath : null,
+            is_file($wPath) ? $wPath : null,
+            $rel
+        );
+
+        if ($files === []) {
+            return ['result' => null, 'baseline' => $baseline];
+        }
+
+        $contentHash = $this->hashFiles($files);
+        $result = [
+            'type' => 'preset',
+            'name' => '_presets',
+            'target' => 'repo',
+            'status' => 'modified',
+            'content_hash' => $contentHash,
+            'files' => $files,
+        ];
+
+        return ['result' => $result, 'baseline' => $baseline];
+    }
+
+    /**
+     * @param array<int, array{type: string, name: string, target: string, status: string, content_hash: string, files?: array<int, array<string, mixed>>}> $results
+     * @param array{package: string, version: string, install_path: string, reference?: string}|null $baseline
+     * @return array<string, mixed>
      */
     public function buildCaptureEvent(
         array $results,
         string $sourceRepo,
         string $sourceCommit,
-        string $baseRef,
+        string $baseRefIgnored,
         string $eventId,
-        string $capturedAt
+        string $capturedAt,
+        ?array $baseline,
     ): array {
         $target = $results === [] ? 'unknown' : $results[0]['target'];
         $eventId = $eventId !== '' ? $eventId : $this->generateUuidV4();
 
-        return [
-            'schema_version' => 1,
+        $legacyBaseRef = '';
+        if ($baseline !== null) {
+            $legacyBaseRef = $baseline['reference'] ?? $baseline['version'];
+        }
+
+        if ($legacyBaseRef === '') {
+            $legacyBaseRef = 'unknown';
+        }
+
+        $items = [];
+        foreach ($results as $result) {
+            $files = $result['files'] ?? [];
+            if ($files === []) {
+                continue;
+            }
+
+            $items[] = [
+                'type' => $result['type'],
+                'name' => $result['name'],
+                'status' => $result['status'],
+                'content_hash' => $result['content_hash'],
+                'files' => $this->normalizeFilesForSchema($files),
+            ];
+        }
+
+        $event = [
+            'schema_version' => 2,
             'event_id' => $eventId,
             'source_repo' => $sourceRepo,
             'source_commit' => $sourceCommit,
-            'base_ref' => $baseRef,
+            'base_ref' => $legacyBaseRef,
             'captured_at' => $capturedAt,
             'target' => $target,
-            'items' => array_map(
-                fn (array $result): array => [
-                    'type' => $result['type'],
-                    'name' => $result['name'],
-                    'status' => $result['status'],
-                    'content_hash' => $result['content_hash'],
-                    'files' => $this->buildPlaceholderFiles($result),
-                ],
-                $results
-            ),
+            'items' => $items,
         ];
-    }
 
-    private function generateUuidV4(): string
-    {
-        $bytes = random_bytes(16);
-        $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
-        $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+        if ($baseline !== null) {
+            $b = [
+                'package' => $baseline['package'],
+                'version' => $baseline['version'],
+                'install_path' => $baseline['install_path'],
+            ];
+            if (isset($baseline['reference'])) {
+                $b['reference'] = $baseline['reference'];
+            }
 
-        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+            $event['baseline'] = $b;
+        }
+
+        return $event;
     }
 
     /**
+     * Persist event when baseline resolved and there is at least one changed item.
+     *
      * @param array{
-     *     schema_version: int,
-     *     event_id: string,
-     *     source_repo: string,
-     *     source_commit: string,
-     *     base_ref: string,
-     *     captured_at: string,
-     *     target: string,
-     *     items: array<int, array{type: string, name: string, status: string, content_hash: string}>
-     * } $event
+     *     results: array<int, mixed>,
+     *     lines: array<int, string>,
+     *     exit_code: int,
+     *     baseline: array{package: string, version: string, install_path: string, reference?: string}|null
+     * } $result
+     * @return array{path: ?string, wrote: bool}
      */
+    public function persistCaptureEvent(
+        array $result,
+        string $sourceRepo,
+        string $sourceCommit,
+        string $eventId,
+        string $capturedAt,
+    ): array {
+        if ($result['baseline'] === null || $result['results'] === []) {
+            return ['path' => null, 'wrote' => false];
+        }
+
+        $event = $this->buildCaptureEvent(
+            $result['results'],
+            $sourceRepo,
+            $sourceCommit,
+            '',
+            $eventId,
+            $capturedAt,
+            $result['baseline'],
+        );
+        $path = $this->writeEventToEventsDir($event);
+
+        return ['path' => $path, 'wrote' => true];
+    }
+
+    /**
+     * After mutating abilities/_presets.json, optionally write an event when the manifest differs from baseline.
+     *
+     * @return array{exit_code: int, path: ?string, baseline_missing: bool, unchanged: bool}
+     */
+    public function persistPresetManifestCapture(
+        string $workspaceRoot,
+        string $sourceRepo,
+        string $sourceCommit,
+        string $eventId,
+        string $capturedAt,
+    ): array {
+        $diff = $this->capturePresetManifestDiff($workspaceRoot);
+        if ($diff['baseline'] === null) {
+            return ['exit_code' => 1, 'path' => null, 'baseline_missing' => true, 'unchanged' => false];
+        }
+
+        if ($diff['result'] === null) {
+            return ['exit_code' => 0, 'path' => null, 'baseline_missing' => false, 'unchanged' => true];
+        }
+
+        $wrapped = [
+            'results' => [$diff['result']],
+            'lines' => [],
+            'exit_code' => $this->checker->evaluateExitCode([$diff['result']]),
+            'baseline' => $diff['baseline'],
+        ];
+
+        $persist = $this->persistCaptureEvent(
+            $wrapped,
+            $sourceRepo,
+            $sourceCommit,
+            $eventId,
+            $capturedAt,
+        );
+
+        return [
+            'exit_code' => $wrapped['exit_code'],
+            'path' => $persist['path'],
+            'baseline_missing' => false,
+            'unchanged' => false,
+        ];
+    }
+
     public function writeEventToEventsDir(array $event): string
     {
         $aipmHome = (string) (getenv('AIPM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.aipm'));
@@ -137,47 +292,108 @@ final class CaptureService
     }
 
     /**
-     * @param array{type: string, name: string, target: string, status: string} $result
+     * @param array<int, array<string, mixed>> $files
+     * @return array<int, array<string, mixed>>
      */
-    private function buildContentHash(array $result): string
+    private function normalizeFilesForSchema(array $files): array
     {
-        return hash('sha256', implode(':', [
-            $result['type'],
-            $result['name'],
-            $result['target'],
-            $result['status'],
-        ]));
+        $out = [];
+        foreach ($files as $file) {
+            $row = [
+                'path' => (string) ($file['path'] ?? ''),
+                'content' => (string) ($file['content'] ?? ''),
+                'patch' => (string) ($file['patch'] ?? ''),
+            ];
+            if (!empty($file['deleted'])) {
+                $row['deleted'] = true;
+            }
+
+            $out[] = $row;
+        }
+
+        return $out;
     }
 
     /**
-     * @param array{type: string, name: string, target: string, status: string, content_hash: string} $result
-     * @return array<int, array{path: string, content: string, patch: string}>
+     * @return array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}
      */
-    private function buildPlaceholderFiles(array $result): array
+    private function diffAbility(string $type, string $name, string $target, string $baselineRoot, string $workspaceRoot): array
     {
-        $defaultPath = 'ABILITY_PLACEHOLDER.txt';
-        if ($result['type'] === 'skill' && $result['target'] === 'cursor') {
-            $defaultPath = 'SKILL.md';
+        $sub = match ($type) {
+            'skill' => 'abilities/skills',
+            'rule' => 'abilities/rules',
+            'agent' => 'abilities/agents',
+            default => 'abilities/unknown-items',
+        };
+
+        $mid = '/' . $sub . '/' . $name . '/' . $target;
+        $bAbs = $baselineRoot . $mid;
+        $wAbs = $workspaceRoot . $mid;
+
+        $bDir = is_dir($bAbs) ? $bAbs : null;
+        $wDir = is_dir($wAbs) ? $wAbs : null;
+
+        $files = $this->directoryDiff->diffDirectories($bDir, $wDir);
+
+        $status = $files === [] ? 'unchanged' : 'modified';
+
+        return [
+            'type' => $type,
+            'name' => $name,
+            'target' => $target,
+            'status' => $status,
+            'content_hash' => $this->hashFiles($files),
+            'files' => $files,
+        ];
+    }
+
+    /**
+     * @param array<int, array<string, mixed>> $files
+     */
+    private function hashFiles(array $files): string
+    {
+        $parts = [];
+        foreach ($files as $f) {
+            $deleted = !empty($f['deleted']);
+            $parts[] = ($f['path'] ?? '') . "\0" . ($deleted ? '1' : '0') . "\0" . ($f['content'] ?? '');
         }
 
-        return [[
-            'path' => $defaultPath,
-            'content' => sprintf(
-                "placeholder generated by capture\nname: %s\ntype: %s\ntarget: %s\nstatus: %s\n",
-                $result['name'],
-                $result['type'],
-                $result['target'],
-                $result['status']
-            ),
-            'patch' => sprintf(
-                "--- a/%s\n+++ b/%s\n@@ -0,0 +1,5 @@\n+placeholder generated by capture\n+name: %s\n+type: %s\n+target: %s\n+status: %s\n",
-                $defaultPath,
-                $defaultPath,
-                $result['name'],
-                $result['type'],
-                $result['target'],
-                $result['status']
-            ),
-        ]];
+        sort($parts);
+
+        return hash('sha256', implode("\n", $parts));
+    }
+
+    private function generateUuidV4(): string
+    {
+        $bytes = random_bytes(16);
+        $bytes[6] = chr((ord($bytes[6]) & 0x0f) | 0x40);
+        $bytes[8] = chr((ord($bytes[8]) & 0x3f) | 0x80);
+
+        return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($bytes), 4));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function listSubdirNames(string $path): array
+    {
+        if (!is_dir($path)) {
+            return [];
+        }
+
+        $names = [];
+        foreach (scandir($path) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+
+            if (is_dir($path . '/' . $entry)) {
+                $names[] = $entry;
+            }
+        }
+
+        sort($names);
+
+        return $names;
     }
 }

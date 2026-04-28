@@ -81,7 +81,15 @@ aipm rule:check spec-core -t kiro
 aipm agent:check gatekeeper -t cursor
 ```
 
-Capture typed item drift（当前为 placeholder 语义）。`capture` 会默认把 event 写入 `~/.aipm/events`：
+### Baseline（对照版本）
+
+Capture 将 **当前仓库工作区**下的 `abilities/{skills,rules,agents}/…` 与 **Composer 全局安装**中的 `no7mks/ai-profile-manager` 包目录做目录级 diff（新增、修改、删除文件）。Baseline 来自 `~/.composer/vendor/composer/installed.json` 解析出的安装路径；无需也不支持额外的 baseline CLI 开关。
+
+开发与测试可设置 **`AIPM_BASELINE_ROOT`** 指向一棵「模拟全局包根目录」以代替解析（须包含相同的 `abilities/…` 布局）。
+
+生成的 **CaptureEvent** 仅使用 **`schema_version`: `2`**，顶层包含必填字段 **`baseline`**：`package`、`version`、`install_path`，以及在有则写入的 **`reference`**。字段 **`base_ref`** 由 CLI 填入 `baseline.reference` 或 `baseline.version`（字符串，可为空）。
+
+### Typed capture（显式 ability）
 
 ```bash
 aipm skill:capture graphify -t cursor
@@ -95,9 +103,11 @@ aipm rule:capture spec-core -t kiro
 aipm agent:capture gatekeeper -t cursor
 ```
 
-你可以通过 `--source-repo`、`--source-commit`、`--base-ref`、`--event-id`、`--captured-at` 覆盖 event metadata。
+有无变更都会打印摘要；**仅有变更时**才向 `~/.aipm/events` 写入 event。可按需传入 `--source-repo`、`--source-commit`、`--event-id`、`--captured-at`。**`--base-ref` 已忽略**（保留仅为兼容旧脚本）。
 
-按 preset 进行 check 与 capture：
+### Preset capture 与全仓库快照
+
+按 preset 展开 ability 列表后做同类 diff：
 
 ```bash
 aipm check gitflow -t cursor
@@ -107,13 +117,45 @@ aipm check gitflow -t cursor
 aipm capture kiro-spec -t kiro
 ```
 
+未带 preset 参数时，对当前仓库 `abilities/skills|rules|agents` 下**所有子目录名**做全量快照；默认会交互确认是否生成 event，**`--yes` / `-y`** 可跳过确认（适合脚本）。
+
+```bash
+aipm capture -t cursor
+```
+
+```bash
+aipm capture -t cursor --yes
+```
+
+### Preset 清单（`abilities/_presets.json`）
+
+若存在 **`abilities/_presets.json`**，则其中内容为 preset 定义的**唯一来源**（否则回退到内置 `AppConfig::PRESET_ITEMS`）。变更 preset 定义后通过回流更新集中仓库：
+
+```bash
+aipm preset:create my-flow --skill gitflow --agent flow-starter
+```
+
+```bash
+aipm preset:add-ability gitflow extra-skill --skill
+```
+
+```bash
+aipm preset:remove-ability gitflow extra-skill --skill
+```
+
+```bash
+aipm preset:delete my-flow
+```
+
+上述命令在 manifest 相对 Composer baseline 有差异时，会写入含 `type: preset` item 的 capture event，供 `ingest` 将 `abilities/_presets.json` 写回 aipm-repo。
+
 更新 knowledge base：
 
 ```bash
 aipm update
 ```
 
-`ingest` 读取本机 `~/.aipm/events` 中的 capture event，并 write-back 到 `<aipm-repo>/abilities/{skills,rules,agents}/{name}/{target}` 的原样文件结构：
+`ingest` 读取本机 `~/.aipm/events` 中的 capture event（**仅 schema v2**），并 write-back 到 `<aipm-repo>/abilities/…`（含 **preset manifest** `abilities/_presets.json` 及删除文件时卸载目标路径）：
 
 ```bash
 aipm ingest
@@ -146,49 +188,17 @@ aipm ingest
 
 ## Check/Capture 状态模型
 
-当前 `check`/`capture` 行为仍是 placeholder。状态值包括：
-
-- `unchanged`
-- `modified`
-- `missing`
-- `unknown`
+Item `status` 取值包括：`unchanged`、`modified`、`missing`、`unknown`（check 占位路径仍可能出现 `unknown`）。
 
 Exit code：
 
-- `0`：全部 unchanged
-- `2`：存在 modified 或 missing
-- `1`：命令或校验错误
+- `0`：无漂移需上报，或检查全部 acceptable
+- `2`：存在 modified/missing（capture 在有文件变更时）
+- `1`：命令或校验错误（含无法解析 Composer baseline）
 
-## CaptureEvent v1（用于本机 events 交换）
+## CaptureEvent v2
 
-Payload 结构：
-
-```json
-{
-  "schema_version": 1,
-  "event_id": "550e8400-e29b-41d4-a716-446655440000",
-  "source_repo": "acme/external-repo",
-  "source_commit": "abc123...",
-  "base_ref": "v1.2.3",
-  "captured_at": "2026-04-27T12:00:00Z",
-  "target": "cursor",
-  "items": [
-    {
-      "type": "skill",
-      "name": "graphify",
-      "status": "modified",
-      "content_hash": "sha256...",
-      "files": [
-        {
-          "path": "SKILL.md",
-          "content": "# graphify\n\nskill content",
-          "patch": "--- a/SKILL.md\n+++ b/SKILL.md\n@@ -0,0 +1,3 @@\n+# graphify\n+\n+skill content"
-        }
-      ]
-    }
-  ]
-}
-```
+**`schema_version` 必须为 `2`**；必填 **`baseline`**（见上文）；文件项可增加 **`deleted`: true** 表示相对 baseline 删除。
 
 推荐路径约定：
 

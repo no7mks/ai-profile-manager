@@ -6,6 +6,7 @@ namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\CheckService;
+use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -37,8 +38,15 @@ final class CheckCommand extends Command
         /** @var array<int, string> $targets */
         $targets = $input->getOption('target');
 
-        if (!in_array($preset, AppConfig::KNOWN_PRESETS, true)) {
-            $io->error(sprintf('Unknown preset: %s. Known presets: %s.', $preset, implode(', ', AppConfig::KNOWN_PRESETS)));
+        $registry = new PresetRegistry((string) getcwd());
+        $known = array_keys($registry->allPresets());
+        if (!in_array($preset, $known, true)) {
+            $io->error(sprintf('Unknown preset: %s. Known presets: %s.', $preset, implode(', ', $known)));
+            return Command::FAILURE;
+        }
+
+        $presetSpec = $registry->getPreset($preset);
+        if ($presetSpec === null) {
             return Command::FAILURE;
         }
 
@@ -50,7 +58,7 @@ final class CheckCommand extends Command
         }
 
         $io->writeln("Preset: {$preset}");
-        $results = $this->checker->checkTyped(AppConfig::PRESET_ITEMS[$preset], $targets);
+        $results = $this->checker->checkTyped($presetSpec, $targets);
         foreach ($this->checker->renderResults($results) as $line) {
             $io->writeln($line);
         }

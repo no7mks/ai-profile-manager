@@ -10,6 +10,10 @@ use AiProfileManager\Command\AgentCheckCommand;
 use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\CaptureCommand;
 use AiProfileManager\Command\CheckCommand;
+use AiProfileManager\Command\PresetAddAbilityCommand;
+use AiProfileManager\Command\PresetCreateCommand;
+use AiProfileManager\Command\PresetDeleteCommand;
+use AiProfileManager\Command\PresetRemoveAbilityCommand;
 use AiProfileManager\Command\IngestCaptureEventCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\RuleCaptureCommand;
@@ -24,6 +28,9 @@ use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
 use Symfony\Component\Console\Application as SymfonyApplication;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 final class Application
 {
@@ -36,7 +43,7 @@ final class Application
     /**
      * @param array<int, string> $argv
      */
-    public function run(array $argv): int
+    public function run(array $argv, ?OutputInterface $output = null): int
     {
         $checker = new CheckService();
         $capture = new CaptureService($checker);
@@ -56,9 +63,13 @@ final class Application
         $app->add(new AgentCaptureCommand($capture));
         $app->add(new CheckCommand($checker));
         $app->add(new CaptureCommand($capture));
+        $app->add(new PresetCreateCommand($capture));
+        $app->add(new PresetAddAbilityCommand($capture));
+        $app->add(new PresetRemoveAbilityCommand($capture));
+        $app->add(new PresetDeleteCommand($capture));
         $app->add(new UpdateCommand($this->updater));
         $app->add(new IngestCaptureEventCommand($ingestor));
 
-        return $app->run();
+        return $app->run(new ArgvInput($argv), $output ?? new ConsoleOutput());
     }
 }

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Command;
 
-use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\CaptureService;
+use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -24,12 +24,13 @@ final class CaptureCommand extends Command
     {
         $this
             ->setName('capture')
-            ->setDescription('Capture modified status for a preset on target IDE/CLI tools (placeholder).')
-            ->addArgument('preset', InputArgument::REQUIRED, 'Preset name to capture.')
+            ->setDescription('Capture preset diff or full workspace abilities vs Composer baseline.')
+            ->addArgument('preset', InputArgument::OPTIONAL, 'Preset name from abilities/_presets.json (merged with defaults); omit for full workspace snapshot.')
             ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.')
+            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'Skip confirmation for full workspace capture.')
             ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
             ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
-            ->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Base version tag/commit for patch generation.', 'unknown')
+            ->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Ignored; baseline comes from Composer (legacy option).', 'unknown')
             ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.')
             ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
     }
@@ -37,38 +38,81 @@ final class CaptureCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        /** @var string $preset */
-        $preset = $input->getArgument('preset');
+        /** @var ?string $presetArg */
+        $presetArg = $input->getArgument('preset');
         /** @var array<int, string> $targets */
         $targets = $input->getOption('target');
 
-        if (!in_array($preset, AppConfig::KNOWN_PRESETS, true)) {
-            $io->error(sprintf('Unknown preset: %s. Known presets: %s.', $preset, implode(', ', AppConfig::KNOWN_PRESETS)));
-            return Command::FAILURE;
-        }
+        $targets = $targets === [] ? \AiProfileManager\Config\AppConfig::DEFAULT_TARGETS : array_values(array_unique($targets));
 
-        $targets = $targets === [] ? AppConfig::DEFAULT_TARGETS : array_values(array_unique($targets));
-        $unknownTargets = array_values(array_diff($targets, AppConfig::KNOWN_TARGETS));
+        $unknownTargets = array_values(array_diff($targets, \AiProfileManager\Config\AppConfig::KNOWN_TARGETS));
         if ($unknownTargets !== []) {
-            $io->error(sprintf('Unknown targets: %s. Known targets: %s.', implode(', ', $unknownTargets), implode(', ', AppConfig::KNOWN_TARGETS)));
+            $io->error(sprintf('Unknown targets: %s. Known targets: %s.', implode(', ', $unknownTargets), implode(', ', \AiProfileManager\Config\AppConfig::KNOWN_TARGETS)));
+
             return Command::FAILURE;
         }
 
-        $io->writeln("Preset: {$preset}");
-        $result = $this->capture->captureTyped(AppConfig::PRESET_ITEMS[$preset], $targets);
-        $event = $this->capture->buildCaptureEvent(
-            $result['results'],
-            (string) $input->getOption('source-repo'),
-            (string) $input->getOption('source-commit'),
-            (string) $input->getOption('base-ref'),
-            (string) ($input->getOption('event-id') ?: ''),
-            (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM))
-        );
-        $path = $this->capture->writeEventToEventsDir($event);
-        $io->writeln(sprintf('[ok] Event written to events dir: %s', $path));
+        $cwd = (string) getcwd();
+        $registry = new PresetRegistry($cwd);
+
+        $presetMissing = $presetArg === null || $presetArg === '';
+
+        if (!$presetMissing) {
+            $spec = $registry->getPreset((string) $presetArg);
+            if ($spec === null) {
+                $io->error(sprintf('Unknown preset: %s. Known presets: %s.', $presetArg, implode(', ', array_keys($registry->allPresets()))));
+
+                return Command::FAILURE;
+            }
+
+            $itemsSpec = [
+                'skills' => $spec['skills'],
+                'rules' => $spec['rules'],
+                'agents' => $spec['agents'],
+            ];
+            $io->writeln(sprintf('Preset: %s', $presetArg));
+        } else {
+            $discovered = $this->capture->discoverWorkspaceAbilities($cwd);
+            $itemsSpec = [
+                'skills' => $discovered['skills'],
+                'rules' => $discovered['rules'],
+                'agents' => $discovered['agents'],
+            ];
+            $io->writeln('Full workspace snapshot (abilities/* subdirectories).');
+        }
+
+        $result = $this->capture->captureTyped($itemsSpec, $targets, $cwd);
 
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
+        }
+
+        if ($result['baseline'] === null) {
+            $io->error('Could not resolve Composer baseline. Install aipm globally or set AIPM_BASELINE_ROOT for testing.');
+
+            return Command::FAILURE;
+        }
+
+        if ($result['results'] === []) {
+            return Command::SUCCESS;
+        }
+
+        if ($presetMissing && !$input->getOption('yes')) {
+            if (!$io->confirm('Generate capture event?', false)) {
+                return Command::SUCCESS;
+            }
+        }
+
+        $persist = $this->capture->persistCaptureEvent(
+            $result,
+            (string) $input->getOption('source-repo'),
+            (string) $input->getOption('source-commit'),
+            (string) ($input->getOption('event-id') ?: ''),
+            (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM)),
+        );
+
+        if ($persist['path'] !== null) {
+            $io->writeln(sprintf('[ok] Event written to events dir: %s', $persist['path']));
         }
 
         return $result['exit_code'];

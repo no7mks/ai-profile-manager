@@ -11,10 +11,15 @@
 - Cursor 规则：Agent 开工入口与中文沟通约定（`.cursor/rules/agent-entry-point.mdc`）。
 - Cursor 规则：Git 分支与发布流程（`.cursor/rules/git-release-flow.mdc`）。
 - 根目录 `CHANGELOG.md` 与发布前更新约定。
+- Capture 相对 Composer 全局安装包目录做 abilities 递归 diff；**CaptureEvent v2** 含必填 `baseline` 块；文件级支持删除写回。
+- `capture` 无参时对全仓库 abilities 快照，可 `--yes` 跳过确认；`preset:*` 命令维护 `abilities/_presets.json` 并可选生成 manifest 类 event。
+- 环境变量 **`AIPM_BASELINE_ROOT`**：开发/测试时指定模拟包根目录。
 
 ### Changed
 
+- `ingest` 与 `CaptureEventSchema` 仅接受 **CaptureEvent schema v2**（不再校验 v1 事件）。
 - 默认安装目标调整为 Cursor 与 Kiro。
+- `install` / `check` / `capture <preset>` 的 preset 名称解析合并 **`abilities/_presets.json`**（存在则为权威来源）。
 
 ## [0.1.1] - 2026-04-28
 
