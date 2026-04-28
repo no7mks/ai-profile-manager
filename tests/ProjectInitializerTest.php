@@ -19,7 +19,8 @@ final class ProjectInitializerTest extends TestCase
         $initializer = ProjectInitializer::fromPackageLayout();
         $lines = $initializer->init($tmp, false, AppConfig::DEFAULT_TARGETS);
 
-        self::assertFileExists($tmp . '/docs/state/README.md');
+        self::assertFileExists($tmp . '/docs/README.md');
+        self::assertDirectoryExists($tmp . '/docs/state');
         self::assertFileExists($tmp . '/issues/README.md');
         self::assertFileExists($tmp . '/AGENTS.md');
         self::assertFileExists($tmp . '/.cursor/rules/cursor-scope.mdc');

@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [0.4.2] - 2026-04-28
+
+### Changed
+
+- 调整 `/apm init` 交付约定：不再为 `docs/state`、`docs/manual` 预设固定文件名，改为按项目上下文创建/更新文档。
+- `docs` 文档规范入口改为单一 `docs/README.md`，`docs` 下五个子目录不再分别维护 README。
+
 ## [0.4.1] - 2026-04-28
 
 ### Added

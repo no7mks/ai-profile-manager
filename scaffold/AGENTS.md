@@ -37,26 +37,9 @@
 
 ## 文档与事实来源
 
-### SSOT
-
-- `docs/state/` + code = 系统唯一事实来源
-- agent 与开发者必须优先参考 state
-- spec 不构成 SSOT
-- 不将旧 spec 当作当前系统事实
-
-### 文档分层
-
-| 层 | 目录 | 回答问题 |
-|----|------|----------|
-| state | `docs/state/` | 系统现在是什么（SSOT） |
-| manual | `docs/manual/` | 如何理解/使用系统（面向人） |
-| proposals | `docs/proposals/` | 为什么做（intent） |
-| notes | `docs/notes/` | 想做什么（lightweight intent） |
-| issues | `issues/` | 已确认的问题 |
-| changes | `docs/changes/` | 改了什么（history） |
-| specs | `<spec-dir>` | 怎么做（implementation plan） |
-
-各层的规范详见对应目录下的 `README.md`。
+- 文档分层与边界以 `docs/README.md` 为准。
+- `docs/state/` + code = 系统唯一事实来源（SSOT）；agent 与开发者必须优先参考 state。
+- spec 不构成 SSOT，不将旧 spec 当作当前系统事实。
 
 实现方案（how-to-implement）通过 spec 工作流确定。无论使用哪个 Agent，都应使用 `<spec-dir>` 作为 spec 工作目录。
 
