@@ -38,6 +38,7 @@
 
 `src/Command` 下的 command 构成 CLI API：
 
+- Init：`init`
 - Install：`install`、`skill:install`、`rule:install`、`agent:install`
 - Check：`check`、`skill:check`、`rule:check`、`agent:check`
 - Capture：`capture`、`skill:capture`、`rule:capture`、`agent:capture`

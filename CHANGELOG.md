@@ -6,6 +6,7 @@
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-04-28
 ### Breaking
 
 - Capture 对象与 JSON 字段：**`CaptureEvent` / `event_id` 更名为 `CaptureChange` / `change_id`**；本机目录 **`~/.aipm/events` 等改为 `changes` / `processed-changes` / `failed-changes`**，审计文件 `events.jsonl`、`processed-event-ids.json` 同步更名。

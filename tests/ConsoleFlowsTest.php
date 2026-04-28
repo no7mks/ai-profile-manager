@@ -148,9 +148,19 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testSkillInstallUsesDefaultSkillsWhenArgumentEmpty(): void
     {
-        $cmd = new SkillInstallCommand(new Installer());
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['skills' => [], '--target' => ['cursor']]);
+        $tmp = sys_get_temp_dir() . '/aipm-flow-skill-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        $old = getcwd();
+        self::assertNotFalse($old);
+        try {
+            chdir($tmp);
+
+            $cmd = new SkillInstallCommand(new Installer());
+            $tester = new CommandTester($cmd);
+            $exit = $tester->execute(['skills' => [], '--target' => ['cursor']]);
+        } finally {
+            chdir($old);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         self::assertStringContainsString('graphify', $tester->getDisplay());
@@ -158,9 +168,19 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testRuleInstallInstallsNamedRule(): void
     {
-        $cmd = new RuleInstallCommand(new Installer());
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['rules' => ['spec-core'], '--target' => ['kiro']]);
+        $tmp = sys_get_temp_dir() . '/aipm-flow-rule-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        $old = getcwd();
+        self::assertNotFalse($old);
+        try {
+            chdir($tmp);
+
+            $cmd = new RuleInstallCommand(new Installer());
+            $tester = new CommandTester($cmd);
+            $exit = $tester->execute(['rules' => ['spec-core'], '--target' => ['kiro']]);
+        } finally {
+            chdir($old);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         self::assertStringContainsString('spec-core', $tester->getDisplay());
@@ -168,9 +188,19 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testAgentInstallInstallsNamedAgent(): void
     {
-        $cmd = new AgentInstallCommand(new Installer());
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['agents' => ['code-reviewer'], '--target' => ['cursor']]);
+        $tmp = sys_get_temp_dir() . '/aipm-flow-agent-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        $old = getcwd();
+        self::assertNotFalse($old);
+        try {
+            chdir($tmp);
+
+            $cmd = new AgentInstallCommand(new Installer());
+            $tester = new CommandTester($cmd);
+            $exit = $tester->execute(['agents' => ['code-reviewer'], '--target' => ['cursor']]);
+        } finally {
+            chdir($old);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         self::assertStringContainsString('code-reviewer', $tester->getDisplay());
