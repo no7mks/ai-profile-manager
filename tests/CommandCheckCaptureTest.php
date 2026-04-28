@@ -43,8 +43,8 @@ final class CommandCheckCaptureTest extends TestCase
     public function testCaptureServicePlaceholderReturnsNoModifiedMessage(): void
     {
         $tmpBaseline = sys_get_temp_dir() . '/aipm-bl-' . bin2hex(random_bytes(4));
-        mkdir($tmpBaseline . '/abilities/skills/graphify/cursor', 0775, true);
-        file_put_contents($tmpBaseline . '/abilities/skills/graphify/cursor/SKILL.md', "same\n");
+        mkdir($tmpBaseline . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($tmpBaseline . '/abilities/skills/graphify/SKILL.md', "same\n");
 
         putenv('AIPM_BASELINE_ROOT=' . $tmpBaseline);
 
@@ -68,10 +68,10 @@ final class CommandCheckCaptureTest extends TestCase
     {
         $tmpBaseline = sys_get_temp_dir() . '/aipm-cap-base-' . bin2hex(random_bytes(4));
         $tmpWorkspace = sys_get_temp_dir() . '/aipm-cap-ws-' . bin2hex(random_bytes(4));
-        mkdir($tmpBaseline . '/abilities/skills/graphify/cursor', 0775, true);
-        mkdir($tmpWorkspace . '/abilities/skills/graphify/cursor', 0775, true);
-        file_put_contents($tmpBaseline . '/abilities/skills/graphify/cursor/SKILL.md', "baseline\n");
-        file_put_contents($tmpWorkspace . '/abilities/skills/graphify/cursor/SKILL.md', "workspace\n");
+        mkdir($tmpBaseline . '/abilities/skills/graphify', 0775, true);
+        mkdir($tmpWorkspace . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($tmpBaseline . '/abilities/skills/graphify/SKILL.md', "baseline\n");
+        file_put_contents($tmpWorkspace . '/abilities/skills/graphify/SKILL.md', "workspace\n");
 
         $tmpAipmHome = sys_get_temp_dir() . '/aipm-capture-test-' . bin2hex(random_bytes(4));
         mkdir($tmpAipmHome, 0775, true);
@@ -116,10 +116,10 @@ final class CommandCheckCaptureTest extends TestCase
     {
         $tmpBaseline = sys_get_temp_dir() . '/aipm-cap-id-' . bin2hex(random_bytes(4));
         $tmpWorkspace = sys_get_temp_dir() . '/aipm-cap-id-ws-' . bin2hex(random_bytes(4));
-        mkdir($tmpBaseline . '/abilities/skills/graphify/cursor', 0775, true);
-        mkdir($tmpWorkspace . '/abilities/skills/graphify/cursor', 0775, true);
-        file_put_contents($tmpBaseline . '/abilities/skills/graphify/cursor/SKILL.md', "b\n");
-        file_put_contents($tmpWorkspace . '/abilities/skills/graphify/cursor/SKILL.md', "w\n");
+        mkdir($tmpBaseline . '/abilities/skills/graphify', 0775, true);
+        mkdir($tmpWorkspace . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($tmpBaseline . '/abilities/skills/graphify/SKILL.md', "b\n");
+        file_put_contents($tmpWorkspace . '/abilities/skills/graphify/SKILL.md', "w\n");
 
         $tmpAipmHome = sys_get_temp_dir() . '/aipm-cap-id-home-' . bin2hex(random_bytes(4));
         mkdir($tmpAipmHome, 0775, true);
@@ -245,6 +245,6 @@ final class CommandCheckCaptureTest extends TestCase
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertStringContainsString('Found changes: 1', $tester->getDisplay());
         self::assertStringContainsString('[ok] Ingested change', $tester->getDisplay());
-        self::assertFileExists($tmpConfigDir . '/abilities/skills/graphify/cursor/SKILL.md');
+        self::assertFileExists($tmpConfigDir . '/abilities/skills/graphify/SKILL.md');
     }
 }

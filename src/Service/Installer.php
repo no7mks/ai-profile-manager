@@ -85,7 +85,9 @@ final class Installer
             default => 'abilities/unknown-items',
         };
 
-        $src = $this->packageRoot . '/' . $typeDir . '/' . $name . '/' . $target;
+        $src = $type === 'skill'
+            ? $this->packageRoot . '/' . $typeDir . '/' . $name
+            : $this->packageRoot . '/' . $typeDir . '/' . $name . '/' . $target;
         $dst = $this->resolveInstallTargetDir($type, $name, $target);
 
         if (!is_dir($src)) {

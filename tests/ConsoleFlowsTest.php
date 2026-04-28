@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\CaptureCommand;
 use AiProfileManager\Command\CheckCommand;
-use AiProfileManager\Command\InitCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
 use AiProfileManager\Command\PresetCreateCommand;
@@ -20,7 +18,6 @@ use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
-use AiProfileManager\Service\ProjectInitializer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -86,6 +83,29 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::FAILURE, $exit);
         self::assertStringContainsString('Unknown targets', $tester->getDisplay());
+    }
+
+    public function testInstallCommandWithoutPresetRunsBootstrap(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-flow-bootstrap-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $cmd = new InstallCommand(new Installer());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute([]);
+
+        chdir($old);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        self::assertFileExists($tmp . '/docs/state/README.md');
+        self::assertFileExists($tmp . '/issues/README.md');
+        self::assertFileExists($tmp . '/AGENTS.md');
+        self::assertFileExists($tmp . '/.cursor/skills/apm/SKILL.md');
+        self::assertFileExists($tmp . '/.kiro/skills/apm/SKILL.md');
+        self::assertStringContainsString("/apm init", $tester->getDisplay());
     }
 
     public function testCheckCommandRunsForKnownPreset(): void
@@ -276,103 +296,4 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('Unknown preset', $tester->getDisplay());
     }
 
-    public function testInitCommandUnknownTargetFails(): void
-    {
-        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['--target' => ['not-a-target']]);
-
-        self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Unknown targets', $tester->getDisplay());
-    }
-
-    public function testInitCommandInstallsIntoPath(): void
-    {
-        $tmp = sys_get_temp_dir() . '/aipm-init-cli-' . bin2hex(random_bytes(4));
-        mkdir($tmp, 0775, true);
-
-        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
-        $tester = new CommandTester($cmd);
-        $tester->setInputs([
-            'accept',
-            'accept',
-            'accept',
-            'accept',
-            'accept',
-            'accept',
-        ]);
-        $exit = $tester->execute(['path' => $tmp]);
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertFileExists($tmp . '/AGENTS.md');
-        self::assertFileExists($tmp . '/PROJECT.md');
-        foreach (AppConfig::DEFAULT_TARGETS as $t) {
-            self::assertStringContainsString($t, $tester->getDisplay());
-        }
-        self::assertStringContainsString('Prefill PROJECT.md', $tester->getDisplay());
-    }
-
-    public function testInitCommandFailsWhenNotInteractiveWithoutNoPrefill(): void
-    {
-        $tmp = sys_get_temp_dir() . '/aipm-init-cli-ni-' . bin2hex(random_bytes(4));
-        mkdir($tmp, 0775, true);
-
-        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['path' => $tmp], ['interactive' => false]);
-
-        self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('--no-prefill', $tester->getDisplay());
-    }
-
-    public function testInitCommandNoPrefillWritesUnknownProfile(): void
-    {
-        $tmp = sys_get_temp_dir() . '/aipm-init-cli-np-' . bin2hex(random_bytes(4));
-        mkdir($tmp, 0775, true);
-
-        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['path' => $tmp, '--no-prefill' => true], ['interactive' => false]);
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertFileExists($tmp . '/PROJECT.md');
-        self::assertStringContainsString('- confirmed: UNKNOWN', (string) file_get_contents($tmp . '/PROJECT.md'));
-    }
-
-    public function testInitCommandCanEditDetectedField(): void
-    {
-        $tmp = sys_get_temp_dir() . '/aipm-init-cli-edit-' . bin2hex(random_bytes(4));
-        mkdir($tmp, 0775, true);
-        file_put_contents($tmp . '/package.json', (string) json_encode([
-            'name' => 'demo',
-            'version' => '1.2.3',
-            'scripts' => [
-                'test' => 'vitest',
-                'build' => 'vite build',
-                'dev' => 'vite',
-            ],
-        ]));
-        file_put_contents($tmp . '/.gitignore', ".env\n");
-
-        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
-        $tester = new CommandTester($cmd);
-        $tester->setInputs([
-            'accept',
-            'edit',
-            'pnpm test:all',
-            'accept',
-            'accept',
-            'accept',
-            'unknown',
-        ]);
-        $exit = $tester->execute(['path' => $tmp, '--force' => true]);
-
-        self::assertSame(Command::SUCCESS, $exit);
-        $project = (string) file_get_contents($tmp . '/PROJECT.md');
-        self::assertStringContainsString('## Full Test Command', $project);
-        self::assertStringContainsString('- detected: npm test', $project);
-        self::assertStringContainsString('- confirmed: pnpm test:all', $project);
-        self::assertStringContainsString('## Sensitive Files', $project);
-        self::assertStringContainsString('- confirmed: UNKNOWN', $project);
-    }
 }

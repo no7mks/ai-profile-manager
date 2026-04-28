@@ -21,7 +21,7 @@
 - `ComposerBaselineResolver`：从 `~/.composer/vendor/composer/installed.json` 解析全局安装的 `no7mks/ai-profile-manager` 路径与版本元数据；支持环境变量 `AIPM_BASELINE_ROOT` 覆盖（测试或本地模拟）。
 - `AbilityDirectoryDiff`：对 baseline 包内目录与工作区目录做递归 diff，生成带 `patch` / 可选 `deleted` 的文件项。
 - `PresetRegistry`：读写 `abilities/_presets.json`；文件存在时其为 preset 定义的权威来源。
-- `Installer`：从全局包安装源拷贝到当前仓库：`skill` / `agent` 用 `abilities/{skills,agents}/{name}/{target}/` 镜像；`rule` 用 `abilities/rules/{category}/{name}.{cursor|kiro}.*` 按名称匹配复制；缺失来源时报 `[fail]` 且 `exit_code` 非 0；末尾合并 `.gitignore` 托管段。
+- `Installer`：从全局包安装源拷贝到当前仓库：`skill` 用 `abilities/skills/{name}/`（跨 target 单份语义）分发到目标平台目录，`agent` 用 `abilities/agents/{name}/{target}/` 镜像；`rule` 用 `abilities/rules/{category}/{name}.{cursor|kiro}.*` 按名称匹配复制；缺失来源时报 `[fail]` 且 `exit_code` 非 0；末尾合并 `.gitignore` 托管段。
 - `DirectoryMirrorService`：递归目录拷贝（`init` 脚手架与 Installer 共用）。
 - `GitIgnoreTemplateService`：从 `abilities/gitignore/template.gitignore` 读取 marker block，按安装的 ability/target 渲染并幂等写入用户仓库 `.gitignore` 的托管段。
 - `CheckService`：状态评估与结果渲染模型。
@@ -38,7 +38,6 @@
 
 `src/Command` 下的 command 构成 CLI API：
 
-- Init：`init`
 - Install：`install`、`skill:install`、`rule:install`、`agent:install`
 - Check：`check`、`skill:check`、`rule:check`、`agent:check`
 - Capture：`capture`、`skill:capture`、`rule:capture`、`agent:capture`
@@ -46,7 +45,7 @@
 - Ingest：`ingest`
 - Update：`update`
 
-typed command 是稳定核心模型；`capture`（无参）对全仓库 abilities 做快照并可交互确认；preset 子命令通过 manifest diff 产生 capture change。
+typed command 是稳定核心模型；`install`（无参数）承担项目初始化（scaffold + apm skill，并提示 `/apm init` 完成 SSOT ready 初始化：`PROJECT.md` + `docs/state/README.md` + `docs/manual/README.md`）；`capture`（无参）对全仓库 abilities 做快照并可交互确认；preset 子命令通过 manifest diff 产生 capture change。
 
 ## 安装期 `.gitignore` 注入（单模板）
 
@@ -100,7 +99,7 @@ typed command 是稳定核心模型；`capture`（无参）对全仓库 abilitie
 - schema 校验（仅 v2）
 - 基于 `source_repo::change_id` 的 dedupe
 - 归档到 `processed-changes` / `failed-changes`，并维护处理索引
-- 将 change 写回当前执行目录下的 `abilities/…`：`skills|rules|agents` 路径结构、`abilities/_presets.json`，以及对标记 `deleted` 的文件执行删除
+- 将 change 写回当前执行目录下的 `abilities/…`：`skills`（无 target 子目录）/`rules`/`agents` 路径结构、`abilities/_presets.json`，以及对标记 `deleted` 的文件执行删除
 
 默认本机目录：
 

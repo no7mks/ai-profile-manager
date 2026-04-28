@@ -31,6 +31,6 @@
     "test": "phpunit"
   },
   "bin": [
-    "bin/aipm"
+    "bin/apm"
   ]
 }

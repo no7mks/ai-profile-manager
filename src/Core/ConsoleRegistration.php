@@ -11,7 +11,6 @@ use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\CaptureCommand;
 use AiProfileManager\Command\CheckCommand;
 use AiProfileManager\Command\IngestCaptureChangeCommand;
-use AiProfileManager\Command\InitCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
 use AiProfileManager\Command\PresetCreateCommand;
@@ -28,7 +27,6 @@ use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
-use AiProfileManager\Service\ProjectInitializer;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
 /**
@@ -47,7 +45,6 @@ final class ConsoleRegistration
         KnowledgeBaseUpdater $updater,
     ): void {
         $app->add(new InstallCommand($installer));
-        $app->add(new InitCommand(ProjectInitializer::fromPackageLayout()));
         $app->add(new SkillInstallCommand($installer));
         $app->add(new RuleInstallCommand($installer));
         $app->add(new AgentInstallCommand($installer));

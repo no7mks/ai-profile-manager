@@ -130,7 +130,7 @@ final class CaptureChangeIngestorTest extends TestCase
         mkdir($cfgDir . '/changes', 0775, true);
 
         $ws = sys_get_temp_dir() . '/aipm-ing-ws-' . bin2hex(random_bytes(4));
-        mkdir($ws . '/abilities/skills/wbtest/cursor', 0775, true);
+        mkdir($ws . '/abilities/skills/wbtest', 0775, true);
 
         $oldHome = getenv('AIPM_HOME');
         putenv('AIPM_HOME=' . $cfgDir);
@@ -155,6 +155,6 @@ final class CaptureChangeIngestorTest extends TestCase
 
         self::assertSame(0, $result['exit_code']);
         self::assertStringContainsString('Write-back item file', implode("\n", $result['lines']));
-        self::assertFileExists($ws . '/abilities/skills/wbtest/cursor/SKILL.md');
+        self::assertFileExists($ws . '/abilities/skills/wbtest/SKILL.md');
     }
 }

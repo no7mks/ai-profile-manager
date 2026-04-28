@@ -14,8 +14,8 @@ final class InstallerTest extends TestCase
     public function testInstallTypedMirrorsSkillAndAgentFromPackageFixture(): void
     {
         $pkg = sys_get_temp_dir() . '/aipm-inst-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/demo-skill/cursor', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/demo-skill/cursor/SKILL.md', "demo skill\n");
+        mkdir($pkg . '/abilities/skills/demo-skill', 0775, true);
+        file_put_contents($pkg . '/abilities/skills/demo-skill/SKILL.md', "demo skill\n");
         mkdir($pkg . '/abilities/agents/demo-agent/cursor', 0775, true);
         file_put_contents($pkg . '/abilities/agents/demo-agent/cursor/demo-agent.md', "demo agent\n");
 
@@ -121,8 +121,8 @@ final class InstallerTest extends TestCase
         ]));
 
         $pkg = sys_get_temp_dir() . '/aipm-installer-gi-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/graphify/cursor', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/graphify/cursor/SKILL.md', 'x');
+        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', 'x');
 
         $old = getcwd();
         self::assertNotFalse($old);

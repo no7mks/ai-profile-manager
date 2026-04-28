@@ -14,7 +14,7 @@ final class CaptureServiceUnitTest extends TestCase
     public function testDiscoverWorkspaceAbilitiesListsSubdirectories(): void
     {
         $root = sys_get_temp_dir() . '/aipm-disc-' . bin2hex(random_bytes(4));
-        mkdir($root . '/abilities/skills/s-a/cursor', 0775, true);
+        mkdir($root . '/abilities/skills/s-a', 0775, true);
         mkdir($root . '/abilities/rules/r-b/cursor', 0775, true);
         mkdir($root . '/abilities/agents/a-c/cursor', 0775, true);
 

@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- CLI 移除 `aipm init`，初始化流程并入 `apm install`（无参数）；原交互式 PROJECT.md 预填链路不再提供。
+- `abilities/skills` 改为跨 target 单份结构：`abilities/skills/<name>/...`。旧的 `abilities/skills/<name>/<target>/...` 不再被安装器识别。
+- aipm 内置引导 skill 名从 `aipm` 更名为 `apm`（命令前缀从 `/aipm ...` 调整为 `/apm ...`）。
+
+### Changed
+
+- `apm install` 新增双模式：有 `preset` 时按预设安装；无 `preset` 时执行仓库 bootstrap（`docs/`、`issues/`、`AGENTS.md`）并安装 `apm` skill。
+- scaffold 不再包含 `PROJECT.md`，安装结束时改为提示使用 skill 命令 `/apm init` 初始化 SSOT（`PROJECT.md` + `docs/state/README.md` + `docs/manual/README.md`）。
+- Capture/write-back 对 skill 路径约定同步为无 target 子目录。
+
 ## [0.3.0] - 2026-04-28
 ### Breaking
 

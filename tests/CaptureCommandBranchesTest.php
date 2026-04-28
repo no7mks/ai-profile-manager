@@ -66,10 +66,10 @@ final class CaptureCommandBranchesTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/aipm-cap-fw-bl-' . bin2hex(random_bytes(4));
         $ws = sys_get_temp_dir() . '/aipm-cap-fw-ws-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/skills/ws-cap/cursor', 0775, true);
-        mkdir($ws . '/abilities/skills/ws-cap/cursor', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/ws-cap/cursor/SKILL.md', "b\n");
-        file_put_contents($ws . '/abilities/skills/ws-cap/cursor/SKILL.md', "w\n");
+        mkdir($baseline . '/abilities/skills/ws-cap', 0775, true);
+        mkdir($ws . '/abilities/skills/ws-cap', 0775, true);
+        file_put_contents($baseline . '/abilities/skills/ws-cap/SKILL.md', "b\n");
+        file_put_contents($ws . '/abilities/skills/ws-cap/SKILL.md', "w\n");
 
         $home = sys_get_temp_dir() . '/aipm-cap-fw-h-' . bin2hex(random_bytes(4));
         mkdir($home, 0775, true);
@@ -113,10 +113,10 @@ final class CaptureCommandBranchesTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/aipm-cap-fw2-bl-' . bin2hex(random_bytes(4));
         $ws = sys_get_temp_dir() . '/aipm-cap-fw2-ws-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/skills/ws-cap2/cursor', 0775, true);
-        mkdir($ws . '/abilities/skills/ws-cap2/cursor', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/ws-cap2/cursor/SKILL.md', "b\n");
-        file_put_contents($ws . '/abilities/skills/ws-cap2/cursor/SKILL.md', "w\n");
+        mkdir($baseline . '/abilities/skills/ws-cap2', 0775, true);
+        mkdir($ws . '/abilities/skills/ws-cap2', 0775, true);
+        file_put_contents($baseline . '/abilities/skills/ws-cap2/SKILL.md', "b\n");
+        file_put_contents($ws . '/abilities/skills/ws-cap2/SKILL.md', "w\n");
 
         $home = sys_get_temp_dir() . '/aipm-cap-fw2-h-' . bin2hex(random_bytes(4));
         mkdir($home, 0775, true);

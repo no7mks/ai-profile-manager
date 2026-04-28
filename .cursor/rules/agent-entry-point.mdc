@@ -22,7 +22,7 @@ alwaysApply: true
 1. **Design**：先更新或补充 `design.md`（或与项目约定的设计文档路径），写清目标、边界与接口/行为约定，再写代码。
 2. **RED**：依据设计编写或调整自动化测试，先得到失败用例（测试先于实现或先于完整实现）。
 3. **GREEN**：实现功能或补齐逻辑，使测试通过；必要时微调设计与测试，保持三者一致。
-4. **Docs**：实现并验证通过后，按需更新 `README.md`、`abilities/skills/aipm/SKILL.md`，以及 `CHANGELOG.md` 中 **`[Unreleased]`** 小节，使安装说明、用法、`aipm` 行为与 CLI 变更对用户可见且一致，并将面向用户的改动记入待发布变更。
+4. **Docs**：实现并验证通过后，按需更新 `README.md`、`abilities/skills/apm/SKILL.md`，以及 `CHANGELOG.md` 中 **`[Unreleased]`** 小节，使安装说明、用法、`aipm` 行为与 CLI 变更对用户可见且一致，并将面向用户的改动记入待发布变更。
 
 微小改动（纯文案、配置注释、明显 typo）可不强制走全流程，但仍应在可验证的前提下尽量保留测试覆盖；若无对外可见变化，第 4 步可省略。
 

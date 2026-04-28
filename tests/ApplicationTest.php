@@ -18,7 +18,7 @@ final class ApplicationTest extends TestCase
 
     public function testBinAipmBinaryExists(): void
     {
-        self::assertFileExists(dirname(__DIR__) . '/bin/aipm');
+        self::assertFileExists(dirname(__DIR__) . '/bin/apm');
     }
 
     public function testCreateSymfonyApplicationRegistersSameCommandsAsCli(): void

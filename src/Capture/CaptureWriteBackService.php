@@ -62,7 +62,9 @@ final class CaptureWriteBackService
                         'agent' => 'abilities/agents',
                         default => 'abilities/unknown-items',
                     };
-                    $itemDir = $sourceDir . '/' . $typeDir . '/' . $name . '/' . $target;
+                    $itemDir = $itemType === 'skill'
+                        ? $sourceDir . '/' . $typeDir . '/' . $name
+                        : $sourceDir . '/' . $typeDir . '/' . $name . '/' . $target;
                     if (!is_dir($itemDir)) {
                         mkdir($itemDir, 0775, true);
                     }

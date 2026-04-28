@@ -346,7 +346,9 @@ final class CaptureService
             default => 'abilities/unknown-items',
         };
 
-        $mid = '/' . $sub . '/' . $name . '/' . $target;
+        $mid = $type === 'skill'
+            ? '/' . $sub . '/' . $name
+            : '/' . $sub . '/' . $name . '/' . $target;
         $bAbs = $baselineRoot . $mid;
         $wAbs = $workspaceRoot . $mid;
 
