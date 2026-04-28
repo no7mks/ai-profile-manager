@@ -22,16 +22,15 @@ final class RuleCaptureCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('rule:capture')
-            ->setDescription('Capture rule changes vs Composer-installed baseline.')
-            ->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to capture.')
-            ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.')
-            ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
-            ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
-            ->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Ignored; baseline comes from Composer (legacy option).', 'unknown')
-            ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.')
-            ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
+        $this->setName('rule:capture');
+        $this->setDescription('Capture rule changes vs Composer-installed baseline.');
+        $this->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to capture.');
+        $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+        $this->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown');
+        $this->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown');
+        $this->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Ignored; baseline comes from Composer (legacy option).', 'unknown');
+        $this->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.');
+        $this->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

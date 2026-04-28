@@ -23,16 +23,15 @@ final class InstallCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('install')
-            ->setDescription('Install a preset into target IDE/CLI tools.')
-            ->addArgument('preset', InputArgument::REQUIRED, 'Preset name to install.')
-            ->addOption(
-                'target',
-                't',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Target IDE/CLI tool. Repeat for multiple values.'
-            );
+        $this->setName('install');
+        $this->setDescription('Install a preset into target IDE/CLI tools.');
+        $this->addArgument('preset', InputArgument::REQUIRED, 'Preset name to install.');
+        $this->addOption(
+            'target',
+            't',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Target IDE/CLI tool. Repeat for multiple values.'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

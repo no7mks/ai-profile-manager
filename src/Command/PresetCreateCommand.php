@@ -22,17 +22,16 @@ final class PresetCreateCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('preset:create')
-            ->setDescription('Create a preset in abilities/_presets.json and emit a capture event when the manifest differs from baseline.')
-            ->addArgument('name', InputArgument::REQUIRED, 'Preset name.')
-            ->addOption('skill', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Skill names (repeatable).', [])
-            ->addOption('rule', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Rule names (repeatable).', [])
-            ->addOption('agent', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Agent names (repeatable).', [])
-            ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
-            ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
-            ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier.')
-            ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601).');
+        $this->setName('preset:create');
+        $this->setDescription('Create a preset in abilities/_presets.json and emit a capture event when the manifest differs from baseline.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'Preset name.');
+        $this->addOption('skill', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Skill names (repeatable).', []);
+        $this->addOption('rule', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Rule names (repeatable).', []);
+        $this->addOption('agent', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Agent names (repeatable).', []);
+        $this->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown');
+        $this->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown');
+        $this->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier.');
+        $this->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

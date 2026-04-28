@@ -22,18 +22,17 @@ final class PresetRemoveAbilityCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('preset:remove-ability')
-            ->setDescription('Remove one ability reference from a preset and emit capture when manifest changes.')
-            ->addArgument('preset', InputArgument::REQUIRED, 'Preset name.')
-            ->addArgument('ability', InputArgument::REQUIRED, 'Ability name.')
-            ->addOption('skill', null, InputOption::VALUE_NONE, 'Treat ability as a skill.')
-            ->addOption('rule', null, InputOption::VALUE_NONE, 'Treat ability as a rule.')
-            ->addOption('agent', null, InputOption::VALUE_NONE, 'Treat ability as an agent.')
-            ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
-            ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
-            ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier.')
-            ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601).');
+        $this->setName('preset:remove-ability');
+        $this->setDescription('Remove one ability reference from a preset and emit capture when manifest changes.');
+        $this->addArgument('preset', InputArgument::REQUIRED, 'Preset name.');
+        $this->addArgument('ability', InputArgument::REQUIRED, 'Ability name.');
+        $this->addOption('skill', null, InputOption::VALUE_NONE, 'Treat ability as a skill.');
+        $this->addOption('rule', null, InputOption::VALUE_NONE, 'Treat ability as a rule.');
+        $this->addOption('agent', null, InputOption::VALUE_NONE, 'Treat ability as an agent.');
+        $this->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown');
+        $this->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown');
+        $this->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier.');
+        $this->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

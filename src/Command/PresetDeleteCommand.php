@@ -22,14 +22,13 @@ final class PresetDeleteCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('preset:delete')
-            ->setDescription('Remove a preset from abilities/_presets.json and emit capture when manifest changes.')
-            ->addArgument('name', InputArgument::REQUIRED, 'Preset name.')
-            ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
-            ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
-            ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier.')
-            ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601).');
+        $this->setName('preset:delete');
+        $this->setDescription('Remove a preset from abilities/_presets.json and emit capture when manifest changes.');
+        $this->addArgument('name', InputArgument::REQUIRED, 'Preset name.');
+        $this->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown');
+        $this->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown');
+        $this->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier.');
+        $this->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

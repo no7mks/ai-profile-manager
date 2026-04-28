@@ -22,11 +22,10 @@ final class AgentCheckCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('agent:check')
-            ->setDescription('Check installed agents status on target IDE/CLI tools.')
-            ->addArgument('agents', InputArgument::IS_ARRAY, 'Agent names to check.')
-            ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+        $this->setName('agent:check');
+        $this->setDescription('Check installed agents status on target IDE/CLI tools.');
+        $this->addArgument('agents', InputArgument::IS_ARRAY, 'Agent names to check.');
+        $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

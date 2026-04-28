@@ -23,11 +23,10 @@ final class CheckCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('check')
-            ->setDescription('Check installed status for a preset on target IDE/CLI tools.')
-            ->addArgument('preset', InputArgument::REQUIRED, 'Preset name to check.')
-            ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+        $this->setName('check');
+        $this->setDescription('Check installed status for a preset on target IDE/CLI tools.');
+        $this->addArgument('preset', InputArgument::REQUIRED, 'Preset name to check.');
+        $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

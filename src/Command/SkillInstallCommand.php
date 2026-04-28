@@ -22,16 +22,15 @@ final class SkillInstallCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('skill:install')
-            ->setDescription('Install skills into target IDE/CLI tools.')
-            ->addArgument('skills', InputArgument::IS_ARRAY, 'Skill names to install.')
-            ->addOption(
-                'target',
-                't',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Target IDE/CLI tool. Repeat for multiple values.'
-            );
+        $this->setName('skill:install');
+        $this->setDescription('Install skills into target IDE/CLI tools.');
+        $this->addArgument('skills', InputArgument::IS_ARRAY, 'Skill names to install.');
+        $this->addOption(
+            'target',
+            't',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Target IDE/CLI tool. Repeat for multiple values.'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

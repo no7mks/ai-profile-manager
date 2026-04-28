@@ -22,11 +22,10 @@ final class RuleCheckCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('rule:check')
-            ->setDescription('Check installed rules status on target IDE/CLI tools.')
-            ->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to check.')
-            ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+        $this->setName('rule:check');
+        $this->setDescription('Check installed rules status on target IDE/CLI tools.');
+        $this->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to check.');
+        $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

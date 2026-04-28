@@ -22,17 +22,16 @@ final class CaptureCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('capture')
-            ->setDescription('Capture preset diff or full workspace abilities vs Composer baseline.')
-            ->addArgument('preset', InputArgument::OPTIONAL, 'Preset name from abilities/_presets.json (merged with defaults); omit for full workspace snapshot.')
-            ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.')
-            ->addOption('yes', 'y', InputOption::VALUE_NONE, 'Skip confirmation for full workspace capture.')
-            ->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown')
-            ->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown')
-            ->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Ignored; baseline comes from Composer (legacy option).', 'unknown')
-            ->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.')
-            ->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
+        $this->setName('capture');
+        $this->setDescription('Capture preset diff or full workspace abilities vs Composer baseline.');
+        $this->addArgument('preset', InputArgument::OPTIONAL, 'Preset name from abilities/_presets.json (merged with defaults); omit for full workspace snapshot.');
+        $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+        $this->addOption('yes', 'y', InputOption::VALUE_NONE, 'Skip confirmation for full workspace capture.');
+        $this->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown');
+        $this->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown');
+        $this->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Ignored; baseline comes from Composer (legacy option).', 'unknown');
+        $this->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.');
+        $this->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

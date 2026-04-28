@@ -20,10 +20,9 @@ final class IngestCaptureEventCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('ingest')
-            ->setDescription('Ingest CaptureEvent files from ~/.aipm/events and write-back.')
-            ->addOption('events-dir', null, InputOption::VALUE_OPTIONAL, 'Events directory. Defaults to ~/.aipm/events.');
+        $this->setName('ingest');
+        $this->setDescription('Ingest CaptureEvent files from ~/.aipm/events and write-back.');
+        $this->addOption('events-dir', null, InputOption::VALUE_OPTIONAL, 'Events directory. Defaults to ~/.aipm/events.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

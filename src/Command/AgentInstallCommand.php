@@ -22,16 +22,15 @@ final class AgentInstallCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('agent:install')
-            ->setDescription('Install sub-agents into target IDE/CLI tools.')
-            ->addArgument('agents', InputArgument::IS_ARRAY, 'Agent names to install.')
-            ->addOption(
-                'target',
-                't',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Target IDE/CLI tool. Repeat for multiple values.'
-            );
+        $this->setName('agent:install');
+        $this->setDescription('Install sub-agents into target IDE/CLI tools.');
+        $this->addArgument('agents', InputArgument::IS_ARRAY, 'Agent names to install.');
+        $this->addOption(
+            'target',
+            't',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Target IDE/CLI tool. Repeat for multiple values.'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

@@ -22,16 +22,15 @@ final class RuleInstallCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('rule:install')
-            ->setDescription('Install rules into target IDE/CLI tools.')
-            ->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to install.')
-            ->addOption(
-                'target',
-                't',
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Target IDE/CLI tool. Repeat for multiple values.'
-            );
+        $this->setName('rule:install');
+        $this->setDescription('Install rules into target IDE/CLI tools.');
+        $this->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to install.');
+        $this->addOption(
+            'target',
+            't',
+            InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
+            'Target IDE/CLI tool. Repeat for multiple values.'
+        );
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

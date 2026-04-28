@@ -22,11 +22,10 @@ final class SkillCheckCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('skill:check')
-            ->setDescription('Check installed skills status on target IDE/CLI tools.')
-            ->addArgument('skills', InputArgument::IS_ARRAY, 'Skill names to check.')
-            ->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+        $this->setName('skill:check');
+        $this->setDescription('Check installed skills status on target IDE/CLI tools.');
+        $this->addArgument('skills', InputArgument::IS_ARRAY, 'Skill names to check.');
+        $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

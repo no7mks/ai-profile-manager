@@ -20,9 +20,8 @@ final class UpdateCommand extends Command
 
     protected function configure(): void
     {
-        $this
-            ->setName('update')
-            ->setDescription('Update aipm local ability knowledge base.');
+        $this->setName('update');
+        $this->setDescription('Update aipm local ability knowledge base.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
