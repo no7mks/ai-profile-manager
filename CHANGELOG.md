@@ -6,6 +6,13 @@
 
 ## [Unreleased]
 
+## [0.4.3] - 2026-04-28
+
+### Changed
+
+- 下线 `doc-operator` agent（Cursor/Kiro 双平台定义），降低未触发子 agent 的维护成本。
+- 将 note/proposal 分支与流转约束上提到 `docs/README.md`，将 issue 分流与 release 收敛约束上提到 `issues/README.md`。
+
 ## [0.4.2] - 2026-04-28
 
 ### Changed

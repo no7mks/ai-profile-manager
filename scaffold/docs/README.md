@@ -75,6 +75,12 @@
 
 `draft` → `accepted` → `in-progress` → `implemented` → `released`（另有 `rejected`、`superseded`）。
 
+### 分支规则
+
+- proposal 的创建、review、状态变更默认必须在 `develop` 分支进行。
+- `in-progress` 可在 feature 分支创建后标记（由 gitflow-starter 处理），这是唯一允许在非 `develop` 分支上修改 proposal 状态的场景。
+- `implemented` / `released` 的标记与收敛由 finish 流程统一处理。
+
 ### 命名建议
 
 - `PRP-001-<slug>.md` 形式递增编号。
@@ -96,6 +102,12 @@
 
 - 每条 note 一个 markdown 文件。
 - 命名使用关键词，如 `feishu-batch-api.md`。
+- 分支规则：可在 `develop` 或 feature 分支创建与维护；feature 分支中的 note 应在分支合并后回到 `develop` 继续管理。
+
+### 流转规则
+
+- note → proposal：当内容成熟并需要正式立项时，在 `develop` 分支基于 note 创建 proposal（初始状态 `draft`），并将原 note 移动到 `docs/notes/resolved/` 说明已升级。
+- note → spec：当内容已明确且不需要 proposal 阶段时，直接将 note 移动到 `docs/notes/resolved/`，并在 spec 工作流中继续推进。
 
 ---
 

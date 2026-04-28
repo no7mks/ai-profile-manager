@@ -41,6 +41,13 @@
 - release issues 中未修复的（`open`）：mv 到本目录，保留原 ID
 - 项目级 `issues/` 中在本次 release 修复的（`closed`）：mv 到 `docs/changes/<version>/fixed/`
 
+### 创建与分流规则
+
+- feature 开发与 `develop` 集成阶段发现的问题，若不是已发布版本中已存在的 bug，统一记录到 `docs/notes/`，不进入 issue 流程。
+- 已发布版本中存在的 bug，无论在哪个阶段发现，都按 `L` 系列创建到 `issues/`。
+- release stabilize 阶段发现的问题，创建为 release issue 并落盘到 `<spec-dir>/release-*/issues/`。
+- release finish 时，所有在本次版本已修复的问题统一归档到 `docs/changes/<version>/fixed/`。
+
 ---
 
 ## Issue ID 规则
