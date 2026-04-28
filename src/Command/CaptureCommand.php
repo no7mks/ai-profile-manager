@@ -29,8 +29,8 @@ final class CaptureCommand extends Command
         $this->addOption('yes', 'y', InputOption::VALUE_NONE, 'Skip confirmation for full workspace capture.');
         $this->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown');
         $this->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown');
-        $this->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Ignored; baseline comes from Composer (legacy option).', 'unknown');
-        $this->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier. Defaults to generated UUID v4.');
+        $this->addOption('base-ref', null, InputOption::VALUE_OPTIONAL, 'Deprecated and ignored; baseline always comes from Composer.', 'unknown');
+        $this->addOption('change-id', null, InputOption::VALUE_OPTIONAL, 'Change identifier. Defaults to generated UUID v4.');
         $this->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601). Defaults to now.');
     }
 
@@ -97,21 +97,21 @@ final class CaptureCommand extends Command
         }
 
         if ($presetMissing && !$input->getOption('yes')) {
-            if (!$io->confirm('Generate capture event?', false)) {
+            if (!$io->confirm('Generate capture change?', false)) {
                 return Command::SUCCESS;
             }
         }
 
-        $persist = $this->capture->persistCaptureEvent(
+        $persist = $this->capture->persistCaptureChange(
             $result,
             (string) $input->getOption('source-repo'),
             (string) $input->getOption('source-commit'),
-            (string) ($input->getOption('event-id') ?: ''),
+            (string) ($input->getOption('change-id') ?: ''),
             (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM)),
         );
 
         if ($persist['path'] !== null) {
-            $io->writeln(sprintf('[ok] Event written to events dir: %s', $persist['path']));
+            $io->writeln(sprintf('[ok] Change written to changes dir: %s', $persist['path']));
         }
 
         return $result['exit_code'];

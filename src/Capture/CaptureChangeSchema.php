@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace AiProfileManager\Capture;
 
 /**
- * Validates CaptureEvent schema version 2 only.
+ * Validates CaptureChange schema version 2 only.
  */
-final class CaptureEventSchema
+final class CaptureChangeSchema
 {
     /**
      * @param array<mixed> $payload
@@ -33,7 +33,7 @@ final class CaptureEventSchema
     {
         $errors = [];
 
-        foreach (['event_id', 'source_repo', 'source_commit', 'captured_at', 'target'] as $field) {
+        foreach (['change_id', 'source_repo', 'source_commit', 'captured_at', 'target'] as $field) {
             if (!isset($payload[$field]) || !is_string($payload[$field]) || trim($payload[$field]) === '') {
                 $errors[] = sprintf('%s must be a non-empty string.', $field);
             }

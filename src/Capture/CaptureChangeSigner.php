@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Capture;
 
-final class CaptureEventSigner
+final class CaptureChangeSigner
 {
     public function sign(string $body, string $timestamp, string $secret): string
     {

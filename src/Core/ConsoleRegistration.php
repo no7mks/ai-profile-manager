@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Core;
 
-use AiProfileManager\Capture\CaptureEventIngestor;
+use AiProfileManager\Capture\CaptureChangeIngestor;
 use AiProfileManager\Command\AgentCaptureCommand;
 use AiProfileManager\Command\AgentCheckCommand;
 use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\CaptureCommand;
 use AiProfileManager\Command\CheckCommand;
-use AiProfileManager\Command\IngestCaptureEventCommand;
+use AiProfileManager\Command\IngestCaptureChangeCommand;
 use AiProfileManager\Command\InitCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
@@ -43,7 +43,7 @@ final class ConsoleRegistration
         Installer $installer,
         CheckService $checker,
         CaptureService $capture,
-        CaptureEventIngestor $ingestor,
+        CaptureChangeIngestor $ingestor,
         KnowledgeBaseUpdater $updater,
     ): void {
         $app->add(new InstallCommand($installer));
@@ -64,6 +64,6 @@ final class ConsoleRegistration
         $app->add(new PresetRemoveAbilityCommand($capture));
         $app->add(new PresetDeleteCommand($capture));
         $app->add(new UpdateCommand($updater));
-        $app->add(new IngestCaptureEventCommand($ingestor));
+        $app->add(new IngestCaptureChangeCommand($ingestor));
     }
 }

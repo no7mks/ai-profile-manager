@@ -133,17 +133,17 @@ final class CaptureService
      * @param array{package: string, version: string, install_path: string, reference?: string}|null $baseline
      * @return array<string, mixed>
      */
-    public function buildCaptureEvent(
+    public function buildCaptureChange(
         array $results,
         string $sourceRepo,
         string $sourceCommit,
         string $baseRefIgnored,
-        string $eventId,
+        string $changeId,
         string $capturedAt,
         ?array $baseline,
     ): array {
         $target = $results === [] ? 'unknown' : $results[0]['target'];
-        $eventId = $eventId !== '' ? $eventId : $this->generateUuidV4();
+        $changeId = $changeId !== '' ? $changeId : $this->generateUuidV4();
 
         $legacyBaseRef = '';
         if ($baseline !== null) {
@@ -170,9 +170,9 @@ final class CaptureService
             ];
         }
 
-        $event = [
+        $change = [
             'schema_version' => 2,
-            'event_id' => $eventId,
+            'change_id' => $changeId,
             'source_repo' => $sourceRepo,
             'source_commit' => $sourceCommit,
             'base_ref' => $legacyBaseRef,
@@ -191,14 +191,14 @@ final class CaptureService
                 $b['reference'] = $baseline['reference'];
             }
 
-            $event['baseline'] = $b;
+            $change['baseline'] = $b;
         }
 
-        return $event;
+        return $change;
     }
 
     /**
-     * Persist event when baseline resolved and there is at least one changed item.
+     * Persist capture change when baseline resolved and there is at least one changed item.
      *
      * @param array{
      *     results: array<int, mixed>,
@@ -208,33 +208,33 @@ final class CaptureService
      * } $result
      * @return array{path: ?string, wrote: bool}
      */
-    public function persistCaptureEvent(
+    public function persistCaptureChange(
         array $result,
         string $sourceRepo,
         string $sourceCommit,
-        string $eventId,
+        string $changeId,
         string $capturedAt,
     ): array {
         if ($result['baseline'] === null || $result['results'] === []) {
             return ['path' => null, 'wrote' => false];
         }
 
-        $event = $this->buildCaptureEvent(
+        $change = $this->buildCaptureChange(
             $result['results'],
             $sourceRepo,
             $sourceCommit,
             '',
-            $eventId,
+            $changeId,
             $capturedAt,
             $result['baseline'],
         );
-        $path = $this->writeEventToEventsDir($event);
+        $path = $this->writeChangeToChangesDir($change);
 
         return ['path' => $path, 'wrote' => true];
     }
 
     /**
-     * After mutating abilities/_presets.json, optionally write an event when the manifest differs from baseline.
+     * After mutating abilities/_presets.json, optionally write a change when the manifest differs from baseline.
      *
      * @return array{exit_code: int, path: ?string, baseline_missing: bool, unchanged: bool}
      */
@@ -242,7 +242,7 @@ final class CaptureService
         string $workspaceRoot,
         string $sourceRepo,
         string $sourceCommit,
-        string $eventId,
+        string $changeId,
         string $capturedAt,
     ): array {
         $diff = $this->capturePresetManifestDiff($workspaceRoot);
@@ -261,11 +261,11 @@ final class CaptureService
             'baseline' => $diff['baseline'],
         ];
 
-        $persist = $this->persistCaptureEvent(
+        $persist = $this->persistCaptureChange(
             $wrapped,
             $sourceRepo,
             $sourceCommit,
-            $eventId,
+            $changeId,
             $capturedAt,
         );
 
@@ -277,16 +277,16 @@ final class CaptureService
         ];
     }
 
-    public function writeEventToEventsDir(array $event): string
+    public function writeChangeToChangesDir(array $change): string
     {
         $aipmHome = (string) (getenv('AIPM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.aipm'));
-        $eventsDir = $aipmHome . '/events';
-        if (!is_dir($eventsDir)) {
-            mkdir($eventsDir, 0775, true);
+        $changesDir = $aipmHome . '/changes';
+        if (!is_dir($changesDir)) {
+            mkdir($changesDir, 0775, true);
         }
 
-        $path = $eventsDir . '/' . $event['event_id'] . '.json';
-        file_put_contents($path, json_encode($event, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
+        $path = $changesDir . '/' . $change['change_id'] . '.json';
+        file_put_contents($path, json_encode($change, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
 
         return $path;
     }
@@ -319,6 +319,26 @@ final class CaptureService
      */
     private function diffAbility(string $type, string $name, string $target, string $baselineRoot, string $workspaceRoot): array
     {
+        if ($type === 'rule') {
+            $relative = $this->resolveRuleRelativePath($workspaceRoot, $name, $target)
+                ?? $this->resolveRuleRelativePath($baselineRoot, $name, $target)
+                ?? ('rules/' . $name . ($target === 'cursor' ? '.cursor.mdc' : '.kiro.md'));
+            $relative = preg_replace('/^abilities\//', '', $relative) ?? $relative;
+            $baselineFile = is_file($baselineRoot . '/abilities/' . $relative) ? $baselineRoot . '/abilities/' . $relative : null;
+            $workspaceFile = is_file($workspaceRoot . '/abilities/' . $relative) ? $workspaceRoot . '/abilities/' . $relative : null;
+            $files = $this->directoryDiff->diffOptionalFiles($baselineFile, $workspaceFile, $relative);
+            $status = $files === [] ? 'unchanged' : 'modified';
+
+            return [
+                'type' => $type,
+                'name' => $name,
+                'target' => $target,
+                'status' => $status,
+                'content_hash' => $this->hashFiles($files),
+                'files' => $files,
+            ];
+        }
+
         $sub = match ($type) {
             'skill' => 'abilities/skills',
             'rule' => 'abilities/rules',
@@ -345,6 +365,21 @@ final class CaptureService
             'content_hash' => $this->hashFiles($files),
             'files' => $files,
         ];
+    }
+
+    private function resolveRuleRelativePath(string $root, string $name, string $target): ?string
+    {
+        $suffix = $target === 'cursor' ? '.cursor.mdc' : '.kiro.md';
+        $byCategory = glob($root . '/abilities/rules/*/' . $name . $suffix) ?: [];
+        $topLevel = glob($root . '/abilities/rules/' . $name . $suffix) ?: [];
+        $candidates = array_merge($byCategory, $topLevel);
+        if ($candidates === []) {
+            return null;
+        }
+
+        $path = (string) $candidates[0];
+
+        return ltrim(substr($path, strlen($root . '/abilities/')), '/');
     }
 
     /**

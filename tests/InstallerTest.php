@@ -4,38 +4,143 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
+use AiProfileManager\Service\DirectoryMirrorService;
+use AiProfileManager\Service\GitIgnoreTemplateService;
 use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
 
 final class InstallerTest extends TestCase
 {
-    public function testInstallTypedIncludesTypeSpecificOutput(): void
+    public function testInstallTypedMirrorsSkillAndAgentFromPackageFixture(): void
     {
-        $installer = new Installer();
+        $pkg = sys_get_temp_dir() . '/aipm-inst-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/skills/demo-skill/cursor', 0775, true);
+        file_put_contents($pkg . '/abilities/skills/demo-skill/cursor/SKILL.md', "demo skill\n");
+        mkdir($pkg . '/abilities/agents/demo-agent/cursor', 0775, true);
+        file_put_contents($pkg . '/abilities/agents/demo-agent/cursor/demo-agent.md', "demo agent\n");
 
-        $lines = $installer->installTyped([
-            'skills' => ['graphify'],
-            'rules' => ['guardrail-core'],
-            'agents' => ['gatekeeper'],
+        $proj = sys_get_temp_dir() . '/aipm-inst-proj-' . bin2hex(random_bytes(4));
+        mkdir($proj, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($proj);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $result = $installer->installTyped([
+            'skills' => ['demo-skill'],
+            'rules' => [],
+            'agents' => ['demo-agent'],
         ], ['cursor']);
 
-        $output = implode("\n", $lines);
-        self::assertStringContainsString('Installed skill graphify -> cursor', $output);
-        self::assertStringContainsString('Installed rule guardrail-core -> cursor', $output);
-        self::assertStringContainsString('Installed agent gatekeeper -> cursor', $output);
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('Installed skill demo-skill -> cursor', $output);
+        self::assertStringContainsString('Installed agent demo-agent -> cursor', $output);
+
+        self::assertFileExists($proj . '/.cursor/skills/demo-skill/SKILL.md');
+        self::assertSame("demo skill\n", (string) file_get_contents($proj . '/.cursor/skills/demo-skill/SKILL.md'));
+        self::assertFileExists($proj . '/.cursor/agents/demo-agent.md');
     }
 
     public function testRulesAreRenderedAsSteeringOnKiro(): void
     {
-        $installer = new Installer();
+        $pkg = sys_get_temp_dir() . '/aipm-inst-st-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/rules/spec', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/spec/spec-core.kiro.md', 'x');
 
-        $lines = $installer->installTyped([
+        $proj = sys_get_temp_dir() . '/aipm-inst-stp-' . bin2hex(random_bytes(4));
+        mkdir($proj, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($proj);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $result = $installer->installTyped([
             'skills' => [],
             'rules' => ['spec-core'],
             'agents' => [],
         ], ['kiro']);
 
-        $output = implode("\n", $lines);
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
         self::assertStringContainsString('Installed steering spec-core -> kiro', $output);
+        self::assertFileExists($proj . '/.kiro/steering/spec/spec-core.md');
+    }
+
+    public function testRuleInstallUsesCategoryFileLayoutNotNameTargetDirs(): void
+    {
+        $pkg = sys_get_temp_dir() . '/aipm-inst-rule-flat-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/rules/git', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/git/branch-overview.cursor.mdc', 'cursor');
+        file_put_contents($pkg . '/abilities/rules/git/branch-overview.kiro.md', 'kiro');
+
+        $proj = sys_get_temp_dir() . '/aipm-inst-rule-flat-proj-' . bin2hex(random_bytes(4));
+        mkdir($proj, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($proj);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $cursor = $installer->installTyped([
+            'skills' => [],
+            'rules' => ['branch-overview'],
+            'agents' => [],
+        ], ['cursor']);
+        $kiro = $installer->installTyped([
+            'skills' => [],
+            'rules' => ['branch-overview'],
+            'agents' => [],
+        ], ['kiro']);
+
+        chdir($old);
+
+        self::assertSame(0, $cursor['exit_code']);
+        self::assertSame(0, $kiro['exit_code']);
+        self::assertFileExists($proj . '/.cursor/rules/git/branch-overview.mdc');
+        self::assertFileExists($proj . '/.kiro/steering/git/branch-overview.md');
+        self::assertDirectoryDoesNotExist($proj . '/abilities/rules/branch-overview/cursor');
+        self::assertDirectoryDoesNotExist($proj . '/abilities/rules/branch-overview/kiro');
+    }
+
+    public function testInstallTypedWritesManagedGitignoreWhenTemplateMatches(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-installer-gi-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        mkdir($tmp . '/abilities/gitignore', 0775, true);
+        file_put_contents($tmp . '/abilities/gitignore/template.gitignore', implode("\n", [
+            '## @aipm:block ability=skill:graphify target=cursor',
+            '/.cache/graphify/',
+            '## @aipm:end',
+        ]));
+
+        $pkg = sys_get_temp_dir() . '/aipm-installer-gi-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/skills/graphify/cursor', 0775, true);
+        file_put_contents($pkg . '/abilities/skills/graphify/cursor/SKILL.md', 'x');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $result = $installer->installTyped([
+            'skills' => ['graphify'],
+            'rules' => [],
+            'agents' => [],
+        ], ['cursor']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+
+        $gitignore = (string) file_get_contents($tmp . '/.gitignore');
+        self::assertStringContainsString('# BEGIN aipm-managed-gitignore v1', $gitignore);
+        self::assertStringContainsString('/.cache/graphify/', $gitignore);
     }
 }

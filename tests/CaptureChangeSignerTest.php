@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Capture\CaptureEventSigner;
+use AiProfileManager\Capture\CaptureChangeSigner;
 use PHPUnit\Framework\TestCase;
 
-final class CaptureEventSignerTest extends TestCase
+final class CaptureChangeSignerTest extends TestCase
 {
     public function testSignAndVerifyRoundTrip(): void
     {
-        $signer = new CaptureEventSigner();
+        $signer = new CaptureChangeSigner();
         $body = '{"x":1}';
         $ts = (string) time();
         $secret = 'sekret';
@@ -24,14 +24,14 @@ final class CaptureEventSignerTest extends TestCase
 
     public function testVerifyRejectsNonDigitTimestamp(): void
     {
-        $signer = new CaptureEventSigner();
+        $signer = new CaptureChangeSigner();
 
         self::assertFalse($signer->verify('{}', 'abc', 'sha256=x', 's'));
     }
 
     public function testVerifyRejectsLargeClockSkew(): void
     {
-        $signer = new CaptureEventSigner();
+        $signer = new CaptureChangeSigner();
         $body = '{}';
         $farPast = (string) (time() - 99999);
         $sig = $signer->sign($body, $farPast, 's');

@@ -27,7 +27,7 @@ final class PresetDeleteCommand extends Command
         $this->addArgument('name', InputArgument::REQUIRED, 'Preset name.');
         $this->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown');
         $this->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown');
-        $this->addOption('event-id', null, InputOption::VALUE_OPTIONAL, 'Event identifier.');
+        $this->addOption('change-id', null, InputOption::VALUE_OPTIONAL, 'Change identifier.');
         $this->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601).');
     }
 
@@ -52,7 +52,7 @@ final class PresetDeleteCommand extends Command
             $cwd,
             (string) $input->getOption('source-repo'),
             (string) $input->getOption('source-commit'),
-            (string) ($input->getOption('event-id') ?: ''),
+            (string) ($input->getOption('change-id') ?: ''),
             (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM)),
         );
 
@@ -63,13 +63,13 @@ final class PresetDeleteCommand extends Command
         }
 
         if ($r['unchanged']) {
-            $io->writeln('[ok] Preset deleted; manifest matches baseline (no event written).');
+            $io->writeln('[ok] Preset deleted; manifest matches baseline (no change written).');
 
             return Command::SUCCESS;
         }
 
         if ($r['path'] !== null) {
-            $io->writeln(sprintf('[ok] Event written to events dir: %s', $r['path']));
+            $io->writeln(sprintf('[ok] Change written to changes dir: %s', $r['path']));
         }
 
         return $r['exit_code'];

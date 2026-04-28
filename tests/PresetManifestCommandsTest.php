@@ -74,7 +74,7 @@ final class PresetManifestCommandsTest extends TestCase
             'preset' => 'gitflow',
             'ability' => 'new-skill-for-test',
             '--skill' => true,
-            '--event-id' => '55555555-5555-4555-8555-555555555555',
+            '--change-id' => '55555555-5555-4555-8555-555555555555',
         ]);
 
         chdir($old);
@@ -85,8 +85,8 @@ final class PresetManifestCommandsTest extends TestCase
         $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
 
         self::assertSame(2, $exit);
-        self::assertStringContainsString('Event written to events dir', $tester->getDisplay());
-        self::assertFileExists($tmpAipm . '/events/55555555-5555-4555-8555-555555555555.json');
+        self::assertStringContainsString('Change written to changes dir', $tester->getDisplay());
+        self::assertFileExists($tmpAipm . '/changes/55555555-5555-4555-8555-555555555555.json');
     }
 
     public function testPresetAddAbilityNoOpWhenAbilityAlreadyPresent(): void
@@ -130,9 +130,9 @@ final class PresetManifestCommandsTest extends TestCase
         $tester = new CommandTester($cmd);
         $exit = $tester->execute([
             'preset' => 'gitflow',
-            'ability' => 'flow-starter',
+            'ability' => 'gitflow-starter',
             '--agent' => true,
-            '--event-id' => '66666666-6666-4666-8666-666666666666',
+            '--change-id' => '66666666-6666-4666-8666-666666666666',
         ]);
 
         chdir($old);
@@ -143,7 +143,7 @@ final class PresetManifestCommandsTest extends TestCase
         $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
 
         self::assertSame(2, $exit);
-        self::assertFileExists($tmpAipm . '/events/66666666-6666-4666-8666-666666666666.json');
+        self::assertFileExists($tmpAipm . '/changes/66666666-6666-4666-8666-666666666666.json');
     }
 
     public function testPresetCreateWritesEventForNewPresetName(): void
@@ -163,7 +163,7 @@ final class PresetManifestCommandsTest extends TestCase
         $exit = $tester->execute([
             'name' => 'fresh-preset-' . bin2hex(random_bytes(2)),
             '--skill' => ['snap'],
-            '--event-id' => 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+            '--change-id' => 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
         ]);
 
         chdir($old);
@@ -175,7 +175,7 @@ final class PresetManifestCommandsTest extends TestCase
         $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
 
         self::assertSame(2, $exit);
-        self::assertFileExists($tmpAipm . '/events/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.json');
+        self::assertFileExists($tmpAipm . '/changes/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.json');
     }
 
     public function testPresetDeleteWritesEventWhenRemovingPresetFromManifest(): void
@@ -194,7 +194,7 @@ final class PresetManifestCommandsTest extends TestCase
         $tester = new CommandTester($cmd);
         $exit = $tester->execute([
             'name' => 'kiro-spec',
-            '--event-id' => 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+            '--change-id' => 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
         ]);
 
         chdir($old);
@@ -206,6 +206,6 @@ final class PresetManifestCommandsTest extends TestCase
         $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
 
         self::assertSame(2, $exit);
-        self::assertFileExists($tmpAipm . '/events/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.json');
+        self::assertFileExists($tmpAipm . '/changes/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.json');
     }
 }

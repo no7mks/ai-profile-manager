@@ -13,7 +13,7 @@ final class CaptureWriteBackServiceTest extends TestCase
     {
         $root = sys_get_temp_dir() . '/aipm-wb-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities/skills/myagent/cursor', 0775, true);
-        mkdir($root . '/abilities/rules/myrule/cursor', 0775, true);
+        mkdir($root . '/abilities/rules/git', 0775, true);
         mkdir($root . '/abilities/agents/myagent/cursor', 0775, true);
 
         $old = getcwd();
@@ -32,7 +32,7 @@ final class CaptureWriteBackServiceTest extends TestCase
                 [
                     'type' => 'rule',
                     'name' => 'myrule',
-                    'files' => [['path' => 'RULE.mdc', 'content' => 'r', 'patch' => 'p']],
+                    'files' => [['path' => 'rules/git/myrule.cursor.mdc', 'content' => 'r', 'patch' => 'p']],
                 ],
                 [
                     'type' => 'agent',
@@ -55,7 +55,7 @@ final class CaptureWriteBackServiceTest extends TestCase
         chdir($old);
 
         self::assertFileExists($root . '/abilities/skills/myskill/cursor/SKILL.md');
-        self::assertFileExists($root . '/abilities/rules/myrule/cursor/RULE.mdc');
+        self::assertFileExists($root . '/abilities/rules/git/myrule.cursor.mdc');
         self::assertFileExists($root . '/abilities/agents/myagent/cursor/agent.md');
         self::assertFileExists($root . '/abilities/_presets.json');
         self::assertFileExists($root . '/abilities/unknown-items/x/cursor/u.txt');

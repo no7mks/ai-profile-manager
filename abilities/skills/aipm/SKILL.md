@@ -5,92 +5,51 @@ description: "当你想在新项目里用 aipm init 装脚手架与 scope 规则
 
 # aipm（AI Profile Manager）
 
-本 Skill 帮助用户通过 `aipm` 工具管理项目的 skills、rules/steerings、custom-agents 等资源。
+本 Skill 是 **Agent 执行手册**，用于在对话中快速、稳妥地调用 `aipm`。  
+完整命令语义、参数与行为细节以仓库根 `README.md` 为准；本文件不重复 CLI 手册。
 
-`aipm` 对应 Composer 包 `no7mks/ai-profile-manager`，安装后命令为 `aipm`，运行需 **PHP ^8.5**。下文由 Agent 协助执行或提示用户执行；`-t` 用于选择 Cursor、Kiro 等安装目标；示例中的名称须替换为实际的 ability / preset。
+## 何时使用本 Skill
 
-## 全局安装
+当用户意图属于以下类型时，优先使用 `aipm`：
 
-用户若尚未安装或无法运行 `aipm`：
+- 在业务仓库初始化脚手架与 scope（`init`）。
+- 把能力安装到 `.cursor` / `.kiro`（`skill:install` / `rule:install` / `agent:install` / `install`）。
+- 检查或捕获本地改动（`check` / `capture`）。
+- 将 capture 事件回流到能力仓库（`ingest`，仅维护场景）。
 
-```bash
-composer global require no7mks/ai-profile-manager
-```
+## Agent 执行原则
 
-把 Composer 全局 `vendor/bin` 加入 `PATH`（以用户本机为准；常见示例）：
+1. 先确认当前目录：默认应在用户目标业务仓库根目录执行。
+2. 不臆造名称：ability / preset 名必须来自用户输入或仓库真实存在项。
+3. 目标明确：涉及写入时显式带 `-t`（`cursor` 或 `kiro`），避免写错平台目录。
+4. 先小后大：不确定时先做 typed 命令（如 `skill:check <name>`），再做 preset 或全量操作。
+5. 保守覆盖：只有用户明确要求时才使用 `--force`。
+6. 非交互环境才用 `--no-prefill` 或 `--yes`，正常对话保持可确认流程。
 
-```bash
-export PATH="$HOME/.composer/vendor/bin:$PATH"
-export PATH="$HOME/.config/composer/vendor/bin:$PATH"
-```
+## 常用决策树（给 Agent）
 
-```bash
-echo 'export PATH="$HOME/.composer/vendor/bin:$PATH"' >> ~/.zshrc
-source ~/.zshrc
-```
+- 新项目落地模板：`aipm init [path] -t <target>`
+- 安装单个能力：
+  - `aipm skill:install <name> -t <target>`
+  - `aipm rule:install <name> -t <target>`
+  - `aipm agent:install <name...> -t <target>`
+- 按预设批量安装：`aipm install <preset> -t <target>`
+- 比较当前改动：
+  - typed：`aipm {skill|rule|agent}:check <name> -t <target>`
+  - preset：`aipm check <preset> -t <target>`
+- 生成改动事件：
+  - typed：`aipm {skill|rule|agent}:capture <name> -t <target>`
+  - preset / 全量：`aipm capture [preset] -t <target> [--yes]`
+- 维护方写回能力仓库：`aipm ingest [--changes-dir <dir>]`
 
-```bash
-which aipm
-aipm --help
-```
+## 常见失败与处理
 
-## 新项目脚手架（`init`）
+- `aipm: command not found`：提示用户全局安装并确认 `PATH`，再重试。
+- 命令执行但写入位置异常：优先检查 cwd 与 `-t`。
+- capture 未产出文件：可能是无差异，先看命令摘要与退出码再判断。
+- ingest 未生效：核对 `~/.aipm/changes`（或 `--changes-dir`）是否存在可处理变更。
 
-在**业务仓库根目录**或 `[path]` 下安装捆绑脚手架（模板来自包内 **`scaffold/`**：`docs/`、`issues/`、`AGENTS.md`、`PROJECT.md`），并按 `-t` 写入对应平台的 **scope** 规则（`cursor-scope` / `kiro-scope`）。**不传 `-t` 时**与 `skill:install` 等一致，默认目标为 **cursor** 与 **kiro**。
+## 与 README 的边界
 
-```bash
-aipm init
-aipm init path/to/project -t cursor
-```
-
-已存在脚手架文件且需覆盖时使用 `-f` / `--force`。
-
-## 装进 `.cursor` / `.kiro`（日常主路径）
-
-在**用户关心的业务仓库根目录**执行（路径按用户实际 workspace）；`-t` 决定写入 **Cursor** 还是 **Kiro** 侧布局。
-
-**单独装某一类**
-
-```bash
-aipm skill:install <name> -t cursor
-aipm rule:install <name> -t kiro
-aipm agent:install <name1> <name2> -t cursor
-```
-
-**按 preset 一批装**（顶层 `install` 只处理 preset）
-
-```bash
-aipm install gitflow -t cursor
-aipm install kiro-spec -t kiro
-```
-
-需要对照是否缺件、是否与装包不一致时，可用 `check`（按需）：
-
-```bash
-aipm skill:check <name> -t cursor
-aipm rule:check <name> -t kiro
-aipm agent:check <name> -t cursor
-aipm check <preset> -t cursor
-```
-
-更新已拉取的能力清单可执行：`aipm update`（按需）。
-
-## 用 capture 反馈本地改动（用户最常需知道的一节）
-
-用户在**本机已经装好的 skill / rule / agent 相关文件**上做了修改后，若要**把「相对安装结果」的差异记下来、用于反馈给提供方**，用 **capture**。若当前仓库根下存在参与管理的 **`abilities/`** 布局，`check` / `capture` 一般在**该仓库根目录**执行。有差异时会在本机 **`~/.aipm/events`** 下写入事件文件（脚本可加 `-y` / `--yes` 跳过交互）。
-
-```bash
-aipm skill:capture <name> -t cursor
-aipm rule:capture <name> -t kiro
-aipm agent:capture <name> -t cursor
-aipm capture <preset> -t kiro
-aipm capture -t cursor --yes
-```
-
-说明：**用户侧只需知道「capture + 事件目录」即可**；谁在下游消费这些事件、是否写回某个 catalog 仓库，属于维护方流程，不必作为 other-repo 用户的必读前提。
-
-## 退出码（简要）
-
-- **0**：正常（含检查通过、capture 无可上报差异等依具体子命令而定）。
-- **2**：存在需关注的差异（常见于 capture 发现变更）。
-- **1**：命令失败（未装全局 `aipm`、PHP 不满足、cwd 不对等）。
+- `README.md`：产品事实来源（source of truth）。
+- `SKILL.md`：对话执行策略（how to operate safely as an agent）。

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace AiProfileManager\Service;
 
 use AiProfileManager\Config\PackagePaths;
-use RecursiveDirectoryIterator;
-use RecursiveIteratorIterator;
 use RuntimeException;
 
 /**
@@ -14,8 +12,11 @@ use RuntimeException;
  */
 final class ProjectInitializer
 {
-    public function __construct(private readonly string $packageRoot)
-    {
+    public function __construct(
+        private readonly string $packageRoot,
+        private readonly DirectoryMirrorService $mirror = new DirectoryMirrorService(),
+        private readonly ProjectProfileRenderer $profileRenderer = new ProjectProfileRenderer(),
+    ) {
     }
 
     public static function fromPackageLayout(): self
@@ -25,10 +26,11 @@ final class ProjectInitializer
 
     /**
      * @param array<int, string> $targets IDE targets (cursor, kiro). Empty means skip installing scope rules.
+     * @param array<string, array{detected: string, confirmed: string, confidence: 'high'|'medium'|'low'}>|null $projectProfile
      *
      * @return array<int, string>
      */
-    public function init(string $targetDir, bool $force, array $targets): array
+    public function init(string $targetDir, bool $force, array $targets, ?array $projectProfile = null): array
     {
         $lines = [];
         $this->prepareTargetDirectory($targetDir);
@@ -46,18 +48,15 @@ final class ProjectInitializer
         }
 
         $lines[] = 'Installing scaffold (docs/, issues/, AGENTS.md, PROJECT.md)...';
-        $this->mirrorDirectory($this->join($scaffoldRoot, 'docs'), $this->join($targetDir, 'docs'));
-        $this->mirrorDirectory($this->join($scaffoldRoot, 'issues'), $this->join($targetDir, 'issues'));
-        $this->copyFile(
+        $this->mirror->mirrorDirectory($this->join($scaffoldRoot, 'docs'), $this->join($targetDir, 'docs'));
+        $this->mirror->mirrorDirectory($this->join($scaffoldRoot, 'issues'), $this->join($targetDir, 'issues'));
+        $this->mirror->copyFile(
             $this->join($scaffoldRoot, 'AGENTS.md'),
             $this->join($targetDir, 'AGENTS.md'),
             $force
         );
-        $this->copyFile(
-            $this->join($scaffoldRoot, 'PROJECT.md'),
-            $this->join($targetDir, 'PROJECT.md'),
-            $force
-        );
+        $profile = $projectProfile ?? ProjectProfileRenderer::unknownProfile();
+        $this->writeProjectProfile($targetDir, $force, $profile);
         $lines[] = '[ok] Scaffold installed at ' . $targetDir;
 
         $lines = array_merge($lines, $this->installScopeRules($targetDir, $force, $targets));
@@ -84,28 +83,28 @@ final class ProjectInitializer
         if (in_array('cursor', $targets, true)) {
             $src = $this->join($rulesRoot, 'cursor-scope.cursor.mdc');
             $dst = $this->join($targetDir, '.cursor', 'rules', 'cursor-scope.mdc');
-            $this->assertPathExists($src, 'Internal package layout error: cursor-scope.cursor.mdc missing.');
+            $this->assertPathExists($src, 'Internal package layout error: cursor-scope bundle missing.');
             if (!$force && is_file($dst)) {
                 throw new RuntimeException(
                     'Target already has .cursor/rules/cursor-scope.mdc. Pass --force to overwrite.'
                 );
             }
-            $this->ensureDirectory(dirname($dst));
-            $this->copyFile($src, $dst, true);
+            $this->mirror->ensureDirectory(dirname($dst));
+            $this->mirror->copyFile($src, $dst, true);
             $lines[] = '[ok] Installed Cursor scope rule -> .cursor/rules/cursor-scope.mdc';
         }
 
         if (in_array('kiro', $targets, true)) {
             $src = $this->join($rulesRoot, 'kiro-scope.kiro.md');
             $dst = $this->join($targetDir, '.kiro', 'steering', 'kiro-scope.md');
-            $this->assertPathExists($src, 'Internal package layout error: kiro-scope.kiro.md missing.');
+            $this->assertPathExists($src, 'Internal package layout error: kiro-scope bundle missing.');
             if (!$force && is_file($dst)) {
                 throw new RuntimeException(
                     'Target already has .kiro/steering/kiro-scope.md. Pass --force to overwrite.'
                 );
             }
-            $this->ensureDirectory(dirname($dst));
-            $this->copyFile($src, $dst, true);
+            $this->mirror->ensureDirectory(dirname($dst));
+            $this->mirror->copyFile($src, $dst, true);
             $lines[] = '[ok] Installed Kiro scope steering -> .kiro/steering/kiro-scope.md';
         }
 
@@ -120,7 +119,7 @@ final class ProjectInitializer
         if (file_exists($targetDir)) {
             throw new RuntimeException(sprintf('Path exists and is not a directory: %s', $targetDir));
         }
-        $this->ensureDirectory($targetDir);
+        $this->mirror->ensureDirectory($targetDir);
     }
 
     private function normalizedAbsolute(string $path): string
@@ -158,59 +157,24 @@ final class ProjectInitializer
             || file_exists($this->join($targetDir, 'PROJECT.md'));
     }
 
-    private function mirrorDirectory(string $source, string $destination): void
-    {
-        if (!is_dir($source)) {
-            throw new RuntimeException(sprintf('Source is not a directory: %s', $source));
-        }
-        $this->ensureDirectory($destination);
-
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
-            RecursiveIteratorIterator::SELF_FIRST
-        );
-
-        foreach ($iterator as $item) {
-            $relative = substr($item->getPathname(), strlen($source) + 1);
-            $destPath = $this->join($destination, $relative);
-            if ($item->isDir()) {
-                $this->ensureDirectory($destPath);
-
-                continue;
-            }
-            $this->ensureDirectory(dirname($destPath));
-            $this->copyFile($item->getPathname(), $destPath, true);
-        }
-    }
-
-    private function copyFile(string $source, string $destination, bool $force): void
-    {
-        if (!$force && file_exists($destination)) {
-            throw new RuntimeException(
-                sprintf('Target already has %s. Pass --force to overwrite.', basename($destination))
-            );
-        }
-        $parent = dirname($destination);
-        if (!is_dir($parent)) {
-            $this->ensureDirectory($parent);
-        }
-        if (!copy($source, $destination)) {
-            throw new RuntimeException(sprintf('Failed to copy to %s', $destination));
-        }
-    }
-
-    private function ensureDirectory(string $path): void
-    {
-        if (is_dir($path)) {
-            return;
-        }
-        if (!mkdir($path, 0775, true) && !is_dir($path)) {
-            throw new RuntimeException(sprintf('Cannot create directory: %s', $path));
-        }
-    }
-
     private function join(string ...$segments): string
     {
         return implode(DIRECTORY_SEPARATOR, $segments);
+    }
+
+    /**
+     * @param array<string, array{detected: string, confirmed: string, confidence: 'high'|'medium'|'low'}> $projectProfile
+     */
+    private function writeProjectProfile(string $targetDir, bool $force, array $projectProfile): void
+    {
+        $target = $this->join($targetDir, 'PROJECT.md');
+        if (!$force && file_exists($target)) {
+            throw new RuntimeException('Target already has PROJECT.md. Pass --force to overwrite.');
+        }
+
+        $content = $this->profileRenderer->renderMarkdown($projectProfile);
+        if (file_put_contents($target, $content) === false) {
+            throw new RuntimeException(sprintf('Failed to write %s', $target));
+        }
     }
 }

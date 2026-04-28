@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Capture\CaptureEventIngestor;
+use AiProfileManager\Capture\CaptureChangeIngestor;
 use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Command\AgentCaptureCommand;
 use AiProfileManager\Command\CheckCommand;
-use AiProfileManager\Command\IngestCaptureEventCommand;
+use AiProfileManager\Command\IngestCaptureChangeCommand;
 use AiProfileManager\Command\SkillCaptureCommand;
 use AiProfileManager\Command\SkillCheckCommand;
 use PHPUnit\Framework\TestCase;
@@ -64,7 +64,7 @@ final class CommandCheckCaptureTest extends TestCase
         self::assertNotNull($result['baseline']);
     }
 
-    public function testSkillCaptureWritesEventToEventsDirByDefault(): void
+    public function testSkillCaptureWritesChangeToChangesDirByDefault(): void
     {
         $tmpBaseline = sys_get_temp_dir() . '/aipm-cap-base-' . bin2hex(random_bytes(4));
         $tmpWorkspace = sys_get_temp_dir() . '/aipm-cap-ws-' . bin2hex(random_bytes(4));
@@ -90,7 +90,7 @@ final class CommandCheckCaptureTest extends TestCase
             '--target' => ['cursor'],
             '--source-repo' => 'acme/project',
             '--source-commit' => 'abc123',
-            '--event-id' => '11111111-1111-4111-8111-111111111111',
+            '--change-id' => '11111111-1111-4111-8111-111111111111',
             '--captured-at' => '2026-04-27T00:00:00Z',
         ]);
 
@@ -100,10 +100,10 @@ final class CommandCheckCaptureTest extends TestCase
 
         self::assertSame(2, $exitCode);
         $output = $tester->getDisplay();
-        self::assertStringContainsString('Event written to events dir', $output);
-        $eventPath = $tmpAipmHome . '/events/11111111-1111-4111-8111-111111111111.json';
-        self::assertFileExists($eventPath);
-        $decoded = json_decode((string) file_get_contents($eventPath), true);
+        self::assertStringContainsString('Change written to changes dir', $output);
+        $changePath = $tmpAipmHome . '/changes/11111111-1111-4111-8111-111111111111.json';
+        self::assertFileExists($changePath);
+        $decoded = json_decode((string) file_get_contents($changePath), true);
         self::assertIsArray($decoded);
         self::assertSame(2, $decoded['schema_version'] ?? null);
         self::assertIsArray($decoded['baseline'] ?? null);
@@ -112,7 +112,7 @@ final class CommandCheckCaptureTest extends TestCase
         self::assertIsString($decoded['items'][0]['files'][0]['patch'] ?? null);
     }
 
-    public function testSkillCaptureGeneratesUuidEventFileWhenEventIdOmitted(): void
+    public function testSkillCaptureGeneratesUuidChangeFileWhenChangeIdOmitted(): void
     {
         $tmpBaseline = sys_get_temp_dir() . '/aipm-cap-id-' . bin2hex(random_bytes(4));
         $tmpWorkspace = sys_get_temp_dir() . '/aipm-cap-id-ws-' . bin2hex(random_bytes(4));
@@ -146,7 +146,7 @@ final class CommandCheckCaptureTest extends TestCase
         putenv('AIPM_BASELINE_ROOT');
 
         self::assertSame(2, $exitCode);
-        $files = glob($tmpAipmHome . '/events/*.json') ?: [];
+        $files = glob($tmpAipmHome . '/changes/*.json') ?: [];
         self::assertCount(1, $files);
         self::assertMatchesRegularExpression(
             '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.json$/i',
@@ -154,9 +154,9 @@ final class CommandCheckCaptureTest extends TestCase
         );
     }
 
-    public function testAgentCaptureWritesEventWhenAgentDiffersFromBaseline(): void
+    public function testAgentCaptureWritesChangeWhenAgentDiffersFromBaseline(): void
     {
-        $name = 'gatekeeper';
+        $name = 'spec-gatekeeper';
         $tmpBaseline = sys_get_temp_dir() . '/aipm-ag-bl-' . bin2hex(random_bytes(4));
         $tmpWorkspace = sys_get_temp_dir() . '/aipm-ag-ws-' . bin2hex(random_bytes(4));
         mkdir($tmpBaseline . '/abilities/agents/' . $name . '/cursor', 0775, true);
@@ -181,7 +181,7 @@ final class CommandCheckCaptureTest extends TestCase
             '--target' => ['cursor'],
             '--source-repo' => 'acme/project',
             '--source-commit' => 'abc123',
-            '--event-id' => '99999999-9999-4999-8999-999999999999',
+            '--change-id' => '99999999-9999-4999-8999-999999999999',
         ]);
 
         chdir($originalCwd);
@@ -189,16 +189,16 @@ final class CommandCheckCaptureTest extends TestCase
         putenv('AIPM_BASELINE_ROOT');
 
         self::assertSame(2, $exitCode);
-        self::assertFileExists($tmpAipmHome . '/events/99999999-9999-4999-8999-999999999999.json');
-        $decoded = json_decode((string) file_get_contents($tmpAipmHome . '/events/99999999-9999-4999-8999-999999999999.json'), true);
+        self::assertFileExists($tmpAipmHome . '/changes/99999999-9999-4999-8999-999999999999.json');
+        $decoded = json_decode((string) file_get_contents($tmpAipmHome . '/changes/99999999-9999-4999-8999-999999999999.json'), true);
         self::assertSame('agent', $decoded['items'][0]['type'] ?? null);
     }
 
-    public function testIngestCaptureEventScansInboxAndIngestsEvent(): void
+    public function testIngestCaptureChangeScansInboxAndIngestsChange(): void
     {
         $payload = json_encode([
             'schema_version' => 2,
-            'event_id' => '22222222-2222-4222-8222-222222222222',
+            'change_id' => '22222222-2222-4222-8222-222222222222',
             'source_repo' => 'acme/project',
             'source_commit' => 'abc123',
             'base_ref' => 'v1.2.3',
@@ -225,26 +225,26 @@ final class CommandCheckCaptureTest extends TestCase
 
         $tmpConfigDir = sys_get_temp_dir() . '/aipm-test-' . bin2hex(random_bytes(4));
         mkdir($tmpConfigDir, 0775, true);
-        $eventsDir = $tmpConfigDir . '/events';
-        mkdir($eventsDir, 0775, true);
+        $changesDir = $tmpConfigDir . '/changes';
+        mkdir($changesDir, 0775, true);
         putenv('AIPM_HOME=' . $tmpConfigDir);
-        file_put_contents($eventsDir . '/22222222-2222-4222-8222-222222222222.json', $payload);
+        file_put_contents($changesDir . '/22222222-2222-4222-8222-222222222222.json', $payload);
         $originalCwd = getcwd();
         self::assertNotFalse($originalCwd);
         chdir($tmpConfigDir);
 
-        $command = new IngestCaptureEventCommand(new CaptureEventIngestor());
+        $command = new IngestCaptureChangeCommand(new CaptureChangeIngestor());
         $tester = new CommandTester($command);
         $exitCode = $tester->execute([
-            '--events-dir' => $eventsDir,
+            '--changes-dir' => $changesDir,
         ]);
 
         chdir($originalCwd);
         putenv('AIPM_HOME');
 
         self::assertSame(Command::SUCCESS, $exitCode);
-        self::assertStringContainsString('Found events: 1', $tester->getDisplay());
-        self::assertStringContainsString('[ok] Ingested event', $tester->getDisplay());
+        self::assertStringContainsString('Found changes: 1', $tester->getDisplay());
+        self::assertStringContainsString('[ok] Ingested change', $tester->getDisplay());
         self::assertFileExists($tmpConfigDir . '/abilities/skills/graphify/cursor/SKILL.md');
     }
 }

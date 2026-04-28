@@ -6,6 +6,8 @@ namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\ProjectInitializer;
+use AiProfileManager\Service\ProjectProfileDetector;
+use AiProfileManager\Service\ProjectProfileRenderer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -15,8 +17,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class InitCommand extends Command
 {
-    public function __construct(private readonly ProjectInitializer $initializer)
-    {
+    public function __construct(
+        private readonly ProjectInitializer $initializer,
+        private readonly ProjectProfileDetector $detector = new ProjectProfileDetector(),
+        private readonly ProjectProfileRenderer $renderer = new ProjectProfileRenderer(),
+    ) {
         parent::__construct();
     }
 
@@ -24,7 +29,7 @@ final class InitCommand extends Command
     {
         $this->setName('init');
         $this->setDescription(
-            'Install the bundled project scaffold (docs/, issues/, AGENTS.md, PROJECT.md) and optional scope rules.'
+            'Install scaffold and scope rules, then detect/confirm and prefill PROJECT.md.'
         );
         $this->addArgument(
             'path',
@@ -42,6 +47,12 @@ final class InitCommand extends Command
             't',
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'IDE/tool targets for scope rules (cursor-scope / kiro-scope). Repeat for multiple values.'
+        );
+        $this->addOption(
+            'no-prefill',
+            null,
+            InputOption::VALUE_NONE,
+            'Skip profile detection/confirmation and write UNKNOWN placeholders to PROJECT.md.'
         );
     }
 
@@ -69,9 +80,23 @@ final class InitCommand extends Command
         }
 
         $force = (bool) $input->getOption('force');
+        $noPrefill = (bool) $input->getOption('no-prefill');
+
+        if (!$noPrefill && !$input->isInteractive()) {
+            $io->error('init requires interactive confirmation to prefill PROJECT.md. Use --no-prefill to skip.');
+
+            return Command::FAILURE;
+        }
+
+        $projectProfile = ProjectProfileRenderer::unknownProfile();
+        if (!$noPrefill) {
+            $detected = $this->detector->detect($target);
+            $confirmed = $this->confirmProfileFields($io, $detected);
+            $projectProfile = $this->renderer->buildProfile($detected, $confirmed);
+        }
 
         try {
-            foreach ($this->initializer->init($target, $force, $targets) as $line) {
+            foreach ($this->initializer->init($target, $force, $targets, $projectProfile) as $line) {
                 $io->writeln($line);
             }
         } catch (\Throwable $e) {
@@ -81,5 +106,52 @@ final class InitCommand extends Command
         }
 
         return Command::SUCCESS;
+    }
+
+    /**
+     * @param array<string, array{detected: string, confidence: 'high'|'medium'|'low'}> $detected
+     * @return array<string, string>
+     */
+    private function confirmProfileFields(SymfonyStyle $io, array $detected): array
+    {
+        $io->section('Prefill PROJECT.md');
+
+        $labels = [
+            'project_stack' => 'Project Stack',
+            'full_test_command' => 'Full Test Command',
+            'build_command' => 'Build Command',
+            'run_entry' => 'Run Entry',
+            'version_locations' => 'Version Locations',
+            'sensitive_files' => 'Sensitive Files',
+        ];
+
+        $confirmed = [];
+        foreach ($labels as $key => $label) {
+            $field = $detected[$key] ?? ['detected' => 'UNKNOWN', 'confidence' => 'low'];
+            $candidate = $field['detected'];
+            $confidence = $field['confidence'];
+            $io->writeln(sprintf('%s | detected=%s | confidence=%s', $label, $candidate, $confidence));
+
+            $choice = $io->choice(
+                sprintf('How to fill %s?', $label),
+                ['accept', 'edit', 'unknown'],
+                'accept'
+            );
+
+            if ($choice === 'edit') {
+                $confirmed[$key] = $io->ask(sprintf('Input confirmed value for %s', $label), $candidate) ?? $candidate;
+
+                continue;
+            }
+            if ($choice === 'unknown') {
+                $confirmed[$key] = 'UNKNOWN';
+
+                continue;
+            }
+
+            $confirmed[$key] = $candidate;
+        }
+
+        return $confirmed;
     }
 }

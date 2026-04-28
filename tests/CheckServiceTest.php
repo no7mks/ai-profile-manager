@@ -16,7 +16,7 @@ final class CheckServiceTest extends TestCase
         $results = $service->checkTyped([
             'skills' => ['graphify'],
             'rules' => ['spec-core'],
-            'agents' => ['gatekeeper'],
+            'agents' => ['spec-gatekeeper'],
         ], ['cursor']);
 
         self::assertCount(3, $results);

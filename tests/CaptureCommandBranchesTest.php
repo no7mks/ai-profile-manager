@@ -62,7 +62,7 @@ final class CaptureCommandBranchesTest extends TestCase
         self::assertStringContainsString('Composer baseline', $tester->getDisplay());
     }
 
-    public function testFullWorkspaceCaptureWithYesWritesEvent(): void
+    public function testFullWorkspaceCaptureWithYesWritesChange(): void
     {
         $baseline = sys_get_temp_dir() . '/aipm-cap-fw-bl-' . bin2hex(random_bytes(4));
         $ws = sys_get_temp_dir() . '/aipm-cap-fw-ws-' . bin2hex(random_bytes(4));
@@ -88,7 +88,7 @@ final class CaptureCommandBranchesTest extends TestCase
         $exit = $tester->execute([
             '--target' => ['cursor'],
             '--yes' => true,
-            '--event-id' => 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
+            '--change-id' => 'cccccccc-cccc-4ccc-8ccc-cccccccccccc',
             '--source-repo' => 'acme/x',
             '--source-commit' => 'sha',
         ]);
@@ -106,7 +106,7 @@ final class CaptureCommandBranchesTest extends TestCase
         }
 
         self::assertSame(2, $exit);
-        self::assertFileExists($home . '/events/cccccccc-cccc-4ccc-8ccc-cccccccccccc.json');
+        self::assertFileExists($home . '/changes/cccccccc-cccc-4ccc-8ccc-cccccccccccc.json');
     }
 
     public function testFullWorkspaceCaptureDeclineConfirmSkipsPersistence(): void
@@ -135,7 +135,7 @@ final class CaptureCommandBranchesTest extends TestCase
         $tester->setInputs(['n']);
         $exit = $tester->execute([
             '--target' => ['cursor'],
-            '--event-id' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
+            '--change-id' => 'dddddddd-dddd-4ddd-8ddd-dddddddddddd',
         ], ['interactive' => true]);
 
         chdir($old);
@@ -151,6 +151,6 @@ final class CaptureCommandBranchesTest extends TestCase
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertFileDoesNotExist($home . '/events/dddddddd-dddd-4ddd-8ddd-dddddddddddd.json');
+        self::assertFileDoesNotExist($home . '/changes/dddddddd-dddd-4ddd-8ddd-dddddddddddd.json');
     }
 }
