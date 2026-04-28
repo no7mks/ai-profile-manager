@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+## [0.4.0] - 2026-04-28
+
 ### Breaking
 
 - CLI 移除 `aipm init`，初始化流程并入 `apm install`（无参数）；原交互式 PROJECT.md 预填链路不再提供。

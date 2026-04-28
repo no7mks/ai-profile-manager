@@ -16,7 +16,7 @@ final class ApplicationTest extends TestCase
         self::assertInstanceOf(Application::class, new Application());
     }
 
-    public function testBinAipmBinaryExists(): void
+    public function testBinApmBinaryExists(): void
     {
         self::assertFileExists(dirname(__DIR__) . '/bin/apm');
     }
@@ -27,6 +27,6 @@ final class ApplicationTest extends TestCase
 
         self::assertTrue($app->has('install'));
         self::assertTrue($app->has('ingest'));
-        self::assertSame('aipm', $app->getName());
+        self::assertSame('apm', $app->getName());
     }
 }
