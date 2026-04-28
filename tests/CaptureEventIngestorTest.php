@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace AiProfileManager\Tests;
 
 use AiProfileManager\Capture\CaptureEventIngestor;
+use AiProfileManager\Capture\CaptureEventSchema;
+use AiProfileManager\Capture\CaptureWriteBackService;
 use PHPUnit\Framework\TestCase;
 
 final class CaptureEventIngestorTest extends TestCase
@@ -119,5 +121,40 @@ final class CaptureEventIngestorTest extends TestCase
         self::assertSame(1, $result['exit_code']);
         self::assertTrue(is_file($base . '/failed-events/bad-schema.json'));
         self::assertStringContainsString('[fail] Schema invalid', implode("\n", $result['lines']));
+    }
+
+    public function testIngestWithWriteBackUsesExplicitDependencies(): void
+    {
+        $cfgDir = sys_get_temp_dir() . '/aipm-ing-wb-' . bin2hex(random_bytes(4));
+        mkdir($cfgDir, 0775, true);
+        mkdir($cfgDir . '/events', 0775, true);
+
+        $ws = sys_get_temp_dir() . '/aipm-ing-ws-' . bin2hex(random_bytes(4));
+        mkdir($ws . '/abilities/skills/wbtest/cursor', 0775, true);
+
+        $oldHome = getenv('AIPM_HOME');
+        putenv('AIPM_HOME=' . $cfgDir);
+
+        $oldCwd = getcwd();
+        self::assertNotFalse($oldCwd);
+        chdir($ws);
+
+        $payload = $this->validPayload('88888888-8888-4888-8888-888888888888');
+        $payload['items'][0]['name'] = 'wbtest';
+        file_put_contents($cfgDir . '/events/wb.json', json_encode($payload, JSON_UNESCAPED_SLASHES));
+
+        $ingestor = new CaptureEventIngestor(new CaptureEventSchema(), new CaptureWriteBackService());
+        $result = $ingestor->ingestEvents($cfgDir . '/events', true);
+
+        chdir($oldCwd);
+        if ($oldHome === false) {
+            putenv('AIPM_HOME');
+        } else {
+            putenv('AIPM_HOME=' . $oldHome);
+        }
+
+        self::assertSame(0, $result['exit_code']);
+        self::assertStringContainsString('Write-back item file', implode("\n", $result['lines']));
+        self::assertFileExists($ws . '/abilities/skills/wbtest/cursor/SKILL.md');
     }
 }

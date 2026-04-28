@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
+use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use PHPUnit\Framework\TestCase;
@@ -86,5 +87,32 @@ final class CaptureServiceUnitTest extends TestCase
 
         self::assertSame('ref123', $event['base_ref']);
         self::assertSame('ref123', $event['baseline']['reference'] ?? null);
+    }
+
+    public function testCapturePresetManifestDiffReturnsNullWhenManifestMatchesBaseline(): void
+    {
+        $baseline = sys_get_temp_dir() . '/aipm-cpmd-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/aipm-cpmd-ws-' . bin2hex(random_bytes(4));
+        mkdir($baseline . '/abilities', 0775, true);
+        mkdir($ws . '/abilities', 0775, true);
+
+        $json = json_encode(AppConfig::PRESET_ITEMS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
+        file_put_contents($baseline . '/abilities/_presets.json', $json);
+        file_put_contents($ws . '/abilities/_presets.json', $json);
+
+        $oldBl = getenv('AIPM_BASELINE_ROOT');
+        putenv('AIPM_BASELINE_ROOT=' . $baseline);
+
+        $svc = new CaptureService(new CheckService());
+        $diff = $svc->capturePresetManifestDiff($ws);
+
+        if ($oldBl === false) {
+            putenv('AIPM_BASELINE_ROOT');
+        } else {
+            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+        }
+
+        self::assertNull($diff['result']);
+        self::assertNotNull($diff['baseline']);
     }
 }

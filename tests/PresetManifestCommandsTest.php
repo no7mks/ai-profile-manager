@@ -6,6 +6,8 @@ namespace AiProfileManager\Tests;
 
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Command\PresetAddAbilityCommand;
+use AiProfileManager\Command\PresetCreateCommand;
+use AiProfileManager\Command\PresetDeleteCommand;
 use AiProfileManager\Command\PresetRemoveAbilityCommand;
 use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
@@ -142,5 +144,68 @@ final class PresetManifestCommandsTest extends TestCase
 
         self::assertSame(2, $exit);
         self::assertFileExists($tmpAipm . '/events/66666666-6666-4666-8666-666666666666.json');
+    }
+
+    public function testPresetCreateWritesEventForNewPresetName(): void
+    {
+        $ctx = $this->workspaceMatchingBaseline();
+        $tmpAipm = sys_get_temp_dir() . '/aipm-pcr-' . bin2hex(random_bytes(4));
+        mkdir($tmpAipm, 0775, true);
+        $oldHome = getenv('AIPM_HOME');
+        putenv('AIPM_HOME=' . $tmpAipm);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($ctx['ws']);
+
+        $cmd = new PresetCreateCommand(new CaptureService(new CheckService()));
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute([
+            'name' => 'fresh-preset-' . bin2hex(random_bytes(2)),
+            '--skill' => ['snap'],
+            '--event-id' => 'aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa',
+        ]);
+
+        chdir($old);
+        if ($oldHome === false) {
+            putenv('AIPM_HOME');
+        } else {
+            putenv('AIPM_HOME=' . $oldHome);
+        }
+        $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
+
+        self::assertSame(2, $exit);
+        self::assertFileExists($tmpAipm . '/events/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa.json');
+    }
+
+    public function testPresetDeleteWritesEventWhenRemovingPresetFromManifest(): void
+    {
+        $ctx = $this->workspaceMatchingBaseline();
+        $tmpAipm = sys_get_temp_dir() . '/aipm-pdel2-' . bin2hex(random_bytes(4));
+        mkdir($tmpAipm, 0775, true);
+        $oldHome = getenv('AIPM_HOME');
+        putenv('AIPM_HOME=' . $tmpAipm);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($ctx['ws']);
+
+        $cmd = new PresetDeleteCommand(new CaptureService(new CheckService()));
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute([
+            'name' => 'kiro-spec',
+            '--event-id' => 'bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb',
+        ]);
+
+        chdir($old);
+        if ($oldHome === false) {
+            putenv('AIPM_HOME');
+        } else {
+            putenv('AIPM_HOME=' . $oldHome);
+        }
+        $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
+
+        self::assertSame(2, $exit);
+        self::assertFileExists($tmpAipm . '/events/bbbbbbbb-bbbb-4bbb-8bbb-bbbbbbbbbbbb.json');
     }
 }

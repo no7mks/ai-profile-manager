@@ -78,4 +78,66 @@ final class ComposerBaselineResolverTest extends TestCase
         self::assertNotNull($out);
         self::assertSame('override', $out['version']);
     }
+
+    public function testResolveUsesSourceReferenceWhenDistMissing(): void
+    {
+        $composerHome = sys_get_temp_dir() . '/aipm-ch-src-' . bin2hex(random_bytes(4));
+        mkdir($composerHome . '/vendor/composer', 0775, true);
+        file_put_contents($composerHome . '/vendor/composer/installed.json', json_encode([
+            'packages' => [[
+                'name' => 'no7mks/ai-profile-manager',
+                'version' => '3.0.0',
+                'source' => ['reference' => 'aaaabbbb'],
+            ]],
+        ], JSON_UNESCAPED_SLASHES));
+
+        $oldHome = getenv('COMPOSER_HOME');
+        $oldBl = getenv('AIPM_BASELINE_ROOT');
+        putenv('COMPOSER_HOME=' . $composerHome);
+        putenv('AIPM_BASELINE_ROOT');
+
+        $resolver = new ComposerBaselineResolver();
+        $out = $resolver->resolve();
+
+        if ($oldHome === false) {
+            putenv('COMPOSER_HOME');
+        } else {
+            putenv('COMPOSER_HOME=' . $oldHome);
+        }
+        if ($oldBl === false) {
+            putenv('AIPM_BASELINE_ROOT');
+        } else {
+            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+        }
+
+        self::assertNotNull($out);
+        self::assertSame('aaaabbbb', $out['reference'] ?? null);
+    }
+
+    public function testResolveReturnsNullWhenInstalledJsonUnreadable(): void
+    {
+        $composerHome = sys_get_temp_dir() . '/aipm-ch-miss-' . bin2hex(random_bytes(4));
+        mkdir($composerHome . '/vendor/composer', 0775, true);
+
+        $oldHome = getenv('COMPOSER_HOME');
+        $oldBl = getenv('AIPM_BASELINE_ROOT');
+        putenv('COMPOSER_HOME=' . $composerHome);
+        putenv('AIPM_BASELINE_ROOT');
+
+        $resolver = new ComposerBaselineResolver();
+        $out = $resolver->resolve();
+
+        if ($oldHome === false) {
+            putenv('COMPOSER_HOME');
+        } else {
+            putenv('COMPOSER_HOME=' . $oldHome);
+        }
+        if ($oldBl === false) {
+            putenv('AIPM_BASELINE_ROOT');
+        } else {
+            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+        }
+
+        self::assertNull($out);
+    }
 }

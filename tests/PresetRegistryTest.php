@@ -52,6 +52,24 @@ final class PresetRegistryTest extends TestCase
         self::assertSame(AppConfig::PRESET_ITEMS, $registry->allPresets());
     }
 
+    public function testLoadFromWorkspaceSkipsMalformedPresetEntries(): void
+    {
+        $root = sys_get_temp_dir() . '/aipm-pr-mal-' . bin2hex(random_bytes(4));
+        mkdir($root . '/abilities', 0775, true);
+        file_put_contents($root . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, json_encode([
+            'valid' => [
+                'skills' => ['ok'],
+                'rules' => [],
+                'agents' => [],
+            ],
+            'bad-shape' => 'not-an-object',
+        ], JSON_UNESCAPED_SLASHES));
+
+        $registry = new PresetRegistry($root);
+        self::assertSame(['ok'], $registry->getPreset('valid')['skills']);
+        self::assertNull($registry->getPreset('bad-shape'));
+    }
+
     public function testSaveToWorkspaceRoundtrip(): void
     {
         $root = sys_get_temp_dir() . '/aipm-pr4-' . bin2hex(random_bytes(4));

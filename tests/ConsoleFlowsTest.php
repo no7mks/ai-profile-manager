@@ -59,6 +59,24 @@ final class ConsoleFlowsTest extends TestCase
         self::assertSame(Command::FAILURE, $exit);
     }
 
+    public function testInstallCommandUnknownTargetsFails(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-flow-itgt-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $cmd = new InstallCommand(new Installer());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['preset' => 'gitflow', '--target' => ['not-a-target']]);
+
+        chdir($old);
+
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('Unknown targets', $tester->getDisplay());
+    }
+
     public function testCheckCommandRunsForKnownPreset(): void
     {
         $tmp = sys_get_temp_dir() . '/aipm-flow-ch-' . bin2hex(random_bytes(4));

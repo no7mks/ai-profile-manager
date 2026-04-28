@@ -60,4 +60,20 @@ final class AbilityDirectoryDiffTest extends TestCase
         self::assertSame('abilities/_presets.json', $files[0]['path']);
         self::assertTrue($files[0]['deleted'] ?? false);
     }
+
+    public function testDiffDirectoriesAddsNestedFileOnlyInWorkspace(): void
+    {
+        $base = sys_get_temp_dir() . '/aipm-nest-a-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/aipm-nest-b-' . bin2hex(random_bytes(4));
+        mkdir($base, 0775, true);
+        mkdir($ws . '/deep/sub', 0775, true);
+        file_put_contents($ws . '/deep/sub/z.txt', 'only-here');
+
+        $diff = new AbilityDirectoryDiff();
+        $files = $diff->diffDirectories($base, $ws);
+
+        self::assertCount(1, $files);
+        self::assertSame('deep/sub/z.txt', $files[0]['path']);
+        self::assertStringContainsString('+only-here', $files[0]['patch']);
+    }
 }

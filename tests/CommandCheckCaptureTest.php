@@ -7,6 +7,7 @@ namespace AiProfileManager\Tests;
 use AiProfileManager\Capture\CaptureEventIngestor;
 use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
+use AiProfileManager\Command\AgentCaptureCommand;
 use AiProfileManager\Command\CheckCommand;
 use AiProfileManager\Command\IngestCaptureEventCommand;
 use AiProfileManager\Command\SkillCaptureCommand;
@@ -109,6 +110,88 @@ final class CommandCheckCaptureTest extends TestCase
         self::assertSame('no7mks/ai-profile-manager', $decoded['baseline']['package'] ?? null);
         self::assertIsArray($decoded['items'][0]['files'] ?? null);
         self::assertIsString($decoded['items'][0]['files'][0]['patch'] ?? null);
+    }
+
+    public function testSkillCaptureGeneratesUuidEventFileWhenEventIdOmitted(): void
+    {
+        $tmpBaseline = sys_get_temp_dir() . '/aipm-cap-id-' . bin2hex(random_bytes(4));
+        $tmpWorkspace = sys_get_temp_dir() . '/aipm-cap-id-ws-' . bin2hex(random_bytes(4));
+        mkdir($tmpBaseline . '/abilities/skills/graphify/cursor', 0775, true);
+        mkdir($tmpWorkspace . '/abilities/skills/graphify/cursor', 0775, true);
+        file_put_contents($tmpBaseline . '/abilities/skills/graphify/cursor/SKILL.md', "b\n");
+        file_put_contents($tmpWorkspace . '/abilities/skills/graphify/cursor/SKILL.md', "w\n");
+
+        $tmpAipmHome = sys_get_temp_dir() . '/aipm-cap-id-home-' . bin2hex(random_bytes(4));
+        mkdir($tmpAipmHome, 0775, true);
+        putenv('AIPM_HOME=' . $tmpAipmHome);
+        putenv('AIPM_BASELINE_ROOT=' . $tmpBaseline);
+
+        $originalCwd = getcwd();
+        self::assertNotFalse($originalCwd);
+        chdir($tmpWorkspace);
+
+        $command = new SkillCaptureCommand(new CaptureService(new CheckService()));
+        $tester = new CommandTester($command);
+
+        $exitCode = $tester->execute([
+            'skills' => ['graphify'],
+            '--target' => ['cursor'],
+            '--source-repo' => 'acme/project',
+            '--source-commit' => 'abc123',
+            '--captured-at' => '2026-04-27T00:00:00Z',
+        ]);
+
+        chdir($originalCwd);
+        putenv('AIPM_HOME');
+        putenv('AIPM_BASELINE_ROOT');
+
+        self::assertSame(2, $exitCode);
+        $files = glob($tmpAipmHome . '/events/*.json') ?: [];
+        self::assertCount(1, $files);
+        self::assertMatchesRegularExpression(
+            '/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}\.json$/i',
+            basename((string) $files[0]),
+        );
+    }
+
+    public function testAgentCaptureWritesEventWhenAgentDiffersFromBaseline(): void
+    {
+        $name = 'gatekeeper';
+        $tmpBaseline = sys_get_temp_dir() . '/aipm-ag-bl-' . bin2hex(random_bytes(4));
+        $tmpWorkspace = sys_get_temp_dir() . '/aipm-ag-ws-' . bin2hex(random_bytes(4));
+        mkdir($tmpBaseline . '/abilities/agents/' . $name . '/cursor', 0775, true);
+        mkdir($tmpWorkspace . '/abilities/agents/' . $name . '/cursor', 0775, true);
+        file_put_contents($tmpBaseline . '/abilities/agents/' . $name . '/cursor/agent.md', "b\n");
+        file_put_contents($tmpWorkspace . '/abilities/agents/' . $name . '/cursor/agent.md', "w\n");
+
+        $tmpAipmHome = sys_get_temp_dir() . '/aipm-ag-home-' . bin2hex(random_bytes(4));
+        mkdir($tmpAipmHome, 0775, true);
+        putenv('AIPM_HOME=' . $tmpAipmHome);
+        putenv('AIPM_BASELINE_ROOT=' . $tmpBaseline);
+
+        $originalCwd = getcwd();
+        self::assertNotFalse($originalCwd);
+        chdir($tmpWorkspace);
+
+        $command = new AgentCaptureCommand(new CaptureService(new CheckService()));
+        $tester = new CommandTester($command);
+
+        $exitCode = $tester->execute([
+            'agents' => [$name],
+            '--target' => ['cursor'],
+            '--source-repo' => 'acme/project',
+            '--source-commit' => 'abc123',
+            '--event-id' => '99999999-9999-4999-8999-999999999999',
+        ]);
+
+        chdir($originalCwd);
+        putenv('AIPM_HOME');
+        putenv('AIPM_BASELINE_ROOT');
+
+        self::assertSame(2, $exitCode);
+        self::assertFileExists($tmpAipmHome . '/events/99999999-9999-4999-8999-999999999999.json');
+        $decoded = json_decode((string) file_get_contents($tmpAipmHome . '/events/99999999-9999-4999-8999-999999999999.json'), true);
+        self::assertSame('agent', $decoded['items'][0]['type'] ?? null);
     }
 
     public function testIngestCaptureEventScansInboxAndIngestsEvent(): void

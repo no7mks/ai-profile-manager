@@ -113,4 +113,26 @@ final class CaptureEventSchemaTest extends TestCase
 
         self::assertTrue($r['valid']);
     }
+
+    public function testValidateRejectsNonObjectItem(): void
+    {
+        $schema = new CaptureEventSchema();
+        $payload = $this->minimalValidV2();
+        $payload['items'] = ['not-an-object'];
+        $r = $schema->validate($payload);
+
+        self::assertFalse($r['valid']);
+        self::assertTrue(array_reduce($r['errors'], fn (bool $a, string $e): bool => $a || str_contains($e, 'items[0]'), false));
+    }
+
+    public function testValidateRejectsFileMissingPatchString(): void
+    {
+        $schema = new CaptureEventSchema();
+        $payload = $this->minimalValidV2();
+        $payload['items'][0]['files'][0] = ['path' => 'SKILL.md', 'content' => 'x'];
+        $r = $schema->validate($payload);
+
+        self::assertFalse($r['valid']);
+        self::assertTrue(array_reduce($r['errors'], fn (bool $a, string $e): bool => $a || str_contains($e, 'patch'), false));
+    }
 }

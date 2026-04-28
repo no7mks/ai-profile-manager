@@ -93,4 +93,28 @@ final class CaptureWriteBackServiceTest extends TestCase
         self::assertFileDoesNotExist($path);
         self::assertTrue(array_reduce($lines, fn (bool $a, string $l): bool => $a || str_contains($l, 'Delete'), false));
     }
+
+    public function testWriteBackSkipsRelativePathThatNormalizesToNothing(): void
+    {
+        $root = sys_get_temp_dir() . '/aipm-wbskip-' . bin2hex(random_bytes(4));
+        mkdir($root . '/abilities/skills/x/cursor', 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($root);
+
+        $svc = new CaptureWriteBackService();
+        $lines = $svc->writeBack([
+            'target' => 'cursor',
+            'items' => [[
+                'type' => 'skill',
+                'name' => 'x',
+                'files' => [['path' => '..', 'content' => 'z', 'patch' => 'p']],
+            ]],
+        ]);
+
+        chdir($old);
+
+        self::assertSame([], $lines);
+    }
 }
