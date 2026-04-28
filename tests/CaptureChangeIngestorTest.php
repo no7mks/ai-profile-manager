@@ -4,18 +4,18 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Capture\CaptureEventIngestor;
-use AiProfileManager\Capture\CaptureEventSchema;
+use AiProfileManager\Capture\CaptureChangeIngestor;
+use AiProfileManager\Capture\CaptureChangeSchema;
 use AiProfileManager\Capture\CaptureWriteBackService;
 use PHPUnit\Framework\TestCase;
 
-final class CaptureEventIngestorTest extends TestCase
+final class CaptureChangeIngestorTest extends TestCase
 {
-    private function validPayload(string $eventId): array
+    private function validPayload(string $changeId): array
     {
         return [
             'schema_version' => 2,
-            'event_id' => $eventId,
+            'change_id' => $changeId,
             'source_repo' => 'acme/p',
             'source_commit' => 'sha',
             'base_ref' => 'v1',
@@ -40,15 +40,15 @@ final class CaptureEventIngestorTest extends TestCase
     {
         $base = sys_get_temp_dir() . '/aipm-ing-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
-        mkdir($base . '/events', 0775, true);
+        mkdir($base . '/changes', 0775, true);
 
         $old = getenv('AIPM_HOME');
         putenv('AIPM_HOME=' . $base);
 
-        file_put_contents($base . '/events/broken.json', '{');
+        file_put_contents($base . '/changes/broken.json', '{');
 
-        $ingestor = new CaptureEventIngestor();
-        $result = $ingestor->ingestEvents($base . '/events', false);
+        $ingestor = new CaptureChangeIngestor();
+        $result = $ingestor->ingestChanges($base . '/changes', false);
 
         if ($old === false) {
             putenv('AIPM_HOME');
@@ -57,26 +57,26 @@ final class CaptureEventIngestorTest extends TestCase
         }
 
         self::assertSame(1, $result['exit_code']);
-        self::assertTrue(is_file($base . '/failed-events/broken.json'));
+        self::assertTrue(is_file($base . '/failed-changes/broken.json'));
         self::assertStringContainsString('[fail] Invalid JSON', implode("\n", $result['lines']));
     }
 
-    public function testDuplicateEventIsSkipped(): void
+    public function testDuplicateChangeIsSkipped(): void
     {
         $base = sys_get_temp_dir() . '/aipm-ing2-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
-        mkdir($base . '/events', 0775, true);
+        mkdir($base . '/changes', 0775, true);
 
         $old = getenv('AIPM_HOME');
         putenv('AIPM_HOME=' . $base);
 
-        $eventId = '44444444-4444-4444-8444-444444444444';
-        $json = json_encode($this->validPayload($eventId), JSON_UNESCAPED_SLASHES);
-        file_put_contents($base . '/events/a.json', $json);
-        file_put_contents($base . '/events/b.json', $json);
+        $changeId = '44444444-4444-4444-8444-444444444444';
+        $json = json_encode($this->validPayload($changeId), JSON_UNESCAPED_SLASHES);
+        file_put_contents($base . '/changes/a.json', $json);
+        file_put_contents($base . '/changes/b.json', $json);
 
-        $ingestor = new CaptureEventIngestor();
-        $result = $ingestor->ingestEvents($base . '/events', false);
+        $ingestor = new CaptureChangeIngestor();
+        $result = $ingestor->ingestChanges($base . '/changes', false);
 
         if ($old === false) {
             putenv('AIPM_HOME');
@@ -85,7 +85,7 @@ final class CaptureEventIngestorTest extends TestCase
         }
 
         $text = implode("\n", $result['lines']);
-        self::assertStringContainsString('[skip] Duplicate event', $text);
+        self::assertStringContainsString('[skip] Duplicate change', $text);
         self::assertSame(0, $result['exit_code']);
     }
 
@@ -93,14 +93,14 @@ final class CaptureEventIngestorTest extends TestCase
     {
         $base = sys_get_temp_dir() . '/aipm-ing3-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
-        mkdir($base . '/events', 0775, true);
+        mkdir($base . '/changes', 0775, true);
 
         $old = getenv('AIPM_HOME');
         putenv('AIPM_HOME=' . $base);
 
-        file_put_contents($base . '/events/bad-schema.json', json_encode([
+        file_put_contents($base . '/changes/bad-schema.json', json_encode([
             'schema_version' => 2,
-            'event_id' => '77777777-7777-4777-8777-777777777777',
+            'change_id' => '77777777-7777-4777-8777-777777777777',
             'source_repo' => 'x',
             'source_commit' => 'y',
             'base_ref' => '',
@@ -109,8 +109,8 @@ final class CaptureEventIngestorTest extends TestCase
             'items' => [],
         ]));
 
-        $ingestor = new CaptureEventIngestor();
-        $result = $ingestor->ingestEvents($base . '/events', false);
+        $ingestor = new CaptureChangeIngestor();
+        $result = $ingestor->ingestChanges($base . '/changes', false);
 
         if ($old === false) {
             putenv('AIPM_HOME');
@@ -119,7 +119,7 @@ final class CaptureEventIngestorTest extends TestCase
         }
 
         self::assertSame(1, $result['exit_code']);
-        self::assertTrue(is_file($base . '/failed-events/bad-schema.json'));
+        self::assertTrue(is_file($base . '/failed-changes/bad-schema.json'));
         self::assertStringContainsString('[fail] Schema invalid', implode("\n", $result['lines']));
     }
 
@@ -127,7 +127,7 @@ final class CaptureEventIngestorTest extends TestCase
     {
         $cfgDir = sys_get_temp_dir() . '/aipm-ing-wb-' . bin2hex(random_bytes(4));
         mkdir($cfgDir, 0775, true);
-        mkdir($cfgDir . '/events', 0775, true);
+        mkdir($cfgDir . '/changes', 0775, true);
 
         $ws = sys_get_temp_dir() . '/aipm-ing-ws-' . bin2hex(random_bytes(4));
         mkdir($ws . '/abilities/skills/wbtest/cursor', 0775, true);
@@ -141,10 +141,10 @@ final class CaptureEventIngestorTest extends TestCase
 
         $payload = $this->validPayload('88888888-8888-4888-8888-888888888888');
         $payload['items'][0]['name'] = 'wbtest';
-        file_put_contents($cfgDir . '/events/wb.json', json_encode($payload, JSON_UNESCAPED_SLASHES));
+        file_put_contents($cfgDir . '/changes/wb.json', json_encode($payload, JSON_UNESCAPED_SLASHES));
 
-        $ingestor = new CaptureEventIngestor(new CaptureEventSchema(), new CaptureWriteBackService());
-        $result = $ingestor->ingestEvents($cfgDir . '/events', true);
+        $ingestor = new CaptureChangeIngestor(new CaptureChangeSchema(), new CaptureWriteBackService());
+        $result = $ingestor->ingestChanges($cfgDir . '/changes', true);
 
         chdir($oldCwd);
         if ($oldHome === false) {

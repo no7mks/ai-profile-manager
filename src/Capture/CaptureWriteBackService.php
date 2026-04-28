@@ -8,16 +8,16 @@ final class CaptureWriteBackService
 {
     /**
      * @param array{
-     *     event_id: string,
+     *     change_id: string,
      *     source_repo: string,
      *     source_commit: string,
      *     base_ref: string,
      *     captured_at: string,
      *     items?: array<int, mixed>
-     * } $event
+     * } $change
      * @return array<int, string>
      */
-    public function writeBack(array $event): array
+    public function writeBack(array $change): array
     {
         $lines = [];
         $sourceDir = $this->resolveSourceDir();
@@ -26,7 +26,7 @@ final class CaptureWriteBackService
             mkdir($abilitiesDir, 0775, true);
         }
 
-        $items = $event['items'] ?? [];
+        $items = $change['items'] ?? [];
         foreach ($items as $item) {
             if (!is_array($item)) {
                 continue;
@@ -34,7 +34,7 @@ final class CaptureWriteBackService
 
             $itemType = (string) ($item['type'] ?? '');
             $name = $this->sanitizePathSegment((string) ($item['name'] ?? 'unknown'));
-            $target = $this->sanitizePathSegment((string) ($event['target'] ?? 'unknown'));
+            $target = $this->sanitizePathSegment((string) ($change['target'] ?? 'unknown'));
 
             $files = $item['files'] ?? [];
             foreach ($files as $file) {
@@ -52,10 +52,13 @@ final class CaptureWriteBackService
 
                 if ($itemType === 'preset') {
                     $targetPath = $this->buildSafeTargetPath($sourceDir, $relativePath);
+                } elseif ($itemType === 'rule') {
+                    // Rules are stored as abilities/rules/<category>/<name>.<target-ext>
+                    // and the event payload path is rooted at abilities/ (e.g. rules/git/foo.cursor.mdc).
+                    $targetPath = $this->buildSafeTargetPath($sourceDir . '/abilities', $relativePath);
                 } else {
                     $typeDir = match ($itemType) {
                         'skill' => 'abilities/skills',
-                        'rule' => 'abilities/rules',
                         'agent' => 'abilities/agents',
                         default => 'abilities/unknown-items',
                     };

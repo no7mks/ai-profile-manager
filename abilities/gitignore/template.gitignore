@@ -1,0 +1,23 @@
+## @aipm:block ability=php target=*
+.phpunit.cache/
+.phpunit.result.cache
+## @aipm:end
+
+## @aipm:block ability=graphify target=*
+graphify-out/.graphify_python
+graphify-out/cache/
+graphify-out/manifest.json
+ut/graphify-out/
+## @aipm:end
+
+## @aipm:block ability=python target=*
+__pycache__/
+*.pyc
+## @aipm:end
+
+## @aipm:block ability=kotlin target=*
+/dist/
+/build/
+.gradle/
+.kotlin/
+## @aipm:end

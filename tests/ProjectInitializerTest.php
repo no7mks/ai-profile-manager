@@ -6,6 +6,7 @@ namespace AiProfileManager\Tests;
 
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\ProjectInitializer;
+use AiProfileManager\Service\ProjectProfileRenderer;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
@@ -25,6 +26,8 @@ final class ProjectInitializerTest extends TestCase
         self::assertFileExists($tmp . '/PROJECT.md');
         self::assertFileExists($tmp . '/.cursor/rules/cursor-scope.mdc');
         self::assertFileExists($tmp . '/.kiro/steering/kiro-scope.md');
+        self::assertStringContainsString('## Full Test Command', (string) file_get_contents($tmp . '/PROJECT.md'));
+        self::assertStringContainsString('- confirmed: UNKNOWN', (string) file_get_contents($tmp . '/PROJECT.md'));
 
         $joined = implode("\n", $lines);
         self::assertStringContainsString('Scaffold installed', $joined);
@@ -81,5 +84,24 @@ final class ProjectInitializerTest extends TestCase
 
         self::assertDirectoryExists($nested);
         self::assertFileExists($nested . '/AGENTS.md');
+    }
+
+    public function testInitWritesProvidedProjectProfile(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-init-profile-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+
+        $initializer = ProjectInitializer::fromPackageLayout();
+        $profile = ProjectProfileRenderer::unknownProfile();
+        $profile['full_test_command'] = [
+            'detected' => 'npm test',
+            'confirmed' => 'pnpm test:ci',
+            'confidence' => 'high',
+        ];
+        $initializer->init($tmp, false, [], $profile);
+
+        $project = (string) file_get_contents($tmp . '/PROJECT.md');
+        self::assertStringContainsString('- detected: npm test', $project);
+        self::assertStringContainsString('- confirmed: pnpm test:ci', $project);
     }
 }

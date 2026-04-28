@@ -73,10 +73,11 @@ final class InstallCommand extends Command
 
         $items = $presetSpec;
         $io->writeln("Preset: {$preset}");
-        foreach ($this->installer->installTyped($items, $targets) as $line) {
+        $result = $this->installer->installTyped($items, $targets, $preset);
+        foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }
 
-        return Command::SUCCESS;
+        return $result['exit_code'] === 0 ? Command::SUCCESS : Command::FAILURE;
     }
 }

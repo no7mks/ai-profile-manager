@@ -30,7 +30,7 @@ final class TypedCaptureCheckCommandsTest extends TestCase
     {
         $cmd = new AgentCheckCommand(new CheckService());
         $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['agents' => ['gatekeeper'], '--target' => ['kiro']]);
+        $exit = $tester->execute(['agents' => ['spec-gatekeeper'], '--target' => ['kiro']]);
 
         self::assertSame(0, $exit);
         self::assertStringContainsString('agent', $tester->getDisplay());
@@ -58,7 +58,7 @@ final class TypedCaptureCheckCommandsTest extends TestCase
 
         $cmd = new AgentCaptureCommand(new CaptureService(new CheckService()));
         $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['agents' => ['gatekeeper'], '--target' => ['cursor']]);
+        $exit = $tester->execute(['agents' => ['spec-gatekeeper'], '--target' => ['cursor']]);
 
         if ($oldCh === false) {
             putenv('COMPOSER_HOME');

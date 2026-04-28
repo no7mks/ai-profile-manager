@@ -4,16 +4,16 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Capture\CaptureEventSchema;
+use AiProfileManager\Capture\CaptureChangeSchema;
 use PHPUnit\Framework\TestCase;
 
-final class CaptureEventSchemaTest extends TestCase
+final class CaptureChangeSchemaTest extends TestCase
 {
     private function minimalValidV2(): array
     {
         return [
             'schema_version' => 2,
-            'event_id' => '33333333-3333-4333-8333-333333333333',
+            'change_id' => '33333333-3333-4333-8333-333333333333',
             'source_repo' => 'org/repo',
             'source_commit' => 'sha',
             'base_ref' => 'v1',
@@ -40,7 +40,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateAcceptsWellFormedV2(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $r = $schema->validate($this->minimalValidV2());
 
         self::assertTrue($r['valid']);
@@ -49,7 +49,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateRejectsWrongSchemaVersion(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $payload = $this->minimalValidV2();
         $payload['schema_version'] = 1;
         $r = $schema->validate($payload);
@@ -60,7 +60,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateRejectsMissingBaselineFields(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $payload = $this->minimalValidV2();
         unset($payload['baseline']['install_path']);
         $r = $schema->validate($payload);
@@ -71,7 +71,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateRejectsInvalidBaselineReferenceType(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $payload = $this->minimalValidV2();
         $payload['baseline']['reference'] = 123;
         $r = $schema->validate($payload);
@@ -82,7 +82,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateRejectsInvalidItem(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $payload = $this->minimalValidV2();
         $payload['items'][0]['files'] = [];
         $r = $schema->validate($payload);
@@ -93,7 +93,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateRejectsInvalidFileDeletedType(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $payload = $this->minimalValidV2();
         $payload['items'][0]['files'][0]['deleted'] = 'yes';
         $r = $schema->validate($payload);
@@ -104,7 +104,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateAcceptsDeletedBoolean(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $payload = $this->minimalValidV2();
         $payload['items'][0]['files'][0]['deleted'] = true;
         $payload['items'][0]['files'][0]['content'] = '';
@@ -116,7 +116,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateRejectsNonObjectItem(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $payload = $this->minimalValidV2();
         $payload['items'] = ['not-an-object'];
         $r = $schema->validate($payload);
@@ -127,7 +127,7 @@ final class CaptureEventSchemaTest extends TestCase
 
     public function testValidateRejectsFileMissingPatchString(): void
     {
-        $schema = new CaptureEventSchema();
+        $schema = new CaptureChangeSchema();
         $payload = $this->minimalValidV2();
         $payload['items'][0]['files'][0] = ['path' => 'SKILL.md', 'content' => 'x'];
         $r = $schema->validate($payload);

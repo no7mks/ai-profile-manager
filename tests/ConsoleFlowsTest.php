@@ -31,6 +31,12 @@ final class ConsoleFlowsTest extends TestCase
     {
         $tmp = sys_get_temp_dir() . '/aipm-flow-i-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
+        mkdir($tmp . '/abilities/gitignore', 0775, true);
+        file_put_contents($tmp . '/abilities/gitignore/template.gitignore', implode("\n", [
+            '## @aipm:block ability=gitflow target=*',
+            '/.aipm/gitflow/',
+            '## @aipm:end',
+        ]));
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -43,6 +49,8 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exit);
         self::assertStringContainsString('Preset: gitflow', $tester->getDisplay());
+        self::assertFileExists($tmp . '/.gitignore');
+        self::assertStringContainsString('/.aipm/gitflow/', (string) file_get_contents($tmp . '/.gitignore'));
     }
 
     public function testInstallCommandUnknownPresetFails(): void
@@ -162,10 +170,10 @@ final class ConsoleFlowsTest extends TestCase
     {
         $cmd = new AgentInstallCommand(new Installer());
         $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['agents' => ['gatekeeper'], '--target' => ['cursor']]);
+        $exit = $tester->execute(['agents' => ['code-reviewer'], '--target' => ['cursor']]);
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('gatekeeper', $tester->getDisplay());
+        self::assertStringContainsString('code-reviewer', $tester->getDisplay());
     }
 
     public function testUpdateCommandWritesKnowledgeBase(): void
@@ -255,6 +263,14 @@ final class ConsoleFlowsTest extends TestCase
 
         $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
         $tester = new CommandTester($cmd);
+        $tester->setInputs([
+            'accept',
+            'accept',
+            'accept',
+            'accept',
+            'accept',
+            'accept',
+        ]);
         $exit = $tester->execute(['path' => $tmp]);
 
         self::assertSame(Command::SUCCESS, $exit);
@@ -263,5 +279,70 @@ final class ConsoleFlowsTest extends TestCase
         foreach (AppConfig::DEFAULT_TARGETS as $t) {
             self::assertStringContainsString($t, $tester->getDisplay());
         }
+        self::assertStringContainsString('Prefill PROJECT.md', $tester->getDisplay());
+    }
+
+    public function testInitCommandFailsWhenNotInteractiveWithoutNoPrefill(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-init-cli-ni-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+
+        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['path' => $tmp], ['interactive' => false]);
+
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('--no-prefill', $tester->getDisplay());
+    }
+
+    public function testInitCommandNoPrefillWritesUnknownProfile(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-init-cli-np-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+
+        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['path' => $tmp, '--no-prefill' => true], ['interactive' => false]);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        self::assertFileExists($tmp . '/PROJECT.md');
+        self::assertStringContainsString('- confirmed: UNKNOWN', (string) file_get_contents($tmp . '/PROJECT.md'));
+    }
+
+    public function testInitCommandCanEditDetectedField(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-init-cli-edit-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        file_put_contents($tmp . '/package.json', (string) json_encode([
+            'name' => 'demo',
+            'version' => '1.2.3',
+            'scripts' => [
+                'test' => 'vitest',
+                'build' => 'vite build',
+                'dev' => 'vite',
+            ],
+        ]));
+        file_put_contents($tmp . '/.gitignore', ".env\n");
+
+        $cmd = new InitCommand(ProjectInitializer::fromPackageLayout());
+        $tester = new CommandTester($cmd);
+        $tester->setInputs([
+            'accept',
+            'edit',
+            'pnpm test:all',
+            'accept',
+            'accept',
+            'accept',
+            'unknown',
+        ]);
+        $exit = $tester->execute(['path' => $tmp, '--force' => true]);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        $project = (string) file_get_contents($tmp . '/PROJECT.md');
+        self::assertStringContainsString('## Full Test Command', $project);
+        self::assertStringContainsString('- detected: npm test', $project);
+        self::assertStringContainsString('- confirmed: pnpm test:all', $project);
+        self::assertStringContainsString('## Sensitive Files', $project);
+        self::assertStringContainsString('- confirmed: UNKNOWN', $project);
     }
 }

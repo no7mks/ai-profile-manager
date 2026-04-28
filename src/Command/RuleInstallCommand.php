@@ -55,14 +55,15 @@ final class RuleInstallCommand extends Command
             return Command::FAILURE;
         }
 
-        foreach ($this->installer->installTyped([
+        $result = $this->installer->installTyped([
             'skills' => [],
             'rules' => $rules,
             'agents' => [],
-        ], $targets) as $line) {
+        ], $targets);
+        foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }
 
-        return Command::SUCCESS;
+        return $result['exit_code'] === 0 ? Command::SUCCESS : Command::FAILURE;
     }
 }

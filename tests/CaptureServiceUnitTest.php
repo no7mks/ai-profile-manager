@@ -60,10 +60,10 @@ final class CaptureServiceUnitTest extends TestCase
         self::assertStringContainsString('Could not resolve Composer baseline', implode("\n", $result['lines']));
     }
 
-    public function testBuildCaptureEventIncludesBaselineReferenceWhenPresent(): void
+    public function testBuildCaptureChangeIncludesBaselineReferenceWhenPresent(): void
     {
         $svc = new CaptureService(new CheckService());
-        $event = $svc->buildCaptureEvent(
+        $change = $svc->buildCaptureChange(
             [[
                 'type' => 'skill',
                 'name' => 'n',
@@ -85,8 +85,8 @@ final class CaptureServiceUnitTest extends TestCase
             ],
         );
 
-        self::assertSame('ref123', $event['base_ref']);
-        self::assertSame('ref123', $event['baseline']['reference'] ?? null);
+        self::assertSame('ref123', $change['base_ref']);
+        self::assertSame('ref123', $change['baseline']['reference'] ?? null);
     }
 
     public function testCapturePresetManifestDiffReturnsNullWhenManifestMatchesBaseline(): void

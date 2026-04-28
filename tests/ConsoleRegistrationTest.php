@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Capture\CaptureEventIngestor;
+use AiProfileManager\Capture\CaptureChangeIngestor;
 use AiProfileManager\Core\ConsoleRegistration;
 use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
@@ -20,7 +20,7 @@ final class ConsoleRegistrationTest extends TestCase
         $installer = new Installer();
         $checker = new CheckService();
         $capture = new CaptureService($checker);
-        $ingestor = new CaptureEventIngestor();
+        $ingestor = new CaptureChangeIngestor();
         $updater = new KnowledgeBaseUpdater();
 
         $app = new Application();

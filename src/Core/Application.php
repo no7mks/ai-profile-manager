@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Core;
 
-use AiProfileManager\Capture\CaptureEventIngestor;
+use AiProfileManager\Capture\CaptureChangeIngestor;
 use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
@@ -31,7 +31,7 @@ final class Application
     ): SymfonyApplication {
         $checker = new CheckService();
         $capture = new CaptureService($checker);
-        $ingestor = new CaptureEventIngestor();
+        $ingestor = new CaptureChangeIngestor();
 
         $app = new SymfonyApplication('aipm', '0.2.0');
         $app->setDefaultCommand('list');

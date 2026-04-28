@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace AiProfileManager\Service;
 
 /**
- * Diff two ability roots (baseline vs workspace) into file records suitable for CaptureEvent items.
+ * Diff two ability roots (baseline vs workspace) into file records suitable for CaptureChange items.
  */
 final class AbilityDirectoryDiff
 {

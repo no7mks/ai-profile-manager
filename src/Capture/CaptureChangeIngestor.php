@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Capture;
 
-final class CaptureEventIngestor
+final class CaptureChangeIngestor
 {
     public function __construct(
-        private readonly CaptureEventSchema $schema = new CaptureEventSchema(),
+        private readonly CaptureChangeSchema $schema = new CaptureChangeSchema(),
         private readonly CaptureWriteBackService $writeBack = new CaptureWriteBackService(),
     ) {
     }
@@ -15,18 +15,18 @@ final class CaptureEventIngestor
     /**
      * @return array{lines: array<int, string>, exit_code: int}
      */
-    public function ingestEvents(
-        ?string $eventsDir = null,
+    public function ingestChanges(
+        ?string $changesDir = null,
         bool $writeBack = false
     ): array {
         $baseDir = (string) (getenv('AIPM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.aipm'));
-        $events = $eventsDir ?? ($baseDir . '/events');
-        $processed = $baseDir . '/processed-events';
-        $failed = $baseDir . '/failed-events';
-        $auditPath = $baseDir . '/events.jsonl';
-        $indexPath = $baseDir . '/processed-event-ids.json';
+        $changes = $changesDir ?? ($baseDir . '/changes');
+        $processed = $baseDir . '/processed-changes';
+        $failed = $baseDir . '/failed-changes';
+        $auditPath = $baseDir . '/changes.jsonl';
+        $indexPath = $baseDir . '/processed-change-ids.json';
 
-        foreach ([$baseDir, $events, $processed, $failed] as $dir) {
+        foreach ([$baseDir, $changes, $processed, $failed] as $dir) {
             if (!is_dir($dir)) {
                 mkdir($dir, 0775, true);
             }
@@ -40,9 +40,9 @@ final class CaptureEventIngestor
             }
         }
 
-        $files = glob($events . '/*.json') ?: [];
+        $files = glob($changes . '/*.json') ?: [];
         sort($files);
-        $lines = ['Events dir: ' . $events, 'Found events: ' . (string) count($files)];
+        $lines = ['Changes dir: ' . $changes, 'Found changes: ' . (string) count($files)];
         $hasFailure = false;
 
         foreach ($files as $file) {
@@ -63,9 +63,9 @@ final class CaptureEventIngestor
                 continue;
             }
 
-            $eventKey = $payload['source_repo'] . '::' . $payload['event_id'];
-            if (in_array($eventKey, $seen, true)) {
-                $lines[] = '[skip] Duplicate event: ' . $eventKey;
+            $changeKey = $payload['source_repo'] . '::' . $payload['change_id'];
+            if (in_array($changeKey, $seen, true)) {
+                $lines[] = '[skip] Duplicate change: ' . $changeKey;
                 rename($file, $processed . '/' . basename($file));
                 continue;
             }
@@ -75,10 +75,10 @@ final class CaptureEventIngestor
                 $lines = array_merge($lines, $this->writeBack->writeBack($payload));
             }
 
-            $seen[] = $eventKey;
+            $seen[] = $changeKey;
             file_put_contents($indexPath, json_encode(array_values(array_unique($seen)), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL);
             rename($file, $processed . '/' . basename($file));
-            $lines[] = '[ok] Ingested event: ' . $eventKey;
+            $lines[] = '[ok] Ingested change: ' . $changeKey;
         }
 
         return ['lines' => $lines, 'exit_code' => $hasFailure ? 1 : 0];

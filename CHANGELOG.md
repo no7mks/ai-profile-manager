@@ -6,6 +6,25 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Capture 对象与 JSON 字段：**`CaptureEvent` / `event_id` 更名为 `CaptureChange` / `change_id`**；本机目录 **`~/.aipm/events` 等改为 `changes` / `processed-changes` / `failed-changes`**，审计文件 `events.jsonl`、`processed-event-ids.json` 同步更名。
+- CLI：`--event-id` → **`--change-id`**，`ingest` 的 **`--events-dir` → `--changes-dir`**。
+- 包内 **`abilities/rules`** 采用分类目录 + 后缀文件：`abilities/rules/{category}/{name}.cursor.mdc|.kiro.md`（与 sample 与安装目标路径映射一致）；`aipm init` 的 scope 规则源路径已同步。
+- 内置 preset **`gitflow` / `kiro-spec`** 的 agent 名称与仓库内目录对齐：`gitflow-starter` / `gitflow-finisher`、`spec-gatekeeper`（原 `flow-*` / `gatekeeper` 占位名不再使用）。
+
+### Added
+
+- **`Installer` 真实实现**：从全局安装包根复制到当前仓库；`skill/agent` 走 `abilities/{skills,agents}/{name}/{target}/`，`rule` 走 `abilities/rules/{category}/{name}.{cursor|kiro}.*`；任一能力缺失来源时输出 `[fail]` 且安装命令返回非 0。
+- **`DirectoryMirrorService`**：供 `ProjectInitializer` 与 `Installer` 复用的递归目录拷贝。
+- **`aipm init` 项目画像预填**：新增项目探测与交互确认流程，初始化时为 `PROJECT.md` 预填 6 项字段（Project Stack / Full Test Command / Build Command / Run Entry / Version Locations / Sensitive Files），并记录 `detected`、`confirmed`、`confidence`。
+
+### Changed
+
+- 安装命令（`install` / `skill:install` / `rule:install` / `agent:install`）在镜像 abilities 之后，继续支持基于 `abilities/gitignore/template.gitignore` 的 marker 模板自动更新仓库根 `.gitignore` 托管段（`aipm-managed-gitignore v1`）。
+- 模板支持 `ability=<id>` 与 `target=<target>` 最小语法：`<id>` 可为 `skill:<name>` / `rule:<name>` / `agent:<name>`，无前缀时按 preset 名匹配。
+- `aipm init` 在非交互环境默认失败并提示使用 `--no-prefill`；使用该参数时写入 `UNKNOWN` 占位值。
+
 ## [0.2.0] - 2026-04-28
 
 ### Added
