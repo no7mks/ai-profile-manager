@@ -101,6 +101,7 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exit);
         self::assertFileExists($tmp . '/docs/README.md');
+        self::assertDirectoryExists($tmp . '/docs/state');
         self::assertFileExists($tmp . '/issues/README.md');
         self::assertFileExists($tmp . '/AGENTS.md');
         self::assertFileExists($tmp . '/.cursor/skills/apm/SKILL.md');
