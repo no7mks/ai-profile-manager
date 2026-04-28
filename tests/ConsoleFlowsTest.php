@@ -10,6 +10,7 @@ use AiProfileManager\Command\CheckCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
 use AiProfileManager\Command\PresetCreateCommand;
+use AiProfileManager\Command\PresetDeleteCommand;
 use AiProfileManager\Command\RuleInstallCommand;
 use AiProfileManager\Command\SkillInstallCommand;
 use AiProfileManager\Command\UpdateCommand;
@@ -196,5 +197,23 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::FAILURE, $exit);
         self::assertStringContainsString('exactly one', $tester->getDisplay());
+    }
+
+    public function testPresetDeleteFailsForUnknownPreset(): void
+    {
+        $tmp = sys_get_temp_dir() . '/aipm-pdel-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $cmd = new PresetDeleteCommand(new CaptureService(new CheckService()));
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['name' => 'nonexistent-preset']);
+
+        chdir($old);
+
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('Unknown preset', $tester->getDisplay());
     }
 }

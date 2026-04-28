@@ -86,4 +86,38 @@ final class CaptureEventIngestorTest extends TestCase
         self::assertStringContainsString('[skip] Duplicate event', $text);
         self::assertSame(0, $result['exit_code']);
     }
+
+    public function testSchemaInvalidPayloadMovesToFailed(): void
+    {
+        $base = sys_get_temp_dir() . '/aipm-ing3-' . bin2hex(random_bytes(4));
+        mkdir($base, 0775, true);
+        mkdir($base . '/events', 0775, true);
+
+        $old = getenv('AIPM_HOME');
+        putenv('AIPM_HOME=' . $base);
+
+        file_put_contents($base . '/events/bad-schema.json', json_encode([
+            'schema_version' => 2,
+            'event_id' => '77777777-7777-4777-8777-777777777777',
+            'source_repo' => 'x',
+            'source_commit' => 'y',
+            'base_ref' => '',
+            'captured_at' => gmdate(DATE_ATOM),
+            'target' => 'cursor',
+            'items' => [],
+        ]));
+
+        $ingestor = new CaptureEventIngestor();
+        $result = $ingestor->ingestEvents($base . '/events', false);
+
+        if ($old === false) {
+            putenv('AIPM_HOME');
+        } else {
+            putenv('AIPM_HOME=' . $old);
+        }
+
+        self::assertSame(1, $result['exit_code']);
+        self::assertTrue(is_file($base . '/failed-events/bad-schema.json'));
+        self::assertStringContainsString('[fail] Schema invalid', implode("\n", $result['lines']));
+    }
 }
