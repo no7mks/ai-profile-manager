@@ -17,7 +17,7 @@
 - 每条 note 一个 markdown 文件，命名使用关键词（如 `feishu-batch-api.md`）
 - 不要求编号体系，不要求状态流转
 - 分支规则：在 develop 上创建和维护，feature 分支中也可写入
-- 消费后处理及完整生命周期规则见 `.kiro/steering/doc-lifecycle.md` Notes 生命周期章节
+- 消费后处理与生命周期由项目文档治理约定统一定义（如 doc-operator agent 所维护规则）
 
 ---
 

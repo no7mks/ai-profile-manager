@@ -1,56 +1,49 @@
 # Changes
 
-本目录用于记录项目的**版本级变更日志**与**spec 归档**。
+本目录用于记录项目的**版本级变更日志**与**release 归档材料**。
 
 ---
 
 ## 目录结构
 
 ```
-docs/changes/
-├── CHANGELOG.md              # 全局摘要（只含已 release 的版本，每版几行关键信息）
-├── unreleased/               # 已完成但未 release 的 feature 变更记录
-│   └── <feature-name>.md     # 每个 feature 一个文件
-├── <version>/                # 已 release 的版本目录
-│   ├── CHANGELOG.md          # 该版本的详细变更记录
-│   └── specs/                # 该版本归档的 specs
-│       └── <feature-name>/   # 从 .kiro/specs/ 移入
+CHANGELOG.md                   # 仓库根目录全局摘要
+docs/
+└── changes/
+    ├── unreleased/            # 已完成但未 release 的 feature 变更记录
+    │   └── <feature-name>.md  # 每个 feature 一个文件
+    ├── <version>/             # 已 release 的版本目录
+    │   ├── CHANGELOG.md       # 该版本的详细变更记录
+    │   └── artifacts/         # 该版本归档材料（可选）
+    │       └── <feature-name>/# 与该版本相关的补充资料
 ```
 
----
-
-## 流程
-
-### Feature 完成时（合并回 develop）
-
-- 在 `docs/changes/unreleased/` 下创建 `<feature-name>.md`
-- 记录该 feature 的详细变更（Added / Changed / Fixed 等）
-
-### Release 时
-
-1. 创建 `docs/changes/<version>/` 目录
-2. 将 `unreleased/` 下本次 release 验证通过的 feature 变更记录合并整理为 `docs/changes/<version>/CHANGELOG.md`
-3. 将已完成的 specs 从 `.kiro/specs/` 移入 `docs/changes/<version>/specs/`
-4. 在全局 `CHANGELOG.md` 顶部追加该版本的摘要（几行即可）
-5. 清除 `unreleased/` 中本次 release 验证通过的 feature 变更记录（未验证的保留）
+`CHANGELOG.md` 与 `docs/changes/` 是一组配套结构：前者做版本索引，后者做版本详情与归档。
 
 ---
 
-## 全局 CHANGELOG.md 格式
+## 边界
+
+- 本目录只记录“已经发生的变更”。
+- 本目录不记录需求意图（属于 `docs/proposals/`）。
+- 本目录不定义当前系统事实（属于 `docs/state/`）。
+- 全局版本摘要放在仓库根目录 `CHANGELOG.md`，本目录只保留版本级详细内容与附属归档。
+
+## 根目录 CHANGELOG.md（摘要）格式
 
 ```md
 # Changelog
 
 ## v0.2 - 2026-03-31
 
-一句话摘要。详见 [0.2/CHANGELOG.md](0.2/CHANGELOG.md)。
+一句话摘要。详见 [docs/changes/0.2/CHANGELOG.md](docs/changes/0.2/CHANGELOG.md)。
 
 ## v0.1 - 2026-03-20
 
-一句话摘要。详见 [0.1/CHANGELOG.md](0.1/CHANGELOG.md)。
+一句话摘要。详见 [docs/changes/0.1/CHANGELOG.md](docs/changes/0.1/CHANGELOG.md)。
 ```
 
-简洁摘要，详细内容见各版本目录下的 CHANGELOG.md。
+保持简洁摘要，详细内容见 `docs/changes/<version>/CHANGELOG.md`。
 
 ---
 
@@ -94,6 +87,29 @@ docs/changes/
 ## 设计原则
 
 - `unreleased/` 按 feature 拆文件，避免并行开发时冲突
-- 每个 release 是自包含目录（changelog + specs 归档）
-- 全局 CHANGELOG.md 保持简洁，只做索引
-- spec 归档后从 `.kiro/specs/` 移除，不再作为系统事实来源
+- 每个 release 是自包含目录（changelog + artifacts）
+- 根目录 `CHANGELOG.md` 保持简洁，只做索引
+- 附属归档材料用于追溯，不作为系统事实来源
+
+---
+
+## 命名与最小模板
+
+- `unreleased/` 文件命名：`<feature-name>.md`（kebab-case）
+- 版本目录命名：`<major>.<minor>`（如 `0.2`）
+- 版本日志文件固定命名：`CHANGELOG.md`
+
+`docs/changes/unreleased/<feature-name>.md` 最小模板：
+
+```md
+# <Feature Name>（PRP-xxx）
+
+## Added
+- ...
+
+## Changed
+- ...
+
+## Fixed
+- ...
+```

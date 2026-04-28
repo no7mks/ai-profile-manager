@@ -6,6 +6,18 @@
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-04-28
+
+### Added
+
+- scaffold 新增根级 `CHANGELOG.md` 模板，初始化后可直接承载版本摘要。
+
+### Changed
+
+- 更新 scaffold 文档结构说明，统一 `docs/changes` 与根级 `CHANGELOG.md` 的职责边界与链接路径。
+- `docs/manual`、`docs/state` 补充命名约定与最小模板，降低初始化项目后的落地成本。
+- `docs/notes`、`docs/proposals` 去除对特定工具目录的硬编码描述，改为项目约定表述。
+
 ## [0.4.0] - 2026-04-28
 
 ### Breaking
