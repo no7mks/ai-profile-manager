@@ -11,7 +11,7 @@ final class CaptureWriteBackServiceTest extends TestCase
 {
     public function testWriteBackSkillRuleAgentAndPresetPaths(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-wb-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-wb-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities/skills/myagent', 0775, true);
         mkdir($root . '/abilities/rules/git', 0775, true);
         mkdir($root . '/abilities/agents', 0775, true);
@@ -64,7 +64,7 @@ final class CaptureWriteBackServiceTest extends TestCase
 
     public function testWriteBackDeletesFileWhenDeletedFlagSet(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-wbdel-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-wbdel-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities/skills/delme', 0775, true);
         $path = $root . '/abilities/skills/delme/SKILL.md';
         file_put_contents($path, 'gone');
@@ -96,7 +96,7 @@ final class CaptureWriteBackServiceTest extends TestCase
 
     public function testWriteBackSkipsRelativePathThatNormalizesToNothing(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-wbskip-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-wbskip-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities/skills/x', 0775, true);
 
         $old = getcwd();

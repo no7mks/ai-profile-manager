@@ -21,8 +21,8 @@ final class IngestCaptureChangeCommand extends Command
     protected function configure(): void
     {
         $this->setName('ingest');
-        $this->setDescription('Ingest CaptureChange files from ~/.aipm/changes and write-back.');
-        $this->addOption('changes-dir', null, InputOption::VALUE_OPTIONAL, 'Changes directory. Defaults to ~/.aipm/changes.');
+        $this->setDescription('Ingest CaptureChange files from ~/.apm/changes and write-back.');
+        $this->addOption('changes-dir', null, InputOption::VALUE_OPTIONAL, 'Changes directory. Defaults to ~/.apm/changes.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int

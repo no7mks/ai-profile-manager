@@ -20,7 +20,7 @@ final class KnowledgeBaseUpdater
         array $presets,
         array $targets
     ): string {
-        $baseDir = rtrim((string) getenv('HOME'), '/') . '/.config/aipm';
+        $baseDir = rtrim((string) getenv('HOME'), '/') . '/.config/apm';
         if (!is_dir($baseDir)) {
             mkdir($baseDir, 0775, true);
         }

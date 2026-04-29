@@ -1,6 +1,6 @@
 ---
 name: apm
-description: "通过 `/apm <command>` 统一入口执行初始化、安装、检查、捕获与回流；按需调用 aipm binary。"
+description: "通过 `/apm <command>` 统一入口执行初始化、安装、检查、捕获与回流；按需调用 apm binary。"
 ---
 
 # apm（AI Profile Manager）
@@ -44,7 +44,7 @@ description: "通过 `/apm <command>` 统一入口执行初始化、安装、检
 - `apm: command not found`：提示用户全局安装并确认 `PATH`，再重试。
 - 命令执行但写入位置异常：优先检查 cwd 与 `-t`。
 - capture 未产出文件：可能是无差异，先看命令摘要与退出码再判断。
-- ingest 未生效：核对 `~/.aipm/changes`（或 `--changes-dir`）是否存在可处理变更。
+- ingest 未生效：核对 `~/.apm/changes`（或 `--changes-dir`）是否存在可处理变更。
 
 ## `/apm init`（skill 命令）交付物
 

@@ -25,8 +25,8 @@ final class PresetManifestCommandsTest extends TestCase
      */
     private function workspaceMatchingBaseline(): array
     {
-        $baseline = sys_get_temp_dir() . '/aipm-pmb-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-pmw-' . bin2hex(random_bytes(4));
+        $baseline = sys_get_temp_dir() . '/apm-pmb-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-pmw-' . bin2hex(random_bytes(4));
         mkdir($baseline . '/abilities', 0775, true);
         mkdir($ws . '/abilities', 0775, true);
 
@@ -34,9 +34,9 @@ final class PresetManifestCommandsTest extends TestCase
         file_put_contents($baseline . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, $json);
         file_put_contents($ws . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, $json);
 
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
+        $oldBl = getenv('APM_BASELINE_ROOT');
         $oldCh = getenv('COMPOSER_HOME');
-        putenv('AIPM_BASELINE_ROOT=' . $baseline);
+        putenv('APM_BASELINE_ROOT=' . $baseline);
         putenv('COMPOSER_HOME');
 
         return ['ws' => $ws, 'baseline' => $baseline, 'oldBl' => $oldBl, 'oldCh' => $oldCh];
@@ -45,9 +45,9 @@ final class PresetManifestCommandsTest extends TestCase
     private function restoreEnv(string|false $oldBl, string|false $oldCh): void
     {
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
         if ($oldCh === false) {
             putenv('COMPOSER_HOME');
@@ -59,10 +59,10 @@ final class PresetManifestCommandsTest extends TestCase
     public function testPresetAddAbilityWritesEventWhenManifestDiffersFromBaseline(): void
     {
         $ctx = $this->workspaceMatchingBaseline();
-        $tmpAipm = sys_get_temp_dir() . '/aipm-pevt-' . bin2hex(random_bytes(4));
+        $tmpAipm = sys_get_temp_dir() . '/apm-pevt-' . bin2hex(random_bytes(4));
         mkdir($tmpAipm, 0775, true);
-        $oldHome = getenv('AIPM_HOME');
-        putenv('AIPM_HOME=' . $tmpAipm);
+        $oldHome = getenv('APM_HOME');
+        putenv('APM_HOME=' . $tmpAipm);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -78,9 +78,9 @@ final class PresetManifestCommandsTest extends TestCase
         ]);
 
         chdir($old);
-        putenv('AIPM_HOME=' . ($oldHome !== false ? $oldHome : ''));
+        putenv('APM_HOME=' . ($oldHome !== false ? $oldHome : ''));
         if ($oldHome === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         }
         $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
 
@@ -91,7 +91,7 @@ final class PresetManifestCommandsTest extends TestCase
 
     public function testPresetAddAbilityNoOpWhenAbilityAlreadyPresent(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-pnop-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-pnop-' . bin2hex(random_bytes(4));
         mkdir($tmp . '/abilities', 0775, true);
         $json = json_encode(AppConfig::PRESET_ITEMS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
         file_put_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, $json);
@@ -117,10 +117,10 @@ final class PresetManifestCommandsTest extends TestCase
     public function testPresetRemoveAbilityWritesEventWhenManifestChanges(): void
     {
         $ctx = $this->workspaceMatchingBaseline();
-        $tmpAipm = sys_get_temp_dir() . '/aipm-prm-' . bin2hex(random_bytes(4));
+        $tmpAipm = sys_get_temp_dir() . '/apm-prm-' . bin2hex(random_bytes(4));
         mkdir($tmpAipm, 0775, true);
-        $oldHome = getenv('AIPM_HOME');
-        putenv('AIPM_HOME=' . $tmpAipm);
+        $oldHome = getenv('APM_HOME');
+        putenv('APM_HOME=' . $tmpAipm);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -136,9 +136,9 @@ final class PresetManifestCommandsTest extends TestCase
         ]);
 
         chdir($old);
-        putenv('AIPM_HOME=' . ($oldHome !== false ? $oldHome : ''));
+        putenv('APM_HOME=' . ($oldHome !== false ? $oldHome : ''));
         if ($oldHome === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         }
         $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
 
@@ -149,10 +149,10 @@ final class PresetManifestCommandsTest extends TestCase
     public function testPresetCreateWritesEventForNewPresetName(): void
     {
         $ctx = $this->workspaceMatchingBaseline();
-        $tmpAipm = sys_get_temp_dir() . '/aipm-pcr-' . bin2hex(random_bytes(4));
+        $tmpAipm = sys_get_temp_dir() . '/apm-pcr-' . bin2hex(random_bytes(4));
         mkdir($tmpAipm, 0775, true);
-        $oldHome = getenv('AIPM_HOME');
-        putenv('AIPM_HOME=' . $tmpAipm);
+        $oldHome = getenv('APM_HOME');
+        putenv('APM_HOME=' . $tmpAipm);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -168,9 +168,9 @@ final class PresetManifestCommandsTest extends TestCase
 
         chdir($old);
         if ($oldHome === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         } else {
-            putenv('AIPM_HOME=' . $oldHome);
+            putenv('APM_HOME=' . $oldHome);
         }
         $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
 
@@ -181,10 +181,10 @@ final class PresetManifestCommandsTest extends TestCase
     public function testPresetDeleteWritesEventWhenRemovingPresetFromManifest(): void
     {
         $ctx = $this->workspaceMatchingBaseline();
-        $tmpAipm = sys_get_temp_dir() . '/aipm-pdel2-' . bin2hex(random_bytes(4));
+        $tmpAipm = sys_get_temp_dir() . '/apm-pdel2-' . bin2hex(random_bytes(4));
         mkdir($tmpAipm, 0775, true);
-        $oldHome = getenv('AIPM_HOME');
-        putenv('AIPM_HOME=' . $tmpAipm);
+        $oldHome = getenv('APM_HOME');
+        putenv('APM_HOME=' . $tmpAipm);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -199,9 +199,9 @@ final class PresetManifestCommandsTest extends TestCase
 
         chdir($old);
         if ($oldHome === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         } else {
-            putenv('AIPM_HOME=' . $oldHome);
+            putenv('APM_HOME=' . $oldHome);
         }
         $this->restoreEnv($ctx['oldBl'], $ctx['oldCh']);
 

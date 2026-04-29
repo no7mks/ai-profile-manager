@@ -11,7 +11,7 @@ final class KnowledgeBaseUpdaterTest extends TestCase
 {
     public function testUpdateWritesSnapshotUnderHomeConfig(): void
     {
-        $home = sys_get_temp_dir() . '/aipm-home-' . bin2hex(random_bytes(4));
+        $home = sys_get_temp_dir() . '/apm-home-' . bin2hex(random_bytes(4));
         mkdir($home, 0775, true);
 
         $old = getenv('HOME');
@@ -28,7 +28,7 @@ final class KnowledgeBaseUpdaterTest extends TestCase
             }
         }
 
-        self::assertSame($home . '/.config/aipm/knowledge-base.json', $path);
+        self::assertSame($home . '/.config/apm/knowledge-base.json', $path);
         self::assertFileExists($path);
         $decoded = json_decode((string) file_get_contents($path), true);
         self::assertIsArray($decoded);

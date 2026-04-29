@@ -15,7 +15,7 @@ final class CaptureCommandBranchesTest extends TestCase
 {
     public function testUnknownPresetFails(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-cap-pre-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-cap-pre-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
         $old = getcwd();
@@ -34,14 +34,14 @@ final class CaptureCommandBranchesTest extends TestCase
 
     public function testBaselineUnresolvedFails(): void
     {
-        $composerHome = sys_get_temp_dir() . '/aipm-cap-bl-miss-' . bin2hex(random_bytes(4));
+        $composerHome = sys_get_temp_dir() . '/apm-cap-bl-miss-' . bin2hex(random_bytes(4));
         mkdir($composerHome . '/vendor/composer', 0775, true);
         file_put_contents($composerHome . '/vendor/composer/installed.json', json_encode(['packages' => []]));
 
         $oldCh = getenv('COMPOSER_HOME');
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
+        $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('COMPOSER_HOME=' . $composerHome);
-        putenv('AIPM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT');
 
         $cmd = new CaptureCommand(new CaptureService(new CheckService()));
         $tester = new CommandTester($cmd);
@@ -53,9 +53,9 @@ final class CaptureCommandBranchesTest extends TestCase
             putenv('COMPOSER_HOME=' . $oldCh);
         }
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
 
         self::assertSame(Command::FAILURE, $exit);
@@ -64,20 +64,20 @@ final class CaptureCommandBranchesTest extends TestCase
 
     public function testFullWorkspaceCaptureWithYesWritesChange(): void
     {
-        $baseline = sys_get_temp_dir() . '/aipm-cap-fw-bl-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-cap-fw-ws-' . bin2hex(random_bytes(4));
+        $baseline = sys_get_temp_dir() . '/apm-cap-fw-bl-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-cap-fw-ws-' . bin2hex(random_bytes(4));
         mkdir($baseline . '/abilities/skills/ws-cap', 0775, true);
         mkdir($ws . '/abilities/skills/ws-cap', 0775, true);
         file_put_contents($baseline . '/abilities/skills/ws-cap/SKILL.md', "b\n");
         file_put_contents($ws . '/abilities/skills/ws-cap/SKILL.md', "w\n");
 
-        $home = sys_get_temp_dir() . '/aipm-cap-fw-h-' . bin2hex(random_bytes(4));
+        $home = sys_get_temp_dir() . '/apm-cap-fw-h-' . bin2hex(random_bytes(4));
         mkdir($home, 0775, true);
 
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
-        $oldHome = getenv('AIPM_HOME');
-        putenv('AIPM_BASELINE_ROOT=' . $baseline);
-        putenv('AIPM_HOME=' . $home);
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        $oldHome = getenv('APM_HOME');
+        putenv('APM_BASELINE_ROOT=' . $baseline);
+        putenv('APM_HOME=' . $home);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -95,14 +95,14 @@ final class CaptureCommandBranchesTest extends TestCase
 
         chdir($old);
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
         if ($oldHome === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         } else {
-            putenv('AIPM_HOME=' . $oldHome);
+            putenv('APM_HOME=' . $oldHome);
         }
 
         self::assertSame(2, $exit);
@@ -111,20 +111,20 @@ final class CaptureCommandBranchesTest extends TestCase
 
     public function testFullWorkspaceCaptureDeclineConfirmSkipsPersistence(): void
     {
-        $baseline = sys_get_temp_dir() . '/aipm-cap-fw2-bl-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-cap-fw2-ws-' . bin2hex(random_bytes(4));
+        $baseline = sys_get_temp_dir() . '/apm-cap-fw2-bl-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-cap-fw2-ws-' . bin2hex(random_bytes(4));
         mkdir($baseline . '/abilities/skills/ws-cap2', 0775, true);
         mkdir($ws . '/abilities/skills/ws-cap2', 0775, true);
         file_put_contents($baseline . '/abilities/skills/ws-cap2/SKILL.md', "b\n");
         file_put_contents($ws . '/abilities/skills/ws-cap2/SKILL.md', "w\n");
 
-        $home = sys_get_temp_dir() . '/aipm-cap-fw2-h-' . bin2hex(random_bytes(4));
+        $home = sys_get_temp_dir() . '/apm-cap-fw2-h-' . bin2hex(random_bytes(4));
         mkdir($home, 0775, true);
 
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
-        $oldHome = getenv('AIPM_HOME');
-        putenv('AIPM_BASELINE_ROOT=' . $baseline);
-        putenv('AIPM_HOME=' . $home);
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        $oldHome = getenv('APM_HOME');
+        putenv('APM_BASELINE_ROOT=' . $baseline);
+        putenv('APM_HOME=' . $home);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -140,14 +140,14 @@ final class CaptureCommandBranchesTest extends TestCase
 
         chdir($old);
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
         if ($oldHome === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         } else {
-            putenv('AIPM_HOME=' . $oldHome);
+            putenv('APM_HOME=' . $oldHome);
         }
 
         self::assertSame(Command::SUCCESS, $exit);

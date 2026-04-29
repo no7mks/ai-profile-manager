@@ -282,8 +282,8 @@ final class CaptureService
 
     public function writeChangeToChangesDir(array $change): string
     {
-        $aipmHome = (string) (getenv('AIPM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.aipm'));
-        $changesDir = $aipmHome . '/changes';
+        $apmHome = (string) (getenv('APM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.apm'));
+        $changesDir = $apmHome . '/changes';
         if (!is_dir($changesDir)) {
             mkdir($changesDir, 0775, true);
         }

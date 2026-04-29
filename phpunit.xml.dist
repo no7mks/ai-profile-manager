@@ -4,7 +4,7 @@
     colors="true"
 >
     <testsuites>
-        <testsuite name="aipm">
+        <testsuite name="apm">
             <directory>tests</directory>
         </testsuite>
     </testsuites>

@@ -38,12 +38,12 @@ final class CaptureChangeIngestorTest extends TestCase
 
     public function testInvalidJsonMovesToFailedAndReturnsFailureExit(): void
     {
-        $base = sys_get_temp_dir() . '/aipm-ing-' . bin2hex(random_bytes(4));
+        $base = sys_get_temp_dir() . '/apm-ing-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
         mkdir($base . '/changes', 0775, true);
 
-        $old = getenv('AIPM_HOME');
-        putenv('AIPM_HOME=' . $base);
+        $old = getenv('APM_HOME');
+        putenv('APM_HOME=' . $base);
 
         file_put_contents($base . '/changes/broken.json', '{');
 
@@ -51,9 +51,9 @@ final class CaptureChangeIngestorTest extends TestCase
         $result = $ingestor->ingestChanges($base . '/changes', false);
 
         if ($old === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         } else {
-            putenv('AIPM_HOME=' . $old);
+            putenv('APM_HOME=' . $old);
         }
 
         self::assertSame(1, $result['exit_code']);
@@ -63,12 +63,12 @@ final class CaptureChangeIngestorTest extends TestCase
 
     public function testDuplicateChangeIsSkipped(): void
     {
-        $base = sys_get_temp_dir() . '/aipm-ing2-' . bin2hex(random_bytes(4));
+        $base = sys_get_temp_dir() . '/apm-ing2-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
         mkdir($base . '/changes', 0775, true);
 
-        $old = getenv('AIPM_HOME');
-        putenv('AIPM_HOME=' . $base);
+        $old = getenv('APM_HOME');
+        putenv('APM_HOME=' . $base);
 
         $changeId = '44444444-4444-4444-8444-444444444444';
         $json = json_encode($this->validPayload($changeId), JSON_UNESCAPED_SLASHES);
@@ -79,9 +79,9 @@ final class CaptureChangeIngestorTest extends TestCase
         $result = $ingestor->ingestChanges($base . '/changes', false);
 
         if ($old === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         } else {
-            putenv('AIPM_HOME=' . $old);
+            putenv('APM_HOME=' . $old);
         }
 
         $text = implode("\n", $result['lines']);
@@ -91,12 +91,12 @@ final class CaptureChangeIngestorTest extends TestCase
 
     public function testSchemaInvalidPayloadMovesToFailed(): void
     {
-        $base = sys_get_temp_dir() . '/aipm-ing3-' . bin2hex(random_bytes(4));
+        $base = sys_get_temp_dir() . '/apm-ing3-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
         mkdir($base . '/changes', 0775, true);
 
-        $old = getenv('AIPM_HOME');
-        putenv('AIPM_HOME=' . $base);
+        $old = getenv('APM_HOME');
+        putenv('APM_HOME=' . $base);
 
         file_put_contents($base . '/changes/bad-schema.json', json_encode([
             'schema_version' => 2,
@@ -113,9 +113,9 @@ final class CaptureChangeIngestorTest extends TestCase
         $result = $ingestor->ingestChanges($base . '/changes', false);
 
         if ($old === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         } else {
-            putenv('AIPM_HOME=' . $old);
+            putenv('APM_HOME=' . $old);
         }
 
         self::assertSame(1, $result['exit_code']);
@@ -125,15 +125,15 @@ final class CaptureChangeIngestorTest extends TestCase
 
     public function testIngestWithWriteBackUsesExplicitDependencies(): void
     {
-        $cfgDir = sys_get_temp_dir() . '/aipm-ing-wb-' . bin2hex(random_bytes(4));
+        $cfgDir = sys_get_temp_dir() . '/apm-ing-wb-' . bin2hex(random_bytes(4));
         mkdir($cfgDir, 0775, true);
         mkdir($cfgDir . '/changes', 0775, true);
 
-        $ws = sys_get_temp_dir() . '/aipm-ing-ws-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-ing-ws-' . bin2hex(random_bytes(4));
         mkdir($ws . '/abilities/skills/wbtest', 0775, true);
 
-        $oldHome = getenv('AIPM_HOME');
-        putenv('AIPM_HOME=' . $cfgDir);
+        $oldHome = getenv('APM_HOME');
+        putenv('APM_HOME=' . $cfgDir);
 
         $oldCwd = getcwd();
         self::assertNotFalse($oldCwd);
@@ -148,9 +148,9 @@ final class CaptureChangeIngestorTest extends TestCase
 
         chdir($oldCwd);
         if ($oldHome === false) {
-            putenv('AIPM_HOME');
+            putenv('APM_HOME');
         } else {
-            putenv('AIPM_HOME=' . $oldHome);
+            putenv('APM_HOME=' . $oldHome);
         }
 
         self::assertSame(0, $result['exit_code']);

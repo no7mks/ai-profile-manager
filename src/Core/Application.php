@@ -23,7 +23,7 @@ final class Application
     }
 
     /**
-     * Builds the same Symfony Console application used by {@see run()} (list default + all aipm commands).
+     * Builds the same Symfony Console application used by {@see run()} (list default + all apm commands).
      */
     public static function createSymfonyApplication(
         Installer $installer,
