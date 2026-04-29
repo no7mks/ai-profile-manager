@@ -6,9 +6,15 @@
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-04-29
+
 ### Breaking
 
 - 包内 **agent** 源文件改为扁平命名：`abilities/agents/<name>.<cursor|kiro>.md`（不再使用 `abilities/agents/<name>/<target>/<name>.md`）。安装目标仍为 `.{cursor|kiro}/agents/<name>.md`。Capture / write-back 路径与 `discoverWorkspaceAbilities` 已对齐。
+
+### Changed
+
+- 统一项目缩写为 `apm`，同步更新文档、CLI 提示、环境变量名、gitignore 托管 marker 与测试命名。
 
 ## [0.4.4] - 2026-04-28
 
@@ -49,7 +55,7 @@
 
 - CLI 移除 `apm init`，初始化流程并入 `apm install`（无参数）；原交互式 PROJECT.md 预填链路不再提供。
 - `abilities/skills` 改为跨 target 单份结构：`abilities/skills/<name>/...`。旧的 `abilities/skills/<name>/<target>/...` 不再被安装器识别。
-- apm 内置引导 skill 名从 `apm` 更名为 `apm`（命令前缀从 `/apm ...` 调整为 `/apm ...`）。
+- 内置引导 skill 名统一为 `apm`（命令前缀统一为 `/apm ...`）。
 
 ### Changed
 
