@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+
 final class CaptureService
 {
     public function __construct(
@@ -82,7 +85,7 @@ final class CaptureService
         return [
             'skills' => $this->listSubdirNames($workspaceRoot . '/abilities/skills'),
             'rules' => $this->listSubdirNames($workspaceRoot . '/abilities/rules'),
-            'agents' => $this->listSubdirNames($workspaceRoot . '/abilities/agents'),
+            'agents' => $this->listAgentAbilityNames($workspaceRoot . '/abilities/agents'),
         ];
     }
 
@@ -279,8 +282,8 @@ final class CaptureService
 
     public function writeChangeToChangesDir(array $change): string
     {
-        $aipmHome = (string) (getenv('AIPM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.aipm'));
-        $changesDir = $aipmHome . '/changes';
+        $apmHome = (string) (getenv('APM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.apm'));
+        $changesDir = $apmHome . '/changes';
         if (!is_dir($changesDir)) {
             mkdir($changesDir, 0775, true);
         }
@@ -339,16 +342,30 @@ final class CaptureService
             ];
         }
 
+        if ($type === 'agent') {
+            $relative = 'agents/' . $name . '.' . $target . '.md';
+            $baselineFile = is_file($baselineRoot . '/abilities/' . $relative) ? $baselineRoot . '/abilities/' . $relative : null;
+            $workspaceFile = is_file($workspaceRoot . '/abilities/' . $relative) ? $workspaceRoot . '/abilities/' . $relative : null;
+            $files = $this->directoryDiff->diffOptionalFiles($baselineFile, $workspaceFile, $relative);
+            $status = $files === [] ? 'unchanged' : 'modified';
+
+            return [
+                'type' => $type,
+                'name' => $name,
+                'target' => $target,
+                'status' => $status,
+                'content_hash' => $this->hashFiles($files),
+                'files' => $files,
+            ];
+        }
+
         $sub = match ($type) {
             'skill' => 'abilities/skills',
             'rule' => 'abilities/rules',
-            'agent' => 'abilities/agents',
             default => 'abilities/unknown-items',
         };
 
-        $mid = $type === 'skill'
-            ? '/' . $sub . '/' . $name
-            : '/' . $sub . '/' . $name . '/' . $target;
+        $mid = '/' . $sub . '/' . $name;
         $bAbs = $baselineRoot . $mid;
         $wAbs = $workspaceRoot . $mid;
 
@@ -371,17 +388,68 @@ final class CaptureService
 
     private function resolveRuleRelativePath(string $root, string $name, string $target): ?string
     {
-        $suffix = $target === 'cursor' ? '.cursor.mdc' : '.kiro.md';
-        $byCategory = glob($root . '/abilities/rules/*/' . $name . $suffix) ?: [];
-        $topLevel = glob($root . '/abilities/rules/' . $name . $suffix) ?: [];
-        $candidates = array_merge($byCategory, $topLevel);
+        $suffixes = $target === 'cursor'
+            ? ['.cursor.mdc', '.cursor.md']
+            : ['.kiro.md', '.kiro.mdc'];
+        $rulesRoot = $root . '/abilities/rules';
+        if (!is_dir($rulesRoot)) {
+            return null;
+        }
+
+        $candidates = [];
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($rulesRoot, RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $fileInfo) {
+            if (!$fileInfo->isFile()) {
+                continue;
+            }
+            $basename = $fileInfo->getBasename();
+            foreach ($suffixes as $suffix) {
+                if ($basename === $name . $suffix) {
+                    $candidates[] = $fileInfo->getPathname();
+                    break;
+                }
+            }
+        }
+
         if ($candidates === []) {
             return null;
         }
 
-        $path = (string) $candidates[0];
+        $path = $this->pickPreferredRuleSourcePath($candidates, $target);
 
         return ltrim(substr($path, strlen($root . '/abilities/')), '/');
+    }
+
+    /**
+     * @param array<int, string> $paths
+     */
+    private function pickPreferredRuleSourcePath(array $paths, string $target): string
+    {
+        if (count($paths) === 1) {
+            return $paths[0];
+        }
+
+        $rank = static function (string $p) use ($target): int {
+            $b = basename($p);
+            if ($target === 'cursor') {
+                if (str_ends_with($b, '.cursor.mdc')) {
+                    return 0;
+                }
+
+                return str_ends_with($b, '.cursor.md') ? 1 : 2;
+            }
+            if (str_ends_with($b, '.kiro.md')) {
+                return 0;
+            }
+
+            return str_ends_with($b, '.kiro.mdc') ? 1 : 2;
+        };
+
+        usort($paths, static fn (string $a, string $b): int => $rank($a) <=> $rank($b));
+
+        return $paths[0];
     }
 
     /**
@@ -429,6 +497,34 @@ final class CaptureService
             }
         }
 
+        sort($names);
+
+        return $names;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function listAgentAbilityNames(string $agentsRoot): array
+    {
+        if (!is_dir($agentsRoot)) {
+            return [];
+        }
+
+        $names = [];
+        foreach (scandir($agentsRoot) ?: [] as $entry) {
+            if ($entry === '.' || $entry === '..') {
+                continue;
+            }
+            if (!is_file($agentsRoot . '/' . $entry)) {
+                continue;
+            }
+            if (preg_match('/^(.+)\.(cursor|kiro)\.md$/', $entry, $m) === 1) {
+                $names[] = $m[1];
+            }
+        }
+
+        $names = array_values(array_unique($names));
         sort($names);
 
         return $names;

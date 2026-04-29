@@ -58,7 +58,7 @@ final class SkillCaptureCommand extends Command
         }
 
         if ($result['baseline'] === null) {
-            $io->error('Could not resolve Composer baseline. Install aipm globally or set AIPM_BASELINE_ROOT for testing.');
+            $io->error('Could not resolve Composer baseline. Install apm globally or set APM_BASELINE_ROOT for testing.');
 
             return Command::FAILURE;
         }

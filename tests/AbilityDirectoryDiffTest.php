@@ -11,8 +11,8 @@ final class AbilityDirectoryDiffTest extends TestCase
 {
     public function testDiffDirectoriesDetectsContentChange(): void
     {
-        $base = sys_get_temp_dir() . '/aipm-diff-a-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-diff-b-' . bin2hex(random_bytes(4));
+        $base = sys_get_temp_dir() . '/apm-diff-a-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-diff-b-' . bin2hex(random_bytes(4));
         mkdir($base . '/sub', 0775, true);
         mkdir($ws . '/sub', 0775, true);
         file_put_contents($base . '/sub/a.txt', "old\n");
@@ -30,8 +30,8 @@ final class AbilityDirectoryDiffTest extends TestCase
 
     public function testDiffDirectoriesMarksFileDeletedInWorkspace(): void
     {
-        $base = sys_get_temp_dir() . '/aipm-diff-del-a-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-diff-del-b-' . bin2hex(random_bytes(4));
+        $base = sys_get_temp_dir() . '/apm-diff-del-a-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-diff-del-b-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
         mkdir($ws, 0775, true);
         file_put_contents($base . '/gone.txt', "only in baseline\n");
@@ -47,7 +47,7 @@ final class AbilityDirectoryDiffTest extends TestCase
 
     public function testDiffOptionalFilesDeletionVsBaseline(): void
     {
-        $base = sys_get_temp_dir() . '/aipm-optf-a-' . bin2hex(random_bytes(4));
+        $base = sys_get_temp_dir() . '/apm-optf-a-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
         $presetPath = $base . '/abilities/_presets.json';
         mkdir(dirname($presetPath), 0775, true);
@@ -63,8 +63,8 @@ final class AbilityDirectoryDiffTest extends TestCase
 
     public function testDiffDirectoriesAddsNestedFileOnlyInWorkspace(): void
     {
-        $base = sys_get_temp_dir() . '/aipm-nest-a-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-nest-b-' . bin2hex(random_bytes(4));
+        $base = sys_get_temp_dir() . '/apm-nest-a-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-nest-b-' . bin2hex(random_bytes(4));
         mkdir($base, 0775, true);
         mkdir($ws . '/deep/sub', 0775, true);
         file_put_contents($ws . '/deep/sub/z.txt', 'only-here');

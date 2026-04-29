@@ -13,7 +13,7 @@ final class ProjectInitializerTest extends TestCase
 {
     public function testInitCopiesScaffoldAndBothScopeRules(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-init-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-init-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
         $initializer = ProjectInitializer::fromPackageLayout();
@@ -34,7 +34,7 @@ final class ProjectInitializerTest extends TestCase
 
     public function testInitWithEmptyTargetsSkipsScopeRules(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-init-sn-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-init-sn-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
         $initializer = ProjectInitializer::fromPackageLayout();
@@ -46,7 +46,7 @@ final class ProjectInitializerTest extends TestCase
 
     public function testInitWithCursorTargetOnlyInstallsCursorScope(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-init-cur-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-init-cur-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
         $initializer = ProjectInitializer::fromPackageLayout();
@@ -58,7 +58,7 @@ final class ProjectInitializerTest extends TestCase
 
     public function testInitFailsWhenScaffoldAlreadyPresentWithoutForce(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-init-dup-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-init-dup-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         mkdir($tmp . '/docs', 0775, true);
 
@@ -72,7 +72,7 @@ final class ProjectInitializerTest extends TestCase
 
     public function testInitCreatesMissingTargetDirectory(): void
     {
-        $parent = sys_get_temp_dir() . '/aipm-init-nested-' . bin2hex(random_bytes(4));
+        $parent = sys_get_temp_dir() . '/apm-init-nested-' . bin2hex(random_bytes(4));
         mkdir($parent, 0775, true);
         $nested = $parent . '/new-proj';
 

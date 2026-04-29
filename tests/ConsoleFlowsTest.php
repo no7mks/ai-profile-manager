@@ -26,13 +26,13 @@ final class ConsoleFlowsTest extends TestCase
 {
     public function testInstallCommandInstallsKnownPreset(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-flow-i-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-i-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         mkdir($tmp . '/abilities/gitignore', 0775, true);
         file_put_contents($tmp . '/abilities/gitignore/template.gitignore', implode("\n", [
-            '## @aipm:block ability=gitflow target=*',
-            '/.aipm/gitflow/',
-            '## @aipm:end',
+            '## @apm:block ability=gitflow target=*',
+            '/.apm/gitflow/',
+            '## @apm:end',
         ]));
         $old = getcwd();
         self::assertNotFalse($old);
@@ -47,12 +47,12 @@ final class ConsoleFlowsTest extends TestCase
         self::assertSame(Command::SUCCESS, $exit);
         self::assertStringContainsString('Preset: gitflow', $tester->getDisplay());
         self::assertFileExists($tmp . '/.gitignore');
-        self::assertStringContainsString('/.aipm/gitflow/', (string) file_get_contents($tmp . '/.gitignore'));
+        self::assertStringContainsString('/.apm/gitflow/', (string) file_get_contents($tmp . '/.gitignore'));
     }
 
     public function testInstallCommandUnknownPresetFails(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-flow-i2-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-i2-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);
@@ -69,7 +69,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testInstallCommandUnknownTargetsFails(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-flow-itgt-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-itgt-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);
@@ -87,7 +87,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testInstallCommandWithoutPresetRunsBootstrap(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-flow-bootstrap-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-bootstrap-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);
@@ -111,7 +111,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testCheckCommandRunsForKnownPreset(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-flow-ch-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-ch-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);
@@ -139,13 +139,13 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testCaptureFullWorkspaceWithNoAbilitiesExitsSuccess(): void
     {
-        $baseline = sys_get_temp_dir() . '/aipm-cap-bl-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-cap-ws-' . bin2hex(random_bytes(4));
+        $baseline = sys_get_temp_dir() . '/apm-cap-bl-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-cap-ws-' . bin2hex(random_bytes(4));
         mkdir($baseline, 0775, true);
         mkdir($ws, 0775, true);
 
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
-        putenv('AIPM_BASELINE_ROOT=' . $baseline);
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT=' . $baseline);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -158,9 +158,9 @@ final class ConsoleFlowsTest extends TestCase
 
         chdir($old);
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
 
         self::assertSame(Command::SUCCESS, $exit);
@@ -169,7 +169,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testSkillInstallUsesDefaultSkillsWhenArgumentEmpty(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-flow-skill-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-skill-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);
@@ -189,7 +189,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testRuleInstallInstallsNamedRule(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-flow-rule-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-rule-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);
@@ -209,7 +209,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testAgentInstallInstallsNamedAgent(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-flow-agent-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-agent-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);
@@ -229,7 +229,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testUpdateCommandWritesKnowledgeBase(): void
     {
-        $home = sys_get_temp_dir() . '/aipm-flow-up-' . bin2hex(random_bytes(4));
+        $home = sys_get_temp_dir() . '/apm-flow-up-' . bin2hex(random_bytes(4));
         mkdir($home, 0775, true);
 
         $oldHome = getenv('HOME');
@@ -248,12 +248,12 @@ final class ConsoleFlowsTest extends TestCase
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertFileExists($home . '/.config/aipm/knowledge-base.json');
+        self::assertFileExists($home . '/.config/apm/knowledge-base.json');
     }
 
     public function testPresetCreateFailsWhenPresetAlreadyExists(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-pc-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-pc-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);
@@ -281,7 +281,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testPresetDeleteFailsForUnknownPreset(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-pdel-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-pdel-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $old = getcwd();
         self::assertNotFalse($old);

@@ -30,7 +30,7 @@ use AiProfileManager\Service\KnowledgeBaseUpdater;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
 /**
- * Registers all aipm console commands on a Symfony Application instance.
+ * Registers all apm console commands on a Symfony Application instance.
  *
  * Kept separate from {@see Application} so registration can be covered without running the full CLI runner.
  */

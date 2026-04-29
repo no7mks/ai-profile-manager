@@ -8,8 +8,8 @@ use RuntimeException;
 
 final class GitIgnoreTemplateService
 {
-    private const BEGIN_MARKER = '# BEGIN aipm-managed-gitignore v1';
-    private const END_MARKER = '# END aipm-managed-gitignore v1';
+    private const BEGIN_MARKER = '# BEGIN apm-managed-gitignore v1';
+    private const END_MARKER = '# END apm-managed-gitignore v1';
 
     /**
      * @param array<int, string> $abilityKeys
@@ -34,7 +34,7 @@ final class GitIgnoreTemplateService
         $blockPatterns = [];
 
         foreach ($lines as $line) {
-            if (!$inBlock && preg_match('/^## @aipm:block ability=([^ ]+) target=([^ ]+)$/', $line, $m) === 1) {
+            if (!$inBlock && preg_match('/^## @apm:block ability=([^ ]+) target=([^ ]+)$/', $line, $m) === 1) {
                 $inBlock = true;
                 $ability = $m[1];
                 $target = $m[2];
@@ -43,7 +43,7 @@ final class GitIgnoreTemplateService
                 continue;
             }
 
-            if ($inBlock && $line === '## @aipm:end') {
+            if ($inBlock && $line === '## @apm:end') {
                 if ($blockMatches && $blockPatterns !== []) {
                     if ($rendered !== []) {
                         $rendered[] = '';
@@ -66,7 +66,7 @@ final class GitIgnoreTemplateService
         }
 
         if ($inBlock) {
-            throw new RuntimeException(sprintf('Unclosed aipm block in template: %s', $templatePath));
+            throw new RuntimeException(sprintf('Unclosed apm block in template: %s', $templatePath));
         }
 
         return implode("\n", $rendered);
@@ -84,7 +84,7 @@ final class GitIgnoreTemplateService
             $current .= "\n";
         }
 
-        $pattern = '/^# BEGIN aipm-managed-gitignore v1\n.*?\n# END aipm-managed-gitignore v1\n?/ms';
+        $pattern = '/^# BEGIN apm-managed-gitignore v1\n.*?\n# END apm-managed-gitignore v1\n?/ms';
         if (preg_match($pattern, $current) === 1) {
             $next = (string) preg_replace($pattern, $managedSection . "\n", $current, 1);
             file_put_contents($gitignorePath, $next);

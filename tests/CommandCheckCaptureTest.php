@@ -42,11 +42,11 @@ final class CommandCheckCaptureTest extends TestCase
 
     public function testCaptureServicePlaceholderReturnsNoModifiedMessage(): void
     {
-        $tmpBaseline = sys_get_temp_dir() . '/aipm-bl-' . bin2hex(random_bytes(4));
+        $tmpBaseline = sys_get_temp_dir() . '/apm-bl-' . bin2hex(random_bytes(4));
         mkdir($tmpBaseline . '/abilities/skills/graphify', 0775, true);
         file_put_contents($tmpBaseline . '/abilities/skills/graphify/SKILL.md', "same\n");
 
-        putenv('AIPM_BASELINE_ROOT=' . $tmpBaseline);
+        putenv('APM_BASELINE_ROOT=' . $tmpBaseline);
 
         $service = new CaptureService(new CheckService());
         $workspace = $tmpBaseline;
@@ -56,7 +56,7 @@ final class CommandCheckCaptureTest extends TestCase
             'agents' => [],
         ], ['cursor'], $workspace);
 
-        putenv('AIPM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT');
 
         self::assertSame(0, $result['exit_code']);
         self::assertStringContainsString('No changes vs Composer baseline', implode("\n", $result['lines']));
@@ -66,17 +66,17 @@ final class CommandCheckCaptureTest extends TestCase
 
     public function testSkillCaptureWritesChangeToChangesDirByDefault(): void
     {
-        $tmpBaseline = sys_get_temp_dir() . '/aipm-cap-base-' . bin2hex(random_bytes(4));
-        $tmpWorkspace = sys_get_temp_dir() . '/aipm-cap-ws-' . bin2hex(random_bytes(4));
+        $tmpBaseline = sys_get_temp_dir() . '/apm-cap-base-' . bin2hex(random_bytes(4));
+        $tmpWorkspace = sys_get_temp_dir() . '/apm-cap-ws-' . bin2hex(random_bytes(4));
         mkdir($tmpBaseline . '/abilities/skills/graphify', 0775, true);
         mkdir($tmpWorkspace . '/abilities/skills/graphify', 0775, true);
         file_put_contents($tmpBaseline . '/abilities/skills/graphify/SKILL.md', "baseline\n");
         file_put_contents($tmpWorkspace . '/abilities/skills/graphify/SKILL.md', "workspace\n");
 
-        $tmpAipmHome = sys_get_temp_dir() . '/aipm-capture-test-' . bin2hex(random_bytes(4));
+        $tmpAipmHome = sys_get_temp_dir() . '/apm-capture-test-' . bin2hex(random_bytes(4));
         mkdir($tmpAipmHome, 0775, true);
-        putenv('AIPM_HOME=' . $tmpAipmHome);
-        putenv('AIPM_BASELINE_ROOT=' . $tmpBaseline);
+        putenv('APM_HOME=' . $tmpAipmHome);
+        putenv('APM_BASELINE_ROOT=' . $tmpBaseline);
 
         $originalCwd = getcwd();
         self::assertNotFalse($originalCwd);
@@ -95,8 +95,8 @@ final class CommandCheckCaptureTest extends TestCase
         ]);
 
         chdir($originalCwd);
-        putenv('AIPM_HOME');
-        putenv('AIPM_BASELINE_ROOT');
+        putenv('APM_HOME');
+        putenv('APM_BASELINE_ROOT');
 
         self::assertSame(2, $exitCode);
         $output = $tester->getDisplay();
@@ -114,17 +114,17 @@ final class CommandCheckCaptureTest extends TestCase
 
     public function testSkillCaptureGeneratesUuidChangeFileWhenChangeIdOmitted(): void
     {
-        $tmpBaseline = sys_get_temp_dir() . '/aipm-cap-id-' . bin2hex(random_bytes(4));
-        $tmpWorkspace = sys_get_temp_dir() . '/aipm-cap-id-ws-' . bin2hex(random_bytes(4));
+        $tmpBaseline = sys_get_temp_dir() . '/apm-cap-id-' . bin2hex(random_bytes(4));
+        $tmpWorkspace = sys_get_temp_dir() . '/apm-cap-id-ws-' . bin2hex(random_bytes(4));
         mkdir($tmpBaseline . '/abilities/skills/graphify', 0775, true);
         mkdir($tmpWorkspace . '/abilities/skills/graphify', 0775, true);
         file_put_contents($tmpBaseline . '/abilities/skills/graphify/SKILL.md', "b\n");
         file_put_contents($tmpWorkspace . '/abilities/skills/graphify/SKILL.md', "w\n");
 
-        $tmpAipmHome = sys_get_temp_dir() . '/aipm-cap-id-home-' . bin2hex(random_bytes(4));
+        $tmpAipmHome = sys_get_temp_dir() . '/apm-cap-id-home-' . bin2hex(random_bytes(4));
         mkdir($tmpAipmHome, 0775, true);
-        putenv('AIPM_HOME=' . $tmpAipmHome);
-        putenv('AIPM_BASELINE_ROOT=' . $tmpBaseline);
+        putenv('APM_HOME=' . $tmpAipmHome);
+        putenv('APM_BASELINE_ROOT=' . $tmpBaseline);
 
         $originalCwd = getcwd();
         self::assertNotFalse($originalCwd);
@@ -142,8 +142,8 @@ final class CommandCheckCaptureTest extends TestCase
         ]);
 
         chdir($originalCwd);
-        putenv('AIPM_HOME');
-        putenv('AIPM_BASELINE_ROOT');
+        putenv('APM_HOME');
+        putenv('APM_BASELINE_ROOT');
 
         self::assertSame(2, $exitCode);
         $files = glob($tmpAipmHome . '/changes/*.json') ?: [];
@@ -156,18 +156,18 @@ final class CommandCheckCaptureTest extends TestCase
 
     public function testAgentCaptureWritesChangeWhenAgentDiffersFromBaseline(): void
     {
-        $name = 'spec-gatekeeper';
-        $tmpBaseline = sys_get_temp_dir() . '/aipm-ag-bl-' . bin2hex(random_bytes(4));
-        $tmpWorkspace = sys_get_temp_dir() . '/aipm-ag-ws-' . bin2hex(random_bytes(4));
-        mkdir($tmpBaseline . '/abilities/agents/' . $name . '/cursor', 0775, true);
-        mkdir($tmpWorkspace . '/abilities/agents/' . $name . '/cursor', 0775, true);
-        file_put_contents($tmpBaseline . '/abilities/agents/' . $name . '/cursor/agent.md', "b\n");
-        file_put_contents($tmpWorkspace . '/abilities/agents/' . $name . '/cursor/agent.md', "w\n");
+        $name = 'code-reviewer';
+        $tmpBaseline = sys_get_temp_dir() . '/apm-ag-bl-' . bin2hex(random_bytes(4));
+        $tmpWorkspace = sys_get_temp_dir() . '/apm-ag-ws-' . bin2hex(random_bytes(4));
+        mkdir($tmpBaseline . '/abilities/agents', 0775, true);
+        mkdir($tmpWorkspace . '/abilities/agents', 0775, true);
+        file_put_contents($tmpBaseline . '/abilities/agents/' . $name . '.cursor.md', "b\n");
+        file_put_contents($tmpWorkspace . '/abilities/agents/' . $name . '.cursor.md', "w\n");
 
-        $tmpAipmHome = sys_get_temp_dir() . '/aipm-ag-home-' . bin2hex(random_bytes(4));
+        $tmpAipmHome = sys_get_temp_dir() . '/apm-ag-home-' . bin2hex(random_bytes(4));
         mkdir($tmpAipmHome, 0775, true);
-        putenv('AIPM_HOME=' . $tmpAipmHome);
-        putenv('AIPM_BASELINE_ROOT=' . $tmpBaseline);
+        putenv('APM_HOME=' . $tmpAipmHome);
+        putenv('APM_BASELINE_ROOT=' . $tmpBaseline);
 
         $originalCwd = getcwd();
         self::assertNotFalse($originalCwd);
@@ -185,8 +185,8 @@ final class CommandCheckCaptureTest extends TestCase
         ]);
 
         chdir($originalCwd);
-        putenv('AIPM_HOME');
-        putenv('AIPM_BASELINE_ROOT');
+        putenv('APM_HOME');
+        putenv('APM_BASELINE_ROOT');
 
         self::assertSame(2, $exitCode);
         self::assertFileExists($tmpAipmHome . '/changes/99999999-9999-4999-8999-999999999999.json');
@@ -223,11 +223,11 @@ final class CommandCheckCaptureTest extends TestCase
         ], JSON_UNESCAPED_SLASHES);
         self::assertIsString($payload);
 
-        $tmpConfigDir = sys_get_temp_dir() . '/aipm-test-' . bin2hex(random_bytes(4));
+        $tmpConfigDir = sys_get_temp_dir() . '/apm-test-' . bin2hex(random_bytes(4));
         mkdir($tmpConfigDir, 0775, true);
         $changesDir = $tmpConfigDir . '/changes';
         mkdir($changesDir, 0775, true);
-        putenv('AIPM_HOME=' . $tmpConfigDir);
+        putenv('APM_HOME=' . $tmpConfigDir);
         file_put_contents($changesDir . '/22222222-2222-4222-8222-222222222222.json', $payload);
         $originalCwd = getcwd();
         self::assertNotFalse($originalCwd);
@@ -240,7 +240,7 @@ final class CommandCheckCaptureTest extends TestCase
         ]);
 
         chdir($originalCwd);
-        putenv('AIPM_HOME');
+        putenv('APM_HOME');
 
         self::assertSame(Command::SUCCESS, $exitCode);
         self::assertStringContainsString('Found changes: 1', $tester->getDisplay());

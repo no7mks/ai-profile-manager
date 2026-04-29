@@ -11,10 +11,10 @@ final class CaptureWriteBackServiceTest extends TestCase
 {
     public function testWriteBackSkillRuleAgentAndPresetPaths(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-wb-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-wb-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities/skills/myagent', 0775, true);
         mkdir($root . '/abilities/rules/git', 0775, true);
-        mkdir($root . '/abilities/agents/myagent/cursor', 0775, true);
+        mkdir($root . '/abilities/agents', 0775, true);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -37,7 +37,7 @@ final class CaptureWriteBackServiceTest extends TestCase
                 [
                     'type' => 'agent',
                     'name' => 'myagent',
-                    'files' => [['path' => 'agent.md', 'content' => 'a', 'patch' => 'p']],
+                    'files' => [['path' => 'agents/myagent.cursor.md', 'content' => 'a', 'patch' => 'p']],
                 ],
                 [
                     'type' => 'preset',
@@ -56,7 +56,7 @@ final class CaptureWriteBackServiceTest extends TestCase
 
         self::assertFileExists($root . '/abilities/skills/myskill/SKILL.md');
         self::assertFileExists($root . '/abilities/rules/git/myrule.cursor.mdc');
-        self::assertFileExists($root . '/abilities/agents/myagent/cursor/agent.md');
+        self::assertFileExists($root . '/abilities/agents/myagent.cursor.md');
         self::assertFileExists($root . '/abilities/_presets.json');
         self::assertFileExists($root . '/abilities/unknown-items/x/cursor/u.txt');
         self::assertNotEmpty($lines);
@@ -64,7 +64,7 @@ final class CaptureWriteBackServiceTest extends TestCase
 
     public function testWriteBackDeletesFileWhenDeletedFlagSet(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-wbdel-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-wbdel-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities/skills/delme', 0775, true);
         $path = $root . '/abilities/skills/delme/SKILL.md';
         file_put_contents($path, 'gone');
@@ -96,7 +96,7 @@ final class CaptureWriteBackServiceTest extends TestCase
 
     public function testWriteBackSkipsRelativePathThatNormalizesToNothing(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-wbskip-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-wbskip-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities/skills/x', 0775, true);
 
         $old = getcwd();

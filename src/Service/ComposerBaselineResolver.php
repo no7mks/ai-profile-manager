@@ -28,7 +28,7 @@ final class ComposerBaselineResolver
      */
     public function resolve(): ?array
     {
-        $envRoot = (string) (getenv('AIPM_BASELINE_ROOT') ?: '');
+        $envRoot = (string) (getenv('APM_BASELINE_ROOT') ?: '');
         if ($envRoot !== '' && is_dir($envRoot)) {
             $real = realpath($envRoot);
 

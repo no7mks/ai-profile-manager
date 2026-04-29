@@ -47,14 +47,14 @@ final class TypedCaptureCheckCommandsTest extends TestCase
 
     public function testAgentCaptureBaselineMissingFails(): void
     {
-        $composerHome = sys_get_temp_dir() . '/aipm-no-aipm-' . bin2hex(random_bytes(4));
+        $composerHome = sys_get_temp_dir() . '/apm-no-apm-' . bin2hex(random_bytes(4));
         mkdir($composerHome . '/vendor/composer', 0775, true);
         file_put_contents($composerHome . '/vendor/composer/installed.json', json_encode(['packages' => []]));
 
         $oldCh = getenv('COMPOSER_HOME');
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
+        $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('COMPOSER_HOME=' . $composerHome);
-        putenv('AIPM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT');
 
         $cmd = new AgentCaptureCommand(new CaptureService(new CheckService()));
         $tester = new CommandTester($cmd);
@@ -66,9 +66,9 @@ final class TypedCaptureCheckCommandsTest extends TestCase
             putenv('COMPOSER_HOME=' . $oldCh);
         }
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
 
         self::assertSame(Command::FAILURE, $exit);
@@ -77,16 +77,16 @@ final class TypedCaptureCheckCommandsTest extends TestCase
 
     public function testRuleCaptureNoChangesVsBaseline(): void
     {
-        $baseline = sys_get_temp_dir() . '/aipm-rcap-bl-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-rcap-ws-' . bin2hex(random_bytes(4));
+        $baseline = sys_get_temp_dir() . '/apm-rcap-bl-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-rcap-ws-' . bin2hex(random_bytes(4));
         $rule = 'demo-rule';
         mkdir($baseline . '/abilities/rules/' . $rule . '/cursor', 0775, true);
         mkdir($ws . '/abilities/rules/' . $rule . '/cursor', 0775, true);
         file_put_contents($baseline . '/abilities/rules/' . $rule . '/cursor/RULE.mdc', "x\n");
         file_put_contents($ws . '/abilities/rules/' . $rule . '/cursor/RULE.mdc', "x\n");
 
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
-        putenv('AIPM_BASELINE_ROOT=' . $baseline);
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT=' . $baseline);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -98,9 +98,9 @@ final class TypedCaptureCheckCommandsTest extends TestCase
 
         chdir($old);
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
 
         self::assertSame(0, $exit);

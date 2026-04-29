@@ -13,13 +13,13 @@ final class InstallerTest extends TestCase
 {
     public function testInstallTypedMirrorsSkillAndAgentFromPackageFixture(): void
     {
-        $pkg = sys_get_temp_dir() . '/aipm-inst-pkg-' . bin2hex(random_bytes(4));
+        $pkg = sys_get_temp_dir() . '/apm-inst-pkg-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/abilities/skills/demo-skill', 0775, true);
         file_put_contents($pkg . '/abilities/skills/demo-skill/SKILL.md', "demo skill\n");
-        mkdir($pkg . '/abilities/agents/demo-agent/cursor', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/demo-agent/cursor/demo-agent.md', "demo agent\n");
+        mkdir($pkg . '/abilities/agents', 0775, true);
+        file_put_contents($pkg . '/abilities/agents/demo-agent.cursor.md', "demo agent\n");
 
-        $proj = sys_get_temp_dir() . '/aipm-inst-proj-' . bin2hex(random_bytes(4));
+        $proj = sys_get_temp_dir() . '/apm-inst-proj-' . bin2hex(random_bytes(4));
         mkdir($proj, 0775, true);
 
         $old = getcwd();
@@ -47,11 +47,11 @@ final class InstallerTest extends TestCase
 
     public function testRulesAreRenderedAsSteeringOnKiro(): void
     {
-        $pkg = sys_get_temp_dir() . '/aipm-inst-st-' . bin2hex(random_bytes(4));
+        $pkg = sys_get_temp_dir() . '/apm-inst-st-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/abilities/rules/spec', 0775, true);
         file_put_contents($pkg . '/abilities/rules/spec/spec-core.kiro.md', 'x');
 
-        $proj = sys_get_temp_dir() . '/aipm-inst-stp-' . bin2hex(random_bytes(4));
+        $proj = sys_get_temp_dir() . '/apm-inst-stp-' . bin2hex(random_bytes(4));
         mkdir($proj, 0775, true);
 
         $old = getcwd();
@@ -75,12 +75,12 @@ final class InstallerTest extends TestCase
 
     public function testRuleInstallUsesCategoryFileLayoutNotNameTargetDirs(): void
     {
-        $pkg = sys_get_temp_dir() . '/aipm-inst-rule-flat-' . bin2hex(random_bytes(4));
+        $pkg = sys_get_temp_dir() . '/apm-inst-rule-flat-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/abilities/rules/git', 0775, true);
         file_put_contents($pkg . '/abilities/rules/git/branch-overview.cursor.mdc', 'cursor');
         file_put_contents($pkg . '/abilities/rules/git/branch-overview.kiro.md', 'kiro');
 
-        $proj = sys_get_temp_dir() . '/aipm-inst-rule-flat-proj-' . bin2hex(random_bytes(4));
+        $proj = sys_get_temp_dir() . '/apm-inst-rule-flat-proj-' . bin2hex(random_bytes(4));
         mkdir($proj, 0775, true);
 
         $old = getcwd();
@@ -111,16 +111,16 @@ final class InstallerTest extends TestCase
 
     public function testInstallTypedWritesManagedGitignoreWhenTemplateMatches(): void
     {
-        $tmp = sys_get_temp_dir() . '/aipm-installer-gi-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-installer-gi-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         mkdir($tmp . '/abilities/gitignore', 0775, true);
         file_put_contents($tmp . '/abilities/gitignore/template.gitignore', implode("\n", [
-            '## @aipm:block ability=skill:graphify target=cursor',
+            '## @apm:block ability=skill:graphify target=cursor',
             '/.cache/graphify/',
-            '## @aipm:end',
+            '## @apm:end',
         ]));
 
-        $pkg = sys_get_temp_dir() . '/aipm-installer-gi-pkg-' . bin2hex(random_bytes(4));
+        $pkg = sys_get_temp_dir() . '/apm-installer-gi-pkg-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/abilities/skills/graphify', 0775, true);
         file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', 'x');
 
@@ -140,7 +140,7 @@ final class InstallerTest extends TestCase
         self::assertSame(0, $result['exit_code']);
 
         $gitignore = (string) file_get_contents($tmp . '/.gitignore');
-        self::assertStringContainsString('# BEGIN aipm-managed-gitignore v1', $gitignore);
+        self::assertStringContainsString('# BEGIN apm-managed-gitignore v1', $gitignore);
         self::assertStringContainsString('/.cache/graphify/', $gitignore);
     }
 }

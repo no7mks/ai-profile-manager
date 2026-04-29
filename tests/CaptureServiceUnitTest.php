@@ -13,10 +13,11 @@ final class CaptureServiceUnitTest extends TestCase
 {
     public function testDiscoverWorkspaceAbilitiesListsSubdirectories(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-disc-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-disc-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities/skills/s-a', 0775, true);
         mkdir($root . '/abilities/rules/r-b/cursor', 0775, true);
-        mkdir($root . '/abilities/agents/a-c/cursor', 0775, true);
+        mkdir($root . '/abilities/agents', 0775, true);
+        file_put_contents($root . '/abilities/agents/a-c.cursor.md', '');
 
         $svc = new CaptureService(new CheckService());
         $discovered = $svc->discoverWorkspaceAbilities($root);
@@ -28,14 +29,14 @@ final class CaptureServiceUnitTest extends TestCase
 
     public function testCaptureTypedReturnsErrorWhenBaselineUnresolved(): void
     {
-        $composerHome = sys_get_temp_dir() . '/aipm-no-pkg-' . bin2hex(random_bytes(4));
+        $composerHome = sys_get_temp_dir() . '/apm-no-pkg-' . bin2hex(random_bytes(4));
         mkdir($composerHome . '/vendor/composer', 0775, true);
         file_put_contents($composerHome . '/vendor/composer/installed.json', json_encode(['packages' => []]));
 
         $oldCh = getenv('COMPOSER_HOME');
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
+        $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('COMPOSER_HOME=' . $composerHome);
-        putenv('AIPM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT');
 
         $svc = new CaptureService(new CheckService());
         $result = $svc->captureTyped([
@@ -50,9 +51,9 @@ final class CaptureServiceUnitTest extends TestCase
             putenv('COMPOSER_HOME=' . $oldCh);
         }
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
 
         self::assertSame(1, $result['exit_code']);
@@ -91,8 +92,8 @@ final class CaptureServiceUnitTest extends TestCase
 
     public function testCapturePresetManifestDiffReturnsNullWhenManifestMatchesBaseline(): void
     {
-        $baseline = sys_get_temp_dir() . '/aipm-cpmd-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/aipm-cpmd-ws-' . bin2hex(random_bytes(4));
+        $baseline = sys_get_temp_dir() . '/apm-cpmd-' . bin2hex(random_bytes(4));
+        $ws = sys_get_temp_dir() . '/apm-cpmd-ws-' . bin2hex(random_bytes(4));
         mkdir($baseline . '/abilities', 0775, true);
         mkdir($ws . '/abilities', 0775, true);
 
@@ -100,16 +101,16 @@ final class CaptureServiceUnitTest extends TestCase
         file_put_contents($baseline . '/abilities/_presets.json', $json);
         file_put_contents($ws . '/abilities/_presets.json', $json);
 
-        $oldBl = getenv('AIPM_BASELINE_ROOT');
-        putenv('AIPM_BASELINE_ROOT=' . $baseline);
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT=' . $baseline);
 
         $svc = new CaptureService(new CheckService());
         $diff = $svc->capturePresetManifestDiff($ws);
 
         if ($oldBl === false) {
-            putenv('AIPM_BASELINE_ROOT');
+            putenv('APM_BASELINE_ROOT');
         } else {
-            putenv('AIPM_BASELINE_ROOT=' . $oldBl);
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
 
         self::assertNull($diff['result']);

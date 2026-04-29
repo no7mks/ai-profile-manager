@@ -12,7 +12,7 @@ final class PresetRegistryTest extends TestCase
 {
     public function testAllPresetsFallsBackToAppConfigWhenManifestMissing(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-pr-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-pr-' . bin2hex(random_bytes(4));
         mkdir($root, 0775, true);
 
         $registry = new PresetRegistry($root);
@@ -24,7 +24,7 @@ final class PresetRegistryTest extends TestCase
 
     public function testLoadFromWorkspaceOverridesAppConfig(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-pr2-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-pr2-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities', 0775, true);
         $manifest = [
             'custom' => [
@@ -43,7 +43,7 @@ final class PresetRegistryTest extends TestCase
 
     public function testInvalidManifestJsonFallsBackToAppConfig(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-pr3-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-pr3-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities', 0775, true);
         file_put_contents($root . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, '{');
 
@@ -54,7 +54,7 @@ final class PresetRegistryTest extends TestCase
 
     public function testLoadFromWorkspaceSkipsMalformedPresetEntries(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-pr-mal-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-pr-mal-' . bin2hex(random_bytes(4));
         mkdir($root . '/abilities', 0775, true);
         file_put_contents($root . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, json_encode([
             'valid' => [
@@ -72,7 +72,7 @@ final class PresetRegistryTest extends TestCase
 
     public function testSaveToWorkspaceRoundtrip(): void
     {
-        $root = sys_get_temp_dir() . '/aipm-pr4-' . bin2hex(random_bytes(4));
+        $root = sys_get_temp_dir() . '/apm-pr4-' . bin2hex(random_bytes(4));
         mkdir($root, 0775, true);
 
         $registry = new PresetRegistry($root);

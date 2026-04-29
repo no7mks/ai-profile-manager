@@ -19,7 +19,7 @@ final class CaptureChangeIngestor
         ?string $changesDir = null,
         bool $writeBack = false
     ): array {
-        $baseDir = (string) (getenv('AIPM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.aipm'));
+        $baseDir = (string) (getenv('APM_HOME') ?: (rtrim((string) getenv('HOME'), '/') . '/.apm'));
         $changes = $changesDir ?? ($baseDir . '/changes');
         $processed = $baseDir . '/processed-changes';
         $failed = $baseDir . '/failed-changes';

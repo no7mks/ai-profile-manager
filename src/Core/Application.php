@@ -23,7 +23,7 @@ final class Application
     }
 
     /**
-     * Builds the same Symfony Console application used by {@see run()} (list default + all aipm commands).
+     * Builds the same Symfony Console application used by {@see run()} (list default + all apm commands).
      */
     public static function createSymfonyApplication(
         Installer $installer,
@@ -33,7 +33,7 @@ final class Application
         $capture = new CaptureService($checker);
         $ingestor = new CaptureChangeIngestor();
 
-        $app = new SymfonyApplication('apm', '0.4.4');
+        $app = new SymfonyApplication('apm', '0.5.0');
         $app->setDefaultCommand('list');
         ConsoleRegistration::register($app, $installer, $checker, $capture, $ingestor, $updater);
 
