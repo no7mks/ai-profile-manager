@@ -89,7 +89,7 @@
 - Capture 对象与 JSON 字段：**`CaptureEvent` / `event_id` 更名为 `CaptureChange` / `change_id`**；本机目录 **`~/.apm/events` 等改为 `changes` / `processed-changes` / `failed-changes`**，审计文件 `events.jsonl`、`processed-event-ids.json` 同步更名。
 - CLI：`--event-id` → **`--change-id`**，`ingest` 的 **`--events-dir` → `--changes-dir`**。
 - 包内 **`abilities/rules`** 采用分类目录 + 后缀文件：`abilities/rules/{category}/{name}.cursor.mdc|.kiro.md`（与 sample 与安装目标路径映射一致）；`apm init` 的 scope 规则源路径已同步。
-- 内置 preset **`gitflow` / `kiro-spec`** 的 agent 名称与仓库内目录对齐：`gitflow-starter` / `gitflow-finisher`、`spec-gatekeeper`（原 `flow-*` / `gatekeeper` 占位名不再使用）。
+- 内置 preset **`gitflow` / `kiro-spec`** 的能力命名与仓库目录对齐（`gitflow`、`spec-gatekeeper`；原 `flow-*` / `gatekeeper` 占位名不再使用）。
 
 ### Added
 

@@ -5,9 +5,9 @@ alwaysApply: false
 
 # Spec Plan Execution
 
-本规则在执行 `.cursor/specs/<name>/plan.md` 中的 task 时生效。
+本规则在执行 `.cursor/specs/<name>/tasks.md` 中的 task 时生效（历史 `plan.md` 同义）。
 
-Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ] Task N:`）和 sub-step（`- [ ]`）。
+Tasks 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ] Task N:`）和 sub-step（`- [ ]`）。
 
 ### 术语约定
 
@@ -20,13 +20,13 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
 
 使用 **Cursor Plan Mode** 执行：
 
-1. 读取 `plan.md`，对当前要执行的 top-level task 进入 Plan Mode 生成执行计划
+1. 读取 `tasks.md`，对当前要执行的 top-level task 进入 Plan Mode 生成执行计划
 2. 用户 review 后点击 Build 执行
-3. 执行完成后在 plan.md 中标记 `- [x]`，commit，推进下一个 task
+3. 执行完成后在 `tasks.md` 中标记 `- [x]`，commit，推进下一个 task
 
 ### Sub-agent 派发
 
-所有 top-level task 均应派发给 **sub-agent** 执行，以控制主 agent 上下文消耗。主 agent 仅负责读取 plan、派发 task、汇总结果、标记进度。
+所有 top-level task 均应派发给 **sub-agent** 执行，以控制主 agent 上下文消耗。主 agent 仅负责读取 tasks、派发 task、汇总结果、标记进度。
 
 | 场景 | 派发方式 |
 |------|---------|
@@ -34,11 +34,11 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
 | 未标注但无依赖关系的 task（不修改同一文件、无调用依赖） | 主 agent 自行判断可否并行派发 |
 | 有依赖关系的 task | 串行派发：前一个 sub-agent 完成后，主 agent 验证结果，再派发下一个 |
 
-派发时向 sub-agent 提供：当前 task 的完整描述、相关文件路径、前序 task 的关键产出（如新增的类名 / 接口签名）。避免把整个 plan 传给 sub-agent。
+派发时向 sub-agent 提供：当前 task 的完整描述、相关文件路径、前序 task 的关键产出（如新增的类名 / 接口签名）。避免把整个 tasks 文件传给 sub-agent。
 
 ### Pre-execution Review
 
-每次开始执行 plan.md（或从中断处恢复执行）时，先做一次轻量预检：
+每次开始执行 `tasks.md`（或从中断处恢复执行）时，先做一次轻量预检：
 
 1. **Drift 检测**：将当前要执行的 task 涉及的关键文件与 design.md 中的预期做快速比对——如果代码结构、接口签名、依赖关系已发生变化（例如被其他分支 merge 改动），标记为 drift
 2. **决策**：
@@ -60,8 +60,8 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
 
 | 派发方式 | sub-agent 职责 | 主 agent 职责 |
 |---------|---------------|-------------|
-| 串行 | 写代码 + 标记 plan.md `[x]` + commit | 验证后推进下一个 task |
-| 并行 | 写代码 + 标记 plan.md `[x]`（不 commit） | 全部完成后 review → 逐 task stage + commit |
+| 串行 | 写代码 + 标记 `tasks.md` `[x]` + commit | 验证后推进下一个 task |
+| 并行 | 写代码 + 标记 `tasks.md` `[x]`（不 commit） | 全部完成后 review → 逐 task stage + commit |
 
 ### Checkpoint
 
@@ -101,7 +101,7 @@ Plan 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ ]
 
 ## Code Review
 
-Plan 的最后一个 top-level task 通常为 code review。执行时派发 `code-reviewer` sub-agent 处理。
+Tasks 的最后一个 top-level task 通常为 code review。执行时派发 `code-reviewer` sub-agent 处理。
 
 ---
 
