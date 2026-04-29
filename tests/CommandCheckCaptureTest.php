@@ -156,13 +156,13 @@ final class CommandCheckCaptureTest extends TestCase
 
     public function testAgentCaptureWritesChangeWhenAgentDiffersFromBaseline(): void
     {
-        $name = 'spec-gatekeeper';
+        $name = 'code-reviewer';
         $tmpBaseline = sys_get_temp_dir() . '/aipm-ag-bl-' . bin2hex(random_bytes(4));
         $tmpWorkspace = sys_get_temp_dir() . '/aipm-ag-ws-' . bin2hex(random_bytes(4));
-        mkdir($tmpBaseline . '/abilities/agents/' . $name . '/cursor', 0775, true);
-        mkdir($tmpWorkspace . '/abilities/agents/' . $name . '/cursor', 0775, true);
-        file_put_contents($tmpBaseline . '/abilities/agents/' . $name . '/cursor/agent.md', "b\n");
-        file_put_contents($tmpWorkspace . '/abilities/agents/' . $name . '/cursor/agent.md', "w\n");
+        mkdir($tmpBaseline . '/abilities/agents', 0775, true);
+        mkdir($tmpWorkspace . '/abilities/agents', 0775, true);
+        file_put_contents($tmpBaseline . '/abilities/agents/' . $name . '.cursor.md', "b\n");
+        file_put_contents($tmpWorkspace . '/abilities/agents/' . $name . '.cursor.md', "w\n");
 
         $tmpAipmHome = sys_get_temp_dir() . '/aipm-ag-home-' . bin2hex(random_bytes(4));
         mkdir($tmpAipmHome, 0775, true);

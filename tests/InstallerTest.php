@@ -16,8 +16,8 @@ final class InstallerTest extends TestCase
         $pkg = sys_get_temp_dir() . '/aipm-inst-pkg-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/abilities/skills/demo-skill', 0775, true);
         file_put_contents($pkg . '/abilities/skills/demo-skill/SKILL.md', "demo skill\n");
-        mkdir($pkg . '/abilities/agents/demo-agent/cursor', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/demo-agent/cursor/demo-agent.md', "demo agent\n");
+        mkdir($pkg . '/abilities/agents', 0775, true);
+        file_put_contents($pkg . '/abilities/agents/demo-agent.cursor.md', "demo agent\n");
 
         $proj = sys_get_temp_dir() . '/aipm-inst-proj-' . bin2hex(random_bytes(4));
         mkdir($proj, 0775, true);

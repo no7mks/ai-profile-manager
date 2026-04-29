@@ -6,6 +6,10 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- 包内 **agent** 源文件改为扁平命名：`abilities/agents/<name>.<cursor|kiro>.md`（不再使用 `abilities/agents/<name>/<target>/<name>.md`）。安装目标仍为 `.{cursor|kiro}/agents/<name>.md`。Capture / write-back 路径与 `discoverWorkspaceAbilities` 已对齐。
+
 ## [0.4.4] - 2026-04-28
 
 ### Changed

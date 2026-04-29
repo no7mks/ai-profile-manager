@@ -52,19 +52,19 @@ final class CaptureWriteBackService
 
                 if ($itemType === 'preset') {
                     $targetPath = $this->buildSafeTargetPath($sourceDir, $relativePath);
-                } elseif ($itemType === 'rule') {
-                    // Rules are stored as abilities/rules/<category>/<name>.<target-ext>
-                    // and the event payload path is rooted at abilities/ (e.g. rules/git/foo.cursor.mdc).
+                } elseif ($itemType === 'rule' || $itemType === 'agent') {
+                    // Rules: abilities/rules/.../<name>.<target>.(md|mdc)
+                    // Agents: abilities/agents/<name>.<target>.md
                     $targetPath = $this->buildSafeTargetPath($sourceDir . '/abilities', $relativePath);
+                } elseif ($itemType === 'skill') {
+                    $itemDir = $sourceDir . '/abilities/skills/' . $name;
+                    if (!is_dir($itemDir)) {
+                        mkdir($itemDir, 0775, true);
+                    }
+
+                    $targetPath = $this->buildSafeTargetPath($itemDir, $relativePath);
                 } else {
-                    $typeDir = match ($itemType) {
-                        'skill' => 'abilities/skills',
-                        'agent' => 'abilities/agents',
-                        default => 'abilities/unknown-items',
-                    };
-                    $itemDir = $itemType === 'skill'
-                        ? $sourceDir . '/' . $typeDir . '/' . $name
-                        : $sourceDir . '/' . $typeDir . '/' . $name . '/' . $target;
+                    $itemDir = $sourceDir . '/abilities/unknown-items/' . $name . '/' . $target;
                     if (!is_dir($itemDir)) {
                         mkdir($itemDir, 0775, true);
                     }
