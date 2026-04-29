@@ -82,4 +82,67 @@ final class ProjectInitializerTest extends TestCase
         self::assertDirectoryExists($nested);
         self::assertFileExists($nested . '/AGENTS.md');
     }
+
+    public function testInitFailsWhenTargetPathIsAFile(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-init-file-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs', 0775, true);
+        mkdir($pkg . '/scaffold/issues', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "x\n");
+        file_put_contents($pkg . '/scaffold/issues/README.md', "x\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "x\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/cursor-scope.cursor.mdc', "x\n");
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "x\n");
+
+        $target = sys_get_temp_dir() . '/apm-init-file-target-' . bin2hex(random_bytes(4));
+        file_put_contents($target, "not a dir\n");
+
+        $initializer = new ProjectInitializer($pkg);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('not a directory');
+
+        $initializer->init($target, false, []);
+    }
+
+    public function testInitFailsWhenScopeRuleBundleMissing(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-init-miss-rule-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs', 0775, true);
+        mkdir($pkg . '/scaffold/issues', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "x\n");
+        file_put_contents($pkg . '/scaffold/issues/README.md', "x\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "x\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "x\n");
+
+        $target = sys_get_temp_dir() . '/apm-init-miss-rule-target-' . bin2hex(random_bytes(4));
+        mkdir($target, 0775, true);
+
+        $initializer = new ProjectInitializer($pkg);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('cursor-scope bundle missing');
+
+        $initializer->init($target, false, ['cursor']);
+    }
+
+    public function testInitFailsWhenScaffoldLeafMissing(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-init-miss-scaffold-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "x\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "x\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/cursor-scope.cursor.mdc', "x\n");
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "x\n");
+
+        $target = sys_get_temp_dir() . '/apm-init-miss-scaffold-target-' . bin2hex(random_bytes(4));
+        mkdir($target, 0775, true);
+
+        $initializer = new ProjectInitializer($pkg);
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('scaffold/issues missing');
+
+        $initializer->init($target, false, []);
+    }
 }

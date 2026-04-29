@@ -26,6 +26,7 @@ use AiProfileManager\Command\SkillCaptureCommand;
 use AiProfileManager\Command\SkillCheckCommand;
 use AiProfileManager\Command\SkillInstallCommand;
 use AiProfileManager\Command\SkillUninstallCommand;
+use AiProfileManager\Command\ShowCommand;
 use AiProfileManager\Command\UpdateCommand;
 use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
@@ -49,6 +50,7 @@ final class ConsoleRegistration
         KnowledgeBaseUpdater $updater,
     ): void {
         $app->add(new InstallCommand($installer));
+        $app->add(new ShowCommand($installer, $checker));
         $app->add(new SkillInstallCommand($installer));
         $app->add(new RuleInstallCommand($installer));
         $app->add(new AgentInstallCommand($installer));

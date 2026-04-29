@@ -102,6 +102,112 @@ final class Installer
     }
 
     /**
+     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}
+     */
+    public function listAvailableItems(): array
+    {
+        $skills = [];
+        $skillsRoot = $this->packageRoot . '/abilities/skills';
+        if (is_dir($skillsRoot)) {
+            foreach (scandir($skillsRoot) ?: [] as $entry) {
+                if ($entry === '.' || $entry === '..') {
+                    continue;
+                }
+                if (is_dir($skillsRoot . '/' . $entry)) {
+                    $skills[] = $entry;
+                }
+            }
+        }
+
+        $agents = [];
+        $agentsRoot = $this->packageRoot . '/abilities/agents';
+        if (is_dir($agentsRoot)) {
+            foreach (scandir($agentsRoot) ?: [] as $entry) {
+                if ($entry === '.' || $entry === '..') {
+                    continue;
+                }
+                $fullPath = $agentsRoot . '/' . $entry;
+                if (!is_file($fullPath)) {
+                    continue;
+                }
+                if (!preg_match('/^(.+)\.(cursor|kiro)\.md$/', $entry, $matches)) {
+                    continue;
+                }
+                $agents[] = $matches[1];
+            }
+        }
+
+        $rules = [];
+        $rulesRoot = $this->packageRoot . '/abilities/rules';
+        if (is_dir($rulesRoot)) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($rulesRoot, RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $fileInfo) {
+                if (!$fileInfo->isFile()) {
+                    continue;
+                }
+                $basename = $fileInfo->getBasename();
+                foreach (['.cursor.mdc', '.cursor.md', '.kiro.md', '.kiro.mdc'] as $suffix) {
+                    if (!str_ends_with($basename, $suffix)) {
+                        continue;
+                    }
+                    $rules[] = substr($basename, 0, -strlen($suffix));
+                    break;
+                }
+            }
+        }
+
+        $skills = array_values(array_unique($skills));
+        $agents = array_values(array_unique($agents));
+        $rules = array_values(array_unique($rules));
+        sort($skills);
+        sort($agents);
+        sort($rules);
+
+        return [
+            'skills' => $skills,
+            'rules' => $rules,
+            'agents' => $agents,
+        ];
+    }
+
+    public function isInstalledOnTarget(string $type, string $name, string $target): bool
+    {
+        if ($type === 'skill') {
+            return is_dir($this->resolveInstallTargetDir('skill', $name, $target));
+        }
+        if ($type === 'agent') {
+            return is_file($this->resolveInstallTargetAgentFile($name, $target));
+        }
+        if ($type !== 'rule') {
+            return false;
+        }
+
+        $root = $target === 'cursor'
+            ? (string) getcwd() . '/.cursor/rules'
+            : (string) getcwd() . '/.kiro/steering';
+        $suffix = $target === 'cursor' ? '.mdc' : '.md';
+        if (!is_dir($root)) {
+            return false;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $fileInfo) {
+            if (!$fileInfo->isFile()) {
+                continue;
+            }
+            if ($fileInfo->getBasename() === $name . $suffix) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return array{lines: array<int, string>, failed: bool}
      */
     private function installAbilityBundle(string $type, string $name, string $target): array

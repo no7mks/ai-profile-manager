@@ -25,6 +25,9 @@ apm install
 # 预设安装
 apm install gitflow -t cursor
 
+# 查看所有可安装能力，并标记已安装项与所属 preset
+apm show -t cursor
+
 # 卸载前会先 check 是否 modified；有改动需 --force
 apm skill:uninstall graphify -t cursor --force
 ```

@@ -9,6 +9,7 @@
 ### Added
 
 - 新增 `preset:uninstall`、`skill:uninstall`、`rule:uninstall`、`agent:uninstall` 四个卸载命令，支持按 target 批量卸载已安装项。
+- 新增 `show` 命令：按 `skill` / `agent` / `rule` 分组展示全部可安装项，标记当前安装状态，并显示每个 ability 所属 preset。
 
 ### Changed
 
