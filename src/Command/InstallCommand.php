@@ -116,7 +116,7 @@ final class InstallCommand extends Command
         $result = $this->installer->installTyped([
             'skills' => ['apm'],
             'rules' => [],
-            'agents' => [],
+            'agents' => ['code-reviewer'],
         ], $targets);
         foreach ($result['lines'] as $line) {
             $io->writeln($line);

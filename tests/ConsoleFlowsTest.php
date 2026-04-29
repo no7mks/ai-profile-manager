@@ -117,6 +117,8 @@ final class ConsoleFlowsTest extends TestCase
         self::assertFileExists($tmp . '/AGENTS.md');
         self::assertFileExists($tmp . '/.cursor/skills/apm/SKILL.md');
         self::assertFileExists($tmp . '/.kiro/skills/apm/SKILL.md');
+        self::assertFileExists($tmp . '/.cursor/agents/code-reviewer.md');
+        self::assertFileExists($tmp . '/.kiro/agents/code-reviewer.md');
         self::assertStringContainsString("/apm init", $tester->getDisplay());
     }
 
