@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [0.5.1] - 2026-04-29
+
+### Fixed
+
+- 清理 `abilities/skills` 下遗留的 `<name>/<target>/.gitkeep` 空目录占位，统一为无 target 子目录的 skill 布局约定（`abilities/skills/<name>/...`）。
+
 ## [0.5.0] - 2026-04-29
 
 ### Breaking
