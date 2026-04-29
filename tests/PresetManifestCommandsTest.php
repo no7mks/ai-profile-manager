@@ -130,8 +130,8 @@ final class PresetManifestCommandsTest extends TestCase
         $tester = new CommandTester($cmd);
         $exit = $tester->execute([
             'preset' => 'gitflow',
-            'ability' => 'gitflow-starter',
-            '--agent' => true,
+            'ability' => 'gitflow',
+            '--skill' => true,
             '--change-id' => '66666666-6666-4666-8666-666666666666',
         ]);
 

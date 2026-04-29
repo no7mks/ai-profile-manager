@@ -26,7 +26,7 @@ final class AppConfig
         'gitflow' => [
             'skills' => ['gitflow'],
             'rules' => [],
-            'agents' => ['gitflow-starter', 'gitflow-finisher'],
+            'agents' => [],
         ],
         'kiro-spec' => [
             'skills' => ['kiro-spec-planning', 'kiro-spec-execution'],

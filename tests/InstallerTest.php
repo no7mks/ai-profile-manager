@@ -49,7 +49,7 @@ final class InstallerTest extends TestCase
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-st-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/abilities/rules/spec', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/spec/spec-core.kiro.md', 'x');
+        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.kiro.md', 'x');
 
         $proj = sys_get_temp_dir() . '/apm-inst-stp-' . bin2hex(random_bytes(4));
         mkdir($proj, 0775, true);
@@ -61,7 +61,7 @@ final class InstallerTest extends TestCase
         $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => [],
-            'rules' => ['spec-core'],
+            'rules' => ['spec-goal'],
             'agents' => [],
         ], ['kiro']);
 
@@ -69,8 +69,8 @@ final class InstallerTest extends TestCase
 
         self::assertSame(0, $result['exit_code']);
         $output = implode("\n", $result['lines']);
-        self::assertStringContainsString('Installed steering spec-core -> kiro', $output);
-        self::assertFileExists($proj . '/.kiro/steering/spec/spec-core.md');
+        self::assertStringContainsString('Installed steering spec-goal -> kiro', $output);
+        self::assertFileExists($proj . '/.kiro/steering/spec/spec-goal.md');
     }
 
     public function testRuleInstallUsesCategoryFileLayoutNotNameTargetDirs(): void
@@ -150,8 +150,8 @@ final class InstallerTest extends TestCase
         mkdir($pkg . '/abilities/skills/graphify', 0775, true);
         mkdir($pkg . '/abilities/rules/spec', 0775, true);
         mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/spec/spec-core.cursor.mdc', 'x');
-        file_put_contents($pkg . '/abilities/rules/spec/spec-core.kiro.md', 'x');
+        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.cursor.mdc', 'x');
+        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.kiro.md', 'x');
         file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', 'x');
         file_put_contents($pkg . '/abilities/agents/code-reviewer.kiro.md', 'x');
 
@@ -159,7 +159,7 @@ final class InstallerTest extends TestCase
         $items = $installer->listAvailableItems();
 
         self::assertSame(['graphify'], $items['skills']);
-        self::assertSame(['spec-core'], $items['rules']);
+        self::assertSame(['spec-goal'], $items['rules']);
         self::assertSame(['code-reviewer'], $items['agents']);
     }
 
@@ -172,7 +172,7 @@ final class InstallerTest extends TestCase
         mkdir($project . '/.cursor/agents', 0775, true);
         mkdir($project . '/.cursor/rules/spec', 0775, true);
         file_put_contents($project . '/.cursor/agents/code-reviewer.md', 'x');
-        file_put_contents($project . '/.cursor/rules/spec/spec-core.mdc', 'x');
+        file_put_contents($project . '/.cursor/rules/spec/spec-goal.mdc', 'x');
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -181,7 +181,7 @@ final class InstallerTest extends TestCase
         $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
         self::assertTrue($installer->isInstalledOnTarget('skill', 'graphify', 'cursor'));
         self::assertTrue($installer->isInstalledOnTarget('agent', 'code-reviewer', 'cursor'));
-        self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-core', 'cursor'));
+        self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-goal', 'cursor'));
         self::assertFalse($installer->isInstalledOnTarget('skill', 'missing-skill', 'cursor'));
 
         chdir($old);
@@ -193,15 +193,15 @@ final class InstallerTest extends TestCase
         mkdir($pkg, 0775, true);
         $project = sys_get_temp_dir() . '/apm-inst-is-installed-kiro-proj-' . bin2hex(random_bytes(4));
         mkdir($project . '/.kiro/steering/spec', 0775, true);
-        file_put_contents($project . '/.kiro/steering/spec/spec-core.md', 'x');
+        file_put_contents($project . '/.kiro/steering/spec/spec-goal.md', 'x');
 
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($project);
 
         $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
-        self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-core', 'kiro'));
-        self::assertFalse($installer->isInstalledOnTarget('unknown', 'spec-core', 'kiro'));
+        self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-goal', 'kiro'));
+        self::assertFalse($installer->isInstalledOnTarget('unknown', 'spec-goal', 'kiro'));
 
         chdir($old);
     }
@@ -266,7 +266,7 @@ final class InstallerTest extends TestCase
         mkdir($project . '/.kiro/steering/spec', 0775, true);
         file_put_contents($project . '/.cursor/skills/graphify/sub/file.txt', 'x');
         file_put_contents($project . '/.cursor/agents/code-reviewer.md', 'x');
-        file_put_contents($project . '/.cursor/rules/spec/spec-core.mdc', 'x');
+        file_put_contents($project . '/.cursor/rules/spec/spec-goal.mdc', 'x');
         file_put_contents($project . '/.kiro/steering/spec/other.md', 'x');
 
         $old = getcwd();
@@ -276,7 +276,7 @@ final class InstallerTest extends TestCase
         $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
         $result = $installer->uninstallTyped([
             'skills' => ['graphify'],
-            'rules' => ['spec-core'],
+            'rules' => ['spec-goal'],
             'agents' => ['code-reviewer'],
         ], ['cursor', 'kiro']);
 
@@ -285,12 +285,12 @@ final class InstallerTest extends TestCase
         self::assertSame(0, $result['exit_code']);
         $output = implode("\n", $result['lines']);
         self::assertStringContainsString('Uninstalled skill graphify from cursor', $output);
-        self::assertStringContainsString('Uninstalled rule spec-core from cursor', $output);
+        self::assertStringContainsString('Uninstalled rule spec-goal from cursor', $output);
         self::assertStringContainsString('Uninstalled agent code-reviewer from cursor', $output);
-        self::assertStringContainsString('Steering spec-core not found on kiro', $output);
+        self::assertStringContainsString('Steering spec-goal not found on kiro', $output);
         self::assertStringContainsString('Agent code-reviewer not found on kiro', $output);
         self::assertDirectoryDoesNotExist($project . '/.cursor/skills/graphify');
-        self::assertFileDoesNotExist($project . '/.cursor/rules/spec/spec-core.mdc');
+        self::assertFileDoesNotExist($project . '/.cursor/rules/spec/spec-goal.mdc');
         self::assertFileDoesNotExist($project . '/.cursor/agents/code-reviewer.md');
     }
 
@@ -331,7 +331,7 @@ final class InstallerTest extends TestCase
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-rule-fail-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/abilities/rules/spec', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/spec/spec-core.cursor.mdc', "x\n");
+        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.cursor.mdc', "x\n");
         $project = sys_get_temp_dir() . '/apm-inst-rule-fail-proj-' . bin2hex(random_bytes(4));
         mkdir($project . '/.cursor/rules', 0775, true);
         file_put_contents($project . '/.cursor/rules/spec', "block dir creation\n");
@@ -347,7 +347,7 @@ final class InstallerTest extends TestCase
         try {
             $result = $installer->installTyped([
                 'skills' => [],
-                'rules' => ['spec-core'],
+                'rules' => ['spec-goal'],
                 'agents' => [],
             ], ['cursor']);
         } finally {
@@ -357,7 +357,7 @@ final class InstallerTest extends TestCase
         chdir($old);
 
         self::assertSame(1, $result['exit_code']);
-        self::assertStringContainsString('Install copy failed (rule spec-core -> cursor)', implode("\n", $result['lines']));
+        self::assertStringContainsString('Install copy failed (rule spec-goal -> cursor)', implode("\n", $result['lines']));
     }
 
     public function testInstallTypedGitignoreReportsSkipWhenTemplateHasNoMatches(): void

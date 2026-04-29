@@ -78,7 +78,7 @@
 ### 分支规则
 
 - proposal 的创建、review、状态变更默认必须在 `develop` 分支进行。
-- `in-progress` 可在 feature 分支创建后标记（由 gitflow-starter 处理），这是唯一允许在非 `develop` 分支上修改 proposal 状态的场景。
+- `in-progress` 可在 feature 分支创建后标记（由 gitflow skill 的 start 流程处理），这是唯一允许在非 `develop` 分支上修改 proposal 状态的场景。
 - `implemented` / `released` 的标记与收敛由 finish 流程统一处理。
 
 ### 命名建议
@@ -133,6 +133,23 @@
 
 - `unreleased` 条目：`<feature-name>.md`（kebab-case）。
 - 版本目录：`<major>.<minor>`（如 `0.2`）。
+
+---
+
+## Spec Planning 入口
+
+Spec 规划统一通过 `spec-planning` skill 进行，采用“完整 skill 能力 + 轻入口 `SKILL.md` + references 承载细节”的组织方式。
+
+### 阶段与产物
+
+- 固定四阶段：`goal` → `requirements` → `design` → `tasks`
+- 对应产物：`.cursor/specs/<name>/goal.md`、`requirements.md`、`design.md`、`tasks.md`
+- 历史命名 `plan.md` 视为 `tasks.md` 同义
+
+### 执行约束
+
+- 每次只执行一个阶段，不跨步
+- 阶段完成后等待用户或 GK 介入，再进入下一阶段
 
 ---
 

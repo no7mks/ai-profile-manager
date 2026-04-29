@@ -234,13 +234,13 @@ final class ConsoleFlowsTest extends TestCase
 
             $cmd = new RuleInstallCommand(new Installer());
             $tester = new CommandTester($cmd);
-            $exit = $tester->execute(['rules' => ['spec-core'], '--target' => ['kiro']]);
+            $exit = $tester->execute(['rules' => ['spec-goal'], '--target' => ['kiro']]);
         } finally {
             chdir($old);
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('spec-core', $tester->getDisplay());
+        self::assertStringContainsString('spec-goal', $tester->getDisplay());
     }
 
     public function testAgentInstallInstallsNamedAgent(): void
@@ -301,7 +301,7 @@ final class ConsoleFlowsTest extends TestCase
         mkdir($baseline . '/abilities/agents', 0775, true);
         file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
         file_put_contents($baseline . '/abilities/skills/gitflow/SKILL.md', "x\n");
-        file_put_contents($baseline . '/abilities/rules/workflow/spec-core.cursor.mdc', "x\n");
+        file_put_contents($baseline . '/abilities/rules/workflow/spec-goal.cursor.mdc', "x\n");
         file_put_contents($baseline . '/abilities/agents/code-reviewer.cursor.md', "x\n");
 
         file_put_contents(
@@ -309,7 +309,7 @@ final class ConsoleFlowsTest extends TestCase
             json_encode([
                 'demo' => [
                     'skills' => ['graphify'],
-                    'rules' => ['spec-core'],
+                    'rules' => ['spec-goal'],
                     'agents' => ['code-reviewer'],
                 ],
             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
@@ -338,7 +338,7 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('[installed] graphify', $display);
         self::assertStringContainsString('presets: demo', $display);
         self::assertStringContainsString('Rules', $display);
-        self::assertStringContainsString('spec-core', $display);
+        self::assertStringContainsString('spec-goal', $display);
         self::assertStringContainsString('Agents', $display);
         self::assertStringContainsString('code-reviewer', $display);
     }

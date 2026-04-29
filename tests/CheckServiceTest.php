@@ -23,7 +23,7 @@ final class CheckServiceTest extends TestCase
 
         $results = $service->checkTyped([
             'skills' => ['graphify'],
-            'rules' => ['spec-core'],
+            'rules' => ['spec-goal'],
             'agents' => ['spec-gatekeeper'],
         ], ['cursor']);
 
@@ -97,7 +97,7 @@ final class CheckServiceTest extends TestCase
         self::assertSame(2, $exitCode);
 
         self::assertSame(2, $service->evaluateExitCode([
-            ['type' => 'rule', 'name' => 'spec-core', 'target' => 'cursor', 'status' => 'missing'],
+            ['type' => 'rule', 'name' => 'spec-goal', 'target' => 'cursor', 'status' => 'missing'],
         ]));
     }
 
