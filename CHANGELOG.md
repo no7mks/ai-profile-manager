@@ -6,6 +6,14 @@
 
 ## [Unreleased]
 
+## [0.6.1] - 2026-04-29
+
+### Changed
+
+- 将 `gitflow` 与 `spec-planning` 统一为 skill 入口：移除 `gitflow-starter`/`gitflow-finisher` agent，规则与文档改为引用 skill references。
+- spec 规划术语统一为 `goal -> requirements -> design -> tasks`，并将历史 `plan.md` 明确为 `tasks.md` 同义名。
+- 内置 preset 与安装/检查测试同步迁移命名：`spec-core` -> `spec-goal`，`gitflow` 改为 skill-only 安装。
+
 ## [0.6.0] - 2026-04-29
 
 ### Added
