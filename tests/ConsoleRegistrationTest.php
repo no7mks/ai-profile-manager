@@ -28,6 +28,7 @@ final class ConsoleRegistrationTest extends TestCase
 
         $names = [
             'install',
+            'show',
             'skill:install',
             'rule:install',
             'agent:install',

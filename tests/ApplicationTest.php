@@ -26,6 +26,7 @@ final class ApplicationTest extends TestCase
         $app = Application::createSymfonyApplication(new Installer(), new KnowledgeBaseUpdater());
 
         self::assertTrue($app->has('install'));
+        self::assertTrue($app->has('show'));
         self::assertTrue($app->has('ingest'));
         self::assertSame('apm', $app->getName());
     }

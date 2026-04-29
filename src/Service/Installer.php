@@ -72,6 +72,142 @@ final class Installer
     }
 
     /**
+     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
+     * @param array<int, string> $targets
+     * @return array{lines: array<int, string>, exit_code: int}
+     */
+    public function uninstallTyped(array $items, array $targets): array
+    {
+        $lines = [];
+        $lines[] = 'Uninstalling profile items...';
+        $lines[] = 'Targets: ' . implode(', ', $targets);
+        $lines[] = 'Skills: ' . $this->formatList($items['skills']);
+        $lines[] = 'Rules: ' . $this->formatList($items['rules']);
+        $lines[] = 'Agents: ' . $this->formatList($items['agents']);
+        $lines[] = '';
+
+        foreach ($targets as $target) {
+            foreach ($items['skills'] as $name) {
+                $lines = array_merge($lines, $this->uninstallSkill($name, $target));
+            }
+            foreach ($items['rules'] as $name) {
+                $lines = array_merge($lines, $this->uninstallRule($name, $target));
+            }
+            foreach ($items['agents'] as $name) {
+                $lines = array_merge($lines, $this->uninstallAgent($name, $target));
+            }
+        }
+
+        return ['lines' => $lines, 'exit_code' => 0];
+    }
+
+    /**
+     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}
+     */
+    public function listAvailableItems(): array
+    {
+        $skills = [];
+        $skillsRoot = $this->packageRoot . '/abilities/skills';
+        if (is_dir($skillsRoot)) {
+            foreach (scandir($skillsRoot) ?: [] as $entry) {
+                if ($entry === '.' || $entry === '..') {
+                    continue;
+                }
+                if (is_dir($skillsRoot . '/' . $entry)) {
+                    $skills[] = $entry;
+                }
+            }
+        }
+
+        $agents = [];
+        $agentsRoot = $this->packageRoot . '/abilities/agents';
+        if (is_dir($agentsRoot)) {
+            foreach (scandir($agentsRoot) ?: [] as $entry) {
+                if ($entry === '.' || $entry === '..') {
+                    continue;
+                }
+                $fullPath = $agentsRoot . '/' . $entry;
+                if (!is_file($fullPath)) {
+                    continue;
+                }
+                if (!preg_match('/^(.+)\.(cursor|kiro)\.md$/', $entry, $matches)) {
+                    continue;
+                }
+                $agents[] = $matches[1];
+            }
+        }
+
+        $rules = [];
+        $rulesRoot = $this->packageRoot . '/abilities/rules';
+        if (is_dir($rulesRoot)) {
+            $iterator = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($rulesRoot, RecursiveDirectoryIterator::SKIP_DOTS)
+            );
+            foreach ($iterator as $fileInfo) {
+                if (!$fileInfo->isFile()) {
+                    continue;
+                }
+                $basename = $fileInfo->getBasename();
+                foreach (['.cursor.mdc', '.cursor.md', '.kiro.md', '.kiro.mdc'] as $suffix) {
+                    if (!str_ends_with($basename, $suffix)) {
+                        continue;
+                    }
+                    $rules[] = substr($basename, 0, -strlen($suffix));
+                    break;
+                }
+            }
+        }
+
+        $skills = array_values(array_unique($skills));
+        $agents = array_values(array_unique($agents));
+        $rules = array_values(array_unique($rules));
+        sort($skills);
+        sort($agents);
+        sort($rules);
+
+        return [
+            'skills' => $skills,
+            'rules' => $rules,
+            'agents' => $agents,
+        ];
+    }
+
+    public function isInstalledOnTarget(string $type, string $name, string $target): bool
+    {
+        if ($type === 'skill') {
+            return is_dir($this->resolveInstallTargetDir('skill', $name, $target));
+        }
+        if ($type === 'agent') {
+            return is_file($this->resolveInstallTargetAgentFile($name, $target));
+        }
+        if ($type !== 'rule') {
+            return false;
+        }
+
+        $root = $target === 'cursor'
+            ? (string) getcwd() . '/.cursor/rules'
+            : (string) getcwd() . '/.kiro/steering';
+        $suffix = $target === 'cursor' ? '.mdc' : '.md';
+        if (!is_dir($root)) {
+            return false;
+        }
+
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $fileInfo) {
+            if (!$fileInfo->isFile()) {
+                continue;
+            }
+            if ($fileInfo->getBasename() === $name . $suffix) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * @return array{lines: array<int, string>, failed: bool}
      */
     private function installAbilityBundle(string $type, string $name, string $target): array
@@ -146,6 +282,71 @@ final class Installer
         $base = $target === 'cursor' ? $cwd . '/.cursor' : $cwd . '/.kiro';
 
         return $base . '/agents/' . $name . '.md';
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function uninstallSkill(string $name, string $target): array
+    {
+        $dir = $this->resolveInstallTargetDir('skill', $name, $target);
+        if (!is_dir($dir)) {
+            return [sprintf('[miss] Skill %s not found on %s', $name, $target)];
+        }
+
+        $this->removeDirectory($dir);
+
+        return [sprintf('[ok] Uninstalled skill %s from %s', $name, $target)];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function uninstallRule(string $name, string $target): array
+    {
+        $root = $target === 'cursor'
+            ? (string) getcwd() . '/.cursor/rules'
+            : (string) getcwd() . '/.kiro/steering';
+        $suffix = $target === 'cursor' ? '.mdc' : '.md';
+        if (!is_dir($root)) {
+            return [sprintf('[miss] %s %s not found on %s', $target === 'kiro' ? 'Steering' : 'Rule', $name, $target)];
+        }
+
+        $removed = [];
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS)
+        );
+        foreach ($iterator as $fileInfo) {
+            if (!$fileInfo->isFile()) {
+                continue;
+            }
+            if ($fileInfo->getBasename() !== $name . $suffix) {
+                continue;
+            }
+            $path = $fileInfo->getPathname();
+            if (is_file($path) && unlink($path)) {
+                $removed[] = $path;
+            }
+        }
+        if ($removed === []) {
+            return [sprintf('[miss] %s %s not found on %s', $target === 'kiro' ? 'Steering' : 'Rule', $name, $target)];
+        }
+
+        return [sprintf('[ok] Uninstalled %s %s from %s', $target === 'kiro' ? 'steering' : 'rule', $name, $target)];
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function uninstallAgent(string $name, string $target): array
+    {
+        $file = $this->resolveInstallTargetAgentFile($name, $target);
+        if (!is_file($file)) {
+            return [sprintf('[miss] Agent %s not found on %s', $name, $target)];
+        }
+        unlink($file);
+
+        return [sprintf('[ok] Uninstalled agent %s from %s', $name, $target)];
     }
 
     /**
@@ -290,6 +491,25 @@ final class Installer
         $dir = $cwd . '/.kiro/steering' . ($category !== '' ? '/' . $category : '');
 
         return $dir . '/' . $name . '.md';
+    }
+
+    private function removeDirectory(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            return;
+        }
+        $iterator = new RecursiveIteratorIterator(
+            new RecursiveDirectoryIterator($dir, RecursiveDirectoryIterator::SKIP_DOTS),
+            RecursiveIteratorIterator::CHILD_FIRST
+        );
+        foreach ($iterator as $fileInfo) {
+            if ($fileInfo->isDir()) {
+                rmdir($fileInfo->getPathname());
+                continue;
+            }
+            unlink($fileInfo->getPathname());
+        }
+        rmdir($dir);
     }
 
     /**

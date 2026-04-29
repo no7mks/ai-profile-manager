@@ -143,4 +143,250 @@ final class InstallerTest extends TestCase
         self::assertStringContainsString('# BEGIN apm-managed-gitignore v1', $gitignore);
         self::assertStringContainsString('/.cache/graphify/', $gitignore);
     }
+
+    public function testListAvailableItemsCollectsSkillsAgentsRules(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-list-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
+        mkdir($pkg . '/abilities/rules/spec', 0775, true);
+        mkdir($pkg . '/abilities/agents', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/spec/spec-core.cursor.mdc', 'x');
+        file_put_contents($pkg . '/abilities/rules/spec/spec-core.kiro.md', 'x');
+        file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', 'x');
+        file_put_contents($pkg . '/abilities/agents/code-reviewer.kiro.md', 'x');
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $items = $installer->listAvailableItems();
+
+        self::assertSame(['graphify'], $items['skills']);
+        self::assertSame(['spec-core'], $items['rules']);
+        self::assertSame(['code-reviewer'], $items['agents']);
+    }
+
+    public function testIsInstalledOnTargetDetectsSkillAgentAndRule(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-is-installed-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+        $project = sys_get_temp_dir() . '/apm-inst-is-installed-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.cursor/skills/graphify', 0775, true);
+        mkdir($project . '/.cursor/agents', 0775, true);
+        mkdir($project . '/.cursor/rules/spec', 0775, true);
+        file_put_contents($project . '/.cursor/agents/code-reviewer.md', 'x');
+        file_put_contents($project . '/.cursor/rules/spec/spec-core.mdc', 'x');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        self::assertTrue($installer->isInstalledOnTarget('skill', 'graphify', 'cursor'));
+        self::assertTrue($installer->isInstalledOnTarget('agent', 'code-reviewer', 'cursor'));
+        self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-core', 'cursor'));
+        self::assertFalse($installer->isInstalledOnTarget('skill', 'missing-skill', 'cursor'));
+
+        chdir($old);
+    }
+
+    public function testIsInstalledOnTargetSupportsKiroAndUnknownType(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-is-installed-kiro-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+        $project = sys_get_temp_dir() . '/apm-inst-is-installed-kiro-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.kiro/steering/spec', 0775, true);
+        file_put_contents($project . '/.kiro/steering/spec/spec-core.md', 'x');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-core', 'kiro'));
+        self::assertFalse($installer->isInstalledOnTarget('unknown', 'spec-core', 'kiro'));
+
+        chdir($old);
+    }
+
+    public function testListAvailableItemsIgnoresInvalidAgentAndSortsNames(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-list-sort-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/skills/zeta', 0775, true);
+        mkdir($pkg . '/abilities/skills/alpha', 0775, true);
+        mkdir($pkg . '/abilities/rules/git', 0775, true);
+        mkdir($pkg . '/abilities/agents', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/git/b-rule.cursor.mdc', 'x');
+        file_put_contents($pkg . '/abilities/rules/git/a-rule.kiro.md', 'x');
+        file_put_contents($pkg . '/abilities/agents/reviewer.cursor.md', 'x');
+        file_put_contents($pkg . '/abilities/agents/README.txt', 'x');
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $items = $installer->listAvailableItems();
+
+        self::assertSame(['alpha', 'zeta'], $items['skills']);
+        self::assertSame(['a-rule', 'b-rule'], $items['rules']);
+        self::assertSame(['reviewer'], $items['agents']);
+    }
+
+    public function testInstallTypedReturnsFailuresWhenBundlesAreMissing(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-missing-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/skills', 0775, true);
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        mkdir($pkg . '/abilities/agents', 0775, true);
+        $project = sys_get_temp_dir() . '/apm-inst-missing-proj-' . bin2hex(random_bytes(4));
+        mkdir($project, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $result = $installer->installTyped([
+            'skills' => ['missing-skill'],
+            'rules' => ['missing-rule'],
+            'agents' => ['missing-agent'],
+        ], ['cursor']);
+
+        chdir($old);
+
+        self::assertSame(1, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('Missing ability bundle: skill missing-skill', $output);
+        self::assertStringContainsString('Missing ability bundle: rule missing-rule', $output);
+        self::assertStringContainsString('Missing ability bundle: agent missing-agent', $output);
+    }
+
+    public function testUninstallTypedRemovesInstalledItemsAndReportsMissingOnKiro(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-uninstall-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+        $project = sys_get_temp_dir() . '/apm-inst-uninstall-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.cursor/skills/graphify/sub', 0775, true);
+        mkdir($project . '/.cursor/agents', 0775, true);
+        mkdir($project . '/.cursor/rules/spec', 0775, true);
+        mkdir($project . '/.kiro/steering/spec', 0775, true);
+        file_put_contents($project . '/.cursor/skills/graphify/sub/file.txt', 'x');
+        file_put_contents($project . '/.cursor/agents/code-reviewer.md', 'x');
+        file_put_contents($project . '/.cursor/rules/spec/spec-core.mdc', 'x');
+        file_put_contents($project . '/.kiro/steering/spec/other.md', 'x');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $result = $installer->uninstallTyped([
+            'skills' => ['graphify'],
+            'rules' => ['spec-core'],
+            'agents' => ['code-reviewer'],
+        ], ['cursor', 'kiro']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('Uninstalled skill graphify from cursor', $output);
+        self::assertStringContainsString('Uninstalled rule spec-core from cursor', $output);
+        self::assertStringContainsString('Uninstalled agent code-reviewer from cursor', $output);
+        self::assertStringContainsString('Steering spec-core not found on kiro', $output);
+        self::assertStringContainsString('Agent code-reviewer not found on kiro', $output);
+        self::assertDirectoryDoesNotExist($project . '/.cursor/skills/graphify');
+        self::assertFileDoesNotExist($project . '/.cursor/rules/spec/spec-core.mdc');
+        self::assertFileDoesNotExist($project . '/.cursor/agents/code-reviewer.md');
+    }
+
+    public function testInstallTypedFailsWhenAgentTargetDirectoryCannotBeCreated(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-agent-fail-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/agents', 0775, true);
+        file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', "x\n");
+        $project = sys_get_temp_dir() . '/apm-inst-agent-fail-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.cursor', 0775, true);
+        file_put_contents($project . '/.cursor/agents', "block dir creation\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        set_error_handler(static function (int $severity, string $message): bool {
+            return str_contains($message, 'mkdir(): File exists');
+        });
+        try {
+            $result = $installer->installTyped([
+                'skills' => [],
+                'rules' => [],
+                'agents' => ['code-reviewer'],
+            ], ['cursor']);
+        } finally {
+            restore_error_handler();
+        }
+
+        chdir($old);
+
+        self::assertSame(1, $result['exit_code']);
+        self::assertStringContainsString('Install copy failed (agent code-reviewer -> cursor)', implode("\n", $result['lines']));
+    }
+
+    public function testInstallTypedFailsWhenRuleTargetDirectoryCannotBeCreated(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-rule-fail-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/rules/spec', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/spec/spec-core.cursor.mdc', "x\n");
+        $project = sys_get_temp_dir() . '/apm-inst-rule-fail-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.cursor/rules', 0775, true);
+        file_put_contents($project . '/.cursor/rules/spec', "block dir creation\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        set_error_handler(static function (int $severity, string $message): bool {
+            return str_contains($message, 'mkdir(): File exists');
+        });
+        try {
+            $result = $installer->installTyped([
+                'skills' => [],
+                'rules' => ['spec-core'],
+                'agents' => [],
+            ], ['cursor']);
+        } finally {
+            restore_error_handler();
+        }
+
+        chdir($old);
+
+        self::assertSame(1, $result['exit_code']);
+        self::assertStringContainsString('Install copy failed (rule spec-core -> cursor)', implode("\n", $result['lines']));
+    }
+
+    public function testInstallTypedGitignoreReportsSkipWhenTemplateHasNoMatches(): void
+    {
+        $project = sys_get_temp_dir() . '/apm-inst-gi-skip-' . bin2hex(random_bytes(4));
+        mkdir($project . '/abilities/gitignore', 0775, true);
+        file_put_contents($project . '/abilities/gitignore/template.gitignore', implode("\n", [
+            '## @apm:block ability=skill:other-skill target=kiro',
+            '/.cache/other/',
+            '## @apm:end',
+        ]));
+        $pkg = sys_get_temp_dir() . '/apm-inst-gi-skip-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', "x\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $result = $installer->installTyped([
+            'skills' => ['graphify'],
+            'rules' => [],
+            'agents' => [],
+        ], ['cursor']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        self::assertStringContainsString('[skip] No matched .gitignore template blocks.', implode("\n", $result['lines']));
+    }
 }

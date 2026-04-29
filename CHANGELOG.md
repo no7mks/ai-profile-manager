@@ -6,6 +6,20 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-29
+
+### Added
+
+- 新增 `preset:uninstall`、`skill:uninstall`、`rule:uninstall`、`agent:uninstall` 四个卸载命令，支持按 target 批量卸载已安装项。
+- 新增 `show` 命令：按 `skill` / `agent` / `rule` 分组展示全部可安装项，标记当前安装状态，并显示每个 ability 所属 preset。
+
+### Changed
+
+- 卸载前统一复用 `check` 状态判定做 preflight：检测到 `modified` 时默认阻断，必须显式传 `--force` 才允许继续删除。
+- 抽出共享能力 diff 逻辑，`CheckService`、`CaptureService` 与 uninstall preflight 复用同一套状态语义（`unknown` / `unchanged` / `modified` / `missing`）。
+- 重构 `abilities/skills/graphify` 文档结构：`SKILL.md` 改为统一入口与 task router（build/query/update/integration 同层级），并新增 `references/` 下分域执行契约文档（pipeline、query、incremental、integrations）。
+- `apm install`（无 preset 的 bootstrap 模式）默认安装项新增 `code-reviewer` agent，随 `apm` skill 一起落盘到目标平台目录。
+
 ## [0.5.1] - 2026-04-29
 
 ### Fixed

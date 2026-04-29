@@ -53,4 +53,41 @@ final class GitIgnoreTemplateServiceTest extends TestCase
         self::assertStringNotContainsString('/.cache/one/', $content);
         self::assertSame(1, substr_count($content, '# BEGIN apm-managed-gitignore v1'));
     }
+
+    public function testRenderManagedBlockReturnsEmptyWhenTemplateMissing(): void
+    {
+        $svc = new GitIgnoreTemplateService();
+        $rendered = $svc->renderManagedBlock('/tmp/apm-no-template-' . bin2hex(random_bytes(4)), ['skill:graphify'], ['cursor']);
+
+        self::assertSame('', $rendered);
+    }
+
+    public function testRenderManagedBlockThrowsWhenBlockIsUnclosed(): void
+    {
+        $tmp = sys_get_temp_dir() . '/apm-gitignore-bad-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        $template = $tmp . '/template.gitignore';
+        file_put_contents($template, implode("\n", [
+            '## @apm:block ability=skill:graphify target=cursor',
+            '/.cache/graphify/',
+        ]));
+
+        $svc = new GitIgnoreTemplateService();
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Unclosed apm block');
+        $svc->renderManagedBlock($template, ['skill:graphify'], ['cursor']);
+    }
+
+    public function testMergeManagedSectionNoopWhenManagedBodyEmpty(): void
+    {
+        $tmp = sys_get_temp_dir() . '/apm-gitignore-empty-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        $gitignore = $tmp . '/.gitignore';
+        file_put_contents($gitignore, "/vendor/\n");
+
+        $svc = new GitIgnoreTemplateService();
+        $svc->mergeManagedSection($gitignore, "  \n");
+
+        self::assertSame("/vendor/\n", (string) file_get_contents($gitignore));
+    }
 }
