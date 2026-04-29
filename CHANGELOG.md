@@ -6,6 +6,8 @@
 
 ## [Unreleased]
 
+## [0.6.0] - 2026-04-29
+
 ### Added
 
 - 新增 `preset:uninstall`、`skill:uninstall`、`rule:uninstall`、`agent:uninstall` 四个卸载命令，支持按 target 批量卸载已安装项。
