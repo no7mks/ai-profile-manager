@@ -6,6 +6,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- 新增 `preset:uninstall`、`skill:uninstall`、`rule:uninstall`、`agent:uninstall` 四个卸载命令，支持按 target 批量卸载已安装项。
+
+### Changed
+
+- 卸载前统一复用 `check` 状态判定做 preflight：检测到 `modified` 时默认阻断，必须显式传 `--force` 才允许继续删除。
+- 抽出共享能力 diff 逻辑，`CheckService`、`CaptureService` 与 uninstall preflight 复用同一套状态语义（`unknown` / `unchanged` / `modified` / `missing`）。
+
 ## [0.5.1] - 2026-04-29
 
 ### Fixed

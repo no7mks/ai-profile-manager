@@ -30,7 +30,7 @@ final class ConsoleFlowsTest extends TestCase
         mkdir($tmp, 0775, true);
         mkdir($tmp . '/abilities/gitignore', 0775, true);
         file_put_contents($tmp . '/abilities/gitignore/template.gitignore', implode("\n", [
-            '## @apm:block ability=gitflow target=*',
+            '## @apm:block ability=installable-preset target=*',
             '/.apm/gitflow/',
             '## @apm:end',
         ]));
@@ -38,14 +38,25 @@ final class ConsoleFlowsTest extends TestCase
         self::assertNotFalse($old);
         chdir($tmp);
 
+        file_put_contents(
+            $tmp . '/abilities/_presets.json',
+            json_encode([
+                'installable-preset' => [
+                    'skills' => ['graphify'],
+                    'rules' => [],
+                    'agents' => [],
+                ],
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
+        );
+
         $cmd = new InstallCommand(new Installer());
         $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['preset' => 'gitflow', '--target' => ['cursor']]);
+        $exit = $tester->execute(['preset' => 'installable-preset', '--target' => ['cursor']]);
 
         chdir($old);
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('Preset: gitflow', $tester->getDisplay());
+        self::assertStringContainsString('Preset: installable-preset', $tester->getDisplay());
         self::assertFileExists($tmp . '/.gitignore');
         self::assertStringContainsString('/.apm/gitflow/', (string) file_get_contents($tmp . '/.gitignore'));
     }
@@ -112,19 +123,41 @@ final class ConsoleFlowsTest extends TestCase
     public function testCheckCommandRunsForKnownPreset(): void
     {
         $tmp = sys_get_temp_dir() . '/apm-flow-ch-' . bin2hex(random_bytes(4));
-        mkdir($tmp, 0775, true);
+        $baseline = sys_get_temp_dir() . '/apm-flow-ch-base-' . bin2hex(random_bytes(4));
+        mkdir($tmp . '/abilities', 0775, true);
+        mkdir($tmp . '/.cursor/skills/demo-skill', 0775, true);
+        mkdir($baseline . '/abilities/skills/demo-skill', 0775, true);
+        file_put_contents($baseline . '/abilities/skills/demo-skill/SKILL.md', "x\n");
+        file_put_contents($tmp . '/.cursor/skills/demo-skill/SKILL.md', "x\n");
+        file_put_contents(
+            $tmp . '/abilities/_presets.json',
+            json_encode([
+                'known-preset' => [
+                    'skills' => ['demo-skill'],
+                    'rules' => [],
+                    'agents' => [],
+                ],
+            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
+        );
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT=' . $baseline);
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
 
         $cmd = new CheckCommand(new CheckService());
         $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['preset' => 'gitflow', '--target' => ['cursor']]);
+        $exit = $tester->execute(['preset' => 'known-preset', '--target' => ['cursor']]);
 
         chdir($old);
+        if ($oldBl === false) {
+            putenv('APM_BASELINE_ROOT');
+        } else {
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
+        }
 
         self::assertSame(0, $exit);
-        self::assertStringContainsString('Preset: gitflow', $tester->getDisplay());
+        self::assertStringContainsString('Preset: known-preset', $tester->getDisplay());
     }
 
     public function testCaptureCommandRejectsUnknownTarget(): void

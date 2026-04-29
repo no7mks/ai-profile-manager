@@ -81,13 +81,14 @@
 `src/Command` 下的 command 构成 CLI API：
 
 - Install：`install`、`skill:install`、`rule:install`、`agent:install`
+- Uninstall：`preset:uninstall`、`skill:uninstall`、`rule:uninstall`、`agent:uninstall`
 - Check：`check`、`skill:check`、`rule:check`、`agent:check`
 - Capture：`capture`、`skill:capture`、`rule:capture`、`agent:capture`
 - Preset：`preset:create`、`preset:add-ability`、`preset:remove-ability`、`preset:delete`
 - Ingest：`ingest`
 - Update：`update`
 
-typed command 是稳定核心模型；`install`（无参数）承担项目初始化（scaffold + apm skill，并提示 `/apm init` 完成 SSOT ready 初始化：`PROJECT.md` + `docs/state/` 与 `docs/manual/` 下按项目上下文生成的内容文件，不固定文件名）；`capture`（无参）对全仓库 abilities 做快照并可交互确认；preset 子命令通过 manifest diff 产生 capture change。
+typed command 是稳定核心模型；`install`（无参数）承担项目初始化（scaffold + apm skill，并提示 `/apm init` 完成 SSOT ready 初始化：`PROJECT.md` + `docs/state/` 与 `docs/manual/` 下按项目上下文生成的内容文件，不固定文件名）；`capture`（无参）对全仓库 abilities 做快照并可交互确认；`*:uninstall` 在删除前先复用 `check` 状态模型做 preflight（命中 `modified` 且未传 `--force` 时阻断）；preset 子命令通过 manifest diff 产生 capture change。
 
 ## 安装期 `.gitignore` 注入（单模板）
 

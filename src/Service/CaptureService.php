@@ -13,6 +13,7 @@ final class CaptureService
         private readonly CheckService $checker,
         private readonly ComposerBaselineResolver $baselineResolver = new ComposerBaselineResolver(),
         private readonly AbilityDirectoryDiff $directoryDiff = new AbilityDirectoryDiff(),
+        private readonly AbilityDiffService $diffService = new AbilityDiffService(),
     ) {
     }
 
@@ -38,22 +39,8 @@ final class CaptureService
             ];
         }
 
-        $results = [];
+        $results = $this->diffService->diffForCapture($items, $targets, $baseline['install_path'], $workspaceRoot);
         $lines = [];
-
-        foreach ($targets as $target) {
-            foreach ($items['skills'] as $name) {
-                $results[] = $this->diffAbility('skill', $name, $target, $baseline['install_path'], $workspaceRoot);
-            }
-
-            foreach ($items['rules'] as $name) {
-                $results[] = $this->diffAbility('rule', $name, $target, $baseline['install_path'], $workspaceRoot);
-            }
-
-            foreach ($items['agents'] as $name) {
-                $results[] = $this->diffAbility('agent', $name, $target, $baseline['install_path'], $workspaceRoot);
-            }
-        }
 
         foreach ($results as $result) {
             if ($result['status'] === 'modified') {
@@ -118,7 +105,7 @@ final class CaptureService
             return ['result' => null, 'baseline' => $baseline];
         }
 
-        $contentHash = $this->hashFiles($files);
+        $contentHash = $this->diffService->hashFiles($files);
         $result = [
             'type' => 'preset',
             'name' => '_presets',
@@ -315,157 +302,6 @@ final class CaptureService
         }
 
         return $out;
-    }
-
-    /**
-     * @return array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}
-     */
-    private function diffAbility(string $type, string $name, string $target, string $baselineRoot, string $workspaceRoot): array
-    {
-        if ($type === 'rule') {
-            $relative = $this->resolveRuleRelativePath($workspaceRoot, $name, $target)
-                ?? $this->resolveRuleRelativePath($baselineRoot, $name, $target)
-                ?? ('rules/' . $name . ($target === 'cursor' ? '.cursor.mdc' : '.kiro.md'));
-            $relative = preg_replace('/^abilities\//', '', $relative) ?? $relative;
-            $baselineFile = is_file($baselineRoot . '/abilities/' . $relative) ? $baselineRoot . '/abilities/' . $relative : null;
-            $workspaceFile = is_file($workspaceRoot . '/abilities/' . $relative) ? $workspaceRoot . '/abilities/' . $relative : null;
-            $files = $this->directoryDiff->diffOptionalFiles($baselineFile, $workspaceFile, $relative);
-            $status = $files === [] ? 'unchanged' : 'modified';
-
-            return [
-                'type' => $type,
-                'name' => $name,
-                'target' => $target,
-                'status' => $status,
-                'content_hash' => $this->hashFiles($files),
-                'files' => $files,
-            ];
-        }
-
-        if ($type === 'agent') {
-            $relative = 'agents/' . $name . '.' . $target . '.md';
-            $baselineFile = is_file($baselineRoot . '/abilities/' . $relative) ? $baselineRoot . '/abilities/' . $relative : null;
-            $workspaceFile = is_file($workspaceRoot . '/abilities/' . $relative) ? $workspaceRoot . '/abilities/' . $relative : null;
-            $files = $this->directoryDiff->diffOptionalFiles($baselineFile, $workspaceFile, $relative);
-            $status = $files === [] ? 'unchanged' : 'modified';
-
-            return [
-                'type' => $type,
-                'name' => $name,
-                'target' => $target,
-                'status' => $status,
-                'content_hash' => $this->hashFiles($files),
-                'files' => $files,
-            ];
-        }
-
-        $sub = match ($type) {
-            'skill' => 'abilities/skills',
-            'rule' => 'abilities/rules',
-            default => 'abilities/unknown-items',
-        };
-
-        $mid = '/' . $sub . '/' . $name;
-        $bAbs = $baselineRoot . $mid;
-        $wAbs = $workspaceRoot . $mid;
-
-        $bDir = is_dir($bAbs) ? $bAbs : null;
-        $wDir = is_dir($wAbs) ? $wAbs : null;
-
-        $files = $this->directoryDiff->diffDirectories($bDir, $wDir);
-
-        $status = $files === [] ? 'unchanged' : 'modified';
-
-        return [
-            'type' => $type,
-            'name' => $name,
-            'target' => $target,
-            'status' => $status,
-            'content_hash' => $this->hashFiles($files),
-            'files' => $files,
-        ];
-    }
-
-    private function resolveRuleRelativePath(string $root, string $name, string $target): ?string
-    {
-        $suffixes = $target === 'cursor'
-            ? ['.cursor.mdc', '.cursor.md']
-            : ['.kiro.md', '.kiro.mdc'];
-        $rulesRoot = $root . '/abilities/rules';
-        if (!is_dir($rulesRoot)) {
-            return null;
-        }
-
-        $candidates = [];
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($rulesRoot, RecursiveDirectoryIterator::SKIP_DOTS)
-        );
-        foreach ($iterator as $fileInfo) {
-            if (!$fileInfo->isFile()) {
-                continue;
-            }
-            $basename = $fileInfo->getBasename();
-            foreach ($suffixes as $suffix) {
-                if ($basename === $name . $suffix) {
-                    $candidates[] = $fileInfo->getPathname();
-                    break;
-                }
-            }
-        }
-
-        if ($candidates === []) {
-            return null;
-        }
-
-        $path = $this->pickPreferredRuleSourcePath($candidates, $target);
-
-        return ltrim(substr($path, strlen($root . '/abilities/')), '/');
-    }
-
-    /**
-     * @param array<int, string> $paths
-     */
-    private function pickPreferredRuleSourcePath(array $paths, string $target): string
-    {
-        if (count($paths) === 1) {
-            return $paths[0];
-        }
-
-        $rank = static function (string $p) use ($target): int {
-            $b = basename($p);
-            if ($target === 'cursor') {
-                if (str_ends_with($b, '.cursor.mdc')) {
-                    return 0;
-                }
-
-                return str_ends_with($b, '.cursor.md') ? 1 : 2;
-            }
-            if (str_ends_with($b, '.kiro.md')) {
-                return 0;
-            }
-
-            return str_ends_with($b, '.kiro.mdc') ? 1 : 2;
-        };
-
-        usort($paths, static fn (string $a, string $b): int => $rank($a) <=> $rank($b));
-
-        return $paths[0];
-    }
-
-    /**
-     * @param array<int, array<string, mixed>> $files
-     */
-    private function hashFiles(array $files): string
-    {
-        $parts = [];
-        foreach ($files as $f) {
-            $deleted = !empty($f['deleted']);
-            $parts[] = ($f['path'] ?? '') . "\0" . ($deleted ? '1' : '0') . "\0" . ($f['content'] ?? '');
-        }
-
-        sort($parts);
-
-        return hash('sha256', implode("\n", $parts));
     }
 
     private function generateUuidV4(): string
