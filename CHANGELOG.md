@@ -6,6 +6,12 @@
 
 ## [Unreleased]
 
+## [0.6.2] - 2026-05-02
+
+### Changed
+
+- `code-reviewer` agent（Cursor / Kiro）：明确「扫描范围」仅约束从何入手审查，**修复范围不限于 diff**；凡认定为问题须按 **RED-GREEN TDD** 修复，不得以非本次变更或非扫描文件为由搁置（仍保留有注释的技术债 / `[review-skip]` 放过约定）。
+
 ## [0.6.1] - 2026-04-29
 
 ### Changed
