@@ -6,6 +6,15 @@
 
 ## [Unreleased]
 
+## [0.6.3] - 2026-05-03
+
+### Changed
+
+- `writing-conventions`（Cursor / Kiro）：补充大段 Markdown 写入建议（分段 `fsWrite` / `fsAppend`）。
+- `spec-execution`（Kiro）：重组章节与 `description`；新增「不推诿原则」等质量标准表述。
+- `spec-execution`（Cursor）：新增「质量标准 / 不推诿原则」；`description` 标明所含小节。
+- `spec-goal`（Cursor）：改为面向 `plan.md` / `tasks.md` 的 **Spec Plan Execution** 规则（与 Kiro 侧 `spec-goal.kiro.md` 兼容入口分工不变）。
+
 ## [0.6.2] - 2026-05-02
 
 ### Changed
