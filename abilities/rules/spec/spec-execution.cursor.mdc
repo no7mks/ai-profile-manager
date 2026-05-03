@@ -1,5 +1,5 @@
 ---
-description: 当执行 spec plan 中的 task（编码、测试、code review）时读取。
+description: 当执行 spec plan 中的 task（编码、测试、code review）时读取；含执行约束与质量标准（含不推诿原则）、测试分层、release stabilize、异常处理。
 alwaysApply: false
 ---
 
@@ -71,7 +71,17 @@ Tasks 文件由 spec-planner sub-agent 生成，包含 top-level task（`## - [ 
 
 ---
 
-## 测试分层
+## 质量标准
+
+### 不推诿原则
+
+测试失败时，不得将原因归咎于"已有代码的问题"或"不是本次变更引起的"而跳过修复。只要你最终要 commit，就必须保证 commit 时所有测试通过、所有行为正确。具体要求：
+
+- 发现测试 fail，无论是否由本次变更引起，都必须修复或向用户确认可以不修
+- 不得以"这是 pre-existing issue"为由自行决定跳过
+- 除非用户明确说"这个不用修"，否则 fail 就是你的责任
+
+### 测试分层
 
 | 层 | 测试类型 | 覆盖范围 |
 |----|---------|---------|
