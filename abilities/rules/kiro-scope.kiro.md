@@ -18,3 +18,7 @@ description: Kiro 平台专属规则，始终生效
 
 - 不要读取、引用或参考 `.cursor/` 目录下的任何文件（包括 `.cursor/rules/` 中的 rule 文件）。
 - `.cursor/` 是另一个编辑器的配置目录，与 Kiro 无关。Kiro 的 steering 规则仅来自 `.kiro/steering/`。
+
+## Session 类型的选择
+
+- 永远不要主动提示用户使用 Spec Session
