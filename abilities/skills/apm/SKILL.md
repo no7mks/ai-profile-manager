@@ -94,9 +94,23 @@ description: "通过 `/apm <command>` 统一入口执行初始化、安装、检
 # 构建
 <command>
 
-# 全量测试
+# 静态检查 / Lint
+<command>
+
+# 单元测试（Unit）
+<command>
+
+# 集成测试（Integration）
+<command>
+
+# 覆盖率测试（Coverage）
 <command>
 ```
+
+测试执行约定：
+
+- 测试命令尽量将完整输出写入日志文件，后续检索与过滤基于日志进行。
+- 避免仅为了切换过滤方式而反复重跑同一测试命令。
 
 ---
 
