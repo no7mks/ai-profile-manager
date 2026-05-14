@@ -1,0 +1,28 @@
+---
+description: Git 分支、版本与发布最小流程规范
+inclusion: always
+---
+
+# Git Release Flow
+
+## 分支与发布约定
+
+- 日常开发在 `develop` 分支进行。
+- 正式发布在 `master` 分支进行。
+
+## CHANGELOG 与版本号
+
+- 每次发布前，根据 `git log` 对照上一版本（常用 tag 或合并点）整理变更，更新根目录 `CHANGELOG.md`（例如 `git log <上一版本>..HEAD --oneline`）。
+- 发布时把 `[Unreleased]` 中属于本版的内容归入新版本小节，并写上发布日期。
+- 发布时须同步更新**代码里**与本次版本一致的标识（例如 `composer.json` 的 `version` 字段若存在、CLI 注册版本如 `SymfonyApplication` 的第二个参数等），并与 Git tag、CHANGELOG 新版本号对齐。
+
+## 发布前验证
+
+- 发布前必须跑通项目约定的自动化测试（例如 PHPUnit），全部通过后方可进入合并与打 tag。
+- 与用户确认当前测试覆盖率是否满足本次发布预期（若有覆盖率门槛或报告，对照说明；必要时补充测试后再发布）。
+
+## 发布后同步要求
+
+- 每次发布后，`develop` 与 `master` 必须保持同步。
+- `develop` 与 `master` 都必须执行 `push` 到远端。
+- 完成发布流程后，切回 `develop` 继续开发工作。
