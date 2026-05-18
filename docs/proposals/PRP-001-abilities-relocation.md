@@ -125,6 +125,14 @@ apm CLI 代码适配新的文件布局：
 
 Scaffold 不纳入 `abilities.yaml`——它们是项目标准结构的固定组成部分，由 `apm init` 按约定路径硬编码生成，不属于可选安装的 ability。
 
+#### 根级 markdown 文件的特殊处理
+
+`PROJECT.md`、`README.md`、`CHANGELOG.md` 是每个项目独有的，内容因项目而异。`apm init` 时：
+
+- 按模板创建这些文件的骨架结构（模板由 apm 约定，存放在本项目中）
+- 不直接复制内容——模板只提供 section 结构和占位符，实际内容由用户或 agent 根据项目上下文填充
+- 如果目标项目已有这些文件，不覆盖
+
 ---
 
 ## `abilities.yaml` 设计
