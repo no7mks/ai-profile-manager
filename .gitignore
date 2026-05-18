@@ -5,3 +5,27 @@
 # BEGIN apm-managed-gitignore v1
 /.cursor/scratchpads/
 # END apm-managed-gitignore v1
+
+## @apm:block ability=php target=*
+.phpunit.cache/
+.phpunit.result.cache
+## @apm:end
+
+## @apm:block ability=graphify target=*
+graphify-out/.graphify_python
+graphify-out/cache/
+graphify-out/manifest.json
+ut/graphify-out/
+## @apm:end
+
+## @apm:block ability=python target=*
+__pycache__/
+*.pyc
+## @apm:end
+
+## @apm:block ability=kotlin target=*
+/dist/
+/build/
+.gradle/
+.kotlin/
+## @apm:end
