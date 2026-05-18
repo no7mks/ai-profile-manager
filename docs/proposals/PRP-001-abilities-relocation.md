@@ -21,12 +21,13 @@
 
 ### Phase 1：迁移文件
 
-将 `abilities/` 下的所有文件迁移到它们真实生效的路径，使本项目自身也能直接使用这些 ability（包括 Kiro session）。
+将 `abilities/` 和 `scaffold/` 下的所有文件迁移到它们真实生效的路径，使本项目自身也能直接使用这些 ability（包括 Kiro session）。
 
 - ability 文件直接放在 `.cursor/` 和 `.kiro/` 下
+- scaffold 文件直接放在项目根目录对应位置
 - target 通过路径前缀区分，文件名不再携带 target 后缀
 - 新增 `abilities.yaml` 作为 ability 注册表
-- 废弃 `abilities/` 目录
+- 废弃 `abilities/` 和 `scaffold/` 目录
 
 ### Phase 2：系统支持新路径
 
@@ -104,6 +105,24 @@ apm CLI 代码适配新的文件布局：
 
 `abilities/gitignore/template.gitignore` 的内容用 `@apm:block` marker 合并到项目根 `.gitignore`。
 
+### Scaffold
+
+`scaffold/` 目录包含项目脚手架模板，这些文件没有 target 概念（不区分 cursor/kiro），直接安装到目标项目根目录。
+
+| 源文件 | 安装目标 |
+|--------|----------|
+| `scaffold/AGENTS.md` | `AGENTS.md` |
+| `scaffold/CHANGELOG.md` | `CHANGELOG.md` |
+| `scaffold/docs/README.md` | `docs/README.md` |
+| `scaffold/issues/README.md` | `issues/README.md` |
+| `scaffold/docs/state/.gitkeep` | `docs/state/.gitkeep` |
+| `scaffold/docs/manual/.gitkeep` | `docs/manual/.gitkeep` |
+| `scaffold/docs/notes/.gitkeep` | `docs/notes/.gitkeep` |
+| `scaffold/docs/proposals/.gitkeep` | `docs/proposals/.gitkeep` |
+| `scaffold/docs/changes/.gitkeep` | `docs/changes/.gitkeep` |
+
+与 abilities 同理，scaffold 文件也应迁移到它们真实生效的路径（即本项目根目录），`scaffold/` 目录废弃。scaffold 类 ability 在 `abilities.yaml` 中用 `type: scaffold` 声明。
+
 ---
 
 ## `abilities.yaml` 设计
@@ -138,6 +157,26 @@ abilities:
     description: PHP 相关忽略规则
     marker: "php"
     target: .gitignore
+
+  - name: agents-md
+    type: scaffold
+    description: Agent 使用原则与项目约定
+    target: AGENTS.md
+
+  - name: docs-readme
+    type: scaffold
+    description: 文档分层规范
+    target: docs/README.md
+
+  - name: issues-readme
+    type: scaffold
+    description: Issue 管理规范
+    target: issues/README.md
+
+  - name: changelog
+    type: scaffold
+    description: 根级 CHANGELOG 模板
+    target: CHANGELOG.md
 ```
 
 ---
@@ -147,7 +186,8 @@ abilities:
 ### 数据层
 
 - `abilities/` 目录整体废弃，内容迁移到真实生效路径
-- 新增 `abilities.yaml` 作为 ability 注册表
+- `scaffold/` 目录整体废弃，内容迁移到项目根目录
+- 新增 `abilities.yaml` 作为 ability 注册表（涵盖 rules/agents/skills/gitignore/scaffold 所有类型）
 - `.gitignore` 中的 managed block 从模板文件变为就地维护
 
 ### 代码层（apm CLI）
@@ -156,6 +196,7 @@ abilities:
 - 后缀解析逻辑废弃，改为路径前缀判定
 - gitignore 命令直接操作 `.gitignore` marker block
 - skill install 处理目录级 duplicate
+- scaffold install 逻辑改为从项目根目录读取模板文件
 - 移除 capture/ingest 相关代码和命令注册
 
 ### 规则/文档层
