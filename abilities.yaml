@@ -155,3 +155,31 @@ gitignore:
   - name: kotlin
     description: Kotlin 相关忽略规则
     marker: kotlin
+
+presets:
+  - name: gitflow
+    description: GitFlow 全套能力
+    includes:
+      - branch-overview
+      - git-conventions
+      - gitflow           # skill
+
+  - name: spec-core
+    description: Spec 规划与执行全套
+    includes:
+      - spec-execution
+      - spec-goal
+      - spec-planning     # rule
+      - manual-testing
+      - spec-planning     # skill (同名，需消歧机制)
+      - spec-planner
+      - spec-gatekeeper
+      - gk-design
+      - gk-requirements
+      - gk-tasks
+
+  - name: graphify
+    description: Graphify 图谱能力
+    includes:
+      - graphify          # rule (同名，需消歧机制)
+      - graphify          # skill (同名，需消歧机制)
