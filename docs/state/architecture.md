@@ -30,10 +30,3 @@ abilities.yaml → Installer → 目标项目 (.cursor/ | .kiro/)
 |------|--------|-----------|-------------|-------------|
 | Cursor | `.cursor/` | `.cursor/rules/` | `.cursor/agents/` | `.cursor/skills/` |
 | Kiro | `.kiro/` | `.kiro/steering/` | `.kiro/agents/` | `.kiro/skills/` |
-
----
-
-## 当前版本
-
-- 最新发布：v0.6.3
-- 活跃分支：develop

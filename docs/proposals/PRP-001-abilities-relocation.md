@@ -140,33 +140,31 @@ Scaffold 不纳入 `abilities.yaml`——它们是项目标准结构的固定组
 ```yaml
 version: "1"
 
-abilities:
+rules:
   - name: git-conventions
-    type: rule
     description: 日常 git 操作的基础规则
     targets:
       cursor: .cursor/rules/git/git-conventions.mdc
       kiro: .kiro/steering/git/git-conventions.md
 
+agents:
   - name: code-reviewer
-    type: agent
     description: 基于 diff 的 code review agent
     targets:
       cursor: .cursor/agents/code-reviewer.md
       kiro: .kiro/agents/code-reviewer.md
 
+skills:
   - name: gitflow
-    type: skill
     description: GitFlow start/finish 统一执行
     targets:
       cursor: .cursor/skills/gitflow/
       kiro: .kiro/skills/gitflow/
 
-  - name: gitignore-php
-    type: gitignore
+gitignore:
+  - name: php
     description: PHP 相关忽略规则
-    marker: "php"
-    target: .gitignore
+    marker: php
 ```
 
 ---
