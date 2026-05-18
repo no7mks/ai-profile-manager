@@ -121,9 +121,9 @@ apm CLI 代码适配新的文件布局：
 | `scaffold/docs/proposals/.gitkeep` | `docs/proposals/.gitkeep` | 已有目录，跳过 |
 | `scaffold/docs/changes/.gitkeep` | `docs/changes/.gitkeep` | 新建目录 |
 
-本项目根目录已有 `CHANGELOG.md`、`README.md` 等文件且包含实际内容，迁移时不覆盖——scaffold 模板仅作为 apm 安装到其他项目时的初始内容。`scaffold/` 目录废弃后，这些模板文件保留在 `abilities.yaml` 中声明，apm install 时仍从本项目对应路径读取。
+本项目根目录已有 `CHANGELOG.md`、`README.md` 等文件且包含实际内容，迁移时不覆盖——scaffold 模板仅作为 apm 安装到其他项目时的初始内容。`scaffold/` 目录废弃后，这些模板文件直接放在本项目对应路径下维护。
 
-scaffold 类 ability 在 `abilities.yaml` 中用 `type: scaffold` 声明。
+Scaffold 不纳入 `abilities.yaml`——它们是项目标准结构的固定组成部分，由 `apm init` 按约定路径硬编码生成，不属于可选安装的 ability。
 
 ---
 
@@ -159,26 +159,6 @@ abilities:
     description: PHP 相关忽略规则
     marker: "php"
     target: .gitignore
-
-  - name: agents-md
-    type: scaffold
-    description: Agent 使用原则与项目约定
-    target: AGENTS.md
-
-  - name: docs-readme
-    type: scaffold
-    description: 文档分层规范
-    target: docs/README.md
-
-  - name: issues-readme
-    type: scaffold
-    description: Issue 管理规范
-    target: issues/README.md
-
-  - name: changelog
-    type: scaffold
-    description: 根级 CHANGELOG 模板
-    target: CHANGELOG.md
 ```
 
 ---
@@ -198,7 +178,7 @@ abilities:
 - 后缀解析逻辑废弃，改为路径前缀判定
 - gitignore 命令直接操作 `.gitignore` marker block
 - skill install 处理目录级 duplicate
-- scaffold install 逻辑改为从项目根目录读取模板文件
+- scaffold install 逻辑改为从项目根目录读取模板文件（硬编码路径，不走 abilities.yaml）
 - 移除 capture/ingest 相关代码和命令注册
 
 ### 规则/文档层
