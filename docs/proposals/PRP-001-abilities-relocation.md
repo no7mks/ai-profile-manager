@@ -109,19 +109,21 @@ apm CLI 代码适配新的文件布局：
 
 `scaffold/` 目录包含项目脚手架模板，这些文件没有 target 概念（不区分 cursor/kiro），直接安装到目标项目根目录。
 
-| 源文件 | 安装目标 |
-|--------|----------|
-| `scaffold/AGENTS.md` | `AGENTS.md` |
-| `scaffold/CHANGELOG.md` | `CHANGELOG.md` |
-| `scaffold/docs/README.md` | `docs/README.md` |
-| `scaffold/issues/README.md` | `issues/README.md` |
-| `scaffold/docs/state/.gitkeep` | `docs/state/.gitkeep` |
-| `scaffold/docs/manual/.gitkeep` | `docs/manual/.gitkeep` |
-| `scaffold/docs/notes/.gitkeep` | `docs/notes/.gitkeep` |
-| `scaffold/docs/proposals/.gitkeep` | `docs/proposals/.gitkeep` |
-| `scaffold/docs/changes/.gitkeep` | `docs/changes/.gitkeep` |
+| 源文件 | 安装目标 | 本项目处理 |
+|--------|----------|-----------|
+| `scaffold/AGENTS.md` | `AGENTS.md` | 已有内容，不覆盖 |
+| `scaffold/CHANGELOG.md` | `CHANGELOG.md` | 已有内容，不覆盖 |
+| `scaffold/docs/README.md` | `docs/README.md` | 新建 |
+| `scaffold/issues/README.md` | `issues/README.md` | 新建 |
+| `scaffold/docs/state/.gitkeep` | `docs/state/.gitkeep` | 新建目录 |
+| `scaffold/docs/manual/.gitkeep` | `docs/manual/.gitkeep` | 新建目录 |
+| `scaffold/docs/notes/.gitkeep` | `docs/notes/.gitkeep` | 新建目录 |
+| `scaffold/docs/proposals/.gitkeep` | `docs/proposals/.gitkeep` | 已有目录，跳过 |
+| `scaffold/docs/changes/.gitkeep` | `docs/changes/.gitkeep` | 新建目录 |
 
-与 abilities 同理，scaffold 文件也应迁移到它们真实生效的路径（即本项目根目录），`scaffold/` 目录废弃。scaffold 类 ability 在 `abilities.yaml` 中用 `type: scaffold` 声明。
+本项目根目录已有 `CHANGELOG.md`、`README.md` 等文件且包含实际内容，迁移时不覆盖——scaffold 模板仅作为 apm 安装到其他项目时的初始内容。`scaffold/` 目录废弃后，这些模板文件保留在 `abilities.yaml` 中声明，apm install 时仍从本项目对应路径读取。
+
+scaffold 类 ability 在 `abilities.yaml` 中用 `type: scaffold` 声明。
 
 ---
 
