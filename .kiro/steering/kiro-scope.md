@@ -1,5 +1,5 @@
 ---
-inclusion: auto
+inclusion: always
 description: Kiro 平台专属规则，始终生效
 ---
 
@@ -13,11 +13,6 @@ description: Kiro 平台专属规则，始终生效
 
 - Agent 首次接触项目时，必须先读取根目录下的 `PROJECT.md` 获取项目的技术栈、构建命令、运行入口、敏感文件清单等项目特定信息。
 - 读取 `PROJECT.md` 时优先使用各项的 `confirmed` 值；若为 `UNKNOWN`，先向用户确认再继续执行。
-
-## 禁止读取 `.cursor` 目录
-
-- 不要读取、引用或参考 `.cursor/` 目录下的任何文件（包括 `.cursor/rules/` 中的 rule 文件）。
-- `.cursor/` 是另一个编辑器的配置目录，与 Kiro 无关。Kiro 的 steering 规则仅来自 `.kiro/steering/`。
 
 ## Session 类型的选择
 
