@@ -49,15 +49,3 @@
 
 - 修复描述。
 ```
-
----
-
-## [Unreleased]
-
-**Added**
-
-**Changed**
-
-**Fixed**
-
-**Breaking**
