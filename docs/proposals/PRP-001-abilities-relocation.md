@@ -52,7 +52,7 @@ apm CLI 代码适配新的文件布局：
 | 改造前（后缀区分 target） | 改造后（路径前缀区分 target） |
 |--------------------------|------------------------------|
 | `abilities/rules/git/git-conventions.cursor.mdc` | `.cursor/rules/git/git-conventions.mdc` |
-| `abilities/rules/git/git-conventions.kiro.md` | `.kiro/steering/rules/git/git-conventions.md` |
+| `abilities/rules/git/git-conventions.kiro.md` | `.kiro/steering/git/git-conventions.md` |
 | `abilities/agents/code-reviewer.cursor.md` | `.cursor/agents/code-reviewer.md` |
 | `abilities/agents/code-reviewer.kiro.md` | `.kiro/agents/code-reviewer.md` |
 | `abilities/skills/gitflow/SKILL.md` | `.cursor/skills/gitflow/SKILL.md` + `.kiro/skills/gitflow/SKILL.md` |
@@ -63,7 +63,7 @@ apm CLI 代码适配新的文件布局：
 
 ### Rules
 
-| 源文件 | `.cursor/rules/` 目标 | `.kiro/steering/rules/` 目标 |
+| 源文件 | `.cursor/rules/` 目标 | `.kiro/steering/` 目标 |
 |--------|----------------------|------------------------------|
 | `rules/cursor-scope.cursor.mdc` | `cursor-scope.mdc` | — |
 | `rules/kiro-scope.kiro.md` | — | `kiro-scope.md` |
@@ -146,7 +146,7 @@ abilities:
     description: 日常 git 操作的基础规则
     targets:
       cursor: .cursor/rules/git/git-conventions.mdc
-      kiro: .kiro/steering/rules/git/git-conventions.md
+      kiro: .kiro/steering/git/git-conventions.md
 
   - name: code-reviewer
     type: agent
@@ -206,7 +206,7 @@ abilities:
 
 ## 约束与决策
 
-- Kiro 的 ability rules 放在 `.kiro/steering/rules/` 子目录下，与项目级 steering 文件区分
+- Kiro 的 ability steering 直接放在 `.kiro/steering/` 下（含子目录），与项目级 steering 文件平级
 - `.cursor/rules/` 和 `.kiro/steering/` 下已有的项目级规则（`agent-entry-point`、`git-release-flow`）不属于 ability 体系，保持不动
 - Skills 在两个 target 下是完全相同的 duplicate，接受冗余
 - `abilities.yaml` 是 apm 的唯一 ability 注册入口
