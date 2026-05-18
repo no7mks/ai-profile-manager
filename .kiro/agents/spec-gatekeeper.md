@@ -24,16 +24,20 @@ tools: ["read", "write", "shell"]
 2. 根据分支名确定 spec 目录路径（见下方 Spec 类型与目录）
 3. 检查 spec 目录下已有哪些文件，以及文件末尾是否已有 `## Gatekeep Log`：
 
-| 已有文件 | Gatekeep Log 状态 | 当前阶段 | 读取 steering |
-|----------|-------------------|----------|---------------|
-| 有 requirements.md，无 Gatekeep Log | → 校验 Requirements | `gk-requirements` |
-| 有 design.md，无 Gatekeep Log | → 校验 Design | `gk-design` |
-| 有 tasks.md，无 Gatekeep Log | → 校验 Tasks | `gk-tasks` |
+| 已有文件 | Gatekeep Log 状态 | 当前阶段 | 读取参考文件 |
+|----------|-------------------|----------|--------------|
+| 有 requirements.md，无 Gatekeep Log | → 校验 Requirements | `gk-requirements.md` |
+| 有 design.md，无 Gatekeep Log | → 校验 Design | `gk-design.md` |
+| 有 tasks.md，无 Gatekeep Log | → 校验 Tasks | `gk-tasks.md` |
 | 所有已有文件都已有 Gatekeep Log | → 告知用户所有已有文档均已校验 | — |
 
 优先校验最新生成的文档（即没有 Gatekeep Log 的文档中最靠后的阶段）。
 
-确定阶段后，执行 Graphify 就绪检测（见下方），然后读取对应的 steering 文件获取该阶段的详细校验指引，按指引执行。
+确定阶段后，执行 Graphify 就绪检测（见下方），然后通过 `discloseContext` 读取对应的校验指引，按指引执行：
+
+- Requirements → `.kiro/steering/gatekeeping/gk-requirements.md`
+- Design → `.kiro/steering/gatekeeping/gk-design.md`
+- Tasks → `.kiro/steering/gatekeeping/gk-tasks.md`
 
 ### Graphify 就绪检测
 

@@ -6,7 +6,7 @@
 
 ## 前置读取
 
-1. `.cursor/specs/<name>/goal.md`
+1. `<spec-dir>/<name>/goal.md`
 2. Goal 中 Clarification 已回答项（必须反映到 requirements）
 3. 相关 SSOT（`docs/state/`）
 
@@ -19,7 +19,7 @@
 
 ## 产物位置
 
-- `.cursor/specs/<name>/requirements.md`
+- `<spec-dir>/<name>/requirements.md`
 
 ## 内容要求
 

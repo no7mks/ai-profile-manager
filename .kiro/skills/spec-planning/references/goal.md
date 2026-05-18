@@ -20,7 +20,7 @@
 
 ## 产物位置
 
-- `.cursor/specs/<name>/goal.md`
+- `<spec-dir>/<name>/goal.md`
 
 ## 文档结构
 

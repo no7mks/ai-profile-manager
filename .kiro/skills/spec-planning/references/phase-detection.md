@@ -6,7 +6,7 @@
 
 ## 目录与命名
 
-- Spec 目录：`.cursor/specs/<name>/`
+- Spec 目录：`<spec-dir>/<name>/`
 - `<name>` 推断：
   - `feature/foo-bar` -> `foo-bar`
   - `hotfix/0.3.1` -> `hotfix-0.3.1`

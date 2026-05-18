@@ -6,7 +6,7 @@
 
 ## 前置读取
 
-1. `.cursor/specs/<name>/requirements.md`
+1. `<spec-dir>/<name>/requirements.md`
 2. requirements Gatekeep Log 中已回答的 Clarification
 3. 相关 SSOT（`docs/state/`）
 
@@ -19,7 +19,7 @@
 
 ## 产物位置
 
-- `.cursor/specs/<name>/design.md`
+- `<spec-dir>/<name>/design.md`
 
 ## 内容要求
 
