@@ -1,179 +1,175 @@
 version: "1"
 
 rules:
-  - name: cursor-scope
+  - path: cursor-scope
     description: Cursor 平台专属规则
     targets:
       cursor: .cursor/rules/cursor-scope.mdc
 
-  - name: kiro-scope
+  - path: kiro-scope
     description: Kiro 平台专属规则
     targets:
       kiro: .kiro/steering/kiro-scope.md
 
-  - name: writing-conventions
+  - path: doc:writing-conventions
     description: 文档书写规范
     targets:
       cursor: .cursor/rules/doc/writing-conventions.mdc
       kiro: .kiro/steering/doc/writing-conventions.md
 
-  - name: branch-overview
+  - path: git:branch-overview
     description: GitFlow 分支模型总览
     targets:
       cursor: .cursor/rules/git/branch-overview.mdc
       kiro: .kiro/steering/git/branch-overview.md
 
-  - name: git-conventions
+  - path: git:git-conventions
     description: 日常 git 操作的基础规则
     targets:
       cursor: .cursor/rules/git/git-conventions.mdc
       kiro: .kiro/steering/git/git-conventions.md
 
-  - name: graphify
+  - path: graphify
     description: 项目知识图谱使用指引
     targets:
       cursor: .cursor/rules/graphify.mdc
       kiro: .kiro/steering/graphify.md
 
-  - name: superpowers-integration
+  - path: plugin:superpowers-integration
     description: Superpowers 插件集成约束
     targets:
       cursor: .cursor/rules/plugin/superpowers-integration.mdc
 
-  - name: command-safety
+  - path: safety:command-safety
     description: Shell 命令安全约束
     targets:
       cursor: .cursor/rules/safety/command-safety.mdc
       kiro: .kiro/steering/safety/command-safety.md
 
-  - name: config-safety
+  - path: safety:config-safety
     description: 配置文件与敏感凭据安全约束
     targets:
       cursor: .cursor/rules/safety/config-safety.mdc
       kiro: .kiro/steering/safety/config-safety.md
 
-  - name: spec-execution
+  - path: spec:spec-execution
     description: Spec task 执行规范
     targets:
       cursor: .cursor/rules/spec/spec-execution.mdc
       kiro: .kiro/steering/spec/spec-execution.md
 
-  - name: spec-goal
+  - path: spec:spec-goal
     description: Spec goal 兼容入口
     targets:
       cursor: .cursor/rules/spec/spec-goal.mdc
       kiro: .kiro/steering/spec/spec-goal.md
 
-  - name: spec-planning
+  - path: spec:spec-planning
     description: Spec planning 兼容入口
     targets:
       cursor: .cursor/rules/spec/spec-planning.mdc
       kiro: .kiro/steering/spec/spec-planning.md
 
-  - name: manual-testing
+  - path: spec:manual-testing
     description: 手工测试执行规范
     targets:
       cursor: .cursor/rules/spec/manual-testing.mdc
       kiro: .kiro/steering/spec/manual-testing.md
 
-  - name: kiro-spec-steering
+  - path: spec:kiro-spec-steering
     description: Kiro spec steering 占位
     targets:
       cursor: .cursor/rules/spec/kiro-spec-steering.mdc
       kiro: .kiro/steering/spec/kiro-spec-steering.md
 
-  - name: gk-design
+  - path: spec:gk-design
     description: Spec gatekeeper design 校验指引
     targets:
       kiro: .kiro/steering/spec/gk-design.md
 
-  - name: gk-requirements
+  - path: spec:gk-requirements
     description: Spec gatekeeper requirements 校验指引
     targets:
       kiro: .kiro/steering/spec/gk-requirements.md
 
-  - name: gk-tasks
+  - path: spec:gk-tasks
     description: Spec gatekeeper tasks 校验指引
     targets:
       kiro: .kiro/steering/spec/gk-tasks.md
 
 agents:
-  - name: code-reviewer
+  - path: code-reviewer
     description: 基于 diff 的 code review agent
     targets:
       cursor: .cursor/agents/code-reviewer.md
       kiro: .kiro/agents/code-reviewer.md
 
-  - name: spec-planner
+  - path: spec-planner
     description: Spec planning 执行器
     targets:
       cursor: .cursor/agents/spec-planner.md
 
-  - name: spec-gatekeeper
+  - path: spec-gatekeeper
     description: Spec 文档质量校验
     targets:
       kiro: .kiro/agents/spec-gatekeeper.md
 
 skills:
-  - name: apm
+  - path: apm
     description: apm CLI 的 Agent 执行手册
     targets:
       cursor: .cursor/skills/apm/
       kiro: .kiro/skills/apm/
 
-  - name: gitflow
+  - path: gitflow
     description: GitFlow start/finish 统一执行
     targets:
       cursor: .cursor/skills/gitflow/
       kiro: .kiro/skills/gitflow/
 
-  - name: graphify
+  - path: graphify
     description: Graphify 知识图谱构建与查询
     targets:
       cursor: .cursor/skills/graphify/
       kiro: .kiro/skills/graphify/
 
-  - name: spec-planning
+  - path: spec-planning
     description: Spec planning 四阶段统一工作流
     targets:
       cursor: .cursor/skills/spec-planning/
       kiro: .kiro/skills/spec-planning/
 
 gitignore:
-  - name: php
+  - marker: php
     description: PHP 相关忽略规则
-    marker: php
 
-  - name: graphify
+  - marker: graphify
     description: Graphify 输出忽略规则
-    marker: graphify
 
-  - name: python
+  - marker: python
     description: Python 相关忽略规则
-    marker: python
 
-  - name: kotlin
+  - marker: kotlin
     description: Kotlin 相关忽略规则
-    marker: kotlin
 
 presets:
   - name: gitflow
     description: GitFlow 全套能力
     includes:
-      - rule:branch-overview
-      - rule:git-conventions
+      - rule:git:branch-overview
+      - rule:git:git-conventions
       - skill:gitflow
 
   - name: spec-core
     description: Spec 规划与执行全套
     includes:
-      - rule:spec-execution
-      - rule:spec-goal
-      - rule:spec-planning
-      - rule:manual-testing
-      - rule:gk-design
-      - rule:gk-requirements
-      - rule:gk-tasks
+      - rule:spec:spec-execution
+      - rule:spec:spec-goal
+      - rule:spec:spec-planning
+      - rule:spec:manual-testing
+      - rule:spec:gk-design
+      - rule:spec:gk-requirements
+      - rule:spec:gk-tasks
       - skill:spec-planning
       - agent:spec-planner
       - agent:spec-gatekeeper
