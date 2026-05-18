@@ -160,26 +160,26 @@ presets:
   - name: gitflow
     description: GitFlow 全套能力
     includes:
-      - branch-overview
-      - git-conventions
-      - gitflow           # skill
+      - rule:branch-overview
+      - rule:git-conventions
+      - skill:gitflow
 
   - name: spec-core
     description: Spec 规划与执行全套
     includes:
-      - spec-execution
-      - spec-goal
-      - spec-planning     # rule
-      - manual-testing
-      - spec-planning     # skill (同名，需消歧机制)
-      - spec-planner
-      - spec-gatekeeper
-      - gk-design
-      - gk-requirements
-      - gk-tasks
+      - rule:spec-execution
+      - rule:spec-goal
+      - rule:spec-planning
+      - rule:manual-testing
+      - rule:gk-design
+      - rule:gk-requirements
+      - rule:gk-tasks
+      - skill:spec-planning
+      - agent:spec-planner
+      - agent:spec-gatekeeper
 
   - name: graphify
     description: Graphify 图谱能力
     includes:
-      - graphify          # rule (同名，需消歧机制)
-      - graphify          # skill (同名，需消歧机制)
+      - rule:graphify
+      - skill:graphify
