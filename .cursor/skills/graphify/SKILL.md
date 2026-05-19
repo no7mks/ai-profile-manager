@@ -1,6 +1,6 @@
 ---
 name: graphify
-description: "Graphify unified entry: what it is, how to start, and task-based routing for build/query/integrations."
+description: "当用户提到 graphify、知识图谱、依赖分析、模块耦合、架构可视化，或要求构建/查询 graph 时激活。"
 ---
 
 # /graphify

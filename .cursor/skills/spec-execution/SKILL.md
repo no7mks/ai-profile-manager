@@ -1,6 +1,6 @@
 ---
 name: spec-execution
-description: 执行 spec tasks 时的规范，含执行模型、质量标准、特殊任务与异常处理。
+description: 当用户要求执行 spec task、推进 tasks.md、或进入 spec 实现阶段时激活。含执行模型、质量标准、特殊任务与异常处理。
 ---
 
 # Spec Execution

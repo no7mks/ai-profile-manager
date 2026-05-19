@@ -1,6 +1,6 @@
 ---
 name: spec-planning
-description: 统一执行 spec planning 四阶段（goal/requirements/design/tasks）。使用轻入口 SKILL.md + references；每次只执行一个阶段并产出对应文档。
+description: 当用户提到 spec、planning、goal、requirements、design、tasks 或要求推进/创建 spec 规划时激活。每次只执行一个阶段并产出对应文档。
 ---
 
 # Spec Planning

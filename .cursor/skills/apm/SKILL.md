@@ -1,6 +1,6 @@
 ---
 name: apm
-description: "通过 `/apm <command>` 统一入口执行初始化、安装、检查、捕获与回流；按需调用 apm binary。"
+description: "当用户说 /apm 或要求执行 apm 命令（init、install、check、uninstall、show）时激活。"
 ---
 
 # apm（AI Profile Manager）
