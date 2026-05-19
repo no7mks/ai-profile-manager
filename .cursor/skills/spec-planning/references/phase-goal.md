@@ -7,7 +7,7 @@
 ## 输入读取
 
 1. 需求来源文档
-   - Feature：proposal
+   - Feature：proposal 或 note
    - Hotfix：issue 或 note
    - Release：本次纳入的 feature proposal 与已完成 spec
 2. `docs/state/`（SSOT）
