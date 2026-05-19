@@ -62,13 +62,11 @@ rules:
     description: Spec goal 兼容入口
     targets:
       cursor: .cursor/rules/spec/spec-goal.mdc
-      kiro: .kiro/steering/spec/spec-goal.md
 
   - path: spec:spec-planning
     description: Spec planning 兼容入口
     targets:
       cursor: .cursor/rules/spec/spec-planning.mdc
-      kiro: .kiro/steering/spec/spec-planning.md
 
   - path: spec:manual-testing
     description: 手工测试执行规范
@@ -76,26 +74,20 @@ rules:
       cursor: .cursor/rules/spec/manual-testing.mdc
       kiro: .kiro/steering/spec/manual-testing.md
 
-  - path: spec:kiro-spec-steering
-    description: Kiro spec steering 占位
-    targets:
-      cursor: .cursor/rules/spec/kiro-spec-steering.mdc
-      kiro: .kiro/steering/spec/kiro-spec-steering.md
-
-  - path: spec:gk-design
+  - path: gatekeeping:gk-design
     description: Spec gatekeeper design 校验指引
     targets:
-      kiro: .kiro/steering/spec/gk-design.md
+      kiro: .kiro/steering/gatekeeping/gk-design.md
 
-  - path: spec:gk-requirements
+  - path: gatekeeping:gk-requirements
     description: Spec gatekeeper requirements 校验指引
     targets:
-      kiro: .kiro/steering/spec/gk-requirements.md
+      kiro: .kiro/steering/gatekeeping/gk-requirements.md
 
-  - path: spec:gk-tasks
+  - path: gatekeeping:gk-tasks
     description: Spec gatekeeper tasks 校验指引
     targets:
-      kiro: .kiro/steering/spec/gk-tasks.md
+      kiro: .kiro/steering/gatekeeping/gk-tasks.md
 
 agents:
   - path: code-reviewer
@@ -164,12 +156,10 @@ presets:
     description: Spec 规划与执行全套
     includes:
       - rule:spec:spec-execution
-      - rule:spec:spec-goal
-      - rule:spec:spec-planning
       - rule:spec:manual-testing
-      - rule:spec:gk-design
-      - rule:spec:gk-requirements
-      - rule:spec:gk-tasks
+      - rule:gatekeeping:gk-design
+      - rule:gatekeeping:gk-requirements
+      - rule:gatekeeping:gk-tasks
       - skill:spec-planning
       - agent:spec-planner
       - agent:spec-gatekeeper
