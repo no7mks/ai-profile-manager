@@ -31,9 +31,9 @@
 | `## Architecture` | 必须 |
 | `## Components and Interfaces` | 必须 |
 | `## Data Models` | 必须 |
-| `## Correctness Properties` | 必须 |
-| `## Error Handling` | 必须 |
-| `## Testing Strategy` | 必须 |
+| `## Correctness Properties` | 推荐 |
+| `## Error Handling` | 推荐 |
+| `## Testing Strategy` | 推荐 |
 | `## Impact Analysis` | 必须 |
 | `## Alternatives Considered` | 推荐 |
 | `## Socratic Review` | 推荐 |

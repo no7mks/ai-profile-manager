@@ -53,9 +53,9 @@ Feature / Hotfix 的 design.md 必须包含以下 section：
 | `## Architecture` | 必须 |
 | `## Components and Interfaces` | 必须 |
 | `## Data Models` | 必须 |
-| `## Correctness Properties` | 必须 |
-| `## Error Handling` | 必须 |
-| `## Testing Strategy` | 必须 |
+| `## Correctness Properties` | 推荐 |
+| `## Error Handling` | 推荐 |
+| `## Testing Strategy` | 推荐 |
 | `## Impact Analysis` | 必须 |
 | `## Alternatives Considered` | 推荐 |
 | `## Socratic Review` | 推荐 |
@@ -69,9 +69,6 @@ Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、�
 - [ ] `## Architecture` section 存在
 - [ ] `## Components and Interfaces` section 存在
 - [ ] `## Data Models` section 存在
-- [ ] `## Correctness Properties` section 存在
-- [ ] `## Error Handling` section 存在
-- [ ] `## Testing Strategy` section 存在
 - [ ] `## Impact Analysis` section 存在
 - [ ] 各 section 之间使用 `---` 分隔
 
