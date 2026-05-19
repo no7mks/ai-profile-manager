@@ -11,9 +11,9 @@
 
 > **规则**：`hotfix/` 分支默认走 Bugfix 路径，无需用户额外确认。
 
-## Kiro Feature Spec 工作流提示
+## Kiro Feature Spec 工作流
 
-使用 Kiro IDE 时，agent 应提示用户通过 Kiro 原生的 Feature Spec workflow 启动一个 **Requirements-First** 的 Feature Spec session，由 Kiro 引导生成 requirements。本文件的格式规范用于 agent 自行生成或 GK 校验时的标准。
+进入 Requirements 阶段时，主 agent 应启动 Kiro 原生的 Feature Spec workflow — 以 **requirements-first** 模式创建 `requirements.md`。本文件的格式规范用于 GK 校验时的标准。
 
 ---
 
@@ -42,7 +42,7 @@
 
 ## 文档结构（必须遵循）
 
-一级标题不约束格式。必须包含以下 section（英文名）：
+一级标题必须为 `# Requirements Document`（严格匹配）。必须包含以下 section（英文名）：
 
 | Section | 必要性 |
 |---------|--------|

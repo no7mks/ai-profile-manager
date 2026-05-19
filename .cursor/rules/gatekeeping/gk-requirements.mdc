@@ -40,7 +40,7 @@ requirements.md 必须包含以下 section，且顺序正确：
 
 | 序号 | Section | 必要性 | 说明 |
 |------|---------|--------|------|
-| 1 | `# Requirements Document` | 必须 | 一级标题，下方一句话说明本文件定位和所属 spec 目录 |
+| 1 | `# Requirements Document` | 必须 | 一级标题，严格匹配此文字 |
 | 2 | `## Introduction` | 必须 | 一段话说明 feature 范围，明确列出不涉及的内容 |
 | 3 | `## Glossary` | 必须 | 术语表，`- **Term**: 定义` 格式 |
 | 4 | `## Requirements` | 必须 | 需求条款，每条为 `### Requirement N: 名称` |
@@ -50,7 +50,7 @@ Release spec 结构不同，必须包含：`# Release <version> Requirements`、
 
 ### 检查项
 
-- [ ] 一级标题存在且正确
+- [ ] 一级标题为 `# Requirements Document`（严格匹配）
 - [ ] Introduction 存在，描述了 feature 范围，明确了 Non-scope
 - [ ] Glossary 存在且非空
 - [ ] Requirements section 存在且包含至少一条 requirement
