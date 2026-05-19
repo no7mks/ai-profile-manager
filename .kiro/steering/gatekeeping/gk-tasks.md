@@ -150,7 +150,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ## 13. Socratic Review 校验
 
-如果缺少 `## Socratic Review`，gatekeeper 应补充，至少覆盖：
+如果缺少 Socratic Review，gatekeeper 应补充（写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Tasks Socratic Review` section），至少覆盖：
 
 - tasks 是否完整覆盖了 design 中的所有实现项？
 - task 之间的依赖顺序是否正确？
@@ -213,7 +213,7 @@ Feature / Hotfix spec 必须包含文档收敛 top-level task。
 
 ## 17. Gatekeep Log
 
-将校验过程中的修正项写入 tasks.md 末尾的 `## Gatekeep Log` section。
+将校验过程中的修正项写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Tasks Gatekeep Log` section（不写在 tasks.md 中）。
 
 ---
 

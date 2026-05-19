@@ -91,7 +91,7 @@ Requirements 应聚焦外部可观察行为，不应包含实现细节。
 
 ## 5. Socratic Review 校验
 
-gatekeeper 应补充 Socratic Review，至少覆盖：
+gatekeeper 应补充 Socratic Review（写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Requirements Socratic Review` section），至少覆盖：
 
 - 每条 requirement 是否都在描述外部可观察的行为？
 - 是否有遗漏的场景？（错误路径、边界条件、并发、幂等性等）
@@ -120,7 +120,7 @@ Requirements 的核心目的是：**让读者清楚地知道要做什么、不�
 
 ## 7. Gatekeep Log
 
-将校验过程中的修正项写入 requirements.md 末尾的 `## Gatekeep Log` section。
+将校验过程中的修正项写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Requirements Gatekeep Log` section（不写在 requirements.md 中）。
 
 ---
 

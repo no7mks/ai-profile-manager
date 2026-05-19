@@ -105,7 +105,7 @@ Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、�
 
 ## 6. Socratic Review 校验
 
-如果缺少 `## Socratic Review`，gatekeeper 应补充，至少覆盖：
+如果缺少 Socratic Review，gatekeeper 应补充（写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Design Socratic Review` section），至少覆盖：
 
 - design 是否完整覆盖了 requirements？
 - 技术选型是否合理？
@@ -136,7 +136,7 @@ Design 的核心目的是：**让读者清楚地知道用什么技术方案实�
 
 ## 8. Gatekeep Log
 
-将校验过程中的修正项写入 design.md 末尾的 `## Gatekeep Log` section。
+将校验过程中的修正项写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Design Gatekeep Log` section（不写在 design.md 中）。
 
 ---
 

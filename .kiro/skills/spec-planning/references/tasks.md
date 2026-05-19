@@ -18,7 +18,7 @@
 - Checkpoint 推荐作为每个 top-level task 的最后一个 sub-task（也可作为独立 top-level task），包含验证与 commit
 - Checkpoint 必须包含 `docs/state/` 同步：将本阶段实现的行为、规则、边界条件更新到对应的 state 文件
 - 包含 `## Notes` section
-- 文末补全 `## Socratic Review`
+- 文末补全 `## Socratic Review`（写入 `<spec-dir>/<name>/gk-logs.md`，不写在 tasks.md 中）
 - 完成后提示可运行 GK 校验 tasks
 
 ## 产物位置
@@ -34,7 +34,6 @@
 | `## Overview` | 必须 — 概述执行策略和关键决策 |
 | `## Tasks` | 必须 — 任务列表 |
 | `## Notes` | 必须 — 执行注意事项，至少提及遵循 `spec-execution` 规则 |
-| `## Socratic Review` | 推荐 |
 | `## Task Dependency Graph` | 必须 — JSON waves 格式 |
 
 ## 顶层结构约束（Feature/Hotfix）

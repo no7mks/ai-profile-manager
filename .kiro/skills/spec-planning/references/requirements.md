@@ -14,7 +14,7 @@
 
 - 文档以中文为主，英文术语可保留
 - 产物较大时采用分段写入，避免一次性大写入
-- 文末补全 Socratic Review
+- Socratic Review 和 Gatekeep Log 写入 `<spec-dir>/<name>/gk-logs.md`，不写在 requirements.md 中
 - 完成后提示可运行 GK 校验 requirements
 
 ## 产物位置
@@ -30,7 +30,6 @@
 | `## Introduction` | 必须 — 说明 feature 范围，明确 Non-scope |
 | `## Glossary` | 必须 — 术语表，格式 `- **Term**: 定义` |
 | `## Requirements` | 必须 — 每条为 `### Requirement N: 名称` |
-| `## Socratic Review` | 推荐 |
 
 各 section 之间使用 `---` 分隔。
 

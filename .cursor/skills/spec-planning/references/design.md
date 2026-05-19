@@ -13,7 +13,7 @@
 ## 关键约束
 
 - 覆盖 requirements 中全部 Requirement/AC
-- 文末补全 Socratic Review
+- Socratic Review 和 Gatekeep Log 写入 `<spec-dir>/<name>/gk-logs.md`，不写在 design.md 中
 - 可用时先做 Graphify readiness 检测，再决定是否用 graphify 辅助架构分析
 - 完成后提示可运行 GK 校验 design
 
@@ -36,7 +36,6 @@
 | `## Testing Strategy` | 推荐 |
 | `## Impact Analysis` | 必须 |
 | `## Alternatives Considered` | 推荐 |
-| `## Socratic Review` | 推荐 |
 
 **各 section 之间使用 `---` 分隔。**
 
