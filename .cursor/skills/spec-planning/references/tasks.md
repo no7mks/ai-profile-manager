@@ -16,6 +16,7 @@
 - 所有任务默认 mandatory，不写 optional
 - 推荐 Test First（RED -> GREEN）编排
 - Checkpoint 作为每个 top-level task 的最后一个 sub-task，且包含验证与 commit
+- Checkpoint 必须包含 `docs/state/` 同步：将本 top-level task 实现的行为、规则、边界条件更新到对应的 state 文件
 - 包含 `## Notes`，至少提及遵循 `spec-execution` 规则
 - 文末补全 Socratic Review
 - 完成后提示可运行 GK 校验 tasks

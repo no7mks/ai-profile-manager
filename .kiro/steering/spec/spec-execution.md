@@ -44,6 +44,7 @@ description: 当执行 spec task（编码、测试、code review）时读取，�
 
 - checkpoint task 必须执行其描述中指定的验证命令
 - 通过标准：不仅要求测试全部通过，还要求**输出干净**——无 compiler warning、无 deprecation warning、无异常堆栈、无非预期的 stderr 输出
+- **State 同步**：checkpoint commit 前，必须将本 top-level task 实现的功能行为、边界条件、错误处理、配置格式等更新到 `docs/state/` 对应文件。state 的描述粒度应足以推导 functional test / integration test 的断言
 - 未通过 checkpoint，不得进入下一层实现
 - checkpoint 失败时，修复问题后重新执行验证，直到通过
 

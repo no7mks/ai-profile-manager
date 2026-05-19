@@ -26,7 +26,7 @@ git branch --show-current
 
 1. 同步 develop 到 feature：`git merge --no-ff develop -m "merge develop into feature/<name>"`
 2. 解决冲突后提交，并重新跑全量测试
-3. 文档收敛：更新 state、写 unreleased 变更记录、收敛 resolved notes，然后提交
+3. 文档收敛：更新 state、更新 manual（使用说明与实际行为一致）、写 unreleased 变更记录、收敛 resolved notes，然后提交
 4. 切回 `develop` 并合并 feature：`git merge --no-ff feature/<name> -m "merge feature/<name> into develop"`
 5. 更新 proposal 状态：`in-progress -> implemented` 并提交
 
