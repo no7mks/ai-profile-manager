@@ -52,12 +52,6 @@ rules:
       cursor: .cursor/rules/safety/config-safety.mdc
       kiro: .kiro/steering/safety/config-safety.md
 
-  - path: spec:spec-execution
-    description: Spec task 执行规范
-    targets:
-      cursor: .cursor/rules/spec/spec-execution.mdc
-      kiro: .kiro/steering/spec/spec-execution.md
-
   - path: spec:spec-goal
     description: Spec goal 兼容入口
     targets:
@@ -131,6 +125,12 @@ skills:
       cursor: .cursor/skills/spec-planning/
       kiro: .kiro/skills/spec-planning/
 
+  - path: spec-execution
+    description: Spec task 执行规范
+    targets:
+      cursor: .cursor/skills/spec-execution/
+      kiro: .kiro/skills/spec-execution/
+
 gitignore:
   - marker: php
     description: PHP 相关忽略规则
@@ -155,7 +155,7 @@ presets:
   - name: spec-core
     description: Spec 规划与执行全套
     includes:
-      - rule:spec:spec-execution
+      - skill:spec-execution
       - rule:spec:manual-testing
       - rule:gatekeeping:gk-design
       - rule:gatekeeping:gk-requirements
