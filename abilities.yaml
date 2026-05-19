@@ -52,16 +52,6 @@ rules:
       cursor: .cursor/rules/safety/config-safety.mdc
       kiro: .kiro/steering/safety/config-safety.md
 
-  - path: spec:spec-goal
-    description: Spec goal 兼容入口
-    targets:
-      cursor: .cursor/rules/spec/spec-goal.mdc
-
-  - path: spec:spec-planning
-    description: Spec planning 兼容入口
-    targets:
-      cursor: .cursor/rules/spec/spec-planning.mdc
-
   - path: spec:manual-testing
     description: 手工测试执行规范
     targets:
@@ -71,16 +61,19 @@ rules:
   - path: gatekeeping:gk-design
     description: Spec gatekeeper design 校验指引
     targets:
+      cursor: .cursor/rules/gatekeeping/gk-design.mdc
       kiro: .kiro/steering/gatekeeping/gk-design.md
 
   - path: gatekeeping:gk-requirements
     description: Spec gatekeeper requirements 校验指引
     targets:
+      cursor: .cursor/rules/gatekeeping/gk-requirements.mdc
       kiro: .kiro/steering/gatekeeping/gk-requirements.md
 
   - path: gatekeeping:gk-tasks
     description: Spec gatekeeper tasks 校验指引
     targets:
+      cursor: .cursor/rules/gatekeeping/gk-tasks.mdc
       kiro: .kiro/steering/gatekeeping/gk-tasks.md
 
 agents:
@@ -98,6 +91,7 @@ agents:
   - path: spec-gatekeeper
     description: Spec 文档质量校验
     targets:
+      cursor: .cursor/agents/spec-gatekeeper.md
       kiro: .kiro/agents/spec-gatekeeper.md
 
 skills:
