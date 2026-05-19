@@ -7,10 +7,13 @@
 ## 目录与命名
 
 - Spec 目录：`<spec-dir>/<name>/`
-- `<name>` 推断：
+- `<name>` 推断（从当前分支名）：
   - `feature/foo-bar` -> `foo-bar`
   - `hotfix/0.3.1` -> `hotfix-0.3.1`
   - `release/0.4` -> `release-0.4`
+- `<name>` 创建（目录不存在时）：
+  - 优先从当前分支名推断
+  - 若当前分支无法推断（如在 develop 上），由 agent 根据需求描述生成 kebab-case slug，向用户确认后创建
 
 ## 产物顺序（不可跳步）
 

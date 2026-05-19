@@ -23,10 +23,10 @@ description: 当用户提到 spec、planning、goal、requirements、design、ta
 ## 流程入口
 
 - 阶段判定：见 [references/phase-detection.md](references/phase-detection.md)
-- Goal 阶段：见 [references/goal.md](references/goal.md)
-- Requirements 阶段：见 [references/requirements.md](references/requirements.md)
-- Design 阶段：见 [references/design.md](references/design.md)
-- Tasks 阶段：见 [references/tasks.md](references/tasks.md)
+- Goal 阶段：见 [references/phase-goal.md](references/phase-goal.md)
+- Requirements 阶段：见 [references/phase-requirements.md](references/phase-requirements.md)
+- Design 阶段：见 [references/phase-design.md](references/phase-design.md)
+- Tasks 阶段：见 [references/phase-tasks.md](references/phase-tasks.md)
 
 ## 完成输出要求
 

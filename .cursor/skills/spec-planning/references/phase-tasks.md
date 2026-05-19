@@ -65,7 +65,7 @@ tasks.md 的 top-level task 遵循**固定顺序**：
 
 ### Requirement 追溯（强制）
 
-**每个实现类 sub-task 必须引用对应的 Requirement 编号**。引用到 AC 是 bonus，不强制。格式灵活，以下均可：
+**每个实现类 sub-task 必须引用对应的 Requirement 编号**。格式灵活：
 
 ```markdown
 - [ ] 1.1 实现 XXX
@@ -92,14 +92,7 @@ tasks.md 的 top-level task 遵循**固定顺序**：
   - commit: `<scope>: <描述>`
 ```
 
-Checkpoint 不是空泛的"确认完成"，必须包含：
-- 具体的验证命令
-- state 文档同步动作
-- commit 描述
-
 ## Task Dependency Graph（强制）
-
-tasks.md 必须包含 `## Task Dependency Graph` section。
 
 ### 格式
 
@@ -122,7 +115,7 @@ tasks.md 必须包含 `## Task Dependency Graph` section。
 每个功能 sub-task 的内部步骤：
 
 1. **编写测试**（覆盖该 sub-task 对应的 AC）
-2. **确认测试失败**（RED — 证明测试有效）
+2. **确认测试失败**（RED）
 3. **编写实现代码**
 4. **确认测试通过**（GREEN）
 
@@ -134,9 +127,9 @@ tasks.md 必须包含 `## Task Dependency Graph` section。
 
 ### 例外
 
-- 纯删除类 task（如删除废弃代码）不需要 test-first
+- 纯删除类 task 不需要 test-first
 - 文档类 task 不需要 test-first
-- 属性测试（Property-based tests）可以作为独立的 top-level task，但仍然是 **mandatory**
+- 属性测试可以作为独立的 top-level task，但仍然是 **mandatory**
 
 ## 手工测试 task 要求
 
@@ -144,19 +137,7 @@ tasks.md 必须包含 `## Task Dependency Graph` section。
 - 场景描述具体，可执行
 - 包含预期结果
 
-## Socratic Review 覆盖项
-
-文末 Socratic Review 至少覆盖：
-
-- tasks 是否完整覆盖了 design 中的所有实现项？
-- task 之间的依赖顺序是否正确？
-- 每个 task 的粒度是否合适（可独立 session 执行）？
-- checkpoint 是否覆盖了关键阶段？
-- 手工测试是否覆盖了关键用户场景？
-
 ## Notes section 要求
-
-`## Notes` section 必须包含：
 
 - 明确提到遵循 `spec-execution` 规则
 - 明确说明 commit 随 checkpoint 一起执行
