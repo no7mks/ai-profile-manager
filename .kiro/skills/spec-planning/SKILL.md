@@ -15,13 +15,14 @@ description: 当用户提到 spec、planning、goal、requirements、design、ta
 
 ## 使用原则
 
-1. 始终先做阶段判定，再执行阶段动作。
-2. 一次只做一步：当前阶段完成后立即停止，等待用户/GK。
-3. 产物路径分两种：
+1. **激活即行动**：skill 被激活后，agent 必须立即、自主地执行阶段判定（读取当前分支名 → 推断 spec name → 扫描 `<spec-dir>/<name>/` 目录中已有文件 → 确定当前阶段）。**禁止在判定完成前向用户提问**（如"你想做什么""针对哪个 feature"）。唯一允许提问的情况：当前分支无法推断 spec name（如在 develop/main 上）且 `<spec-dir>` 下无唯一活跃目录时，才可询问用户。
+2. **用户显式指定阶段时直接执行**：若用户输入包含阶段关键词（如 `req`/`requirements`/`design`/`tasks`/`goal`），agent 应将其视为目标阶段，完成判定后直接执行该阶段（若与判定结果不一致则先简短告知状态差异并请求确认）。
+3. 一次只做一步：当前阶段完成后立即停止，等待用户/GK。
+4. 产物路径分两种：
    - **Feature 路径**：`goal.md` → `requirements.md` → `design.md` → `tasks.md`
    - **Bugfix 路径**：`goal.md` → `bugfix.md` → `design.md` → `tasks.md`
-4. 若用户提到 `plan.md`，视为 `tasks.md` 的历史命名并在输出中显式说明。
-5. Bugfix 路径的触发条件见 `phase-detection.md`；`bugfix.md` 的格式与校验标准见 `phase-requirements.md` 的 Bugfix Analysis 小节。
+5. 若用户提到 `plan.md`，视为 `tasks.md` 的历史命名并在输出中显式说明。
+6. Bugfix 路径的触发条件见 `phase-detection.md`；`bugfix.md` 的格式与校验标准见 `phase-requirements.md` 的 Bugfix Analysis 小节。
 
 ## 流程入口
 
