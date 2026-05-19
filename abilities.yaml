@@ -83,11 +83,6 @@ agents:
       cursor: .cursor/agents/code-reviewer.md
       kiro: .kiro/agents/code-reviewer.md
 
-  - path: spec-planner
-    description: Spec planning 执行器
-    targets:
-      cursor: .cursor/agents/spec-planner.md
-
   - path: spec-gatekeeper
     description: Spec 文档质量校验
     targets:
@@ -155,7 +150,6 @@ presets:
       - rule:gatekeeping:gk-requirements
       - rule:gatekeeping:gk-tasks
       - skill:spec-planning
-      - agent:spec-planner
       - agent:spec-gatekeeper
 
   - name: graphify
