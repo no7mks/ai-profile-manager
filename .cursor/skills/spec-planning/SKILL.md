@@ -17,8 +17,11 @@ description: 当用户提到 spec、planning、goal、requirements、design、ta
 
 1. 始终先做阶段判定，再执行阶段动作。
 2. 一次只做一步：当前阶段完成后立即停止，等待用户/GK。
-3. 四阶段产物固定为：`goal.md`、`requirements.md`、`design.md`、`tasks.md`。
+3. 产物路径分两种：
+   - **Feature 路径**：`goal.md` → `requirements.md` → `design.md` → `tasks.md`
+   - **Bugfix 路径**：`goal.md` → `bugfix.md` → `design.md` → `tasks.md`
 4. 若用户提到 `plan.md`，视为 `tasks.md` 的历史命名并在输出中显式说明。
+5. Bugfix 路径的触发条件见 `phase-detection.md`；`bugfix.md` 的格式与校验标准见 `phase-requirements.md` 的 Bugfix Analysis 小节。
 
 ## 流程入口
 

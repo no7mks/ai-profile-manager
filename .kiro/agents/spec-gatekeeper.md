@@ -26,15 +26,19 @@ tools: ["read", "write", "shell"]
 
 | 已有文件 | gk-logs.md 状态 | 当前阶段 | 读取参考文件 |
 |----------|-----------------|----------|--------------|
+| 有 bugfix.md，gk-logs.md 中无 `## Bugfix` section | → 校验 Bugfix | `gk-bugfix.md` |
 | 有 requirements.md，gk-logs.md 中无 `## Requirements` section | → 校验 Requirements | `gk-requirements.md` |
 | 有 design.md，gk-logs.md 中无 `## Design` section | → 校验 Design | `gk-design.md` |
 | 有 tasks.md，gk-logs.md 中无 `## Tasks` section | → 校验 Tasks | `gk-tasks.md` |
 | 所有已有文件对应的阶段都在 gk-logs.md 中有 section | → 告知用户所有已有文档均已校验 | — |
 
+> **注意**：`bugfix.md` 和 `requirements.md` 互斥——同一 spec 目录下只会存在其中之一。hotfix 分支默认产出 `bugfix.md`。
+
 优先校验最新生成的文档（即 gk-logs.md 中没有对应 section 的文档中最靠后的阶段）。
 
 确定阶段后，执行 Graphify 就绪检测（见下方），然后通过 `discloseContext` 读取对应的校验指引，按指引执行：
 
+- Bugfix → `.kiro/steering/gatekeeping/gk-bugfix.md`
 - Requirements → `.kiro/steering/gatekeeping/gk-requirements.md`
 - Design → `.kiro/steering/gatekeeping/gk-design.md`
 - Tasks → `.kiro/steering/gatekeeping/gk-tasks.md`

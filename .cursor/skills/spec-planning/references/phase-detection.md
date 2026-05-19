@@ -17,18 +17,44 @@
 
 ## 产物顺序（不可跳步）
 
+### Feature 路径（默认）
+
 1. `goal.md`
 2. `requirements.md`
 3. `design.md`
 4. `tasks.md`（历史 `plan.md` 等价）
 
+### Bugfix 路径
+
+1. `goal.md`
+2. `bugfix.md`（替代 `requirements.md`）
+3. `design.md`
+4. `tasks.md`
+
+### 路径选择规则
+
+- 分支前缀为 `hotfix/` 时，默认走 Bugfix 路径
+- 用户在 Goal 阶段显式声明为 bugfix 时，走 Bugfix 路径
+- 其余情况走 Feature 路径
+- 已存在 `bugfix.md` 的 spec 目录，视为 Bugfix 路径（无论分支名）
+
 ## 判定规则
 
-按顺序检查文件是否存在：
+按顺序检查文件是否存在（先判定路径类型）：
+
+**Feature 路径：**
 
 - 不存在 `goal.md` -> 当前阶段是 Goal
 - 存在 `goal.md` 且不存在 `requirements.md` -> 当前阶段是 Requirements
 - 存在 `requirements.md` 且不存在 `design.md` -> 当前阶段是 Design
+- 存在 `design.md` 且不存在 `tasks.md` -> 当前阶段是 Tasks
+- 四个文件都存在 -> Spec Planning Done（仅允许修订，不生成新阶段）
+
+**Bugfix 路径：**
+
+- 不存在 `goal.md` -> 当前阶段是 Goal
+- 存在 `goal.md` 且不存在 `bugfix.md` -> 当前阶段是 Bugfix Analysis
+- 存在 `bugfix.md` 且不存在 `design.md` -> 当前阶段是 Design
 - 存在 `design.md` 且不存在 `tasks.md` -> 当前阶段是 Tasks
 - 四个文件都存在 -> Spec Planning Done（仅允许修订，不生成新阶段）
 
