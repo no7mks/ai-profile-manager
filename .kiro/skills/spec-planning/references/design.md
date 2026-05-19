@@ -27,10 +27,15 @@
 
 | Section | 必要性 |
 |---------|--------|
-| 技术方案主体（section 名自由） | 必须 — 承接 requirements，给出具体技术方案 |
-| 接口 / 数据模型（section 名自由） | 必须 — 接口签名、数据模型、模块划分 |
-| `## Impact Analysis` | 必须 — 影响分析 |
-| `## Alternatives Considered` | 推荐 — 备选方案及落选理由 |
+| `## Overview` | 必须 |
+| `## Architecture` | 必须 |
+| `## Components and Interfaces` | 必须 |
+| `## Data Models` | 必须 |
+| `## Correctness Properties` | 必须 |
+| `## Error Handling` | 必须 |
+| `## Testing Strategy` | 必须 |
+| `## Impact Analysis` | 必须 |
+| `## Alternatives Considered` | 推荐 |
 | `## Socratic Review` | 推荐 |
 
 各 section 之间使用 `---` 分隔。

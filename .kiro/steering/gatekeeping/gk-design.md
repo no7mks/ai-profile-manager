@@ -45,24 +45,34 @@ description: Spec gatekeeper 校验 design 阶段的详细指引。由 spec-gate
 
 ## 2. 结构校验
 
-Feature / Hotfix 的 design.md 应包含以下关键 section：
+Feature / Hotfix 的 design.md 必须包含以下 section：
 
-| Section | 必要性 | 说明 |
-|---------|--------|------|
-| 一级标题 | 必须 | 说明本文件定位 |
-| 技术方案主体 | 必须 | 承接 requirements，给出具体技术方案 |
-| 接口 / 数据模型定义 | 必须 | 接口签名、数据模型、模块划分 |
-| `## Impact Analysis` | 必须 | 影响分析 |
-| `## Alternatives Considered` | 推荐 | 备选方案及落选理由 |
-| `## Socratic Review` | 推荐 | 自问自答式审查 |
+| Section | 必要性 |
+|---------|--------|
+| `## Overview` | 必须 |
+| `## Architecture` | 必须 |
+| `## Components and Interfaces` | 必须 |
+| `## Data Models` | 必须 |
+| `## Correctness Properties` | 必须 |
+| `## Error Handling` | 必须 |
+| `## Testing Strategy` | 必须 |
+| `## Impact Analysis` | 必须 |
+| `## Alternatives Considered` | 推荐 |
+| `## Socratic Review` | 推荐 |
 
 Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、测试策略、收敛计划。
 
 ### 检查项
 
 - [ ] 一级标题存在（格式不约束）
-- [ ] 技术方案主体存在，且承接了 requirements 中的需求
-- [ ] 接口签名 / 数据模型有明确定义
+- [ ] `## Overview` section 存在
+- [ ] `## Architecture` section 存在
+- [ ] `## Components and Interfaces` section 存在
+- [ ] `## Data Models` section 存在
+- [ ] `## Correctness Properties` section 存在
+- [ ] `## Error Handling` section 存在
+- [ ] `## Testing Strategy` section 存在
+- [ ] `## Impact Analysis` section 存在
 - [ ] 各 section 之间使用 `---` 分隔
 
 ---
