@@ -144,6 +144,8 @@ Design 的核心目的是：**让读者清楚地知道用什么技术方案实�
 
 校验完成后，生成面向 tasks 阶段的 CR 问题（**3 个以上**）。
 
+CR 写入 design.md 末尾的 `## Clarification Round` section（保留在源文件中，不写入 gk-logs.md）。
+
 CR 聚焦 **design 到 tasks 的衔接**——哪些技术决策在拆分为具体 task 时可能存在歧义。
 
 聚焦方向：

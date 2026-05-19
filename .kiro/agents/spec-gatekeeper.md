@@ -22,16 +22,16 @@ tools: ["read", "write", "shell"]
 
 1. 运行 `git branch --show-current` 确定当前分支和 spec 类型
 2. 根据分支名确定 spec 目录路径（见下方 Spec 类型与目录）
-3. 检查 spec 目录下已有哪些文件，以及文件末尾是否已有 `## Gatekeep Log`：
+3. 检查 spec 目录下的 `gk-logs.md` 文件，确认哪些阶段已校验：
 
-| 已有文件 | Gatekeep Log 状态 | 当前阶段 | 读取参考文件 |
-|----------|-------------------|----------|--------------|
-| 有 requirements.md，无 Gatekeep Log | → 校验 Requirements | `gk-requirements.md` |
-| 有 design.md，无 Gatekeep Log | → 校验 Design | `gk-design.md` |
-| 有 tasks.md，无 Gatekeep Log | → 校验 Tasks | `gk-tasks.md` |
-| 所有已有文件都已有 Gatekeep Log | → 告知用户所有已有文档均已校验 | — |
+| 已有文件 | gk-logs.md 状态 | 当前阶段 | 读取参考文件 |
+|----------|-----------------|----------|--------------|
+| 有 requirements.md，gk-logs.md 中无 `## Requirements` section | → 校验 Requirements | `gk-requirements.md` |
+| 有 design.md，gk-logs.md 中无 `## Design` section | → 校验 Design | `gk-design.md` |
+| 有 tasks.md，gk-logs.md 中无 `## Tasks` section | → 校验 Tasks | `gk-tasks.md` |
+| 所有已有文件对应的阶段都在 gk-logs.md 中有 section | → 告知用户所有已有文档均已校验 | — |
 
-优先校验最新生成的文档（即没有 Gatekeep Log 的文档中最靠后的阶段）。
+优先校验最新生成的文档（即 gk-logs.md 中没有对应 section 的文档中最靠后的阶段）。
 
 确定阶段后，执行 Graphify 就绪检测（见下方），然后通过 `discloseContext` 读取对应的校验指引，按指引执行：
 
@@ -67,35 +67,56 @@ tools: ["read", "write", "shell"]
 2. **标准来源**：校验标准来自对应阶段的 steering（`gk-requirements` / `gk-design` / `gk-tasks`）。
 3. **修正即执行**：发现问题直接修正文档，不要只列出问题让用户自己改。
 4. **分段写入**：修正文档或追加 Gatekeep Log 时，如果预计写入内容较大（超过约 50 行），不应尝试一次性写入，而应先用 `fsWrite` 写入第一段，再用 `fsAppend` 逐段追加后续内容，避免单次写入过大导致截断或丢失。
-5. **Gatekeep Log**：校验完成后，在文档末尾追加 `## Gatekeep Log` section，记录校验结果。
+5. **Gatekeep Log**：校验完成后，将 Socratic Review 和 Gatekeep Log 写入 spec 目录下的 `gk-logs.md`（按阶段分 section），不写在源文件中。CR（Clarification Round）保留在源文件末尾。
 
 ---
 
 ## Gatekeep Log 格式
 
+Socratic Review 和 Gatekeep Log 统一写入 `<spec-dir>/<name>/gk-logs.md`。按阶段分 section：
+
 ```markdown
-## Gatekeep Log
+# GK Logs
+
+## Requirements
+
+### Socratic Review
+<自问自答内容>
+
+### Gatekeep Log
 
 **校验时间**: YYYY-MM-DD
 **校验结果**: ✅ 通过 / ⚠️ 已修正后通过
 
-### 修正项
+#### 修正项
 （如无修正项，写"无"）
 - [修正类型] 修正描述
 
-### 合规检查
+#### 合规检查
 - [x/○] 检查项描述
+
+---
+
+## Design
+
+### Socratic Review
+<自问自答内容>
+
+### Gatekeep Log
+...
+
+---
+
+## Tasks
+
+### Socratic Review
+<自问自答内容>
+
+### Gatekeep Log
+...
 ```
 
-- ✅ 通过：文档完全符合标准，无需修正
-- ⚠️ 已修正后通过：发现问题并已修正
-
-修正类型包括：
-- `结构` — 缺少必要 section、section 顺序不对
-- `语体` — AC 语体不符合规范、术语使用不一致
-- `内容` — 遗漏场景、引用不一致、实现细节混入 requirements
-- `格式` — 标题层级、列表格式、代码块格式等
-- `目的` — 文档整体未达到该阶段的核心目的（如 goal 不清晰、技术选型未明确、task 不可独立执行等）
+**CR（Clarification Round）保留在源文件末尾**（requirements.md / design.md 的 `## Clarification Round` section），不写入 gk-logs.md。
 
 ---
 
@@ -103,7 +124,7 @@ tools: ["read", "write", "shell"]
 
 - 如果 spec 目录不存在或为空，告知用户没有可校验的文档
 - 如果当前不在正确的分支上且无法定位 spec 目录，告知用户
-- 如果文档已有 Gatekeep Log，告知用户该文档已校验过，询问是否需要重新校验
+- 如果文档对应的阶段已在 gk-logs.md 中有记录，告知用户该文档已校验过，询问是否需要重新校验
 
 ---
 

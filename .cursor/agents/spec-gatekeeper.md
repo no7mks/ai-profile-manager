@@ -21,16 +21,16 @@ description: 当用户说 "gatekeep" / "GK" / "校验 spec" / "review spec" 或�
 
 1. 运行 `git branch --show-current` 确定当前分支和 spec 类型
 2. 根据分支名确定 spec 目录路径（见下方 Spec 类型与目录）
-3. 检查 spec 目录下已有哪些文件，以及文件末尾是否已有 `## Gatekeep Log`：
+3. 检查 spec 目录下的 `gk-logs.md` 文件，确认哪些阶段已校验：
 
-| 已有文件 | Gatekeep Log 状态 | 当前阶段 | 读取参考文件 |
-|----------|-------------------|----------|--------------|
-| 有 requirements.md，无 Gatekeep Log | → 校验 Requirements | `gk-requirements` |
-| 有 design.md，无 Gatekeep Log | → 校验 Design | `gk-design` |
-| 有 tasks.md，无 Gatekeep Log | → 校验 Tasks | `gk-tasks` |
-| 所有已有文件都已有 Gatekeep Log | → 告知用户所有已有文档均已校验 | — |
+| 已有文件 | gk-logs.md 状态 | 当前阶段 | 读取参考文件 |
+|----------|-----------------|----------|--------------|
+| 有 requirements.md，gk-logs.md 中无 `## Requirements` section | → 校验 Requirements | `gk-requirements` |
+| 有 design.md，gk-logs.md 中无 `## Design` section | → 校验 Design | `gk-design` |
+| 有 tasks.md，gk-logs.md 中无 `## Tasks` section | → 校验 Tasks | `gk-tasks` |
+| 所有已有文件对应的阶段都在 gk-logs.md 中有 section | → 告知用户所有已有文档均已校验 | — |
 
-优先校验最新生成的文档（即没有 Gatekeep Log 的文档中最靠后的阶段）。
+优先校验最新生成的文档（即 gk-logs.md 中没有对应 section 的文档中最靠后的阶段）。
 
 确定阶段后，执行 Graphify 就绪检测（见下方），然后读取对应的校验指引，按指引执行：
 
@@ -66,25 +66,56 @@ description: 当用户说 "gatekeep" / "GK" / "校验 spec" / "review spec" 或�
 2. **标准来源**：校验标准来自对应阶段的 rule（`gk-requirements` / `gk-design` / `gk-tasks`）。
 3. **修正即执行**：发现问题直接修正文档，不要只列出问题让用户自己改。
 4. **分段写入**：修正文档或追加 Gatekeep Log 时，如果预计写入内容较大，应分段写入避免截断。
-5. **Gatekeep Log**：校验完成后，在文档末尾追加 `## Gatekeep Log` section，记录校验结果。
+5. **Gatekeep Log**：校验完成后，将 Socratic Review 和 Gatekeep Log 写入 spec 目录下的 `gk-logs.md`（按阶段分 section），不写在源文件中。CR（Clarification Round）保留在源文件末尾。
 
 ---
 
 ## Gatekeep Log 格式
 
+Socratic Review 和 Gatekeep Log 统一写入 `<spec-dir>/<name>/gk-logs.md`。按阶段分 section：
+
 ```markdown
-## Gatekeep Log
+# GK Logs
+
+## Requirements
+
+### Socratic Review
+<自问自答内容>
+
+### Gatekeep Log
 
 **校验时间**: YYYY-MM-DD
 **校验结果**: ✅ 通过 / ⚠️ 已修正后通过
 
-### 修正项
+#### 修正项
 （如无修正项，写"无"）
 - [修正类型] 修正描述
 
-### 合规检查
+#### 合规检查
 - [x/○] 检查项描述
+
+---
+
+## Design
+
+### Socratic Review
+...
+
+### Gatekeep Log
+...
+
+---
+
+## Tasks
+
+### Socratic Review
+...
+
+### Gatekeep Log
+...
 ```
+
+**CR（Clarification Round）保留在源文件末尾**（requirements.md / design.md 的 `## Clarification Round` section），不写入 gk-logs.md。
 
 修正类型：`结构`、`语体`、`内容`、`格式`、`目的`。
 
@@ -94,7 +125,7 @@ description: 当用户说 "gatekeep" / "GK" / "校验 spec" / "review spec" 或�
 
 - 如果 spec 目录不存在或为空，告知用户没有可校验的文档
 - 如果当前不在正确的分支上且无法定位 spec 目录，告知用户
-- 如果文档已有 Gatekeep Log，告知用户该文档已校验过，询问是否需要重新校验
+- 如果文档对应的阶段已在 gk-logs.md 中有记录，告知用户该文档已校验过，询问是否需要重新校验
 
 ---
 

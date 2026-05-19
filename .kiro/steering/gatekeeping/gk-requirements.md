@@ -128,6 +128,8 @@ Requirements 的核心目的是：**让读者清楚地知道要做什么、不�
 
 校验完成后，生成面向 design 阶段的 CR 问题（**3 个以上**）。
 
+CR 写入 requirements.md 末尾的 `## Clarification Round` section（保留在源文件中，不写入 gk-logs.md）。
+
 CR 聚焦 **requirements 到 design 的衔接**——哪些行为描述存在多种合理的实现路径，需要用户在进入 design 前做出决策。
 
 聚焦方向：
