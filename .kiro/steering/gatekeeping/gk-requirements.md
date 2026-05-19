@@ -50,7 +50,7 @@ Release spec 结构不同，必须包含：`# Release <version> Requirements`、
 
 ### 检查项
 
-- [ ] 一级标题存在且正确
+- [ ] 一级标题存在（格式不约束）
 - [ ] Introduction 存在，描述了 feature 范围，明确了 Non-scope
 - [ ] Glossary 存在且非空
 - [ ] Requirements section 存在且包含至少一条 requirement

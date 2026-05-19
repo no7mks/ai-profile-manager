@@ -6,30 +6,162 @@
 
 ## 前置读取
 
-1. `.cursor/specs/<name>/design.md`
+1. `<spec-dir>/<name>/design.md`
 2. design Gatekeep Log 中已回答的 Clarification
-3. `.cursor/specs/<name>/requirements.md`
+3. `<spec-dir>/<name>/requirements.md`
 
 ## 关键约束
 
 - 产物名统一为 `tasks.md`（历史 `plan.md` 为同义）
-- 所有任务默认 mandatory，不写 optional
-- 推荐 Test First（RED -> GREEN）编排
-- Checkpoint 作为每个 top-level task 的最后一个 sub-task，且包含验证与 commit
-- Checkpoint 必须包含 `docs/state/` 同步：将本 top-level task 实现的行为、规则、边界条件更新到对应的 state 文件
-- 包含 `## Notes`，至少提及遵循 `spec-execution` 规则
-- 文末补全 Socratic Review
+- **所有任务均为 mandatory，禁止标记 optional（`*` 或其他标记）**
+- **Test First（RED → GREEN）编排**：每个功能 sub-task 内部先写失败测试，再写实现让测试通过。测试不拆分为独立 task。
+- Checkpoint 推荐作为每个 top-level task 的最后一个 sub-task（也可作为独立 top-level task），包含验证与 commit
+- Checkpoint 必须包含 `docs/state/` 同步
+- 包含 `## Notes` section
+- 文末补全 `## Socratic Review`
 - 完成后提示可运行 GK 校验 tasks
 
 ## 产物位置
 
-- `.cursor/specs/<name>/tasks.md`
+- `<spec-dir>/<name>/tasks.md`
 
 ## 顶层结构约束（Feature/Hotfix）
 
-1. 实现类 top-level tasks（1..N）
-2. 手工测试 top-level task（N+1）
-3. Code Review top-level task（最后一个）
+tasks.md 的 top-level task 遵循**固定顺序**：
+
+| 序号 | 类型 |
+|------|------|
+| 1 ~ N | 自动化实现 task |
+| N+1 | 手工测试 task |
+| N+2 | 文档收敛 task |
+| 最后一个 | Code Review task |
+
+## 文档 Section 结构
+
+一级标题不约束格式。必须包含以下 section（英文名）：
+
+| Section | 必要性 |
+|---------|--------|
+| `## Overview` | 必须 — 概述执行策略和关键决策 |
+| `## Tasks` | 必须 — 任务列表 |
+| `## Notes` | 必须 — 执行注意事项，至少提及遵循 `spec-execution` 规则 |
+| `## Socratic Review` | 推荐 |
+| `## Task Dependency Graph` | 必须 — JSON waves 格式 |
+
+## 文档收敛 task 要求
+
+文档收敛是倒数第二个 top-level task（Code Review 之前），必须包含：
+
+- state 文档更新 sub-task（与 design Impact Analysis 一致）
+- manual 文档更新 sub-task（如适用）
+- migration guide sub-task（如适用）
+- checkpoint sub-task
+
+## Code Review task 要求
+
+- 描述为"委托给 code-reviewer sub-agent 执行"
+- 不展开 review checklist（由 code-reviewer 自行决定）
+
+## Sub-task 格式要求
+
+### Requirement 追溯（强制）
+
+**每个实现类 sub-task 必须引用对应的 Requirement 编号**。引用到 AC 是 bonus，不强制。格式灵活，以下均可：
+
+```markdown
+- [ ] 1.1 实现 XXX
+  - 具体描述...
+  - _Ref: Requirement 2, AC 1-3_
+
+- [ ] 1.2 实现 YYY
+  - 具体描述...
+  - _Requirements: 3.1, 3.2_
+```
+
+引用规则：
+- requirements.md 中的每条 requirement 至少被一个 task 引用
+- 引用的编号在 requirements.md 中确实存在
+
+### Checkpoint 格式（强制）
+
+每个 top-level task 的最后一个 sub-task 必须是 checkpoint：
+
+```markdown
+- [ ] 1.N Checkpoint
+  - 运行 `<具体验证命令>`（如 `./vendor/bin/phpunit`）
+  - 更新 `docs/state/<相关文件>.md`
+  - commit: `<scope>: <描述>`
+```
+
+Checkpoint 不是空泛的"确认完成"，必须包含：
+- 具体的验证命令
+- state 文档同步动作
+- commit 描述
+
+## Task Dependency Graph（强制）
+
+tasks.md 必须包含 `## Task Dependency Graph` section。
+
+### 格式
+
+```json
+{"waves": [
+  { "id": 0, "tasks": ["1.1", "1.2"] },
+  { "id": 1, "tasks": ["2.1"] }
+]}
+```
+
+### 校验规则
+
+- task ID 与 sub-task 编号一致
+- wave 顺序反映正确的依赖关系
+- 同一 wave 内的 task 确实可并行（无数据依赖）
+- **所有 leaf sub-task 都必须出现在 TDG 中**
+
+## Test First 编排规则（强制）
+
+每个功能 sub-task 的内部步骤：
+
+1. **编写测试**（覆盖该 sub-task 对应的 AC）
+2. **确认测试失败**（RED — 证明测试有效）
+3. **编写实现代码**
+4. **确认测试通过**（GREEN）
+
+### 禁止事项
+
+- ❌ 将测试拆分为独立的 sub-task
+- ❌ 将测试标记为 optional
+- ❌ 先写实现再补测试
+
+### 例外
+
+- 纯删除类 task（如删除废弃代码）不需要 test-first
+- 文档类 task 不需要 test-first
+- 属性测试（Property-based tests）可以作为独立的 top-level task，但仍然是 **mandatory**
+
+## 手工测试 task 要求
+
+- 覆盖 requirements 中的关键用户场景
+- 场景描述具体，可执行
+- 包含预期结果
+
+## Socratic Review 覆盖项
+
+文末 Socratic Review 至少覆盖：
+
+- tasks 是否完整覆盖了 design 中的所有实现项？
+- task 之间的依赖顺序是否正确？
+- 每个 task 的粒度是否合适（可独立 session 执行）？
+- checkpoint 是否覆盖了关键阶段？
+- 手工测试是否覆盖了关键用户场景？
+
+## Notes section 要求
+
+`## Notes` section 必须包含：
+
+- 明确提到遵循 `spec-execution` 规则
+- 明确说明 commit 随 checkpoint 一起执行
+- 包含当前 spec 特有的执行要点（如有）
 
 ## 完成后输出
 

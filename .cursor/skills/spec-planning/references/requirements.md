@@ -6,7 +6,7 @@
 
 ## 前置读取
 
-1. `.cursor/specs/<name>/goal.md`
+1. `<spec-dir>/<name>/goal.md`
 2. Goal 中 Clarification 已回答项（必须反映到 requirements）
 3. 相关 SSOT（`docs/state/`）
 
@@ -19,13 +19,91 @@
 
 ## 产物位置
 
-- `.cursor/specs/<name>/requirements.md`
+- `<spec-dir>/<name>/requirements.md`
+
+## 文档结构（必须遵循）
+
+一级标题不约束格式。必须包含以下 section（英文名）：
+
+| Section | 必要性 | 说明 |
+|---------|--------|------|
+| `## Introduction` | 必须 | 一段话说明 feature 范围，**必须明确列出不涉及的内容（Non-scope）** |
+| `## Glossary` | 必须 | 术语表，格式 `- **Term**: 定义` |
+| `## Requirements` | 必须 | 需求条款，每条为 `### Requirement N: 名称` |
+| `## Socratic Review` | 推荐 | 自问自答式审查 |
+
+**各 section 之间使用 `---` 分隔。**
+
+## Requirement 条款格式
+
+每条 requirement 必须包含 User Story 和 Acceptance Criteria：
+
+```markdown
+### Requirement N: 名称
+
+**User Story:** As a <role>, I want <feature>, so that <benefit>
+
+#### Acceptance Criteria
+
+1. THE <Subject> SHALL ...
+2. WHEN <条件>, THE <Subject> SHALL ...
+3. IF <条件>, THEN THE <Subject> SHALL ...
+```
+
+## AC 语体规则（EARS 格式）
+
+AC 必须使用以下语体之一：
+
+| 模式 | 格式 | 用途 |
+|------|------|------|
+| 无条件 | `THE <Subject> SHALL <行为>` | 必须具备的行为 |
+| 触发条件 | `WHEN <条件>, THE <Subject> SHALL <行为>` | 特定条件下的行为 |
+| 异常/边界 | `IF <条件>, THEN THE <Subject> SHALL <行为>` | 异常或边界条件下的行为 |
+
+### 规则
+
+- Subject 使用 Glossary 中定义的术语（大写形式）
+- AC 编号连续，无跳号
+- 每条 AC 描述一个可独立验证的行为
+
+## 内容边界
+
+Requirements 聚焦**外部可观察行为**，不应包含实现细节。
+
+**不应出现**：
+- 具体库名/框架名（如 "使用 Symfony YAML 组件"）
+- 内部结构描述（如 "在 src/Service/ 下创建"）
+- 实现策略（如 "使用递归遍历"）
+- 具体类名/方法签名
+
+**可以出现**：
+- 质量属性（性能、可靠性约束）
+- 外部可观察的行为约束
+- Glossary 中定义的领域术语作为 Subject
+
+## 术语表规则
+
+- Glossary 中的术语在正文 AC 中被实际使用（无孤立术语）
+- AC 中使用的领域概念在 Glossary 中有定义（无未定义术语）
+- 格式严格为 `- **Term**: 定义`（加粗术语名 + 冒号 + 定义）
+
+## Socratic Review 覆盖项
+
+如果补充 Socratic Review，至少覆盖：
+
+- 每条 requirement 是否都在描述外部可观察的行为？
+- 是否有遗漏的场景？（错误路径、边界条件、并发、幂等性等）
+- 各 requirement 之间是否存在矛盾或重叠？
+- 是否有隐含的前置假设没有显式列出？
+- 与 proposal / goal 的 scope / non-goals 是否一致？
+- scope 边界是否清晰？
 
 ## 内容要求
 
 - 覆盖目标、范围、术语和验收条款
 - 面向外部可观察行为，避免实现细节
 - 与 goal 决策一致，不重复冲突决策
+- Introduction 明确 Non-scope（不涉及的内容）
 
 ## 完成后输出
 

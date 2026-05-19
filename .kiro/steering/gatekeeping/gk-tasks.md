@@ -59,6 +59,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ### 检查项
 
+- [ ] `## Overview` section 存在
 - [ ] `## Tasks` section 存在
 - [ ] 倒数第一个 top-level task 是 Code Review
 - [ ] 倒数第二个是文档收敛（feature / hotfix）
@@ -76,7 +77,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ## 4. Requirement 追溯校验
 
-- [ ] 每个实现类 sub-task 引用了 `Ref: Requirement X, AC Y`
+- [ ] 每个实现类 sub-task 引用了对应的 Requirement 编号（引用到 AC 是 bonus，不强制）
 - [ ] requirements.md 中的每条 requirement 至少被一个 task 引用
 - [ ] 引用的编号在 requirements.md 中确实存在
 
@@ -102,7 +103,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ## 7. Checkpoint 校验
 
-- [ ] checkpoint 作为每个 top-level task 的最后一个 sub-task
+- [ ] checkpoint 存在（推荐作为 top-level task 的最后一个 sub-task，也可作为独立 top-level task）
 - [ ] 包含具体的验证命令以及 commit 动作
 - [ ] 不是空泛的"确认完成"
 
