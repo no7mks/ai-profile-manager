@@ -28,6 +28,21 @@ description: 当写入或校验 gk-logs.md 时读取，定义 Socratic Review �
 - **Socratic Review**：agent 自问自答，审视产物质量（由 spec-planning 写入）
 - **Gatekeep Log**：gatekeeper 校验记录，含修正项和合规检查（由 spec-gatekeeper 写入）
 
+### Section 顺序（强制）
+
+`##` section 必须按以下顺序排列，不可乱序：
+
+1. `## Requirements Phase — Socratic Review`
+2. `## Requirements Phase — Gatekeep Log`
+3. `## Design Phase — Socratic Review`
+4. `## Design Phase — Gatekeep Log`
+5. `## Tasks Phase — Socratic Review`
+6. `## Tasks Phase — Gatekeep Log`
+
+Bugfix 路径用 `Bugfix Phase` 替代 `Requirements Phase`，其余顺序不变。
+
+同一阶段内，Socratic Review 必须在 Gatekeep Log 之前。后续阶段追加在文件末尾。
+
 ---
 
 ## Socratic Review 格式
