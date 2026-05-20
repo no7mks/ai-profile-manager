@@ -106,7 +106,7 @@ bugfix.md 必须包含以下 section，且顺序正确：
 
 ## 6. Socratic Review 校验
 
-gatekeeper 应补充 Socratic Review（写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Bugfix Socratic Review` section），至少覆盖：
+检查 `gk-logs.md` 中是否存在 `## Bugfix Phase — Socratic Review` section。如果缺少，gatekeeper 应按 `gatekeeping/gk-log-format.md` 的格式补充，Q&A 至少覆盖：
 
 - bug 的根因是否已在 Current Behavior 中充分体现？
 - Expected Behavior 是否完整覆盖了所有 defect 场景？

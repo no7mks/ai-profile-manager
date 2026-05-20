@@ -58,7 +58,6 @@ Feature / Hotfix 的 design.md 必须包含以下 section：
 | `## Testing Strategy` | 推荐 |
 | `## Impact Analysis` | 必须 |
 | `## Alternatives Considered` | 推荐 |
-| `## Socratic Review` | 推荐 |
 
 Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、测试策略、收敛计划。
 
@@ -105,7 +104,7 @@ Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、�
 
 ## 6. Socratic Review 校验
 
-如果缺少 Socratic Review，gatekeeper 应补充（写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Design Socratic Review` section），至少覆盖：
+检查 `gk-logs.md` 中是否存在 `## Design Phase — Socratic Review` section。如果缺少，gatekeeper 应按 `gatekeeping/gk-log-format.md` 的格式补充，Q&A 至少覆盖：
 
 - design 是否完整覆盖了 requirements？
 - 技术选型是否合理？

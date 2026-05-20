@@ -150,7 +150,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ## 13. Socratic Review 校验
 
-如果缺少 Socratic Review，gatekeeper 应补充（写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Tasks Socratic Review` section），至少覆盖：
+检查 `gk-logs.md` 中是否存在 `## Tasks Phase — Socratic Review` section。如果缺少，gatekeeper 应按 `gatekeeping/gk-log-format.md` 的格式补充，Q&A 至少覆盖：
 
 - tasks 是否完整覆盖了 design 中的所有实现项？
 - task 之间的依赖顺序是否正确？

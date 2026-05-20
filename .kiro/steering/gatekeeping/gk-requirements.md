@@ -44,7 +44,6 @@ requirements.md 必须包含以下 section，且顺序正确：
 | 2 | `## Introduction` | 必须 | 一段话说明 feature 范围，明确列出不涉及的内容 |
 | 3 | `## Glossary` | 必须 | 术语表，`- **Term**: 定义` 格式 |
 | 4 | `## Requirements` | 必须 | 需求条款，每条为 `### Requirement N: 名称` |
-| 5 | `## Socratic Review` | 推荐 | 自问自答式审查 |
 
 Release spec 结构不同，必须包含：`# Release <version> Requirements`、`## 发布范围`、`## Feature 概要`、`## 已知 Issue 评估`、`## 发布判定`。
 
@@ -91,7 +90,7 @@ Requirements 应聚焦外部可观察行为，不应包含实现细节。
 
 ## 5. Socratic Review 校验
 
-gatekeeper 应补充 Socratic Review（写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Requirements Socratic Review` section），至少覆盖：
+检查 `gk-logs.md` 中是否存在 `## Requirements Phase — Socratic Review` section。如果缺少，gatekeeper 应按 `gatekeeping/gk-log-format.md` 的格式补充，Q&A 至少覆盖：
 
 - 每条 requirement 是否都在描述外部可观察的行为？
 - 是否有遗漏的场景？（错误路径、边界条件、并发、幂等性等）
