@@ -199,9 +199,15 @@ tasks.md 必须包含 `## Task Dependency Graph` section。
 - [ ] wave 顺序反映正确的依赖关系
 - [ ] 所有 leaf sub-task 都出现在 TDG 中
 
-### 同一 wave 并行安全校验（逐 wave 检查）
+### 同一 wave 并行安全校验
 
-对 TDG 中每个 wave，逐对检查其中的 sub-task 是否真正可并行。任一条件不满足则必须拆到不同 wave：
+#### 编排顺序
+
+1. **合并**：先检查哪些 sub-task 满足并行安全条件，尽可能合并到同一 wave，减少 wave 总数
+2. **Checkpoint 独占**：checkpoint sub-task 必须单独占一个 wave，不得与其他 sub-task 同 wave（checkpoint 依赖前序所有 sub-task 的产出，且需要运行全量验证）
+3. **逐 wave 拆分检查**：对合并后的每个 wave，逐对检查其中的 sub-task，任一条件不满足则拆到不同 wave
+
+#### 并行安全条件
 
 - [ ] **Input ready**：该 wave 中每个 sub-task 的输入（依赖的文件、接口、数据）在该 wave 开始前已由前序 wave 产出
 - [ ] **Reliance ready**：该 wave 中每个 sub-task 引用的类、函数、配置在该 wave 开始前已存在（不依赖同 wave 其他 sub-task 的产出）
