@@ -41,7 +41,7 @@ description: 当用户要求执行 spec task、推进 tasks.md、或进入 spec 
 | 未标注但无依赖关系的 task（不修改同一文件、无调用依赖） | 主 agent 自行判断可否并行派发 |
 | 有依赖关系的 task | 串行派发：前一个 sub-agent 完成后，主 agent 验证结果，再派发下一个 |
 
-派发时向 sub-agent 提供：当前 task 的完整描述、相关文件路径、前序 task 的关键产出（如新增的类名 / 接口签名）。避免把整个 tasks 文件传给 sub-agent。
+派发时向 sub-agent 提供：当前 task 的完整描述、相关文件路径、前序 task 的关键产出（如新增的类名 / 接口签名）。避免把整个 tasks 文件传给 sub-agent。详细的上下文准备规则见 [references/execution-model.md](references/execution-model.md) 的「Sub-agent 派发上下文」section。
 
 ### Commit 粒度
 
