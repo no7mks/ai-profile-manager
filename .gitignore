@@ -4,6 +4,7 @@
 
 # BEGIN apm-managed-gitignore v1
 /.cursor/scratchpads/
+/.cursor/hooks/*.log
 # END apm-managed-gitignore v1
 
 ## @apm:block ability=php target=*
