@@ -206,7 +206,7 @@ tasks.md 必须包含 `## Task Dependency Graph` section。
 - [ ] **Input ready**：该 wave 中每个 sub-task 的输入（依赖的文件、接口、数据）在该 wave 开始前已由前序 wave 产出
 - [ ] **Reliance ready**：该 wave 中每个 sub-task 引用的类、函数、配置在该 wave 开始前已存在（不依赖同 wave 其他 sub-task 的产出）
 - [ ] **无文件冲突**：同一 wave 内的 sub-task 不修改同一个文件（即使不同 section 也算冲突）
-- [ ] **无测试干扰**：同一 wave 内的 sub-task 运行测试时不会相互影响（不共享可变的 fixture、不操作同一测试数据库表、不绑定同一端口）
+- [ ] **无测试干扰**：同一 wave 内的 sub-task 运行测试时不会相互影响（不共享可变的 fixture、不操作同一测试数据库表、不绑定同一端口等）
 - [ ] **无逻辑前置**：不存在 A 定义接口 / B 使用接口的关系
 
 如果发现违反，将冲突的 sub-task 拆到后续 wave，并在 Gatekeep Log 中记录修正。

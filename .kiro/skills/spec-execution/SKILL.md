@@ -69,7 +69,7 @@ Main-agent 负责调度和验收，不直接写代码。
 
 **不传递**：整个 tasks.md、与当前 task 无关的 references、已完成 task 的过程。
 
-### 2.6 汇总与推进
+### 2.5 汇总与推进
 
 - 并行组内所有 sub-agent 完成后，main-agent review 结果
 - 执行 checkpoint（验证命令 + state 同步 + commit）

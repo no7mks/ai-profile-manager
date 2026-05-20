@@ -19,25 +19,25 @@
 
 ## Tasks
 
-- [ ] 1. Capture/Ingest 模块移除
-  - [ ] 1.1 移除 Capture/Ingest 源文件与测试
+- [x] 1. Capture/Ingest 模块移除
+  - [x] 1.1 移除 Capture/Ingest 源文件与测试
     - 删除 `src/Capture/` 目录
     - 删除 `src/Service/CaptureService.php`
     - 删除 `src/Command/` 下的 CaptureCommand、SkillCaptureCommand、RuleCaptureCommand、AgentCaptureCommand、IngestCaptureChangeCommand
     - 删除对应的测试文件与 fixture
     - 修改 ConsoleRegistration：移除 Capture/Ingest 命令注册和相关依赖注入参数
     - _Ref: Requirement 6, AC 1-5; Requirement 7, AC 1-4_
-  - [ ] 1.2 验证无残留引用
+  - [x] 1.2 验证无残留引用
     - 运行全量测试确认通过
     - grep 搜索已删除类名（CaptureService、CaptureCommand、SkillCaptureCommand、RuleCaptureCommand、AgentCaptureCommand、IngestCaptureChangeCommand、CaptureChangeIngestor）确认无残留
     - _Ref: Requirement 6, AC 4; Requirement 7, AC 4_
-  - [ ] 1.3 Checkpoint
+  - [x] 1.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（移除 Capture/Ingest 模块条目）
     - commit: `refactor: remove deprecated Capture/Ingest modules`
 
-- [ ] 2. AbilityRegistry 新增与 Installer 集成
-  - [ ] 2.1 实现 AbilityRegistry + AbilityEntry + AbilityRegistryException
+- [x] 2. AbilityRegistry 新增与 Installer 集成
+  - [x] 2.1 实现 AbilityRegistry + AbilityEntry + AbilityRegistryException
     - 编写测试：解析正常 YAML、未知 section 忽略、缺失字段收集所有错误后一次性报告、文件不存在、YAML 无效
     - 确认测试失败（RED）
     - 实现 `AbilityRegistry::parse()` — 按顶层 section 名称分类，仅识别 knownSections()，忽略未知 section
@@ -45,7 +45,7 @@
     - 实现 `AbilityRegistryException` 三种工厂方法
     - 确认测试通过（GREEN）
     - _Ref: Requirement 1, AC 1-4; Requirement 8, AC 1-3, 6_
-  - [ ] 2.2 替换 Installer 解析逻辑
+  - [x] 2.2 替换 Installer 解析逻辑
     - 编写测试：Installer 构造函数注入 AbilityRegistry 后 installTyped/uninstallTyped 正确分发
     - 确认测试失败（RED）
     - 修改 Installer 构造函数注入 AbilityRegistry
@@ -54,31 +54,31 @@
     - installTyped/uninstallTyped 参数扩展为包含 `hooks` 键
     - 确认测试通过（GREEN）
     - _Ref: Requirement 1, AC 1, 4; Requirement 2, AC 1-3_
-  - [ ] 2.3 Checkpoint
+  - [x] 2.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（新增 AbilityRegistry 模块条目）
     - commit: `feat: add AbilityRegistry and integrate with Installer`
 
-- [ ] 3. HookInstaller 新增
-  - [ ] 3.1 实现 HookInstaller Kiro 平台逻辑
+- [x] 3. HookInstaller 新增
+  - [x] 3.1 实现 HookInstaller Kiro 平台逻辑
     - 编写测试：installKiro 文件复制成功、目录自动创建、uninstallKiro 删除文件、卸载时文件不存在跳过
     - 确认测试失败（RED）
     - 实现 `installKiro()` 和 `uninstallKiro()`
     - 确认测试通过（GREEN）
     - _Ref: Requirement 9, AC 1, 3, 4_
-  - [ ] 3.2 实现 HookInstaller Cursor 平台逻辑
+  - [x] 3.2 实现 HookInstaller Cursor 平台逻辑
     - 编写测试：installCursor 目录递归复制 + JSON merge（新建 hooks.json、追加条目、去重跳过）、uninstallCursor 条目移除 + 目录删除、hooks.json 无效 JSON 抛异常
     - 确认测试失败（RED）
     - 实现 `installCursor()` 和 `uninstallCursor()`
     - 实现 `HookRegistryException`
     - 确认测试通过（GREEN）
     - _Ref: Requirement 10, AC 1-4, 6-8_
-  - [ ] 3.3 Checkpoint
+  - [x] 3.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（新增 HookInstaller 模块条目）
     - commit: `feat: add HookInstaller for Kiro and Cursor platforms`
 
-- [ ] 4. HookChecker 新增与 CheckService 集成
+- [-] 4. HookChecker 新增与 CheckService 集成
   - [ ] 4.1 实现 HookChecker
     - 编写测试：checkKiro ok/drift/missing 三种状态、checkCursor ok/missing（目录/入口脚本/hooks.json 条目三项检查）
     - 确认测试失败（RED）
