@@ -57,6 +57,8 @@ Feature / Hotfix 的 design.md 应包含以下关键 section：
 
 Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、测试策略、收敛计划。
 
+如果包含 `## Correctness Properties`，每条 property 必须使用 `### Property N: <名称>` 格式，包含条件、保证、违反后果三项。
+
 ### 检查项
 
 - [ ] 一级标题存在

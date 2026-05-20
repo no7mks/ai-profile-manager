@@ -81,6 +81,18 @@
 
 各 section 之间使用 `---` 分隔。
 
+### Correctness Properties 格式
+
+如果包含 `## Correctness Properties`，每条 property 必须使用三级标题：
+
+```markdown
+### Property N: <名称>
+
+- **条件**: <何时成立>
+- **保证**: <系统保证什么>
+- **违反后果**: <如果违反会怎样>
+```
+
 ### Impact Analysis 必须覆盖
 
 | 检查项 | 说明 |
