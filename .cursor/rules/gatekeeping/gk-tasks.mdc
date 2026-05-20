@@ -197,8 +197,19 @@ tasks.md 必须包含 `## Task Dependency Graph` section。
 - [ ] waves JSON 使用 ` ```json ``` ` 代码块包裹（硬约束）
 - [ ] TDG 中的 task ID 与 sub-task 编号一致
 - [ ] wave 顺序反映正确的依赖关系
-- [ ] 同一 wave 内的 task 确实可并行
 - [ ] 所有 leaf sub-task 都出现在 TDG 中
+
+### 同一 wave 并行安全校验（逐 wave 检查）
+
+对 TDG 中每个 wave，逐对检查其中的 sub-task 是否真正可并行。任一条件不满足则必须拆到不同 wave：
+
+- [ ] **Input ready**：该 wave 中每个 sub-task 的输入（依赖的文件、接口、数据）在该 wave 开始前已由前序 wave 产出
+- [ ] **Reliance ready**：该 wave 中每个 sub-task 引用的类、函数、配置在该 wave 开始前已存在（不依赖同 wave 其他 sub-task 的产出）
+- [ ] **无文件冲突**：同一 wave 内的 sub-task 不修改同一个文件（即使不同 section 也算冲突）
+- [ ] **无测试干扰**：同一 wave 内的 sub-task 运行测试时不会相互影响（不共享可变的 fixture、不操作同一测试数据库表、不绑定同一端口）
+- [ ] **无逻辑前置**：不存在 A 定义接口 / B 使用接口的关系
+
+如果发现违反，将冲突的 sub-task 拆到后续 wave，并在 Gatekeep Log 中记录修正。
 
 ---
 
