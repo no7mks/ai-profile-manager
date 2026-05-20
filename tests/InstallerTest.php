@@ -26,7 +26,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($proj);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => ['demo-skill'],
             'rules' => [],
@@ -58,7 +58,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($proj);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => [],
             'rules' => ['spec-goal'],
@@ -87,7 +87,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($proj);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $cursor = $installer->installTyped([
             'skills' => [],
             'rules' => ['branch-overview'],
@@ -128,7 +128,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($tmp);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => ['graphify'],
             'rules' => [],
@@ -155,7 +155,7 @@ final class InstallerTest extends TestCase
         file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', 'x');
         file_put_contents($pkg . '/abilities/agents/code-reviewer.kiro.md', 'x');
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $items = $installer->listAvailableItems();
 
         self::assertSame(['graphify'], $items['skills']);
@@ -178,7 +178,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         self::assertTrue($installer->isInstalledOnTarget('skill', 'graphify', 'cursor'));
         self::assertTrue($installer->isInstalledOnTarget('agent', 'code-reviewer', 'cursor'));
         self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-goal', 'cursor'));
@@ -199,7 +199,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-goal', 'kiro'));
         self::assertFalse($installer->isInstalledOnTarget('unknown', 'spec-goal', 'kiro'));
 
@@ -218,7 +218,7 @@ final class InstallerTest extends TestCase
         file_put_contents($pkg . '/abilities/agents/reviewer.cursor.md', 'x');
         file_put_contents($pkg . '/abilities/agents/README.txt', 'x');
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $items = $installer->listAvailableItems();
 
         self::assertSame(['alpha', 'zeta'], $items['skills']);
@@ -239,7 +239,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => ['missing-skill'],
             'rules' => ['missing-rule'],
@@ -273,7 +273,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->uninstallTyped([
             'skills' => ['graphify'],
             'rules' => ['spec-goal'],
@@ -307,7 +307,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         set_error_handler(static function (int $severity, string $message): bool {
             return str_contains($message, 'mkdir(): File exists');
         });
@@ -340,7 +340,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         set_error_handler(static function (int $severity, string $message): bool {
             return str_contains($message, 'mkdir(): File exists');
         });
@@ -377,7 +377,7 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(new GitIgnoreTemplateService(), null, $pkg, new DirectoryMirrorService());
+        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => ['graphify'],
             'rules' => [],

@@ -13,6 +13,7 @@ final class Installer
     private readonly string $packageRoot;
 
     public function __construct(
+        private readonly ?AbilityRegistry $registry = null,
         private readonly GitIgnoreTemplateService $gitIgnore = new GitIgnoreTemplateService(),
         private readonly ?string $templatePath = null,
         ?string $packageRoot = null,
@@ -22,19 +23,22 @@ final class Installer
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
+     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>} $items
      * @param array<int, string> $targets
      * @param string|null $presetName
      * @return array{lines: array<int, string>, exit_code: int}
      */
     public function installTyped(array $items, array $targets, ?string $presetName = null): array
     {
+        $hooks = $items['hooks'] ?? [];
+
         $lines = [];
         $lines[] = 'Installing profile items...';
         $lines[] = 'Targets: ' . implode(', ', $targets);
         $lines[] = 'Skills: ' . $this->formatList($items['skills']);
         $lines[] = 'Rules: ' . $this->formatList($items['rules']);
         $lines[] = 'Agents: ' . $this->formatList($items['agents']);
+        $lines[] = 'Hooks: ' . $this->formatList($hooks);
         $lines[] = '';
 
         $exitCode = 0;
@@ -61,6 +65,7 @@ final class Installer
                     $exitCode = 1;
                 }
             }
+            // hooks: no-op for now (HookInstaller will be added in Task 5)
         }
 
         $gitignoreResult = $this->installGitIgnore($items, $targets, $presetName);
@@ -72,18 +77,21 @@ final class Installer
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
+     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>} $items
      * @param array<int, string> $targets
      * @return array{lines: array<int, string>, exit_code: int}
      */
     public function uninstallTyped(array $items, array $targets): array
     {
+        $hooks = $items['hooks'] ?? [];
+
         $lines = [];
         $lines[] = 'Uninstalling profile items...';
         $lines[] = 'Targets: ' . implode(', ', $targets);
         $lines[] = 'Skills: ' . $this->formatList($items['skills']);
         $lines[] = 'Rules: ' . $this->formatList($items['rules']);
         $lines[] = 'Agents: ' . $this->formatList($items['agents']);
+        $lines[] = 'Hooks: ' . $this->formatList($hooks);
         $lines[] = '';
 
         foreach ($targets as $target) {
@@ -96,15 +104,54 @@ final class Installer
             foreach ($items['agents'] as $name) {
                 $lines = array_merge($lines, $this->uninstallAgent($name, $target));
             }
+            // hooks: no-op for now (HookInstaller will be added in Task 5)
         }
 
         return ['lines' => $lines, 'exit_code' => 0];
     }
 
     /**
-     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}
+     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks: array<int, string>}
      */
     public function listAvailableItems(): array
+    {
+        if ($this->registry !== null) {
+            return $this->listFromRegistry();
+        }
+
+        return $this->listFromFilesystem();
+    }
+
+    /**
+     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks: array<int, string>}
+     */
+    private function listFromRegistry(): array
+    {
+        $parsed = $this->registry->parse();
+
+        $skills = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['skills']);
+        $rules = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['rules']);
+        $agents = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['agents']);
+        $hooks = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['hooks']);
+
+        sort($skills);
+        sort($rules);
+        sort($agents);
+        sort($hooks);
+
+        return [
+            'skills' => array_values($skills),
+            'rules' => array_values($rules),
+            'agents' => array_values($agents),
+            'hooks' => array_values($hooks),
+        ];
+    }
+
+    /**
+     * Legacy filesystem-based listing (used when no AbilityRegistry is injected).
+     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks: array<int, string>}
+     */
+    private function listFromFilesystem(): array
     {
         $skills = [];
         $skillsRoot = $this->packageRoot . '/abilities/skills';
@@ -169,6 +216,7 @@ final class Installer
             'skills' => $skills,
             'rules' => $rules,
             'agents' => $agents,
+            'hooks' => [],
         ];
     }
 
