@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AiProfileManager\Tests;
 
 use AiProfileManager\Command\AgentInstallCommand;
-use AiProfileManager\Command\CaptureCommand;
 use AiProfileManager\Command\CheckCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
@@ -15,7 +14,6 @@ use AiProfileManager\Command\RuleInstallCommand;
 use AiProfileManager\Command\ShowCommand;
 use AiProfileManager\Command\SkillInstallCommand;
 use AiProfileManager\Command\UpdateCommand;
-use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
@@ -161,46 +159,6 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(0, $exit);
         self::assertStringContainsString('Preset: known-preset', $tester->getDisplay());
-    }
-
-    public function testCaptureCommandRejectsUnknownTarget(): void
-    {
-        $capture = new CaptureService(new CheckService());
-        $cmd = new CaptureCommand($capture);
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute(['preset' => 'gitflow', '--target' => ['not-a-target']]);
-
-        self::assertSame(Command::FAILURE, $exit);
-    }
-
-    public function testCaptureFullWorkspaceWithNoAbilitiesExitsSuccess(): void
-    {
-        $baseline = sys_get_temp_dir() . '/apm-cap-bl-' . bin2hex(random_bytes(4));
-        $ws = sys_get_temp_dir() . '/apm-cap-ws-' . bin2hex(random_bytes(4));
-        mkdir($baseline, 0775, true);
-        mkdir($ws, 0775, true);
-
-        $oldBl = getenv('APM_BASELINE_ROOT');
-        putenv('APM_BASELINE_ROOT=' . $baseline);
-
-        $old = getcwd();
-        self::assertNotFalse($old);
-        chdir($ws);
-
-        $capture = new CaptureService(new CheckService());
-        $cmd = new CaptureCommand($capture);
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute([]);
-
-        chdir($old);
-        if ($oldBl === false) {
-            putenv('APM_BASELINE_ROOT');
-        } else {
-            putenv('APM_BASELINE_ROOT=' . $oldBl);
-        }
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('Full workspace snapshot', $tester->getDisplay());
     }
 
     public function testSkillInstallUsesDefaultSkillsWhenArgumentEmpty(): void
@@ -449,7 +407,7 @@ final class ConsoleFlowsTest extends TestCase
         self::assertNotFalse($old);
         chdir($tmp);
 
-        $cmd = new PresetCreateCommand(new CaptureService(new CheckService()));
+        $cmd = new PresetCreateCommand();
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['name' => 'gitflow']);
 
@@ -461,7 +419,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testPresetAddAbilityRequiresExactlyOneKindFlag(): void
     {
-        $cmd = new PresetAddAbilityCommand(new CaptureService(new CheckService()));
+        $cmd = new PresetAddAbilityCommand();
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'gitflow', 'ability' => 'x']);
 
@@ -477,7 +435,7 @@ final class ConsoleFlowsTest extends TestCase
         self::assertNotFalse($old);
         chdir($tmp);
 
-        $cmd = new PresetDeleteCommand(new CaptureService(new CheckService()));
+        $cmd = new PresetDeleteCommand();
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['name' => 'nonexistent-preset']);
 

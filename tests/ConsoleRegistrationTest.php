@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Capture\CaptureChangeIngestor;
 use AiProfileManager\Core\ConsoleRegistration;
-use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
@@ -19,12 +17,10 @@ final class ConsoleRegistrationTest extends TestCase
     {
         $installer = new Installer();
         $checker = new CheckService();
-        $capture = new CaptureService($checker);
-        $ingestor = new CaptureChangeIngestor();
         $updater = new KnowledgeBaseUpdater();
 
         $app = new Application();
-        ConsoleRegistration::register($app, $installer, $checker, $capture, $ingestor, $updater);
+        ConsoleRegistration::register($app, $installer, $checker, $updater);
 
         $names = [
             'install',
@@ -35,17 +31,12 @@ final class ConsoleRegistrationTest extends TestCase
             'skill:check',
             'rule:check',
             'agent:check',
-            'skill:capture',
-            'rule:capture',
-            'agent:capture',
             'check',
-            'capture',
             'preset:create',
             'preset:add-ability',
             'preset:remove-ability',
             'preset:delete',
             'update',
-            'ingest',
         ];
 
         foreach ($names as $name) {
