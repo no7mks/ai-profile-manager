@@ -88,7 +88,7 @@ Socratic Review 和 Gatekeep Log 统一写入 `<spec-dir>/<name>/gk-logs.md`。�
 
 ### Gatekeep Log
 
-**校验时间**: YYYY-MM-DD
+**校验时间**: YYYY-MM-DD HH:mm
 **校验结果**: ✅ 通过 / ⚠️ 已修正后通过
 
 #### 修正项
