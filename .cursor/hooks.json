@@ -3,7 +3,7 @@
   "hooks": {
     "preToolUse": [
       {
-        "command": ".cursor/hooks/check-write-length.sh",
+        "command": ".cursor/hooks/check-write-length/check-write-length.sh",
         "matcher": "Write"
       }
     ]
