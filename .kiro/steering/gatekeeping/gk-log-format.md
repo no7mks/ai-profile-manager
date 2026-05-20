@@ -15,33 +15,62 @@ description: 当写入或校验 gk-logs.md 时读取，定义 Socratic Review �
 
 ---
 
+## 时间获取
+
+写入任何时间戳前，必须先执行 `date '+%Y-%m-%d %H:%M'` 获取真实系统时间。禁止猜测或使用默认值。
+
+---
+
 ## 整体结构
 
-按阶段分 `##` section，每个阶段包含 Socratic Review 和 Gatekeep Log 两个 `###` 子 section：
+按阶段分 `##` section。每个阶段有两个独立的 `##` section：**Socratic Review** 和 **Gatekeep Log**。两者职责不同，不可混淆：
+
+- **Socratic Review**：agent 自问自答，审视产物质量（由 spec-planning 写入）
+- **Gatekeep Log**：gatekeeper 校验记录，含修正项和合规检查（由 spec-gatekeeper 写入）
+
+---
+
+## Socratic Review 格式
 
 ```markdown
-# GK Logs — <spec-name>
-
 ## <Phase> Phase — Socratic Review
 
 **日期**: YYYY-MM-DD HH:mm
 
-### 自检清单
+### Q&A
 
-| 检查项 | 结果 | 备注 |
-|--------|------|------|
-| ... | ✓/✗ | ... |
+> **Q1**: <自问问题>
+> **A1**: <自答>
 
-### 发现的问题
+> **Q2**: <自问问题>
+> **A2**: <自答>
 
-<问题描述，无则写"无重大问题">
+> **Q3**: <自问问题>
+> **A3**: <自答>
+
+> **Q4**: <自问问题>
+> **A4**: <自答>
+
+> **Q5**: <自问问题>
+> **A5**: <自答>
 
 ### 结论
 
-<通过/不通过，及后续建议>
+<通过/发现问题需修正，及后续建议>
+```
+
+### Socratic Review 规则
+
+- **至少 5 条** Q&A，不设上限
+- 问题应覆盖：完整性、一致性、边界条件、与上游文档的对齐、scope 越界风险
+- 回答必须基于实际产物内容，不可泛泛而谈
+- 如果发现问题，在结论中说明并在产物中修正后再写入
 
 ---
 
+## Gatekeep Log 格式
+
+```markdown
 ## <Phase> Phase — Gatekeep Log
 
 **校验时间**: YYYY-MM-DD HH:mm
@@ -58,11 +87,14 @@ description: 当写入或校验 gk-logs.md 时读取，定义 Socratic Review �
 - [x/○] 检查项描述
 ```
 
+### Gatekeep Log 规则
+
+- 修正类型：`结构`、`语体`、`内容`、`格式`、`目的`
+- 合规检查项来自对应阶段的 gk-* steering/rule
+
 ---
 
 ## Phase 名称
-
-按阶段使用以下名称：
 
 | 阶段 | Section 名称 |
 |------|-------------|
@@ -70,18 +102,6 @@ description: 当写入或校验 gk-logs.md 时读取，定义 Socratic Review �
 | Bugfix | `Bugfix Phase` |
 | Design | `Design Phase` |
 | Tasks | `Tasks Phase` |
-
----
-
-## 时间格式
-
-- 统一使用 `YYYY-MM-DD HH:mm`（24 小时制）
-
----
-
-## 修正类型
-
-修正项使用以下类型标签：`结构`、`语体`、`内容`、`格式`、`目的`
 
 ---
 

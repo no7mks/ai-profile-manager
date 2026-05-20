@@ -35,7 +35,7 @@
 9. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
 10. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
 11. **写入产物**：按文档结构写入 `design.md`
-12. **Socratic Review**：先执行 `date '+%Y-%m-%d %H:%M'` 获取当前时间，再读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+12. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
 13. **输出完成报告**：按「完成后输出」格式报告
 
 ---

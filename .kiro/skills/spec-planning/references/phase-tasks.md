@@ -43,7 +43,7 @@
 12. **添加 Code Review task**：委托给 code-reviewer sub-agent
 13. **生成 Task Dependency Graph**：JSON waves 格式
 14. **写入产物**：按文档结构写入 `tasks.md`
-15. **Socratic Review**：先执行 `date '+%Y-%m-%d %H:%M'` 获取当前时间，再读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+15. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
 16. **输出完成报告**：按「完成后输出」格式报告
 
 ---
