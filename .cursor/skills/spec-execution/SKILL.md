@@ -83,7 +83,7 @@ Main-agent 负责调度和验收，不直接写代码。
 - 并行组内所有 sub-agent 完成后，main-agent review 结果
 - 执行 checkpoint（验证命令 + state 同步 + commit）
 - 标记 tasks.md 进度
-- **停止并等待用户指令**：完成当前 top-level task 或 wave 后，不得自动执行下一个 task/wave，必须等待用户明确要求（如 next wave、next task、继续执行）
+- **硬停止**：完成当前 top-level task 或 wave 后，**禁止**自动执行下一个 task/wave。不得以"让我继续下一个"、"接下来执行"等措辞自行推进。必须停下来，等待用户显式发出下一步指令（如 next wave、next task、继续执行）。标记完成后的唯一允许动作是向用户汇报当前进度。
 
 ---
 
