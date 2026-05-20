@@ -36,6 +36,7 @@ description: 当用户要求执行 spec task、推进 tasks.md、或进入 spec 
 
 | 场景 | 派发方式 |
 |------|---------|
+| tasks.md 包含 TDG（Task Dependency Graph） | 按 wave 执行：同一 wave 内的 sub-task 并行派发，wave 间串行 |
 | Plan 标注 `[Parallel: ...]` 的 task | 并行派发多个 sub-agent，全部完成后统一 review 再推进 |
 | 未标注但无依赖关系的 task（不修改同一文件、无调用依赖） | 主 agent 自行判断可否并行派发 |
 | 有依赖关系的 task | 串行派发：前一个 sub-agent 完成后，主 agent 验证结果，再派发下一个 |

@@ -20,7 +20,7 @@ description: Spec gatekeeper 校验 tasks 阶段的详细指引。由 spec-gatek
 7. Checkpoint 校验
 8. Test-first 校验
 9. Task 粒度校验
-10. 手工测试 Task 校验
+10. E2E 测试 Task 校验
 11. Code Review Task 校验
 12. 执行注意事项校验
 13. Socratic Review 校验
@@ -53,7 +53,7 @@ Feature / Hotfix 的 tasks.md top-level task 遵循固定顺序：
 | 序号 | 类型 |
 |------|------|
 | 1 ~ N | 自动化实现 task |
-| N+1 | 手工测试 task |
+| N+1 | E2E 测试 task |
 | N+2 | 文档收敛 task |
 | 最后一个 | Code Review task |
 
@@ -65,7 +65,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 - [ ] `## Tasks` section 存在
 - [ ] 倒数第一个 top-level task 是 Code Review
 - [ ] 倒数第二个是文档收敛（feature / hotfix）
-- [ ] 倒数第三个是手工测试（feature / hotfix）
+- [ ] 倒数第三个是 E2E 测试（feature / hotfix）
 
 ---
 
@@ -125,11 +125,12 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ---
 
-## 10. 手工测试 Task 校验
+## 10. E2E 测试 Task 校验
 
-- [ ] 手工测试 top-level task 存在
+- [ ] E2E 测试 top-level task 存在
 - [ ] 覆盖 requirements 中的关键用户场景
 - [ ] 场景描述具体，可执行
+- [ ] 测试方式与项目类型匹配（CLI→命令执行、UI→交互模拟、库→下游消费者视角）
 
 ---
 
@@ -159,7 +160,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 - 每个 task 的粒度是否合适？
 - checkpoint 是否覆盖了关键阶段？
 - 并行标注是否满足并行条件？
-- 手工测试是否覆盖了关键用户场景？
+- E2E 测试是否覆盖了关键用户场景？
 
 ---
 
@@ -172,7 +173,7 @@ Tasks 的核心目的是：**提供一份可直接执行的实现计划，让执
 - [ ] **Design CR 回应**：用户在 design GK CR 中的决策是否在 tasks 编排中体现。
 - [ ] **Design 全覆盖**：tasks 是否覆盖了 design 中的所有模块、接口和实现项？
 - [ ] **可独立执行**：每个 sub-task 的描述是否足够自包含？
-- [ ] **验收闭环**：checkpoint + 手工测试 + 文档收敛 + code review 是否构成完整验收闭环？
+- [ ] **验收闭环**：checkpoint + E2E 测试 + 文档收敛 + code review 是否构成完整验收闭环？
 - [ ] **执行路径无歧义**：排序和依赖关系是否清晰？
 
 如果不达标，直接修正。修正后在 Gatekeep Log 中记录（修正类型为 `目的`）。

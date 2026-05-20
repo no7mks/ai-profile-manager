@@ -1,9 +1,9 @@
 # 特殊任务
 
-## 手工测试
+## E2E 测试
 
 - 执行时机：feature 分支上完成（finish 之前），或推迟到 release stabilize 阶段
-- 生成或执行手工测试时，按 manual-testing 规范编排和执行
+- 生成或执行 E2E 测试时，按 e2e-testing 规范编排和执行
 
 ## Code Review
 

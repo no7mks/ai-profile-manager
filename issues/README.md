@@ -31,7 +31,7 @@
 
 ### Release Issue（stabilize 阶段）
 
-- release stabilize 阶段手工测试中发现的问题
+- release stabilize 阶段 E2E 测试中发现的问题
 - 记录在 `.kiro/specs/release-*/issues/`
 - 修复流程、severity 门槛等详见 release-workflow steering
 
@@ -114,7 +114,7 @@ issues/
 | Status | `open` / `in-progress` / `closed` |
 | Found In | 见上方 Found In 规则 |
 | Fixed In | 见上方 Fixed In 规则；未修复则留空 |
-| Related Test | 关联的手工测试项（如 `tasks.md 4.2`）；无则留空 |
+| Related Test | 关联的 E2E 测试项（如 `tasks.md 4.2`）；无则留空 |
 
 ### 必填章节
 

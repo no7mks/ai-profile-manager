@@ -17,6 +17,18 @@
    - 发现 drift 但不影响当前 task 的实现路径 → 记录 drift，正常执行
    - 发现 drift 且影响当前 task 的实现路径 → **停下来**，向用户报告 drift 内容，等待确认后再继续
 
+## 并行执行策略
+
+执行一个 top-level task 时，先分析其所有 sub-task：
+
+1. **上下文分析**：列出每个 sub-task 需要读取的文件和需要修改的文件
+2. **冲突检测**：如果两个 sub-task 修改同一个文件，或一个 sub-task 的输出是另一个的输入，则存在冲突
+3. **分组**：将不冲突的 sub-task 分为可并行组，冲突的 sub-task 保持串行
+4. **并行执行**：同一组内的 sub-task 使用并行的 sub-agent 同时执行
+5. **汇总**：并行组内所有 sub-task 完成后，统一 commit 一次，然后进入下一组
+
+如果 tasks.md 中包含 Task Dependency Graph（TDG），优先按 TDG 的 wave 分组执行——同一 wave 内的 sub-task 并行，不同 wave 串行。如果没有 TDG，按上述策略自行判断。
+
 ## Checkpoint
 
 - checkpoint task 必须执行其描述中指定的验证命令

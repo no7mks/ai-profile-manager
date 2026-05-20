@@ -27,7 +27,7 @@
 4. **并行执行**：同一组内的 sub-task 使用并行的 sub-agent 同时执行
 5. **汇总**：并行组内所有 sub-task 完成后，统一 commit 一次，然后进入下一组
 
-如果 tasks.md 中已标注了并行计划（如 `[并行: 1.1, 1.2, 1.3]`），优先遵循标注；否则按上述策略自行判断。
+如果 tasks.md 中包含 Task Dependency Graph（TDG），优先按 TDG 的 wave 分组执行——同一 wave 内的 sub-task 并行，不同 wave 串行。如果没有 TDG 也没有标注，按上述策略自行判断。
 
 ## Checkpoint
 

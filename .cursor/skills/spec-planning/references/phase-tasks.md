@@ -35,7 +35,7 @@
 4. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
 5. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
 6. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
-7. **添加手工测试 task**：覆盖关键用户场景
+7. **添加 E2E 测试 task**：覆盖关键用户场景
 8. **添加文档收敛 task**：与 design Impact Analysis 一致
 9. **添加 Code Review task**：委托给 code-reviewer sub-agent
 10. **生成 Task Dependency Graph**：JSON waves 格式
@@ -89,7 +89,7 @@
 | 序号 | 类型 |
 |------|------|
 | 1 ~ N | 自动化实现 task |
-| N+1 | 手工测试 task |
+| N+1 | E2E 测试 task |
 | N+2 | 文档收敛 task |
 | 最后一个 | Code Review task |
 
@@ -209,7 +209,7 @@
     - 更新 `docs/state/<file>.md`
     - commit: `<scope>: <描述>`
 
-- [ ] N+1. 手工测试
+- [ ] N+1. E2E 测试
   - [ ] N+1.1 <场景>
 
 - [ ] N+2. 文档收敛

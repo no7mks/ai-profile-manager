@@ -52,11 +52,11 @@ rules:
       cursor: .cursor/rules/safety/config-safety.mdc
       kiro: .kiro/steering/safety/config-safety.md
 
-  - path: spec:manual-testing
-    description: 手工测试执行规范
+  - path: spec:e2e-testing
+    description: E2E 测试执行规范
     targets:
-      cursor: .cursor/rules/spec/manual-testing.mdc
-      kiro: .kiro/steering/spec/manual-testing.md
+      cursor: .cursor/rules/spec/e2e-testing.mdc
+      kiro: .kiro/steering/spec/e2e-testing.md
 
   - path: gatekeeping:gk-design
     description: Spec gatekeeper design 校验指引
@@ -145,7 +145,7 @@ presets:
     description: Spec 规划与执行全套
     includes:
       - skill:spec-execution
-      - rule:spec:manual-testing
+      - rule:spec:e2e-testing
       - rule:gatekeeping:gk-design
       - rule:gatekeeping:gk-requirements
       - rule:gatekeeping:gk-tasks
