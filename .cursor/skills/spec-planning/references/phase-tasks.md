@@ -210,9 +210,7 @@
 
 ## Task Dependency Graph
 
-```json
-{"waves": [...]}
-```
+（waves JSON 用 ```json 代码块包裹）
 ```
 
 ---
