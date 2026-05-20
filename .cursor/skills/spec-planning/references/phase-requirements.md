@@ -44,7 +44,7 @@
 5. **逐条撰写 Requirement**：每条包含 User Story + AC（EARS 格式）
 6. **交叉校验**：确认 Glossary ↔ AC 双向引用无孤立/未定义术语
 7. **写入产物**：按文档结构写入 `requirements.md`
-8. **Socratic Review**：读取 rule `spec/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
+8. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
 9. **输出完成报告**：按「完成后输出」格式报告
 
 ### Feature 前置读取
@@ -136,7 +136,7 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 5. **识别回归风险**：列出不应被修改影响的现有行为（SHALL CONTINUE TO）
 6. **补充环境/约束**：记录影响版本、兼容性要求等
 7. **写入产物**：按文档结构写入 `bugfix.md`
-8. **Socratic Review**：读取 rule `spec/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
+8. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
 9. **输出完成报告**：按「完成后输出」格式报告
 
 ### Bugfix 前置读取

@@ -75,7 +75,7 @@ description: 当用户说 "gatekeep" / "GK" / "校验 spec" / "review spec" 或�
 
 ## Gatekeep Log 格式
 
-格式定义见 rule `spec/gk-log-format.mdc`（写入 gk-logs.md 前须读取该文件）。
+格式定义见 rule `gatekeeping/gk-log-format.mdc`（写入 gk-logs.md 前须读取该文件）。
 
 ---
 

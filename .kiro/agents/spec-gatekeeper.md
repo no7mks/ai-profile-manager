@@ -76,7 +76,7 @@ tools: ["read", "write", "shell"]
 
 ## Gatekeep Log 格式
 
-格式定义见 steering `spec/gk-log-format.md`（写入 gk-logs.md 前须读取该文件）。
+格式定义见 steering `gatekeeping/gk-log-format.md`（写入 gk-logs.md 前须读取该文件）。
 
 ---
 
