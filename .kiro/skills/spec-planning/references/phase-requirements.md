@@ -38,14 +38,18 @@
 ### Feature 执行步骤
 
 1. **读取前置文件**：按「前置读取」清单获取 goal、Clarification 回答、SSOT
-2. **提取需求要素**：从 goal 的目标、决策、Clarification 中识别外部可观察行为
-3. **建立术语表**：识别领域概念，撰写 Glossary
-4. **撰写 Introduction**：说明 feature 范围，明确 Non-scope
-5. **逐条撰写 Requirement**：每条包含 User Story + AC（EARS 格式）
-6. **交叉校验**：确认 Glossary ↔ AC 双向引用无孤立/未定义术语
-7. **写入产物**：按文档结构写入 `requirements.md`（大文件分段写入）
-8. **Socratic Review**：自检写入 `gk-logs.md`
-9. **输出完成报告**：按「完成后输出」格式报告
+2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 requirement-first feature spec 子代理，将 goal 内容与本文件的产物格式约束作为输入，由其生成 requirements.md 初稿
+3. **若委托成功** → 跳至步骤 12（Socratic Review）
+4. **若委托不可用或失败** → 继续以下手动步骤：
+5. **提取需求要素**：从 goal 的目标、决策、Clarification 中识别外部可观察行为
+6. **建立术语表**：识别领域概念，撰写 Glossary
+7. **撰写 Introduction**：说明 feature 范围，明确 Non-scope
+8. **逐条撰写 Requirement**：每条包含 User Story + AC（EARS 格式）
+9. **交叉校验**：确认 Glossary ↔ AC 双向引用无孤立/未定义术语
+10. **写入产物**：按文档结构写入 `requirements.md`（大文件分段写入）
+11. **调用 requirement-detailer 分析需求**：对已写入的 requirements 逐条分析，补充遗漏或细化不足
+12. **Socratic Review**：自检写入 `gk-logs.md`
+13. **输出完成报告**：按「完成后输出」格式报告
 
 ### Feature 前置读取
 
@@ -131,14 +135,18 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 ### Bugfix 执行步骤
 
 1. **读取前置文件**：按「前置读取」清单获取 goal、Clarification 回答、SSOT、相关源代码
-2. **复现分析**：阅读源代码，理解 bug 触发路径，撰写 Reproduction Steps
-3. **描述当前行为**：用 EARS 格式（不含 SHALL）描述 defect 行为
-4. **描述期望行为**：用 EARS 格式（含 SHALL）描述修复后正确行为
-5. **识别回归风险**：列出不应被修改影响的现有行为（SHALL CONTINUE TO）
-6. **补充环境/约束**：记录影响版本、兼容性要求等
-7. **写入产物**：按文档结构写入 `bugfix.md`（大文件分段写入）
-8. **Socratic Review**：自检写入 `gk-logs.md`
-9. **输出完成报告**：按「完成后输出」格式报告
+2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 requirement-first bugfix spec 子代理，将 goal 内容、相关源代码与本文件的 Bugfix 产物格式约束作为输入，由其生成 bugfix.md 初稿
+3. **若委托成功** → 跳至步骤 12（Socratic Review）
+4. **若委托不可用或失败** → 继续以下手动步骤：
+5. **复现分析**：阅读源代码，理解 bug 触发路径，撰写 Reproduction Steps
+6. **描述当前行为**：用 EARS 格式（不含 SHALL）描述 defect 行为
+7. **描述期望行为**：用 EARS 格式（含 SHALL）描述修复后正确行为
+8. **识别回归风险**：列出不应被修改影响的现有行为（SHALL CONTINUE TO）
+9. **补充环境/约束**：记录影响版本、兼容性要求等
+10. **写入产物**：按文档结构写入 `bugfix.md`（大文件分段写入）
+11. **调用 requirement-detailer 分析需求**：对已写入的 bugfix 需求逐条分析，补充遗漏或细化不足
+12. **Socratic Review**：自检写入 `gk-logs.md`
+13. **输出完成报告**：按「完成后输出」格式报告
 
 ### Bugfix 前置读取
 
