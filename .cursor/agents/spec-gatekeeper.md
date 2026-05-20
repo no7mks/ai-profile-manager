@@ -76,52 +76,7 @@ description: 当用户说 "gatekeep" / "GK" / "校验 spec" / "review spec" 或�
 
 ## Gatekeep Log 格式
 
-Socratic Review 和 Gatekeep Log 统一写入 `<spec-dir>/<name>/gk-logs.md`。按阶段分 section：
-
-```markdown
-# GK Logs
-
-## Requirements
-
-### Socratic Review
-<自问自答内容>
-
-### Gatekeep Log
-
-**校验时间**: YYYY-MM-DD HH:mm
-**校验结果**: ✅ 通过 / ⚠️ 已修正后通过
-
-#### 修正项
-（如无修正项，写"无"）
-- [修正类型] 修正描述
-
-#### 合规检查
-- [x/○] 检查项描述
-
----
-
-## Design
-
-### Socratic Review
-...
-
-### Gatekeep Log
-...
-
----
-
-## Tasks
-
-### Socratic Review
-...
-
-### Gatekeep Log
-...
-```
-
-**CR（Clarification Round）保留在源文件末尾**（requirements.md / design.md 的 `## Clarification Round` section），不写入 gk-logs.md。
-
-修正类型：`结构`、`语体`、`内容`、`格式`、`目的`。
+格式定义见 rule `spec/gk-log-format.mdc`（写入 gk-logs.md 前须读取该文件）。
 
 ---
 
