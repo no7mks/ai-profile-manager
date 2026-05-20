@@ -31,32 +31,11 @@
 
 ## Sub-agent 派发上下文
 
-main-agent 派发 task 给 sub-agent 时，必须根据 task 类型准备充分的上下文，而非仅传递 task 描述本身：
+派发规则详见 SKILL.md 的 Step 2.4。此处仅列出核心原则：
 
-### 必传信息
-
-| 信息 | 说明 |
-|------|------|
-| task 完整描述 | tasks.md 中该 sub-task 的全部内容（含 Ref） |
-| 相关文件路径 | task 涉及的源文件、测试文件、配置文件 |
-| 前序产出 | 前序 task 的关键产出（新增的类名、接口签名、文件路径等） |
-| error-handling 规则 | Blocker Escalation 条件与常规错误处理方式 |
-
-### 按 task 类型追加
-
-| task 类型 | 额外传递 |
-|-----------|---------|
-| 功能实现 task | quality-standards 中的测试分层、单元测试覆盖自检、不推诿原则 |
-| Bug fix task | quality-standards 中的 Bug Fix 测试规则 |
-| E2E 测试 task | special-tasks 中的 E2E 测试规则 + e2e-testing steering 的执行流程 |
-| Code Review task | special-tasks 中的 Code Review 规则 |
-| 文档收敛 task | 相关 state 文档的当前内容（供 sub-agent 增量更新） |
-
-### 不传递
-
-- 整个 tasks.md 文件（避免上下文膨胀）
-- 与当前 task 无关的 references 内容
-- 已完成 task 的详细执行过程
+- 必传：激活 spec-execution skill 的指令、task 完整描述、相关文件路径、前序产出、error-handling 规则
+- 按类型追加：功能实现带 quality-standards，E2E 带 e2e-testing steering，Code Review 带 special-tasks
+- 不传递：整个 tasks.md、无关 references、已完成 task 的过程
 
 ## Checkpoint
 
