@@ -88,7 +88,7 @@
 ```markdown
 ### Property N: <名称>
 
-- **Validates**: Requirement X, Requirement Y
+- **Validates**: Requirement 1.2, Requirement 3.4
 - **条件**: <何时成立>
 - **保证**: <系统保证什么>
 - **违反后果**: <如果违反会怎样>
