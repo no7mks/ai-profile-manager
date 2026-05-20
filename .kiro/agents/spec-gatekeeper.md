@@ -22,15 +22,15 @@ tools: ["read", "write", "shell"]
 
 1. 运行 `git branch --show-current` 确定当前分支和 spec 类型
 2. 根据分支名确定 spec 目录路径（见下方 Spec 类型与目录）
-3. 检查 spec 目录下的 `gk-logs.md` 文件，确认哪些阶段已校验：
+3. 检查 spec 目录下的 `gk-logs.md` 文件，确认哪些阶段已**由 gatekeeper 校验过**（以 `— Gatekeep Log` section 为准，Socratic Review section 不算）：
 
 | 已有文件 | gk-logs.md 状态 | 当前阶段 | 读取参考文件 |
 |----------|-----------------|----------|--------------|
-| 有 bugfix.md，gk-logs.md 中无 `## Bugfix` section | → 校验 Bugfix | `gk-bugfix.md` |
-| 有 requirements.md，gk-logs.md 中无 `## Requirements` section | → 校验 Requirements | `gk-requirements.md` |
-| 有 design.md，gk-logs.md 中无 `## Design` section | → 校验 Design | `gk-design.md` |
-| 有 tasks.md，gk-logs.md 中无 `## Tasks` section | → 校验 Tasks | `gk-tasks.md` |
-| 所有已有文件对应的阶段都在 gk-logs.md 中有 section | → 告知用户所有已有文档均已校验 | — |
+| 有 bugfix.md，无 `## Bugfix Phase — Gatekeep Log` | → 校验 Bugfix | `gk-bugfix.md` |
+| 有 requirements.md，无 `## Requirements Phase — Gatekeep Log` | → 校验 Requirements | `gk-requirements.md` |
+| 有 design.md，无 `## Design Phase — Gatekeep Log` | → 校验 Design | `gk-design.md` |
+| 有 tasks.md，无 `## Tasks Phase — Gatekeep Log` | → 校验 Tasks | `gk-tasks.md` |
+| 所有已有文件对应的阶段都有 `— Gatekeep Log` section | → 告知用户所有已有文档均已校验 | — |
 
 > **注意**：`bugfix.md` 和 `requirements.md` 互斥——同一 spec 目录下只会存在其中之一。hotfix 分支默认产出 `bugfix.md`。
 
