@@ -23,6 +23,7 @@ description: 当用户提到 spec、planning、goal、requirements、design、ta
    - **Bugfix 路径**：`goal.md` → `bugfix.md` → `design.md` → `tasks.md`
 5. 若用户提到 `plan.md`，视为 `tasks.md` 的历史命名并在输出中显式说明。
 6. Bugfix 路径的触发条件见 `phase-detection.md`；`bugfix.md` 的格式与校验标准见 `phase-requirements.md` 的 Bugfix Analysis 小节。
+7. **步骤报告**：执行 phase reference 中的「执行步骤」时，每开始一个步骤须输出 `▶ 步骤 N: <名称>`，完成后输出 `✓ 步骤 N 完成`。跳转步骤时须说明跳转原因。这确保用户能追踪执行进度。
 
 ## 流程入口
 
