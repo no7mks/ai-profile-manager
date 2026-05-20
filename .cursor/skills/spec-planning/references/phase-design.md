@@ -32,7 +32,7 @@
 6. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
 7. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
 8. **写入产物**：按文档结构写入 `design.md`
-9. **Socratic Review**：自检写入 `gk-logs.md`
+9. **Socratic Review**：读取 rule `spec/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
 10. **输出完成报告**：按「完成后输出」格式报告
 
 ---

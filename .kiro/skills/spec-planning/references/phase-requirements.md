@@ -49,7 +49,7 @@
 10. **交叉校验**：确认 Glossary ↔ AC 双向引用无孤立/未定义术语
 11. **写入产物**：按文档结构写入 `requirements.md`
 12. **调用 requirement-detailer 分析需求**：对已写入的 requirements 逐条分析，补充遗漏或细化不足
-13. **Socratic Review**：自检写入 `gk-logs.md`
+13. **Socratic Review**：读取 steering `spec/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
 14. **输出完成报告**：按「完成后输出」格式报告
 
 ### Feature 前置读取
@@ -146,7 +146,7 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 10. **补充环境/约束**：记录影响版本、兼容性要求等
 11. **写入产物**：按文档结构写入 `bugfix.md`
 12. **调用 requirement-detailer 分析需求**：对已写入的 bugfix 需求逐条分析，补充遗漏或细化不足
-13. **Socratic Review**：自检写入 `gk-logs.md`
+13. **Socratic Review**：读取 steering `spec/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
 14. **输出完成报告**：按「完成后输出」格式报告
 
 ### Bugfix 前置读取

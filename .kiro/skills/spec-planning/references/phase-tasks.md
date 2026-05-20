@@ -30,18 +30,21 @@
 ## 执行步骤
 
 1. **读取前置文件**：按「前置读取」清单获取 design、GK Clarification、requirements
-2. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
-3. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
-4. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
-5. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
-6. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
-7. **添加手工测试 task**：覆盖关键用户场景
-8. **添加文档收敛 task**：与 design Impact Analysis 一致
-9. **添加 Code Review task**：委托给 code-reviewer sub-agent
-10. **生成 Task Dependency Graph**：JSON waves 格式
-11. **写入产物**：按文档结构写入 `tasks.md`
-12. **Socratic Review**：自检写入 `gk-logs.md`
-13. **输出完成报告**：按「完成后输出」格式报告
+2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 tasks spec 子代理，将 design 内容与本文件的产物格式约束作为输入，由其生成 tasks.md 初稿
+3. **若委托成功** → 跳至步骤 14（Socratic Review）
+4. **若委托不可用或失败** → 继续以下手动步骤：
+5. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
+6. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
+7. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
+8. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
+9. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
+10. **添加手工测试 task**：覆盖关键用户场景
+11. **添加文档收敛 task**：与 design Impact Analysis 一致
+12. **添加 Code Review task**：委托给 code-reviewer sub-agent
+13. **生成 Task Dependency Graph**：JSON waves 格式
+14. **写入产物**：按文档结构写入 `tasks.md`
+15. **Socratic Review**：读取 steering `spec/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+16. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 
