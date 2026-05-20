@@ -39,7 +39,7 @@
 
 1. **读取前置文件**：按「前置读取」清单获取 goal、Clarification 回答、SSOT
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 requirement-first feature spec 子代理，将 goal 内容与本文件的产物格式约束作为输入，由其生成 requirements.md 初稿
-3. **若委托成功** → 跳至步骤 12（调用 requirement-detailer 分析需求）
+3. **若委托成功** → 跳至步骤 13（调用 requirement-detailer 分析需求）
 4. **若委托不可用或失败** → 继续以下手动步骤：
 5. **生成 .config.kiro**：在 `<spec-dir>/<name>/` 下写入 `.config.kiro`，内容为 `{"specId": "<uuid>", "workflowType": "requirements-first", "specType": "feature"}`
 6. **提取需求要素**：从 goal 的目标、决策、Clarification 中识别外部可观察行为
@@ -48,9 +48,10 @@
 9. **逐条撰写 Requirement**：每条包含 User Story + AC（EARS 格式）
 10. **交叉校验**：确认 Glossary ↔ AC 双向引用无孤立/未定义术语
 11. **写入产物**：按文档结构写入 `requirements.md`
-12. **调用 requirement-detailer 分析需求**：对已写入的 requirements **逐条、全量**分析（禁止只挑选"关键需求"），补充遗漏或细化不足
-13. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
-14. **输出完成报告**：按「完成后输出」格式报告
+12. **诊断检查**：对写入的 `requirements.md` 执行 `getDiagnostics`，有问题则修正
+13. **调用 requirement-detailer 分析需求**：对已写入的 requirements **逐条、全量**分析（禁止只挑选"关键需求"），补充遗漏或细化不足
+14. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+15. **输出完成报告**：按「完成后输出」格式报告
 
 ### Feature 前置读取
 
@@ -136,7 +137,7 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 
 1. **读取前置文件**：按「前置读取」清单获取 goal、Clarification 回答、SSOT、相关源代码
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 requirement-first bugfix spec 子代理，将 goal 内容、相关源代码与本文件的 Bugfix 产物格式约束作为输入，由其生成 bugfix.md 初稿
-3. **若委托成功** → 跳至步骤 12（调用 requirement-detailer 分析需求）
+3. **若委托成功** → 跳至步骤 13（调用 requirement-detailer 分析需求）
 4. **若委托不可用或失败** → 继续以下手动步骤：
 5. **生成 .config.kiro**：在 `<spec-dir>/<name>/` 下写入 `.config.kiro`，内容为 `{"specId": "<uuid>", "workflowType": "requirements-first", "specType": "bugfix"}`
 6. **复现分析**：阅读源代码，理解 bug 触发路径，撰写 Reproduction Steps
@@ -145,9 +146,10 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 9. **识别回归风险**：列出不应被修改影响的现有行为（SHALL CONTINUE TO）
 10. **补充环境/约束**：记录影响版本、兼容性要求等
 11. **写入产物**：按文档结构写入 `bugfix.md`
-12. **调用 requirement-detailer 分析需求**：对已写入的 bugfix 需求**逐条、全量**分析（禁止只挑选"关键需求"），补充遗漏或细化不足
-13. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
-14. **输出完成报告**：按「完成后输出」格式报告
+12. **诊断检查**：对写入的 `bugfix.md` 执行 `getDiagnostics`，有问题则修正
+13. **调用 requirement-detailer 分析需求**：对已写入的 bugfix 需求**逐条、全量**分析（禁止只挑选"关键需求"），补充遗漏或细化不足
+14. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+15. **输出完成报告**：按「完成后输出」格式报告
 
 ### Bugfix 前置读取
 

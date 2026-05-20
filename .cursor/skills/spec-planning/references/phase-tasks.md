@@ -73,7 +73,7 @@
 
 ### 文档 Section 结构
 
-一级标题不约束格式。必须包含以下 section：
+一级标题必须为 `# Implementation Plan: <spec-name>`（严格匹配）。必须包含以下 section：
 
 | Section | 必要性 |
 |---------|--------|
@@ -151,6 +151,7 @@
 - wave 顺序反映正确的依赖关系
 - 同一 wave 内的 task 确实可并行（无数据依赖）
 - 所有 leaf sub-task 都必须出现在 TDG 中
+- waves JSON 必须用 ` ```json ``` ` 代码块包裹（硬约束）
 
 ### Test First 编排规则
 
@@ -175,7 +176,7 @@
 ### Skeleton 模板
 
 ```markdown
-# <自由标题>
+# Implementation Plan: <spec-name>
 
 ## Overview
 
@@ -209,7 +210,9 @@
 
 ## Task Dependency Graph
 
+```json
 {"waves": [...]}
+```
 ```
 
 ---

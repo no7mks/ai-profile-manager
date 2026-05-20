@@ -46,6 +46,8 @@ alwaysApply: false
 
 ## 2. 结构校验
 
+一级标题必须为 `# Implementation Plan: <spec-name>`（严格匹配）。
+
 Feature / Hotfix 的 tasks.md top-level task 遵循固定顺序：
 
 | 序号 | 类型 |
@@ -191,6 +193,7 @@ tasks.md 必须包含 `## Task Dependency Graph` section。
 ```
 
 - [ ] TDG section 存在，使用 `{"waves": [...]}` JSON 格式
+- [ ] waves JSON 使用 ` ```json ``` ` 代码块包裹（硬约束）
 - [ ] TDG 中的 task ID 与 sub-task 编号一致
 - [ ] wave 顺序反映正确的依赖关系
 - [ ] 同一 wave 内的 task 确实可并行

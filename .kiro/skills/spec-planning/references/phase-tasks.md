@@ -30,8 +30,8 @@
 ## 执行步骤
 
 1. **读取前置文件**：按「前置读取」清单获取 design、GK Clarification、requirements
-2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 tasks spec 子代理，将 design 内容与本文件的产物格式约束作为输入，由其生成 tasks.md 初稿
-3. **若委托成功** → 跳至步骤 15（Socratic Review）
+2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 create tasks spec 子代理（注意：不是 spec-task-execution），将 design 内容与本文件的产物格式约束作为输入，由其生成 tasks.md 初稿
+3. **若委托成功** → 跳至步骤 16（Socratic Review）
 4. **若委托不可用或失败** → 继续以下手动步骤：
 5. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
 6. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
@@ -43,8 +43,9 @@
 12. **添加 Code Review task**：委托给 code-reviewer sub-agent
 13. **生成 Task Dependency Graph**：JSON waves 格式
 14. **写入产物**：按文档结构写入 `tasks.md`
-15. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
-16. **输出完成报告**：按「完成后输出」格式报告
+15. **诊断检查**：对写入的 `tasks.md` 执行 `getDiagnostics`，有问题则修正
+16. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+17. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 
@@ -76,7 +77,7 @@
 
 ### 文档 Section 结构
 
-一级标题不约束格式。必须包含以下 section：
+一级标题必须为 `# Implementation Plan: <spec-name>`（严格匹配）。必须包含以下 section：
 
 | Section | 必要性 |
 |---------|--------|
@@ -154,6 +155,7 @@
 - wave 顺序反映正确的依赖关系
 - 同一 wave 内的 task 确实可并行（无数据依赖）
 - 所有 leaf sub-task 都必须出现在 TDG 中
+- waves JSON 必须用 ` ```json ``` ` 代码块包裹（硬约束）
 
 ### Test First 编排规则
 
@@ -178,7 +180,7 @@
 ### Skeleton 模板
 
 ```markdown
-# <自由标题>
+# Implementation Plan: <spec-name>
 
 ## Overview
 
@@ -212,7 +214,9 @@
 
 ## Task Dependency Graph
 
+```json
 {"waves": [...]}
+```
 ```
 
 ---
