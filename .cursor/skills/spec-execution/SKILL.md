@@ -34,7 +34,7 @@ description: 当用户要求执行 spec task、执行 spec wave、推进 tasks.m
 
 ## Step 2：Main-agent 流程
 
-Main-agent 负责调度和验收，不直接写代码。
+Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step（2.1 → 2.2 → ...）必须向用户汇报「2.1 done」「2.2 done」，再进入下一步。
 
 ### 2.1 Pre-execution Review
 
@@ -89,7 +89,7 @@ Main-agent 负责调度和验收，不直接写代码。
 
 ## Step 3：Sub-agent 流程
 
-Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。
+Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完成一个 sub-step（3.1 → 3.2 → ...）必须向 main-agent（或用户）汇报「3.1 done」「3.2 done」，再进入下一步。
 
 ### 3.1 确认 task 类型
 
