@@ -69,8 +69,7 @@ description: 当用户说 "gatekeep" / "GK" / "校验 spec" / "review spec" 或�
 1. **不重写，只修正**：gatekeeper 的职责是校验和修正，不是重写。
 2. **标准来源**：校验标准来自对应阶段的 rule（`gk-requirements` / `gk-design` / `gk-tasks`）。
 3. **修正即执行**：发现问题直接修正文档，不要只列出问题让用户自己改。
-4. **分段写入**：修正文档或追加 Gatekeep Log 时，如果预计写入内容较大，应分段写入避免截断。
-5. **Gatekeep Log**：校验完成后，将 Socratic Review 和 Gatekeep Log 写入 spec 目录下的 `gk-logs.md`（按阶段分 section），不写在源文件中。CR（Clarification Round）保留在源文件末尾。
+4. **Gatekeep Log**：校验完成后，将 Socratic Review 和 Gatekeep Log 写入 spec 目录下的 `gk-logs.md`（按阶段分 section），不写在源文件中。CR（Clarification Round）保留在源文件末尾。
 
 ---
 

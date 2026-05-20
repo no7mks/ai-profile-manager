@@ -39,7 +39,7 @@
 8. **添加文档收敛 task**：与 design Impact Analysis 一致
 9. **添加 Code Review task**：委托给 code-reviewer sub-agent
 10. **生成 Task Dependency Graph**：JSON waves 格式
-11. **写入产物**：按文档结构写入 `tasks.md`（大文件分段写入）
+11. **写入产物**：按文档结构写入 `tasks.md`
 12. **Socratic Review**：自检写入 `gk-logs.md`
 13. **输出完成报告**：按「完成后输出」格式报告
 

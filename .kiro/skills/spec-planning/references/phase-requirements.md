@@ -47,7 +47,7 @@
 8. **撰写 Introduction**：说明 feature 范围，明确 Non-scope
 9. **逐条撰写 Requirement**：每条包含 User Story + AC（EARS 格式）
 10. **交叉校验**：确认 Glossary ↔ AC 双向引用无孤立/未定义术语
-11. **写入产物**：按文档结构写入 `requirements.md`（大文件分段写入）
+11. **写入产物**：按文档结构写入 `requirements.md`
 12. **调用 requirement-detailer 分析需求**：对已写入的 requirements 逐条分析，补充遗漏或细化不足
 13. **Socratic Review**：自检写入 `gk-logs.md`
 14. **输出完成报告**：按「完成后输出」格式报告
@@ -61,7 +61,6 @@
 ### Feature 关键约束
 
 - 文档以中文为主，英文术语可保留
-- 产物较大时采用分段写入，避免一次性大写入
 - Socratic Review 和 Gatekeep Log 写入 `<spec-dir>/<name>/gk-logs.md`，不写在 requirements.md 中
 - 完成后提示可运行 GK 校验 requirements
 
@@ -145,7 +144,7 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 8. **描述期望行为**：用 EARS 格式（含 SHALL）描述修复后正确行为
 9. **识别回归风险**：列出不应被修改影响的现有行为（SHALL CONTINUE TO）
 10. **补充环境/约束**：记录影响版本、兼容性要求等
-11. **写入产物**：按文档结构写入 `bugfix.md`（大文件分段写入）
+11. **写入产物**：按文档结构写入 `bugfix.md`
 12. **调用 requirement-detailer 分析需求**：对已写入的 bugfix 需求逐条分析，补充遗漏或细化不足
 13. **Socratic Review**：自检写入 `gk-logs.md`
 14. **输出完成报告**：按「完成后输出」格式报告
@@ -160,7 +159,6 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 ### Bugfix 关键约束
 
 - 文档以中文为主，英文术语可保留
-- 产物较大时采用分段写入
 - Socratic Review 和 Gatekeep Log 写入 `<spec-dir>/<name>/gk-logs.md`，不写在 bugfix.md 中
 - 完成后提示可运行 GK 校验 bugfix（使用 `gk-bugfix` 而非 `gk-requirements`）
 

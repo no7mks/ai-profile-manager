@@ -70,8 +70,7 @@ tools: ["read", "write", "shell"]
 1. **不重写，只修正**：gatekeeper 的职责是校验和修正，不是重写。保留系统生成内容的主体结构和表述，只修正不符合标准的部分。
 2. **标准来源**：校验标准来自对应阶段的 steering（`gk-requirements` / `gk-design` / `gk-tasks`）。
 3. **修正即执行**：发现问题直接修正文档，不要只列出问题让用户自己改。
-4. **分段写入**：修正文档或追加 Gatekeep Log 时，如果预计写入内容较大（超过约 50 行），不应尝试一次性写入，而应先用 `fsWrite` 写入第一段，再用 `fsAppend` 逐段追加后续内容，避免单次写入过大导致截断或丢失。
-5. **Gatekeep Log**：校验完成后，将 Socratic Review 和 Gatekeep Log 写入 spec 目录下的 `gk-logs.md`（按阶段分 section），不写在源文件中。CR（Clarification Round）保留在源文件末尾。
+4. **Gatekeep Log**：校验完成后，将 Socratic Review 和 Gatekeep Log 写入 spec 目录下的 `gk-logs.md`（按阶段分 section），不写在源文件中。CR（Clarification Round）保留在源文件末尾。
 
 ---
 
