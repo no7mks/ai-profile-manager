@@ -47,16 +47,14 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 ### 2.3 执行任务
 
-按照 2.2 的分析，为每个 sub-task 派发一个 sub-agent 执行，串行的任务等上一个 sub-task 完毕后再派发下一个。对每个 sub-task 派发 sub-agent 时，必须包含以下上下文：
+0. 先输出一句话"不管任务多少、难度几何，都不允许在 main-agent 执行任务！"
+1. 按照 2.2 的分析，为每个 sub-task 派发一个 sub-agent 执行，串行的任务等上一个 sub-task 完毕后再派发下一个。对每个 sub-task 派发 sub-agent 时，必须包含以下上下文：
+  - **激活指令**：明确告知 sub-agent 以 `sub-agent` 身份激活 `spec-execution` skill（这是硬性要求，不可省略）
+  - **task 描述**：tasks.md 中该 sub-task 的完整内容（含 Ref）
+  - **相关文件路径**：task 涉及的源文件、测试文件、配置文件
+  - **前序产出**：前序 task 的关键产出（新增的类名、接口签名、文件路径等）
 
-1. **激活指令**：明确告知 sub-agent 以 `sub-agent` 身份激活 `spec-execution` skill（这是硬性要求，不可省略）
-2. **task 描述**：tasks.md 中该 sub-task 的完整内容（含 Ref）
-3. **相关文件路径**：task 涉及的源文件、测试文件、配置文件
-4. **前序产出**：前序 task 的关键产出（新增的类名、接口签名、文件路径等）
-
-**不传递**：整个 tasks.md、与当前 task 无关的 references、已完成 task 的过程。
-
-**sub-agent 模式约束**：不允许 main-agent 直接执行任何 sub-task
+> **注意**：不向 sub-agent 传递整个 tasks.md、与当前 task 无关的 references、已完成 task 的过程。
 
 ### 2.4 Commit 粒度（Cursor 特有）
 
@@ -79,9 +77,9 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完成一个 sub-step（3.1 → 3.2 → ...）必须向 main-agent（或用户）汇报「3.1 done」「3.2 done」，再进入下一步。
 
-### 3.1 加载执行法则与确认 task 类型
+### 3.1 确认执行模型已加载
 
-首先加载 [references/execution-model.md](references/execution-model.md)，然后根据收到的 task 描述判断类型，并加载对应规则。
+确认 [references/execution-model.md](references/execution-model.md) 已加载，然后根据收到的 task 描述判断类型，并加载对应规则。
 
 ### 3.2 拆分 Sub-steps
 
@@ -109,7 +107,7 @@ Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完�
 - 任务状态：成功 / 失败 / 被阻断
 - 产出物清单：新增或修改的文件列表
 - 测试结果：运行了哪些测试、是否全部通过
-- 遗留问题：如有未解决的 warning 或需要后续关注的点（不限于本次引入的）
+- **合规自检**：逐项确认遗留问题是否按 execution-model 处理（包括 pre-existing failures——已修复，或已获得用户确认可跳过）。如果存在未处理的失败且未获用户确认，任务状态不得报"成功"
 
 ---
 
