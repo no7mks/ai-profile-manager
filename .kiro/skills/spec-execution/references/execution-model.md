@@ -1,4 +1,4 @@
-# Sub-agent 执行法则
+# 执行模型
 
 所有被派发的 sub-agent 必须遵守本文件的规则。main-agent 派发时必须将本文件内容传递给 sub-agent。
 

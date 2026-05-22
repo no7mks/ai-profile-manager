@@ -41,36 +41,28 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 - 发现 drift 但不影响当前 task 的实现路径 → 记录 drift，正常执行
 - 发现 drift 且影响当前 task 的实现路径 → **停下来**，向用户报告 drift 内容，等待确认后再继续
 
-### 2.2 确定执行范围
+### 2.2 确定执行范围与编排
 
-读取 tasks.md（和 TDG），确定当前要执行的 task 范围。范围可以是一个 top-level task、一个 wave、或用户指定的若干 sub-task。
-
-**默认行为**：如果用户空白激活 skill（无其他上下文），等同于用户说了 "next wave"，执行下一个未完成的 wave。
-
-**汇报格式**：确定后必须向用户报出执行范围，例如：
-
-> 下一个 wave 是 3.1, 3.2，执行范围确认，绝不额外执行。
+1. 读取 tasks.md和 TDG
+2. 若没有 TDG → 按 [references/orchestration.md](references/orchestration.md) 生成 TDG
+3. **确定范围**：范围可以是一个 top-level task、一个 wave、或用户指定的若干 sub-task；若用户没指定，视为执行下一个 wave
+4. **分析并行性**：若 wave 内包含不止一个任务，按 [references/orchestration.md](references/orchestration.md) 的并行策略分析所有任务是否可以并行执行
+5. **汇报**：确定后必须向用户报出执行范围，例如：“下一个 wave 是 3.1, 3.2，执行范围确认，绝不额外执行。”
 
 **严格避免**：执行非范围内的任务。
 
-### 2.3 分析并行性
-
-- 如果 tasks.md 包含 TDG → 按 wave 分组
-- 如果没有 TDG → 按 [references/orchestration.md](references/orchestration.md) 的并行策略自行分析
-
-### 2.4 派发 Sub-agent
+### 2.3 派发 Sub-agent
 
 **对每个 sub-task 派发 sub-agent 时，必须包含以下上下文：**
 
 1. **激活指令**：明确告知 sub-agent 以 `sub-agent` 身份激活 `spec-execution` skill（这是硬性要求，不可省略）
-2. **执行法则**：[references/sub-agent-rules.md](references/sub-agent-rules.md) 的完整内容（所有 sub-agent 必传，不可省略）
-3. **task 描述**：tasks.md 中该 sub-task 的完整内容（含 Ref）
-4. **相关文件路径**：task 涉及的源文件、测试文件、配置文件
-5. **前序产出**：前序 task 的关键产出（新增的类名、接口签名、文件路径等）
+2. **task 描述**：tasks.md 中该 sub-task 的完整内容（含 Ref）
+3. **相关文件路径**：task 涉及的源文件、测试文件、配置文件
+4. **前序产出**：前序 task 的关键产出（新增的类名、接口签名、文件路径等）
 
 **不传递**：整个 tasks.md、与当前 task 无关的 references、已完成 task 的过程。
 
-### 2.5 汇总与推进
+### 2.4 汇总与推进
 
 - 并行组内所有 sub-agent 完成后，main-agent review 结果
 - 标记 tasks.md 进度
@@ -82,16 +74,9 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完成一个 sub-step（3.1 → 3.2 → ...）必须向 main-agent（或用户）汇报「3.1 done」「3.2 done」，再进入下一步。
 
-### 3.1 确认 task 类型与加载规则
+### 3.1 加载执行法则与确认 task 类型
 
-根据收到的 task 描述判断类型，并加载对应规则：
-
-- 功能实现（编码）→ 按 sub-agent-rules 的测试规范执行
-- Bug fix → 按 sub-agent-rules 的 Bug Fix 测试规则执行
-- E2E 测试 → 加载 e2e-testing steering
-- Code Review → 委托 code-reviewer sub-agent
-- 文档收敛 → 无额外加载
-- Checkpoint → 按 sub-agent-rules 的 Checkpoint 规则执行
+首先加载 [references/execution-model.md](references/execution-model.md)，然后根据收到的 task 描述判断类型，并加载对应规则。
 
 ### 3.2 拆分 Sub-steps
 
@@ -110,17 +95,6 @@ Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完�
 - 当前完成了什么
 - 执行结果（测试输出、编译结果等）
 - 下一步计划
+- 若执行中遇到错误，按 execution-model 的异常处理规则处理
 
-### 3.4 异常处理
 
-执行中遇到问题时，按 sub-agent-rules 的异常处理规则处理：
-
-- 常规错误（编译失败、测试失败）→ 自行修复，继续推进
-- 触发 Blocker Escalation 条件 → 立即停止，向 main-agent/用户报告
-
----
-
-## References
-
-- 编排规则（无 TDG 时的并行分析）：[references/orchestration.md](references/orchestration.md)
-- Sub-agent 执行法则（异常处理、测试规范、checkpoint、特殊任务）：[references/sub-agent-rules.md](references/sub-agent-rules.md)
