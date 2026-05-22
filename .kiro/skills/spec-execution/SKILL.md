@@ -9,12 +9,6 @@ description: 当用户要求执行 spec task、执行 spec wave、推进 tasks.m
 
 ---
 
-## 通用约束
-
-- **Pre-existing failures 不可跳过**：任何时候运行测试或验证命令，如果存在失败，无论是否由本次变更引起，都必须修复或向用户确认可以忽略后才能继续。不得以"pre-existing issue"、"非本次引入"等理由自行决定跳过。
-
----
-
 ## Step 1：判断执行角色
 
 激活后立即判断当前处于哪种角色：
@@ -51,9 +45,9 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 **严格避免**：执行非范围内的任务。
 
-### 2.3 派发 Sub-agent
+### 2.3 执行任务
 
-**对每个 sub-task 派发 sub-agent 时，必须包含以下上下文：**
+按照 2.2 的分析，为每个 sub-task 派发一个 sub-agent 执行，串行的任务等上一个 sub-task 完毕后再派发下一个。对每个 sub-task 派发 sub-agent 时，必须包含以下上下文：
 
 1. **激活指令**：明确告知 sub-agent 以 `sub-agent` 身份激活 `spec-execution` skill（这是硬性要求，不可省略）
 2. **task 描述**：tasks.md 中该 sub-task 的完整内容（含 Ref）
@@ -61,6 +55,8 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 4. **前序产出**：前序 task 的关键产出（新增的类名、接口签名、文件路径等）
 
 **不传递**：整个 tasks.md、与当前 task 无关的 references、已完成 task 的过程。
+
+**sub-agent 模式约束**：不允许 main-agent 直接执行任何 sub-task
 
 ### 2.4 汇总与推进
 
