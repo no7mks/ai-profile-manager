@@ -9,6 +9,12 @@ description: 当用户要求执行 spec task、执行 spec wave、推进 tasks.m
 
 ---
 
+## 通用约束
+
+- **Pre-existing failures 不可跳过**：任何时候运行测试或验证命令，如果存在失败，无论是否由本次变更引起，都必须修复或向用户确认可以忽略后才能继续。不得以"pre-existing issue"、"非本次引入"等理由自行决定跳过。
+
+---
+
 ## Step 1：判断执行角色
 
 激活后立即判断当前处于哪种角色：
@@ -26,9 +32,14 @@ description: 当用户要求执行 spec task、执行 spec wave、推进 tasks.m
 
 Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step（2.1 → 2.2 → ...）必须向用户汇报「2.1 done」「2.2 done」，再进入下一步。
 
-### 2.1 Pre-execution Review
+### 2.1 Pre-execution Review（Drift 检测）
 
-每次开始或恢复执行前，做 drift 检测。详见 [references/execution-model.md](references/execution-model.md)。
+每次开始或恢复执行前，将当前要执行的 task 涉及的关键文件与 design.md 中的预期做快速比对——如果代码结构、接口签名、依赖关系已发生变化（例如被其他分支 merge 改动），标记为 drift。
+
+决策：
+- 无 drift → 正常执行
+- 发现 drift 但不影响当前 task 的实现路径 → 记录 drift，正常执行
+- 发现 drift 且影响当前 task 的实现路径 → **停下来**，向用户报告 drift 内容，等待确认后再继续
 
 ### 2.2 确定执行范围
 
@@ -45,25 +56,17 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 ### 2.3 分析并行性
 
 - 如果 tasks.md 包含 TDG → 按 wave 分组
-- 如果没有 TDG → 按 [references/execution-model.md](references/execution-model.md) 的并行策略自行分析
+- 如果没有 TDG → 按 [references/orchestration.md](references/orchestration.md) 的并行策略自行分析
 
 ### 2.4 派发 Sub-agent
 
 **对每个 sub-task 派发 sub-agent 时，必须包含以下上下文：**
 
 1. **激活指令**：明确告知 sub-agent 以 `sub-agent` 身份激活 `spec-execution` skill（这是硬性要求，不可省略）
-2. **task 描述**：tasks.md 中该 sub-task 的完整内容（含 Ref）
-3. **相关文件路径**：task 涉及的源文件、测试文件、配置文件
-4. **前序产出**：前序 task 的关键产出（新增的类名、接口签名、文件路径等）
-5. **类型相关规则**：按 task 类型追加（见下表）
-
-| task 类型 | 额外传递 |
-|-----------|---------|
-| 功能实现 | quality-standards 的测试分层 + 单元测试覆盖自检 + 不推诿原则 |
-| Bug fix | quality-standards 的 Bug Fix 测试规则 |
-| E2E 测试 | special-tasks 的 E2E 规则 + e2e-testing steering 的执行流程 |
-| Code Review | special-tasks 的 Code Review 规则 |
-| 文档收敛 | 相关 state 文档的当前内容 |
+2. **执行法则**：[references/sub-agent-rules.md](references/sub-agent-rules.md) 的完整内容（所有 sub-agent 必传，不可省略）
+3. **task 描述**：tasks.md 中该 sub-task 的完整内容（含 Ref）
+4. **相关文件路径**：task 涉及的源文件、测试文件、配置文件
+5. **前序产出**：前序 task 的关键产出（新增的类名、接口签名、文件路径等）
 
 **不传递**：整个 tasks.md、与当前 task 无关的 references、已完成 task 的过程。
 
@@ -79,7 +82,6 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 ### 2.6 汇总与推进
 
 - 并行组内所有 sub-agent 完成后，main-agent review 结果
-- 执行 checkpoint（验证命令 + state 同步 + commit）
 - 标记 tasks.md 进度
 - **硬停止**：完成当前 top-level task 或 wave 后，**禁止**自动执行下一个 task/wave。不得以"让我继续下一个"、"接下来执行"等措辞自行推进。必须停下来，等待用户显式发出下一步指令（如 next wave、next task、继续执行）。标记完成后的唯一允许动作是向用户汇报当前进度。
 
@@ -89,16 +91,16 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完成一个 sub-step（3.1 → 3.2 → ...）必须向 main-agent（或用户）汇报「3.1 done」「3.2 done」，再进入下一步。
 
-### 3.1 确认 task 类型
+### 3.1 确认 task 类型与加载规则
 
-根据收到的 task 描述判断类型：
+根据收到的 task 描述判断类型，并加载对应规则：
 
-- 功能实现（编码）→ 加载 quality-standards
-- Bug fix → 加载 quality-standards
+- 功能实现（编码）→ 按 sub-agent-rules 的测试规范执行
+- Bug fix → 按 sub-agent-rules 的 Bug Fix 测试规则执行
 - E2E 测试 → 加载 e2e-testing steering
 - Code Review → 委托 code-reviewer sub-agent
 - 文档收敛 → 无额外加载
-- Checkpoint → 执行验证命令
+- Checkpoint → 按 sub-agent-rules 的 Checkpoint 规则执行
 
 ### 3.2 拆分 Sub-steps
 
@@ -120,7 +122,7 @@ Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完�
 
 ### 3.4 异常处理
 
-执行中遇到问题时，按 [references/error-handling.md](references/error-handling.md) 处理：
+执行中遇到问题时，按 sub-agent-rules 的异常处理规则处理：
 
 - 常规错误（编译失败、测试失败）→ 自行修复，继续推进
 - 触发 Blocker Escalation 条件 → 立即停止，向 main-agent/用户报告
@@ -136,9 +138,5 @@ Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完�
 
 ## References
 
-详细规则按需加载：
-
-- 执行模型（并行策略、checkpoint、drift 检测）：[references/execution-model.md](references/execution-model.md)
-- 质量标准（测试分层、覆盖自检、不推诿）：[references/quality-standards.md](references/quality-standards.md)
-- 特殊任务（E2E、Code Review、Release Stabilize）：[references/special-tasks.md](references/special-tasks.md)
-- 异常处理（Blocker Escalation、常规错误）：[references/error-handling.md](references/error-handling.md)
+- 编排规则（无 TDG 时的并行分析）：[references/orchestration.md](references/orchestration.md)
+- Sub-agent 执行法则（异常处理、测试规范、checkpoint、特殊任务）：[references/sub-agent-rules.md](references/sub-agent-rules.md)
