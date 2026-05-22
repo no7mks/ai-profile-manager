@@ -68,9 +68,10 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 Sub-agent 负责执行具体 sub-task，按步骤推进并逐步汇报。每完成一个 sub-step（3.1 → 3.2 → ...）必须向 main-agent（或用户）汇报「3.1 done」「3.2 done」，再进入下一步。
 
-### 3.1 确认执行模型已加载
+### 3.1 加载执行模型
 
-确认 [references/execution-model.md](references/execution-model.md) 已加载，然后根据收到的 task 描述判断类型，并加载对应规则。
+读取 [执行模型](references/execution-model.md) ，然后根据收到的 task 描述判断类型，并加载对应规则。最终汇报类似下文的内容：
+“已从<file-path>加载执行模型，task 类型判断为<task-type>，将按照约定……”
 
 ### 3.2 拆分 Sub-steps
 
