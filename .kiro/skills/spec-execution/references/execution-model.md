@@ -42,5 +42,6 @@
 - checkpoint task 必须执行其描述中指定的验证命令
 - 通过标准：不仅要求测试全部通过，还要求**输出干净**——无 compiler warning、无 deprecation warning、无异常堆栈、无非预期的 stderr 输出
 - **State 同步**：checkpoint commit 前，必须将本 top-level task 实现的功能行为、边界条件、错误处理、配置格式等更新到 `docs/state/` 对应文件。state 的描述粒度应足以推导 functional test / integration test 的断言
+- **Pre-existing failures**：运行验证时如果存在非本次变更引起的测试失败，不得以"pre-existing"为由自行跳过。必须修复，或向用户确认可以忽略后才能继续。详见 quality-standards 的「不推诿原则」
 - 未通过 checkpoint，不得进入下一层实现
 - checkpoint 失败时，修复问题后重新执行验证，直到通过
