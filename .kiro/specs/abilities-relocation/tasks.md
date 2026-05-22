@@ -97,7 +97,7 @@
     - 更新 `docs/state/architecture.md`（新增 HookChecker 模块条目）
     - commit: `feat: add HookChecker and integrate with CheckService`
 
-- [ ] 5. Installer hook 分发与 --force 卸载
+- [x] 5. Installer hook 分发与 --force 卸载
   - [x] 5.1 Installer hook 类型安装分发
     - 编写测试：installTyped 对 hook 类型调用 HookInstaller（Kiro/Cursor 分别验证）、Directory_Duplicate 不对 hook 触发
     - 确认测试失败（RED）
@@ -112,7 +112,7 @@
     - 新增 --force 选项传递到 uninstall 流程
     - 确认测试通过（GREEN）
     - _Ref: Requirement 4, AC 1-5; Requirement 9, AC 3-4; Requirement 10, AC 6-7_
-  - [ ] 5.3 Checkpoint
+  - [x] 5.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（Installer 模块描述更新）
     - commit: `feat: integrate hook dispatch and --force uninstall in Installer`
