@@ -5,17 +5,7 @@ description: 当用户要求执行 spec task、执行 spec wave、推进 tasks.m
 
 # Spec Execution
 
-统一 spec task 执行规范。激活后第一步是判断当前执行角色。
-
----
-
-## 触发场景
-
-- 用户要求执行 spec task、执行 spec wave、推进 tasks.md
-- 用户说 next wave、next task、继续执行
-- 用户提到 checkpoint、TDD、测试分层
-- 用户提到 release stabilize、alpha tag
-- 进入 spec 实现阶段
+本 Skill 统一了 spec 中 task 的执行规范。激活后严格按如下步骤执行，并在每个 step / sub-step 执行前后向用户反馈执行结果与下一步计划。
 
 ---
 
@@ -50,6 +40,8 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 > 下一个 wave 是 3.1, 3.2，执行范围确认，绝不额外执行。
 
+**严格避免**：执行非范围内的任务。
+
 ### 2.3 分析并行性
 
 - 如果 tasks.md 包含 TDG → 按 wave 分组
@@ -59,7 +51,7 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 **对每个 sub-task 派发 sub-agent 时，必须包含以下上下文：**
 
-1. **激活指令**：明确告知 sub-agent 激活 `spec-execution` skill（这是硬性要求，不可省略）
+1. **激活指令**：明确告知 sub-agent 以 `sub-agent` 身份激活 `spec-execution` skill（这是硬性要求，不可省略）
 2. **task 描述**：tasks.md 中该 sub-task 的完整内容（含 Ref）
 3. **相关文件路径**：task 涉及的源文件、测试文件、配置文件
 4. **前序产出**：前序 task 的关键产出（新增的类名、接口签名、文件路径等）
