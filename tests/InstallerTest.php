@@ -6,6 +6,8 @@ namespace AiProfileManager\Tests;
 
 use AiProfileManager\Service\DirectoryMirrorService;
 use AiProfileManager\Service\GitIgnoreTemplateService;
+use AiProfileManager\Service\HookChecker;
+use AiProfileManager\Service\HookInstaller;
 use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
 
@@ -388,5 +390,501 @@ final class InstallerTest extends TestCase
 
         self::assertSame(0, $result['exit_code']);
         self::assertStringContainsString('[skip] No matched .gitignore template blocks.', implode("\n", $result['lines']));
+    }
+
+    // ─── Hook type dispatch tests (Task 5.1) ──────────────────────────
+
+    public function testInstallTypedDispatchesHookToKiroPlatform(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-hook-kiro-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+        file_put_contents($pkg . '/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"1"}');
+
+        $project = sys_get_temp_dir() . '/apm-inst-hook-kiro-proj-' . bin2hex(random_bytes(4));
+        mkdir($project, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->installTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['check-write-length'],
+        ], ['kiro']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[ok]', $output);
+        self::assertStringContainsString('check-write-length', $output);
+        self::assertFileExists($project . '/.kiro/hooks/check-write-length.kiro.hook');
+        self::assertSame(
+            '{"name":"check-write-length","version":"1"}',
+            (string) file_get_contents($project . '/.kiro/hooks/check-write-length.kiro.hook'),
+        );
+    }
+
+    public function testInstallTypedDispatchesHookToCursorPlatform(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-hook-cursor-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks/check-write-length', 0775, true);
+        file_put_contents($pkg . '/hooks/check-write-length/check-write-length.sh', '#!/bin/bash');
+        file_put_contents($pkg . '/hooks/check-write-length/check-write-length.json', json_encode([
+            'preToolUse' => [
+                ['command' => '.cursor/hooks/check-write-length/check-write-length.sh', 'matcher' => 'Write'],
+            ],
+        ]));
+
+        $project = sys_get_temp_dir() . '/apm-inst-hook-cursor-proj-' . bin2hex(random_bytes(4));
+        mkdir($project, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->installTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['check-write-length'],
+        ], ['cursor']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[ok]', $output);
+        self::assertStringContainsString('check-write-length', $output);
+        self::assertFileExists($project . '/.cursor/hooks/check-write-length/check-write-length.sh');
+        self::assertFileExists($project . '/.cursor/hooks.json');
+
+        $hooksJson = json_decode((string) file_get_contents($project . '/.cursor/hooks.json'), true);
+        self::assertSame(1, $hooksJson['version']);
+        self::assertCount(1, $hooksJson['hooks']['preToolUse']);
+        self::assertSame(
+            '.cursor/hooks/check-write-length/check-write-length.sh',
+            $hooksJson['hooks']['preToolUse'][0]['command'],
+        );
+    }
+
+    public function testInstallTypedHookFailsWhenSourceNotExists(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-hook-missing-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+        // No hook source file created
+
+        $project = sys_get_temp_dir() . '/apm-inst-hook-missing-proj-' . bin2hex(random_bytes(4));
+        mkdir($project, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->installTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['nonexistent-hook'],
+        ], ['kiro']);
+
+        chdir($old);
+
+        self::assertSame(1, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[fail]', $output);
+        self::assertStringContainsString('nonexistent-hook', $output);
+    }
+
+    public function testInstallTypedHookEmptyListDoesNotError(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-hook-empty-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+
+        $project = sys_get_temp_dir() . '/apm-inst-hook-empty-proj-' . bin2hex(random_bytes(4));
+        mkdir($project, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->installTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => [],
+        ], ['kiro', 'cursor']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+    }
+
+    public function testInstallTypedDirectoryDuplicateDoesNotTriggerForHooks(): void
+    {
+        // Pre-create the hook target directory to simulate "already exists" scenario
+        $pkg = sys_get_temp_dir() . '/apm-inst-hook-nodup-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks/check-write-length', 0775, true);
+        file_put_contents($pkg . '/hooks/check-write-length/check-write-length.sh', '#!/bin/bash');
+        file_put_contents($pkg . '/hooks/check-write-length/check-write-length.json', json_encode([
+            'preToolUse' => [
+                ['command' => '.cursor/hooks/check-write-length/check-write-length.sh', 'matcher' => 'Write'],
+            ],
+        ]));
+        // Also create Kiro source
+        file_put_contents($pkg . '/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"1"}');
+
+        $project = sys_get_temp_dir() . '/apm-inst-hook-nodup-proj-' . bin2hex(random_bytes(4));
+        // Pre-create target directories (simulating already-installed state)
+        mkdir($project . '/.cursor/hooks/check-write-length', 0775, true);
+        file_put_contents($project . '/.cursor/hooks/check-write-length/check-write-length.sh', '#!/bin/bash old');
+        mkdir($project . '/.kiro/hooks', 0775, true);
+        file_put_contents($project . '/.kiro/hooks/check-write-length.kiro.hook', '{"old":"content"}');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->installTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['check-write-length'],
+        ], ['kiro', 'cursor']);
+
+        chdir($old);
+
+        // Hook should succeed even though target already exists (no Directory_Duplicate)
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringNotContainsString('Directory_Duplicate', $output);
+        self::assertStringNotContainsString('conflict', $output);
+        // Verify files were overwritten successfully
+        self::assertSame(
+            '{"name":"check-write-length","version":"1"}',
+            (string) file_get_contents($project . '/.kiro/hooks/check-write-length.kiro.hook'),
+        );
+    }
+
+    // ─── Hook uninstall dispatch tests (Task 5.2) ──────────────────────────
+
+    public function testUninstallTypedDispatchesHookToKiroPlatform(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-hook-kiro-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+        file_put_contents($pkg . '/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"1"}');
+
+        $project = sys_get_temp_dir() . '/apm-uninst-hook-kiro-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.kiro/hooks', 0775, true);
+        // Install the hook file first
+        file_put_contents($project . '/.kiro/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"1"}');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            hookChecker: new HookChecker(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->uninstallTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['check-write-length'],
+        ], ['kiro']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[ok]', $output);
+        self::assertStringContainsString('check-write-length', $output);
+        self::assertFileDoesNotExist($project . '/.kiro/hooks/check-write-length.kiro.hook');
+    }
+
+    public function testUninstallTypedDispatchesHookToCursorPlatform(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-hook-cursor-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+
+        $project = sys_get_temp_dir() . '/apm-uninst-hook-cursor-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.cursor/hooks/check-write-length', 0775, true);
+        file_put_contents($project . '/.cursor/hooks/check-write-length/check-write-length.sh', '#!/bin/bash');
+        file_put_contents($project . '/.cursor/hooks/check-write-length/check-write-length.json', json_encode([
+            'preToolUse' => [
+                ['command' => '.cursor/hooks/check-write-length/check-write-length.sh', 'matcher' => 'Write'],
+            ],
+        ]));
+        // Create hooks.json with the entry
+        file_put_contents($project . '/.cursor/hooks.json', json_encode([
+            'version' => 1,
+            'hooks' => [
+                'preToolUse' => [
+                    ['command' => '.cursor/hooks/check-write-length/check-write-length.sh', 'matcher' => 'Write'],
+                ],
+            ],
+        ]));
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            hookChecker: new HookChecker(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->uninstallTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['check-write-length'],
+        ], ['cursor']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[ok]', $output);
+        self::assertStringContainsString('check-write-length', $output);
+        self::assertDirectoryDoesNotExist($project . '/.cursor/hooks/check-write-length');
+        // Verify hooks.json entry was removed
+        $hooksJson = json_decode((string) file_get_contents($project . '/.cursor/hooks.json'), true);
+        self::assertSame([], $hooksJson['hooks']['preToolUse']);
+    }
+
+    public function testUninstallTypedHookEmptyListDoesNotError(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-hook-empty-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+
+        $project = sys_get_temp_dir() . '/apm-uninst-hook-empty-proj-' . bin2hex(random_bytes(4));
+        mkdir($project, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            hookChecker: new HookChecker(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->uninstallTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => [],
+        ], ['kiro', 'cursor']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+    }
+
+    public function testUninstallTypedHookDriftWithoutForceAborts(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-hook-drift-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+        file_put_contents($pkg . '/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"1"}');
+
+        $project = sys_get_temp_dir() . '/apm-uninst-hook-drift-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.kiro/hooks', 0775, true);
+        // Install a MODIFIED version (drift)
+        file_put_contents($project . '/.kiro/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"2-modified"}');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            hookChecker: new HookChecker(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        // No --force (default false)
+        $result = $installer->uninstallTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['check-write-length'],
+        ], ['kiro']);
+
+        chdir($old);
+
+        // Should abort with exit_code 1
+        self::assertSame(1, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('drift', $output);
+        self::assertStringContainsString('--force', $output);
+        // File should NOT be deleted
+        self::assertFileExists($project . '/.kiro/hooks/check-write-length.kiro.hook');
+    }
+
+    public function testUninstallTypedHookDriftWithForceContinues(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-hook-force-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+        file_put_contents($pkg . '/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"1"}');
+
+        $project = sys_get_temp_dir() . '/apm-uninst-hook-force-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.kiro/hooks', 0775, true);
+        // Install a MODIFIED version (drift)
+        file_put_contents($project . '/.kiro/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"2-modified"}');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            hookChecker: new HookChecker(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        // With --force = true
+        $result = $installer->uninstallTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['check-write-length'],
+        ], ['kiro'], force: true);
+
+        chdir($old);
+
+        // Should succeed
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[ok]', $output);
+        // File should be deleted
+        self::assertFileDoesNotExist($project . '/.kiro/hooks/check-write-length.kiro.hook');
+    }
+
+    public function testUninstallTypedCursorHookNoDriftCheckDirectlyUninstalls(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-hook-cursor-nodrift-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+
+        $project = sys_get_temp_dir() . '/apm-uninst-hook-cursor-nodrift-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.cursor/hooks/my-hook', 0775, true);
+        file_put_contents($project . '/.cursor/hooks/my-hook/my-hook.sh', '#!/bin/bash modified');
+        file_put_contents($project . '/.cursor/hooks/my-hook/my-hook.json', json_encode([
+            'preToolUse' => [
+                ['command' => '.cursor/hooks/my-hook/my-hook.sh', 'matcher' => 'Write'],
+            ],
+        ]));
+        file_put_contents($project . '/.cursor/hooks.json', json_encode([
+            'version' => 1,
+            'hooks' => [
+                'preToolUse' => [
+                    ['command' => '.cursor/hooks/my-hook/my-hook.sh', 'matcher' => 'Write'],
+                ],
+            ],
+        ]));
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            hookChecker: new HookChecker(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        // Cursor has no drift concept, should uninstall directly without --force
+        $result = $installer->uninstallTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['my-hook'],
+        ], ['cursor']);
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[ok]', $output);
+        self::assertDirectoryDoesNotExist($project . '/.cursor/hooks/my-hook');
+    }
+
+    public function testUninstallTypedHookSkipsWhenTargetNotExists(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-hook-miss-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+        file_put_contents($pkg . '/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"1"}');
+
+        $project = sys_get_temp_dir() . '/apm-uninst-hook-miss-proj-' . bin2hex(random_bytes(4));
+        mkdir($project, 0775, true);
+        // No hook installed
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $installer = new Installer(
+            hookInstaller: new HookInstaller(),
+            hookChecker: new HookChecker(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->uninstallTyped([
+            'skills' => [],
+            'rules' => [],
+            'agents' => [],
+            'hooks' => ['check-write-length'],
+        ], ['kiro', 'cursor']);
+
+        chdir($old);
+
+        // Should not error, just skip
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[skip]', $output);
     }
 }

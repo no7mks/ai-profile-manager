@@ -78,11 +78,14 @@ YAML;
         self::assertSame(['my-hook'], $items['hooks']);
     }
 
-    public function testInstallTypedAcceptsHooksKeyAndSkipsHookItems(): void
+    public function testInstallTypedAcceptsHooksKeyAndDispatchesHookItems(): void
     {
         $pkg = $this->tmpDir . '/pkg';
         mkdir($pkg . '/abilities/skills/demo-skill', 0775, true);
         file_put_contents($pkg . '/abilities/skills/demo-skill/SKILL.md', "demo\n");
+        // Provide a valid hook source for Kiro
+        mkdir($pkg . '/hooks', 0775, true);
+        file_put_contents($pkg . '/hooks/my-hook.kiro.hook', '{"name":"my-hook","version":"1"}');
 
         $registryPath = $this->tmpDir . '/abilities.yaml';
         file_put_contents($registryPath, "rules: []\n");
@@ -102,13 +105,12 @@ YAML;
             'rules' => [],
             'agents' => [],
             'hooks' => ['my-hook'],
-        ], ['cursor']);
+        ], ['kiro']);
 
         self::assertSame(0, $result['exit_code']);
         $output = implode("\n", $result['lines']);
-        self::assertStringContainsString('Installed skill demo-skill -> cursor', $output);
-        // hooks key is accepted but hook items are skipped (no-op)
         self::assertStringContainsString('Hooks: my-hook', $output);
+        self::assertStringContainsString('[ok] Installed hook my-hook -> kiro', $output);
     }
 
     public function testUninstallTypedAcceptsHooksKeyAndSkipsHookItems(): void

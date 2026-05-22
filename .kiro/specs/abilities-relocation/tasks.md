@@ -78,7 +78,7 @@
     - 更新 `docs/state/architecture.md`（新增 HookInstaller 模块条目）
     - commit: `feat: add HookInstaller for Kiro and Cursor platforms`
 
-- [ ] 4. HookChecker 新增与 CheckService 集成
+- [x] 4. HookChecker 新增与 CheckService 集成
   - [x] 4.1 实现 HookChecker
     - 编写测试：checkKiro ok/drift/missing 三种状态、checkCursor ok/missing（目录/入口脚本/hooks.json 条目三项检查）
     - 确认测试失败（RED）
@@ -92,20 +92,20 @@
     - checkTyped 参数扩展为包含 `hooks` 键，hook 类型分发到 HookChecker
     - 确认测试通过（GREEN）
     - _Ref: Requirement 3, AC 1-7_
-  - [ ] 4.3 Checkpoint
+  - [x] 4.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（新增 HookChecker 模块条目）
     - commit: `feat: add HookChecker and integrate with CheckService`
 
 - [ ] 5. Installer hook 分发与 --force 卸载
-  - [ ] 5.1 Installer hook 类型安装分发
+  - [x] 5.1 Installer hook 类型安装分发
     - 编写测试：installTyped 对 hook 类型调用 HookInstaller（Kiro/Cursor 分别验证）、Directory_Duplicate 不对 hook 触发
     - 确认测试失败（RED）
     - 修改 Installer 构造函数注入 HookInstaller
     - installTyped 内部对 hook 类型分发到 HookInstaller.installKiro/installCursor
     - 确认测试通过（GREEN）
     - _Ref: Requirement 2, AC 1-6; Requirement 9, AC 1; Requirement 10, AC 1-3_
-  - [ ] 5.2 Installer hook 类型卸载分发与 --force 选项
+  - [x] 5.2 Installer hook 类型卸载分发与 --force 选项
     - 编写测试：uninstallTyped 对 hook 类型调用 HookInstaller.uninstall*、drift 时无 --force 中止、drift 时有 --force 继续
     - 确认测试失败（RED）
     - uninstallTyped 内部对 hook 类型分发到 HookInstaller.uninstallKiro/uninstallCursor

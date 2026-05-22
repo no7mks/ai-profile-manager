@@ -10,7 +10,7 @@ apm 系统架构与模块边界。
 |------|------|
 | CLI Commands | Symfony Console 命令注册与参数解析 |
 | AbilityRegistry | 解析 abilities.yaml，按 section 返回结构化 AbilityEntry 列表 |
-| Installer | 委托 AbilityRegistry 获取 ability 列表，复制到目标项目 |
+| Installer | 委托 AbilityRegistry 获取 ability 列表，按类型分发安装/卸载：skill/rule/agent 走文件复制，hook 走 HookInstaller；卸载时支持 --force 跳过 drift 检查 |
 | CheckService | 对比已安装 ability 与源文件的 diff 状态 |
 | GitignoreManager | 操作 `.gitignore` 中的 `@apm:block` marker |
 | HookInstaller | 跨平台 hook 安装/卸载：Kiro（文件复制 installKiro/uninstallKiro）、Cursor（目录递归复制 + hooks.json JSON merge installCursor/uninstallCursor） |
