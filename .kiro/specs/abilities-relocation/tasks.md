@@ -78,14 +78,14 @@
     - 更新 `docs/state/architecture.md`（新增 HookInstaller 模块条目）
     - commit: `feat: add HookInstaller for Kiro and Cursor platforms`
 
-- [-] 4. HookChecker 新增与 CheckService 集成
-  - [ ] 4.1 实现 HookChecker
+- [ ] 4. HookChecker 新增与 CheckService 集成
+  - [x] 4.1 实现 HookChecker
     - 编写测试：checkKiro ok/drift/missing 三种状态、checkCursor ok/missing（目录/入口脚本/hooks.json 条目三项检查）
     - 确认测试失败（RED）
     - 实现 `HookChecker::checkKiro()` 和 `HookChecker::checkCursor()`
     - 确认测试通过（GREEN）
     - _Ref: Requirement 9, AC 2; Requirement 10, AC 5_
-  - [ ] 4.2 修改 CheckService 集成 HookChecker
+  - [x] 4.2 修改 CheckService 集成 HookChecker
     - 编写测试：CheckService 对 hook 类型分发到 HookChecker、exit code 2 当存在 drift/missing
     - 确认测试失败（RED）
     - 修改 CheckService 构造函数注入 HookChecker
