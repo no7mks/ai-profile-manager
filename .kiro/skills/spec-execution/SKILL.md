@@ -56,7 +56,16 @@ Main-agent 负责调度和验收，不直接写代码。每完成一个 sub-step
 
 > **注意**：不向 sub-agent 传递整个 tasks.md、与当前 task 无关的 references、已完成 task 的过程。
 
-### 2.4 汇总与推进
+### 2.4 Pre-existing Failure Review
+
+所有 sub-agent 完成后、标记进度前，main-agent 必须执行以下检查：
+
+1. 审查每个 sub-agent 的完成汇报，确认是否存在 pre-existing failure
+2. 如果存在，确认是否按 execution-model 的异常处理流程进行了处理（修复成功 / 用户明确说可忽略）
+3. 如果发现有被忽略、跳过、或未按流程处理的 pre-existing failure → **回到 2.3**，派发新的 sub-agent 专门处理这些遗留 failure
+4. 新 sub-agent 完成后，再次执行本步骤检查，直到无不合规情况
+
+### 2.5 汇总与推进
 
 - 并行组内所有 sub-agent 完成后，main-agent review 结果
 - 标记 tasks.md 进度
