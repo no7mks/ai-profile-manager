@@ -118,14 +118,14 @@
     - commit: `*(service): integrate hook dispatch and --force uninstall in Installer`
 
 - [-] 6. ShowCommand 修改
-  - [ ] 6.1 实现 ShowCommand hook 展示与类型过滤
+  - [x] 6.1 实现 ShowCommand hook 展示与类型过滤
     - 编写测试：show 输出包含 Hooks 分区、--type hook 仅输出 hook 分区、未知类型返回错误、无 hook 时显示空状态、无过滤时包含所有分区
     - 确认测试失败（RED）
     - 修改 ShowCommand：新增 `renderTypeSection('Hooks', 'hook', ...)` 调用
     - 新增 `--type` 选项，支持类型过滤（已知类型：rule、agent、skill、hook、gitignore、preset）
     - 确认测试通过（GREEN）
     - _Ref: Requirement 11, AC 1-5_
-  - [ ] 6.2 Checkpoint
+  - [-] 6.2 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（ShowCommand 描述更新）
     - commit: `*(command): add hook display and --type filter to ShowCommand`

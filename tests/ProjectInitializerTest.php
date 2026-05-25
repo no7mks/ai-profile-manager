@@ -16,7 +16,18 @@ final class ProjectInitializerTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-init-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
-        $initializer = ProjectInitializer::fromPackageLayout();
+        // Create a fake package root with scaffold and abilities
+        $pkg = sys_get_temp_dir() . '/apm-init-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs/state', 0775, true);
+        mkdir($pkg . '/scaffold/issues', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "# Docs\n");
+        file_put_contents($pkg . '/scaffold/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "# Agents\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/cursor-scope.cursor.mdc', "cursor-scope\n");
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "kiro-scope\n");
+
+        $initializer = new ProjectInitializer($pkg);
         $lines = $initializer->init($tmp, false, AppConfig::DEFAULT_TARGETS);
 
         self::assertFileExists($tmp . '/docs/README.md');
@@ -37,7 +48,18 @@ final class ProjectInitializerTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-init-sn-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
-        $initializer = ProjectInitializer::fromPackageLayout();
+        // Create a fake package root with scaffold
+        $pkg = sys_get_temp_dir() . '/apm-init-sn-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs/state', 0775, true);
+        mkdir($pkg . '/scaffold/issues', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "# Docs\n");
+        file_put_contents($pkg . '/scaffold/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "# Agents\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/cursor-scope.cursor.mdc', "cursor-scope\n");
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "kiro-scope\n");
+
+        $initializer = new ProjectInitializer($pkg);
         $initializer->init($tmp, false, []);
 
         self::assertFileDoesNotExist($tmp . '/.cursor/rules/cursor-scope.mdc');
@@ -49,7 +71,18 @@ final class ProjectInitializerTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-init-cur-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
-        $initializer = ProjectInitializer::fromPackageLayout();
+        // Create a fake package root with scaffold
+        $pkg = sys_get_temp_dir() . '/apm-init-cur-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs/state', 0775, true);
+        mkdir($pkg . '/scaffold/issues', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "# Docs\n");
+        file_put_contents($pkg . '/scaffold/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "# Agents\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/cursor-scope.cursor.mdc', "cursor-scope\n");
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "kiro-scope\n");
+
+        $initializer = new ProjectInitializer($pkg);
         $initializer->init($tmp, false, ['cursor']);
 
         self::assertFileExists($tmp . '/.cursor/rules/cursor-scope.mdc');
@@ -62,7 +95,18 @@ final class ProjectInitializerTest extends TestCase
         mkdir($tmp, 0775, true);
         mkdir($tmp . '/docs', 0775, true);
 
-        $initializer = ProjectInitializer::fromPackageLayout();
+        // Create a fake package root with scaffold
+        $pkg = sys_get_temp_dir() . '/apm-init-dup-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs/state', 0775, true);
+        mkdir($pkg . '/scaffold/issues', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "# Docs\n");
+        file_put_contents($pkg . '/scaffold/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "# Agents\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/cursor-scope.cursor.mdc', "cursor-scope\n");
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "kiro-scope\n");
+
+        $initializer = new ProjectInitializer($pkg);
 
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('--force');
@@ -76,7 +120,18 @@ final class ProjectInitializerTest extends TestCase
         mkdir($parent, 0775, true);
         $nested = $parent . '/new-proj';
 
-        $initializer = ProjectInitializer::fromPackageLayout();
+        // Create a fake package root with scaffold
+        $pkg = sys_get_temp_dir() . '/apm-init-nested-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs/state', 0775, true);
+        mkdir($pkg . '/scaffold/issues', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "# Docs\n");
+        file_put_contents($pkg . '/scaffold/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "# Agents\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/cursor-scope.cursor.mdc', "cursor-scope\n");
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "kiro-scope\n");
+
+        $initializer = new ProjectInitializer($pkg);
         $initializer->init($nested, false, []);
 
         self::assertDirectoryExists($nested);

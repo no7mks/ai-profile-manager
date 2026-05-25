@@ -9,6 +9,7 @@ apm 系统架构与模块边界。
 | 模块 | 职责 |
 |------|------|
 | CLI Commands | Symfony Console 命令注册与参数解析 |
+| ShowCommand | 展示所有可安装 ability（skill/agent/rule/hook）及其安装状态与 preset 映射；支持 `--type` 选项按类型过滤输出 |
 | AbilityRegistry | 解析 abilities.yaml，按 section 返回结构化 AbilityEntry 列表 |
 | Installer | 委托 AbilityRegistry 获取 ability 列表，按类型分发安装/卸载：skill/rule/agent 走文件复制，hook 走 HookInstaller；卸载时支持 --force 跳过 drift 检查 |
 | CheckService | 对比已安装 ability 与源文件的 diff 状态 |

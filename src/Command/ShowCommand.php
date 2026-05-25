@@ -24,11 +24,14 @@ final class ShowCommand extends Command
         parent::__construct();
     }
 
+    private const KNOWN_TYPES = ['rule', 'agent', 'skill', 'hook', 'gitignore', 'preset'];
+
     protected function configure(): void
     {
         $this->setName('show');
         $this->setDescription('Show all installable skills, agents, and rules with install status and preset mapping.');
         $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+        $this->addOption('type', null, InputOption::VALUE_REQUIRED, 'Filter by ability type (rule, agent, skill, hook, gitignore, preset).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -44,6 +47,14 @@ final class ShowCommand extends Command
             return Command::FAILURE;
         }
 
+        /** @var string|null $typeFilter */
+        $typeFilter = $input->getOption('type');
+        if ($typeFilter !== null && !in_array($typeFilter, self::KNOWN_TYPES, true)) {
+            $io->error(sprintf('Unknown type: %s. Known types: %s.', $typeFilter, implode(', ', self::KNOWN_TYPES)));
+
+            return Command::FAILURE;
+        }
+
         $available = $this->installer->listAvailableItems();
         $results = $this->checker->checkTyped($available, $targets);
         $installedMap = $this->buildInstalledMap($results, $targets);
@@ -52,9 +63,18 @@ final class ShowCommand extends Command
         $io->writeln('Targets: ' . implode(', ', $targets));
         $io->newLine();
 
-        $this->renderTypeSection($io, 'Skills', 'skill', $available['skills'], $installedMap, $presetMap);
-        $this->renderTypeSection($io, 'Agents', 'agent', $available['agents'], $installedMap, $presetMap);
-        $this->renderTypeSection($io, 'Rules', 'rule', $available['rules'], $installedMap, $presetMap);
+        if ($typeFilter === null || $typeFilter === 'skill') {
+            $this->renderTypeSection($io, 'Skills', 'skill', $available['skills'], $installedMap, $presetMap);
+        }
+        if ($typeFilter === null || $typeFilter === 'agent') {
+            $this->renderTypeSection($io, 'Agents', 'agent', $available['agents'], $installedMap, $presetMap);
+        }
+        if ($typeFilter === null || $typeFilter === 'rule') {
+            $this->renderTypeSection($io, 'Rules', 'rule', $available['rules'], $installedMap, $presetMap);
+        }
+        if ($typeFilter === null || $typeFilter === 'hook') {
+            $this->renderTypeSection($io, 'Hooks', 'hook', $available['hooks'] ?? [], $installedMap, $presetMap);
+        }
 
         return Command::SUCCESS;
     }

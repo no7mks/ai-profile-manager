@@ -33,6 +33,11 @@ final class ConsoleFlowsTest extends TestCase
             '/.apm/gitflow/',
             '## @apm:end',
         ]));
+
+        // Create skill source fixture so Installer can find it
+        mkdir($tmp . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($tmp . '/abilities/skills/graphify/SKILL.md', "# Graphify\n");
+
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -48,7 +53,7 @@ final class ConsoleFlowsTest extends TestCase
             ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
         );
 
-        $cmd = new InstallCommand(new Installer());
+        $cmd = new InstallCommand(new Installer(packageRoot: $tmp));
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'installable-preset', '--target' => ['cursor']]);
 
@@ -99,11 +104,29 @@ final class ConsoleFlowsTest extends TestCase
     {
         $tmp = sys_get_temp_dir() . '/apm-flow-bootstrap-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
+
+        // Create a fake package root with scaffold and abilities for the bootstrap flow
+        $pkg = sys_get_temp_dir() . '/apm-flow-bootstrap-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/scaffold/docs/state', 0775, true);
+        mkdir($pkg . '/scaffold/issues', 0775, true);
+        file_put_contents($pkg . '/scaffold/docs/README.md', "# Docs\n");
+        file_put_contents($pkg . '/scaffold/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/scaffold/AGENTS.md', "# Agents\n");
+        mkdir($pkg . '/abilities/rules', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/cursor-scope.cursor.mdc', "cursor-scope\n");
+        file_put_contents($pkg . '/abilities/rules/kiro-scope.kiro.md', "kiro-scope\n");
+        mkdir($pkg . '/abilities/skills/apm', 0775, true);
+        file_put_contents($pkg . '/abilities/skills/apm/SKILL.md', "# APM\n");
+        mkdir($pkg . '/abilities/agents', 0775, true);
+        file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', "# Code Reviewer\n");
+        file_put_contents($pkg . '/abilities/agents/code-reviewer.kiro.md', "# Code Reviewer\n");
+
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
 
-        $cmd = new InstallCommand(new Installer());
+        $initializer = new \AiProfileManager\Service\ProjectInitializer($pkg);
+        $cmd = new InstallCommand(new Installer(packageRoot: $pkg), $initializer);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute([]);
 
@@ -165,12 +188,18 @@ final class ConsoleFlowsTest extends TestCase
     {
         $tmp = sys_get_temp_dir() . '/apm-flow-skill-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
+
+        // Create skill source fixture
+        $pkg = sys_get_temp_dir() . '/apm-flow-skill-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', "# Graphify\n");
+
         $old = getcwd();
         self::assertNotFalse($old);
         try {
             chdir($tmp);
 
-            $cmd = new SkillInstallCommand(new Installer());
+            $cmd = new SkillInstallCommand(new Installer(packageRoot: $pkg));
             $tester = new CommandTester($cmd);
             $exit = $tester->execute(['skills' => [], '--target' => ['cursor']]);
         } finally {
@@ -185,12 +214,18 @@ final class ConsoleFlowsTest extends TestCase
     {
         $tmp = sys_get_temp_dir() . '/apm-flow-rule-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
+
+        // Create rule source fixture
+        $pkg = sys_get_temp_dir() . '/apm-flow-rule-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/rules/spec', 0775, true);
+        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.kiro.md', "# Spec Goal\n");
+
         $old = getcwd();
         self::assertNotFalse($old);
         try {
             chdir($tmp);
 
-            $cmd = new RuleInstallCommand(new Installer());
+            $cmd = new RuleInstallCommand(new Installer(packageRoot: $pkg));
             $tester = new CommandTester($cmd);
             $exit = $tester->execute(['rules' => ['spec-goal'], '--target' => ['kiro']]);
         } finally {
@@ -205,12 +240,18 @@ final class ConsoleFlowsTest extends TestCase
     {
         $tmp = sys_get_temp_dir() . '/apm-flow-agent-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
+
+        // Create agent source fixture
+        $pkg = sys_get_temp_dir() . '/apm-flow-agent-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/agents', 0775, true);
+        file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', "# Code Reviewer\n");
+
         $old = getcwd();
         self::assertNotFalse($old);
         try {
             chdir($tmp);
 
-            $cmd = new AgentInstallCommand(new Installer());
+            $cmd = new AgentInstallCommand(new Installer(packageRoot: $pkg));
             $tester = new CommandTester($cmd);
             $exit = $tester->execute(['agents' => ['code-reviewer'], '--target' => ['cursor']]);
         } finally {
@@ -397,6 +438,185 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('Agents', $display);
         self::assertStringContainsString('Rules', $display);
         self::assertStringContainsString('  (none)', $display);
+    }
+
+    /**
+     * AC 1: show 命令输出中以独立的 "Hooks" 分区列出所有 hook 类型 ability
+     */
+    public function testShowCommandDisplaysHooksSection(): void
+    {
+        $tmp = sys_get_temp_dir() . '/apm-show-hooks-' . bin2hex(random_bytes(4));
+        $packageRoot = sys_get_temp_dir() . '/apm-show-hooks-pkg-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        mkdir($packageRoot . '/abilities/skills', 0775, true);
+        mkdir($packageRoot . '/abilities/rules', 0775, true);
+        mkdir($packageRoot . '/abilities/agents', 0775, true);
+        mkdir($packageRoot . '/hooks', 0775, true);
+        file_put_contents($packageRoot . '/hooks/check-write-length.kiro.hook', "hook content\n");
+
+        // Create abilities.yaml with hooks section
+        file_put_contents($packageRoot . '/abilities.yaml', implode("\n", [
+            'hooks:',
+            '  - path: check-write-length',
+            '    description: Check write length hook',
+            '    targets: [cursor, kiro]',
+        ]) . "\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($packageRoot . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
+        $cmd = new ShowCommand($installer, new CheckService());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['cursor']]);
+
+        chdir($old);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('Hooks', $display);
+        self::assertStringContainsString('check-write-length', $display);
+    }
+
+    /**
+     * AC 2: --type hook 仅输出 hook 分区而省略其他类型分区
+     */
+    public function testShowCommandTypeFilterHookOnlyShowsHooks(): void
+    {
+        $tmp = sys_get_temp_dir() . '/apm-show-type-hook-' . bin2hex(random_bytes(4));
+        $packageRoot = sys_get_temp_dir() . '/apm-show-type-hook-pkg-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        mkdir($packageRoot . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($packageRoot . '/abilities/skills/graphify/SKILL.md', "x\n");
+        mkdir($packageRoot . '/abilities/rules', 0775, true);
+        mkdir($packageRoot . '/abilities/agents', 0775, true);
+        mkdir($packageRoot . '/hooks', 0775, true);
+        file_put_contents($packageRoot . '/hooks/check-write-length.kiro.hook', "hook content\n");
+
+        file_put_contents($packageRoot . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: Graphify skill',
+            '    targets: [cursor, kiro]',
+            'hooks:',
+            '  - path: check-write-length',
+            '    description: Check write length hook',
+            '    targets: [cursor, kiro]',
+        ]) . "\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($packageRoot . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
+        $cmd = new ShowCommand($installer, new CheckService());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
+
+        chdir($old);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('Hooks', $display);
+        self::assertStringContainsString('check-write-length', $display);
+        // Other sections should NOT appear
+        self::assertStringNotContainsString('Skills', $display);
+        self::assertStringNotContainsString('Agents', $display);
+        self::assertStringNotContainsString('Rules', $display);
+    }
+
+    /**
+     * AC 3: 未知类型过滤值返回错误并列出已知类型
+     */
+    public function testShowCommandTypeFilterUnknownTypeReturnsError(): void
+    {
+        $cmd = new ShowCommand(new Installer(), new CheckService());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'banana']);
+
+        self::assertSame(Command::FAILURE, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('Unknown type', $display);
+        self::assertStringContainsString('rule', $display);
+        self::assertStringContainsString('agent', $display);
+        self::assertStringContainsString('skill', $display);
+        self::assertStringContainsString('hook', $display);
+        self::assertStringContainsString('gitignore', $display);
+        self::assertStringContainsString('preset', $display);
+    }
+
+    /**
+     * AC 4: 无 hook 时显示空状态占位文本
+     */
+    public function testShowCommandDisplaysNoneWhenNoHooks(): void
+    {
+        $tmp = sys_get_temp_dir() . '/apm-show-no-hooks-' . bin2hex(random_bytes(4));
+        $packageRoot = sys_get_temp_dir() . '/apm-show-no-hooks-pkg-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        mkdir($packageRoot . '/abilities/skills', 0775, true);
+        mkdir($packageRoot . '/abilities/rules', 0775, true);
+        mkdir($packageRoot . '/abilities/agents', 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $installer = new Installer(packageRoot: $packageRoot);
+        $cmd = new ShowCommand($installer, new CheckService());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
+
+        chdir($old);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('Hooks', $display);
+        self::assertStringContainsString('(none)', $display);
+    }
+
+    /**
+     * AC 5: 未指定类型过滤时，输出中同时包含 hook 分区与其他所有类型分区
+     */
+    public function testShowCommandWithoutTypeFilterShowsAllSections(): void
+    {
+        $tmp = sys_get_temp_dir() . '/apm-show-all-' . bin2hex(random_bytes(4));
+        $packageRoot = sys_get_temp_dir() . '/apm-show-all-pkg-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        mkdir($packageRoot . '/abilities/skills', 0775, true);
+        mkdir($packageRoot . '/abilities/rules', 0775, true);
+        mkdir($packageRoot . '/abilities/agents', 0775, true);
+        mkdir($packageRoot . '/hooks', 0775, true);
+        file_put_contents($packageRoot . '/hooks/check-write-length.kiro.hook', "hook content\n");
+
+        file_put_contents($packageRoot . '/abilities.yaml', implode("\n", [
+            'hooks:',
+            '  - path: check-write-length',
+            '    description: Check write length hook',
+            '    targets: [cursor, kiro]',
+        ]) . "\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($packageRoot . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
+        $cmd = new ShowCommand($installer, new CheckService());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['cursor']]);
+
+        chdir($old);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        $display = $tester->getDisplay();
+        // All sections should be present
+        self::assertStringContainsString('Skills', $display);
+        self::assertStringContainsString('Agents', $display);
+        self::assertStringContainsString('Rules', $display);
+        self::assertStringContainsString('Hooks', $display);
     }
 
     public function testPresetCreateFailsWhenPresetAlreadyExists(): void
