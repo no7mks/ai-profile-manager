@@ -108,6 +108,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 - [ ] checkpoint 存在（推荐作为 top-level task 的最后一个 sub-task，也可作为独立 top-level task）
 - [ ] 包含具体的验证命令以及 commit 动作
 - [ ] 不是空泛的"确认完成"
+- [ ] 如指定了 commit message，须符合 `git-conventions.md` steering 规范
 
 ---
 

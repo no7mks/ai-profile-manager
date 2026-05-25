@@ -1,6 +1,6 @@
 ---
 name: spec-execution
-description: 当用户要求执行 spec task、执行 spec wave、推进 tasks.md、说 next wave/next task/继续执行、或进入 spec 实现阶段时激活。含执行模型、质量标准、特殊任务与异常处理。
+description: 当用户说 execute task/next wave/next task/执行任务/继续执行 等场景，表明要进入 spec 实现阶段时激活。含执行模型、质量标准、特殊任务与异常处理。
 ---
 
 # Spec Execution
