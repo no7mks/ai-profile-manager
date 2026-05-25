@@ -34,7 +34,7 @@
   - [x] 1.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（移除 Capture/Ingest 模块条目）
-    - commit: `refactor: remove deprecated Capture/Ingest modules`
+    - commit: `-(module): remove deprecated Capture/Ingest modules`
 
 - [x] 2. AbilityRegistry 新增与 Installer 集成
   - [x] 2.1 实现 AbilityRegistry + AbilityEntry + AbilityRegistryException
@@ -57,7 +57,7 @@
   - [x] 2.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（新增 AbilityRegistry 模块条目）
-    - commit: `feat: add AbilityRegistry and integrate with Installer`
+    - commit: `+(service): add AbilityRegistry and integrate with Installer`
 
 - [x] 3. HookInstaller 新增
   - [x] 3.1 实现 HookInstaller Kiro 平台逻辑
@@ -76,7 +76,7 @@
   - [x] 3.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（新增 HookInstaller 模块条目）
-    - commit: `feat: add HookInstaller for Kiro and Cursor platforms`
+    - commit: `+(service): add HookInstaller for Kiro and Cursor platforms`
 
 - [x] 4. HookChecker 新增与 CheckService 集成
   - [x] 4.1 实现 HookChecker
@@ -95,7 +95,7 @@
   - [x] 4.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（新增 HookChecker 模块条目）
-    - commit: `feat: add HookChecker and integrate with CheckService`
+    - commit: `+(service): add HookChecker and integrate with CheckService`
 
 - [x] 5. Installer hook 分发与 --force 卸载
   - [x] 5.1 Installer hook 类型安装分发
@@ -115,7 +115,7 @@
   - [x] 5.3 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（Installer 模块描述更新）
-    - commit: `feat: integrate hook dispatch and --force uninstall in Installer`
+    - commit: `*(service): integrate hook dispatch and --force uninstall in Installer`
 
 - [ ] 6. ShowCommand 修改
   - [ ] 6.1 实现 ShowCommand hook 展示与类型过滤
@@ -128,7 +128,7 @@
   - [ ] 6.2 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（ShowCommand 描述更新）
-    - commit: `feat: add hook display and --type filter to ShowCommand`
+    - commit: `*(command): add hook display and --type filter to ShowCommand`
 
 - [ ] 7. E2E 测试
   - [ ] 7.1 验证 Capture/Ingest 命令不可达
@@ -176,7 +176,7 @@
   - [ ] 8.4 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（最终版本确认）
-    - commit: `docs: add state documentation for abilities-relocation`
+    - commit: `+(state): add state documentation for abilities-relocation`
 
 - [ ] 9. Code Review
   - 委托给 code-reviewer sub-agent 执行
@@ -210,14 +210,15 @@
   { "id": 8, "tasks": ["4.1"] },
   { "id": 9, "tasks": ["4.2"] },
   { "id": 10, "tasks": ["4.3"] },
-  { "id": 11, "tasks": ["5.1", "5.2"] },
-  { "id": 12, "tasks": ["5.3"] },
-  { "id": 13, "tasks": ["6.1"] },
-  { "id": 14, "tasks": ["6.2"] },
-  { "id": 15, "tasks": ["7.1", "7.2", "7.3", "7.4", "7.5"] },
-  { "id": 16, "tasks": ["8.1"] },
-  { "id": 17, "tasks": ["8.2", "8.3"] },
-  { "id": 18, "tasks": ["8.4"] },
-  { "id": 19, "tasks": ["9"] }
+  { "id": 11, "tasks": ["5.1"] },
+  { "id": 12, "tasks": ["5.2"] },
+  { "id": 13, "tasks": ["5.3"] },
+  { "id": 14, "tasks": ["6.1"] },
+  { "id": 15, "tasks": ["6.2"] },
+  { "id": 16, "tasks": ["7.1", "7.2", "7.3", "7.4", "7.5"] },
+  { "id": 17, "tasks": ["8.1"] },
+  { "id": 18, "tasks": ["8.2", "8.3"] },
+  { "id": 19, "tasks": ["8.4"] },
+  { "id": 20, "tasks": ["9"] }
 ]}
 ```

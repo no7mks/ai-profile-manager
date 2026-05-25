@@ -240,21 +240,20 @@
 
 ## Tasks Phase — Gatekeep Log
 
-**校验时间**: 2026-05-20 17:27
+**校验时间**: 2026-05-25 15:28
 **校验结果**: ⚠️ 已修正后通过
 
 ### 修正项
 
-- [内容] 文档收敛 Task（Task 8）：缺少 manual 文档更新 sub-task。`docs/manual/usage.md` 记录了 CLI 命令用法，hook 新增和 capture 移除后需同步更新。已新增 Task 8.2（Manual 文档更新）
-- [内容] 文档收敛 Task（Task 8）：缺少 migration guide sub-task。Capture/Ingest 移除属于破坏性变更，需为用户提供迁移说明。已新增 Task 8.3（Migration Guide）
-- [结构] Task Dependency Graph：原 TDG 将同一 top-level task 的所有 sub-task 放入同一 wave，但 sub-task 之间存在顺序依赖（如 1.1→1.2→1.3），不可并行。已重构 TDG 为 20 个 wave，正确反映 sub-task 间的依赖关系，仅将确实可并行的 sub-task 放入同一 wave（如 3.1/3.2、5.1/5.2、7.1-7.5、8.2/8.3）
+- [格式] Checkpoint commit message（Task 1.3, 2.3, 3.3, 4.3, 5.3, 6.2, 8.4）：使用了 conventional commit 格式（`feat:`、`refactor:`、`docs:`），不符合 `git-conventions.md` 规定的 `<action>(scope): description` 格式。已全部修正为 `+`/`-`/`*` 前缀格式
+- [结构] Task Dependency Graph Wave 11：原将 5.1 和 5.2 放入同一 wave，但两者都修改 Installer 类（5.1 修改 installTyped，5.2 修改 uninstallTyped + 新增 --force），违反"无文件冲突"并行安全条件。已将 5.2 拆到独立 wave（id 12），后续 wave id 顺延，TDG 总计 21 个 wave
 
 ### 合规检查
 
 - [x] 无 TBD / TODO / 待定 / 占位符
 - [x] 无空 section 或不完整的列表
 - [x] 内部引用一致（Requirement 编号 1-12 均存在于 requirements.md）
-- [x] checkbox 语法正确（`- [ ]`）
+- [x] checkbox 语法正确（`- [ ]` / `- [x]`）
 - [x] 无 markdown 格式错误
 - [x] 一级标题为 `# Implementation Plan: abilities-relocation`
 - [x] `## Overview` section 存在
@@ -262,7 +261,7 @@
 - [x] 倒数第一个 top-level task 是 Code Review（Task 9）
 - [x] 倒数第二个是文档收敛（Task 8）
 - [x] 倒数第三个是 E2E 测试（Task 7）
-- [x] 所有 task 使用 `- [ ]` checkbox 语法
+- [x] 所有 task 使用 `- [ ]` / `- [x]` checkbox 语法
 - [x] top-level task 有序号（1-9），sub-task 有层级序号
 - [x] 序号连续，无跳号
 - [x] 每个实现类 sub-task 引用了对应的 Requirement 编号
@@ -273,6 +272,7 @@
 - [○] Graphify 跨模块依赖校验：graphify_ready = false，跳过
 - [x] checkpoint 存在（每个 top-level task 1-6, 8 均有）
 - [x] checkpoint 包含具体验证命令（`./vendor/bin/phpunit`）和 commit 动作
+- [x] commit message 符合 git-conventions.md 格式（修正后）
 - [x] 推荐 test-first 顺序已遵循（RED→GREEN 模式）
 - [x] 每个 sub-task 足够具体，可独立 session 执行
 - [x] 无过粗或过细的 task
@@ -293,16 +293,16 @@
 - [x] 每个 sub-task 描述足够自包含
 - [x] checkpoint + E2E 测试 + 文档收敛 + code review 构成完整验收闭环
 - [x] 排序和依赖关系清晰
-- [x] TDG section 存在，使用 `{"waves": [...]}` JSON 格式（修正后）
+- [x] TDG section 存在，使用 `{"waves": [...]}` JSON 格式
 - [x] TDG JSON 使用 ```json``` 代码块包裹
 - [x] TDG 中的 task ID 与 sub-task 编号一致
 - [x] wave 顺序反映正确的依赖关系（修正后）
-- [x] 同一 wave 内的 task 确实可并行（修正后）
+- [x] 同一 wave 内的 task 满足并行安全条件（修正后）
 - [x] 所有 leaf sub-task 都出现在 TDG 中
 - [x] 文档收敛 top-level task 存在（Task 8）
-- [x] 包含 state 文档更新 sub-task（8.1）（修正后）
-- [x] 包含 manual 文档更新 sub-task（8.2）（修正后）
-- [x] 包含 migration guide sub-task（8.3）（修正后）
-- [x] 包含 checkpoint sub-task（8.4）（修正后）
+- [x] 包含 state 文档更新 sub-task（8.1）
+- [x] 包含 manual 文档更新 sub-task（8.2）
+- [x] 包含 migration guide sub-task（8.3）
+- [x] 包含 checkpoint sub-task（8.4）
 - [x] 文档收敛内容与 design.md 的 Impact Analysis 一致
 
