@@ -66,12 +66,13 @@ Main-agent 负责调度和验收，不直接写代码。
 
 ### 2.4 Pre-existing Failure Review（当前 wave）
 
-1. 输出："§2.4.1 审查 wave <id> 的 pre-existing failure 合规情况……"
-2. 审查当前 wave 内每个 sub-agent 的完成汇报，确认是否存在 pre-existing failure
-3. 判定标准：sub-agent 汇报中存在任何测试失败，且用户**未在本轮 prompt 中明确说过**这些 failure 可以忽略 → 视为不合规，必须处理。"与本次变更无关"、"pre-existing"、"已知问题"等理由**不构成**忽略依据。
-4. 不合规时 → **回到 §2.3**，派发新的 sub-agent 专门修复这些 failure（按 execution-model 异常处理流程，最多 3 次）
-5. 新 sub-agent 完成后，再次执行本步骤检查，直到无不合规情况
-6. 输出："§2.4.6 wave <id> 审查完成。结果：<无 failure / 已修复 / 用户确认可忽略>"
+1. 输出："§2.4.1 审查 wave <id> 的测试结果……"
+2. 检查当前 wave 内 sub-agent 汇报的测试结果，是否存在任何失败（无论原因）
+3. **硬规则**：存在失败 → 检查用户是否在本轮对话中明确说过这些 failure 可以忽略
+   - 用户说了可忽略 → 合规，继续
+   - 用户没说 → **不合规**。禁止以任何理由（包括"与本次变更无关"、"pre-existing"、"已知问题"、"不影响当前 task"）自行判定为合规。回到 §2.3，派发新 sub-agent 修复（按 execution-model，最多 3 次）
+4. 无失败 → 合规，继续
+5. 输出："§2.4.5 wave <id> 审查完成。结果：<全部通过 / 已修复 / 用户确认可忽略 / 不合规已派发修复>"
 
 ### 2.5 Wave 汇总
 
