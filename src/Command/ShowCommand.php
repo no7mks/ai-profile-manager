@@ -24,11 +24,14 @@ final class ShowCommand extends Command
         parent::__construct();
     }
 
+    private const KNOWN_TYPES = ['rule', 'agent', 'skill', 'hook', 'gitignore', 'preset'];
+
     protected function configure(): void
     {
         $this->setName('show');
-        $this->setDescription('Show all installable skills, agents, and rules with install status and preset mapping.');
+        $this->setDescription('Show all installable skills, agents, rules, and hooks with install status and preset mapping.');
         $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
+        $this->addOption('type', null, InputOption::VALUE_REQUIRED, 'Filter output by ability type.');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -44,6 +47,14 @@ final class ShowCommand extends Command
             return Command::FAILURE;
         }
 
+        /** @var string|null $typeFilter */
+        $typeFilter = $input->getOption('type');
+        if ($typeFilter !== null && !in_array($typeFilter, self::KNOWN_TYPES, true)) {
+            $io->error(sprintf('Unknown type: %s. Known types: %s.', $typeFilter, implode(', ', self::KNOWN_TYPES)));
+
+            return Command::FAILURE;
+        }
+
         $available = $this->installer->listAvailableItems();
         $results = $this->checker->checkTyped($available, $targets);
         $installedMap = $this->buildInstalledMap($results, $targets);
@@ -52,9 +63,19 @@ final class ShowCommand extends Command
         $io->writeln('Targets: ' . implode(', ', $targets));
         $io->newLine();
 
-        $this->renderTypeSection($io, 'Skills', 'skill', $available['skills'], $installedMap, $presetMap);
-        $this->renderTypeSection($io, 'Agents', 'agent', $available['agents'], $installedMap, $presetMap);
-        $this->renderTypeSection($io, 'Rules', 'rule', $available['rules'], $installedMap, $presetMap);
+        $sections = [
+            ['title' => 'Skills', 'type' => 'skill', 'items' => $available['skills']],
+            ['title' => 'Agents', 'type' => 'agent', 'items' => $available['agents']],
+            ['title' => 'Rules', 'type' => 'rule', 'items' => $available['rules']],
+            ['title' => 'Hooks', 'type' => 'hook', 'items' => $available['hooks']],
+        ];
+
+        foreach ($sections as $section) {
+            if ($typeFilter !== null && $section['type'] !== $typeFilter) {
+                continue;
+            }
+            $this->renderTypeSection($io, $section['title'], $section['type'], $section['items'], $installedMap, $presetMap);
+        }
 
         return Command::SUCCESS;
     }
