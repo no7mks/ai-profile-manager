@@ -13,7 +13,7 @@ final class Installer
     private readonly string $packageRoot;
 
     public function __construct(
-        private readonly ?AbilityRegistry $registry = null,
+        private readonly AbilityRegistry $registry = new AbilityRegistry(__DIR__ . '/../../abilities.yaml'),
         private readonly HookInstaller $hookInstaller = new HookInstaller(),
         private readonly HookChecker $hookChecker = new HookChecker(),
         private readonly GitIgnoreTemplateService $gitIgnore = new GitIgnoreTemplateService(),
@@ -134,18 +134,6 @@ final class Installer
      */
     public function listAvailableItems(): array
     {
-        if ($this->registry !== null) {
-            return $this->listFromRegistry();
-        }
-
-        return $this->listFromFilesystem();
-    }
-
-    /**
-     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks: array<int, string>}
-     */
-    private function listFromRegistry(): array
-    {
         $parsed = $this->registry->parse();
 
         $skills = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['skills']);
@@ -163,79 +151,6 @@ final class Installer
             'rules' => array_values($rules),
             'agents' => array_values($agents),
             'hooks' => array_values($hooks),
-        ];
-    }
-
-    /**
-     * Legacy filesystem-based listing (used when no AbilityRegistry is injected).
-     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks: array<int, string>}
-     */
-    private function listFromFilesystem(): array
-    {
-        $skills = [];
-        $skillsRoot = $this->packageRoot . '/abilities/skills';
-        if (is_dir($skillsRoot)) {
-            foreach (scandir($skillsRoot) ?: [] as $entry) {
-                if ($entry === '.' || $entry === '..') {
-                    continue;
-                }
-                if (is_dir($skillsRoot . '/' . $entry)) {
-                    $skills[] = $entry;
-                }
-            }
-        }
-
-        $agents = [];
-        $agentsRoot = $this->packageRoot . '/abilities/agents';
-        if (is_dir($agentsRoot)) {
-            foreach (scandir($agentsRoot) ?: [] as $entry) {
-                if ($entry === '.' || $entry === '..') {
-                    continue;
-                }
-                $fullPath = $agentsRoot . '/' . $entry;
-                if (!is_file($fullPath)) {
-                    continue;
-                }
-                if (!preg_match('/^(.+)\.(cursor|kiro)\.md$/', $entry, $matches)) {
-                    continue;
-                }
-                $agents[] = $matches[1];
-            }
-        }
-
-        $rules = [];
-        $rulesRoot = $this->packageRoot . '/abilities/rules';
-        if (is_dir($rulesRoot)) {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($rulesRoot, RecursiveDirectoryIterator::SKIP_DOTS)
-            );
-            foreach ($iterator as $fileInfo) {
-                if (!$fileInfo->isFile()) {
-                    continue;
-                }
-                $basename = $fileInfo->getBasename();
-                foreach (['.cursor.mdc', '.cursor.md', '.kiro.md', '.kiro.mdc'] as $suffix) {
-                    if (!str_ends_with($basename, $suffix)) {
-                        continue;
-                    }
-                    $rules[] = substr($basename, 0, -strlen($suffix));
-                    break;
-                }
-            }
-        }
-
-        $skills = array_values(array_unique($skills));
-        $agents = array_values(array_unique($agents));
-        $rules = array_values(array_unique($rules));
-        sort($skills);
-        sort($agents);
-        sort($rules);
-
-        return [
-            'skills' => $skills,
-            'rules' => $rules,
-            'agents' => $agents,
-            'hooks' => [],
         ];
     }
 

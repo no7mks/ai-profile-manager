@@ -15,7 +15,11 @@ final class ConsoleRegistrationTest extends TestCase
 {
     public function testRegisterAddsAllNamedCommands(): void
     {
-        $installer = new Installer();
+        $tmp = sys_get_temp_dir() . '/apm-reg-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        file_put_contents($tmp . '/abilities.yaml', "skills: []\n");
+        $registry = new \AiProfileManager\Service\AbilityRegistry($tmp . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, packageRoot: $tmp);
         $checker = new CheckService();
         $updater = new KnowledgeBaseUpdater();
 

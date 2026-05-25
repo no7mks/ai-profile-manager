@@ -149,15 +149,32 @@ final class InstallerTest extends TestCase
     public function testListAvailableItemsCollectsSkillsAgentsRules(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-list-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
-        mkdir($pkg . '/abilities/rules/spec', 0775, true);
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.cursor.mdc', 'x');
-        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.kiro.md', 'x');
-        file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', 'x');
-        file_put_contents($pkg . '/abilities/agents/code-reviewer.kiro.md', 'x');
+        mkdir($pkg, 0775, true);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        // Create abilities.yaml with skills, rules, agents
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: Graphify skill',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+            '      kiro: .kiro/skills/graphify',
+            'rules:',
+            '  - path: spec-goal',
+            '    description: Spec goal rule',
+            '    targets:',
+            '      cursor: .cursor/rules/spec/spec-goal.mdc',
+            '      kiro: .kiro/steering/spec/spec-goal.md',
+            'agents:',
+            '  - path: code-reviewer',
+            '    description: Code reviewer agent',
+            '    targets:',
+            '      cursor: .cursor/agents/code-reviewer.md',
+            '      kiro: .kiro/agents/code-reviewer.md',
+        ]) . "\n");
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $items = $installer->listAvailableItems();
 
         self::assertSame(['graphify'], $items['skills']);
@@ -211,16 +228,37 @@ final class InstallerTest extends TestCase
     public function testListAvailableItemsIgnoresInvalidAgentAndSortsNames(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-list-sort-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/zeta', 0775, true);
-        mkdir($pkg . '/abilities/skills/alpha', 0775, true);
-        mkdir($pkg . '/abilities/rules/git', 0775, true);
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/git/b-rule.cursor.mdc', 'x');
-        file_put_contents($pkg . '/abilities/rules/git/a-rule.kiro.md', 'x');
-        file_put_contents($pkg . '/abilities/agents/reviewer.cursor.md', 'x');
-        file_put_contents($pkg . '/abilities/agents/README.txt', 'x');
+        mkdir($pkg, 0775, true);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        // Create abilities.yaml with multiple entries to verify sorting
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: zeta',
+            '    description: Zeta skill',
+            '    targets:',
+            '      cursor: .cursor/skills/zeta',
+            '  - path: alpha',
+            '    description: Alpha skill',
+            '    targets:',
+            '      cursor: .cursor/skills/alpha',
+            'rules:',
+            '  - path: b-rule',
+            '    description: B rule',
+            '    targets:',
+            '      cursor: .cursor/rules/git/b-rule.mdc',
+            '  - path: a-rule',
+            '    description: A rule',
+            '    targets:',
+            '      kiro: .kiro/steering/git/a-rule.md',
+            'agents:',
+            '  - path: reviewer',
+            '    description: Reviewer agent',
+            '    targets:',
+            '      cursor: .cursor/agents/reviewer.md',
+        ]) . "\n");
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $items = $installer->listAvailableItems();
 
         self::assertSame(['alpha', 'zeta'], $items['skills']);
