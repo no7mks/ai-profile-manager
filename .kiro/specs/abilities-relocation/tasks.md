@@ -117,7 +117,7 @@
     - 更新 `docs/state/architecture.md`（Installer 模块描述更新）
     - commit: `*(service): integrate hook dispatch and --force uninstall in Installer`
 
-- [ ] 6. ShowCommand 修改
+- [-] 6. ShowCommand 修改
   - [ ] 6.1 实现 ShowCommand hook 展示与类型过滤
     - 编写测试：show 输出包含 Hooks 分区、--type hook 仅输出 hook 分区、未知类型返回错误、无 hook 时显示空状态、无过滤时包含所有分区
     - 确认测试失败（RED）

@@ -20,4 +20,4 @@ description: Kiro 平台专属规则，始终生效
 
 ## 执行任务
 
-- 当执行任务时，请务必确保 spec-execution SKILL 已被激活。
+- 当执行 tasks.md 中的任务时，请务必确保 spec-execution SKILL 已被激活。
