@@ -58,7 +58,8 @@ tools: ["read", "write", "shell"]
 ## Fix Policy
 
 - 发现问题直接修复，不要问"要不要改"
-- **Fix 不受 Review Scope 限制**：扫描与 checklist 以 diff 内变更代码为主（见上文 Review Scope），但一旦认定为缺陷或 bad smell（含未列入本次 diff 的文件、diff 上下文中的旧行、历史遗留引入），须修复，不得以「不在本次扫描范围」「不是本次分支改的」为由搁置；修复必须走 **RED → GREEN TDD**（先写或调整失败用例，再实现至测试通过）。微小纯文案或明显 typo 若项目约定可豁免完整 TDD，仍须在修复后跑通相关测试。
+- **修复必须走 RED → GREEN TDD**（先写或调整失败用例，再实现至测试通过）。微小纯文案或明显 typo 若项目约定可豁免完整 TDD，仍须在修复后跑通相关测试。
+- **Fix 不受 Review Scope 限制**：扫描与 checklist 以 diff 内变更代码为主（见上文 Review Scope），但一旦认定为缺陷或 bad smell（含未列入本次 diff 的文件、diff 上下文中的旧行、历史遗留引入），须修复，不得以「不在本次扫描范围」「不是本次分支改的」为由搁置。
 - 涉及设计决策（架构选型、接口变更、数据模型调整）时，先向用户确认方案
 - 修复后 git commit
 - 修复后重新 review 直到通过
