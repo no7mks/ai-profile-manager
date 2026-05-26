@@ -142,7 +142,7 @@ Release 时将 `docs/changes/unreleased/` rename 为 `docs/changes/<version>/`�
 
 ## 初始化约定
 
-新项目通过 `apm install` 初始化时，各子目录以 `.gitkeep` 占位确保目录结构存在：
+新项目初始化后（`apm install` bootstrap），各子目录应以 `.gitkeep` 占位确保目录结构存在：
 
 - `docs/state/.gitkeep`
 - `docs/manual/.gitkeep`
