@@ -101,30 +101,54 @@ PHP;
 
     // ─── Fixture helpers ─────────────────────────────────────────────
 
+    /**
+     * Create a skill source in the package root (new layout: directly at target path).
+     * Per PRP-001, skills live at .<target>/skills/<name>/ in the package root.
+     */
     protected function createSkillSource(string $name, string $content = "# Skill\n"): void
     {
-        $dir = $this->packageRoot . '/abilities/skills/' . $name;
-        mkdir($dir, 0775, true);
-        file_put_contents($dir . '/SKILL.md', $content);
+        // New layout: source IS the target path within the package root
+        foreach (['cursor', 'kiro'] as $target) {
+            $prefix = $target === 'cursor' ? '.cursor' : '.kiro';
+            $dir = "{$this->packageRoot}/{$prefix}/skills/{$name}";
+            if (!is_dir($dir)) {
+                mkdir($dir, 0775, true);
+            }
+            file_put_contents("{$dir}/SKILL.md", $content);
+        }
     }
 
+    /**
+     * Create a rule source in the package root (new layout: directly at target path).
+     * Per PRP-001, rules live at .cursor/rules/<category>/<name>.mdc or .kiro/steering/<category>/<name>.md.
+     */
     protected function createRuleSource(string $name, string $category, string $target, string $content = "rule\n"): void
     {
-        $dir = $this->packageRoot . '/abilities/rules/' . $category;
+        if ($target === 'cursor') {
+            $dir = "{$this->packageRoot}/.cursor/rules/{$category}";
+            $file = "{$name}.mdc";
+        } else {
+            $dir = "{$this->packageRoot}/.kiro/steering/{$category}";
+            $file = "{$name}.md";
+        }
         if (!is_dir($dir)) {
             mkdir($dir, 0775, true);
         }
-        $suffix = $target === 'cursor' ? '.cursor.mdc' : '.kiro.md';
-        file_put_contents($dir . '/' . $name . $suffix, $content);
+        file_put_contents("{$dir}/{$file}", $content);
     }
 
+    /**
+     * Create an agent source in the package root (new layout: directly at target path).
+     * Per PRP-001, agents live at .<target>/agents/<name>.md.
+     */
     protected function createAgentSource(string $name, string $target, string $content = "# Agent\n"): void
     {
-        $dir = $this->packageRoot . '/abilities/agents';
+        $prefix = $target === 'cursor' ? '.cursor' : '.kiro';
+        $dir = "{$this->packageRoot}/{$prefix}/agents";
         if (!is_dir($dir)) {
             mkdir($dir, 0775, true);
         }
-        file_put_contents($dir . '/' . $name . '.' . $target . '.md', $content);
+        file_put_contents("{$dir}/{$name}.md", $content);
     }
 
     protected function createHookSourceKiro(string $name, string $content): void
