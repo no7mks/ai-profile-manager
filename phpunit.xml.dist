@@ -2,6 +2,7 @@
 <phpunit
     bootstrap="vendor/autoload.php"
     colors="true"
+    defaultTestSuite="apm"
 >
     <source>
         <include>
@@ -11,6 +12,10 @@
     <testsuites>
         <testsuite name="apm">
             <directory>tests</directory>
+            <exclude>tests/E2E</exclude>
+        </testsuite>
+        <testsuite name="e2e">
+            <directory>tests/E2E</directory>
         </testsuite>
     </testsuites>
 </phpunit>
