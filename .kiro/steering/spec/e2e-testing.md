@@ -97,7 +97,7 @@ E2E 测试作为一个大的 task，按以下流程执行：
 
 ## 测试资源目录
 
-统一存放在 `<spec-dir>/<spec-name>/tests/` 目录下（进入版本控制），随 spec 一起归档到 `docs/changes/<version>/specs/`：
+统一存放在 `<spec-dir>/<spec-name>/tests/` 目录下（进入版本控制），随 spec 一起归档到 `changes/<version>/specs/`：
 
 - Feature 示例：`<spec-dir>/resume-deduplication/tests/`
 - Release 示例：`<spec-dir>/release-0.4/tests/`

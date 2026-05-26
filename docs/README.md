@@ -12,7 +12,8 @@
 | manual | `docs/manual/` | 使用说明（面向人） |
 | proposals | `docs/proposals/` | 正式需求提案（scope + 目标 + 生命周期） |
 | notes | `docs/notes/` | 轻量暂存（观察、想法、改进方向） |
-| changes | `docs/changes/` | 归档（已完成使命的文档按版本组织） |
+
+归档目录已独立为根目录级 `changes/`，详见 `changes/README.md`。
 
 ---
 
@@ -101,45 +102,6 @@
 
 ---
 
-## `docs/changes/`
-
-### 作用
-
-归档已完成使命的文档，按版本组织历史。
-
-### 结构
-
-```
-docs/changes/
-├── unreleased/          # 当前开发周期已归档但未发布
-│   ├── notes/           # 已解决的 note
-│   ├── proposals/       # 已 implemented 的 proposal
-│   └── fixed/           # 已关闭的 issue
-└── <version>/           # Release 后的版本归档
-    ├── notes/
-    ├── proposals/
-    └── fixed/
-```
-
-### 归档入口
-
-| 来源 | 触发时机 | 归档目标 |
-|------|---------|---------|
-| `docs/notes/<name>.md` | note 已解决 | `docs/changes/unreleased/notes/` |
-| `docs/proposals/<name>.md` | proposal status → implemented | `docs/changes/unreleased/proposals/` |
-| `issues/<name>.md` | issue closed | `docs/changes/unreleased/fixed/` |
-
-### Release 归档
-
-Release 时将 `docs/changes/unreleased/` rename 为 `docs/changes/<version>/`，然后重建空的 unreleased 子目录。
-
-### 与根 CHANGELOG.md 的关系
-
-- 根 `CHANGELOG.md`：版本摘要索引，面向用户的变更概述。
-- `docs/changes/<version>/`：该版本归档的完整文档原文。
-
----
-
 ## 初始化约定
 
 新项目初始化后（`apm install` bootstrap），各子目录应以 `.gitkeep` 占位确保目录结构存在：
@@ -148,8 +110,5 @@ Release 时将 `docs/changes/unreleased/` rename 为 `docs/changes/<version>/`�
 - `docs/manual/.gitkeep`
 - `docs/notes/.gitkeep`
 - `docs/proposals/.gitkeep`
-- `docs/changes/unreleased/notes/.gitkeep`
-- `docs/changes/unreleased/proposals/.gitkeep`
-- `docs/changes/unreleased/fixed/.gitkeep`
 
 目录内有实际文件后，对应 `.gitkeep` 可移除。

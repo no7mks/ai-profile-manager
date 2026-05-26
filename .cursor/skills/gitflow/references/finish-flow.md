@@ -31,8 +31,9 @@ git branch --show-current
    - 确认 state / manual 一致性
    - 更新 CHANGELOG `[Unreleased]`
    - 统一提交
-4. 切回 `develop` 并合并 feature：`git merge --no-ff feature/<name> -m "merge feature/<name> into develop"`
-5. 归档 proposal（status `in-progress -> implemented`，移入 `docs/changes/unreleased/proposals/`），提交
+4. Spec 归档：`mv .kiro/specs/<spec-name>/ → changes/unreleased/specs/<spec-name>/`
+5. 切回 `develop` 并合并 feature：`git merge --no-ff feature/<name> -m "merge feature/<name> into develop"`
+6. 归档 proposal（status `in-progress -> implemented`，移入 `changes/unreleased/proposals/`），提交
 
 ## Release Finish
 
@@ -43,13 +44,17 @@ git branch --show-current
 
 步骤：
 
-1. Issue 收敛（release issues + 项目级 issues + Found In/Fixed In tag review）
+1. Issue 收敛：
+   - 找出 `issues/` 中 status=closed 的 issue
+   - Review Found In / Fixed In，替换为正式 release tag
+   - `mv` 到 `issues/fixed/`
 2. 文档收敛（按 doc-convergence steering 执行）：
-   - Release 归档：`docs/changes/unreleased/` rename 为 `docs/changes/<version>/`
+   - Release 归档：`changes/unreleased/` rename 为 `changes/<version>/`
+   - 在 `changes/<version>/CHANGELOG.md` 中记录本版本修复的 issue 编号
    - 版本 CHANGELOG：将 `[Unreleased]` 归入新版本小节
-   - spec 归档
+   - Spec 归档（如有未归档的 spec）
    - proposal status → `released`
-   - 重建空的 `docs/changes/unreleased/{notes,proposals,fixed}/`
+   - 重建空的 `changes/unreleased/{notes,proposals,specs}/`
    - 确认 state/manual 一致性
 3. 更新版本号声明，测试通过
 4. 提交收敛变更，并在 release 分支预检冲突：
@@ -71,8 +76,15 @@ git branch --show-current
 
 步骤：
 
-1. 归档 issues（status → `closed`，填写 `Fixed In`，移入 `docs/changes/unreleased/fixed/`）
-2. 文档收敛（按 doc-convergence steering 执行）：版本 CHANGELOG、根 CHANGELOG、确认 state/manual 一致性、归档 notes
+1. Issue 收敛：
+   - 找出 `issues/` 中 status=closed 的 issue
+   - Review Found In / Fixed In，替换为正式 hotfix tag
+   - `mv` 到 `issues/fixed/`
+2. 文档收敛（按 doc-convergence steering 执行）：
+   - 版本 CHANGELOG、根 CHANGELOG
+   - 在 `changes/<version>/CHANGELOG.md` 中记录本版本修复的 issue 编号
+   - 确认 state/manual 一致性
+   - 归档 notes
 3. 更新 patch 版本号声明并测试通过
 4. 提交收敛变更，并在 hotfix 分支预检冲突：
    - `git merge --no-ff master -m "merge master into hotfix/<version>"`

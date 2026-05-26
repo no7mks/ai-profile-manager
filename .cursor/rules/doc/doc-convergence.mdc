@@ -1,12 +1,12 @@
 ---
-description: 文档归档操作规范——notes/proposals/issues 的归档判定与操作
+description: 文档归档操作规范——notes/proposals/specs/issues 的归档判定与操作
 globs:
 alwaysApply: false
 ---
 
 # Doc Convergence
 
-文档归档的操作规范。定义何时、如何将已完成使命的文档移入 `docs/changes/`。
+文档归档的操作规范。定义何时、如何将已完成使命的文档归档。
 
 ---
 
@@ -29,21 +29,29 @@ alwaysApply: false
 
 ### 操作
 
-已解决的 note：`mv docs/notes/<name>.md → docs/changes/unreleased/notes/<name>.md`
+已解决的 note：`mv docs/notes/<name>.md → changes/unreleased/notes/<name>.md`
 
 ---
 
 ## 归档 Proposals
 
 - 将 proposal status 更新为 `implemented`。
-- `mv docs/proposals/<name>.md → docs/changes/unreleased/proposals/<name>.md`
+- `mv docs/proposals/<name>.md → changes/unreleased/proposals/<name>.md`
+
+---
+
+## 归档 Specs
+
+- 由 gitflow finish 流程触发。
+- `mv .kiro/specs/<name>/ → changes/unreleased/specs/<name>/`
 
 ---
 
 ## 归档 Issues
 
-- 将 issue status 更新为 `closed`，填写 `Fixed In` 版本。
-- `mv issues/<name>.md → docs/changes/unreleased/fixed/<name>.md`
+- 将 issue status 更新为 `closed`，填写 `Fixed In`。
+- issue 文件留在 `issues/` 原位（status=closed 表示已修复未发布）。
+- release/hotfix finish 时，review tag 后 `mv issues/<name>.md → issues/fixed/<name>.md`。
 
 ---
 
@@ -82,6 +90,7 @@ alwaysApply: false
 
 ## Release 归档
 
-1. 将 `docs/changes/unreleased/` rename 为 `docs/changes/<version>/`。
-2. 重建空的 `docs/changes/unreleased/{notes,proposals,fixed}/`（含 `.gitkeep`）。
-3. 根 `CHANGELOG.md` 中将 `[Unreleased]` 内容归入新版本小节并标注日期。
+1. 将 `changes/unreleased/` rename 为 `changes/<version>/`。
+2. 在 `changes/<version>/CHANGELOG.md` 中记录本版本修复的 issue 编号。
+3. 重建空的 `changes/unreleased/{notes,proposals,specs}/`（含 `.gitkeep`）。
+4. 根 `CHANGELOG.md` 中将 `[Unreleased]` 内容归入新版本小节并标注日期。
