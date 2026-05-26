@@ -18,9 +18,9 @@ Feature/Release/Hotfix Finish 时的文档收敛操作细则。
 
 逐个检查 `docs/notes/` 下的文件：
 
-1. **已解决**：note 描述的问题/想法已在本次 feature 中实现或被 proposal 覆盖。
+1. **已解决**：note 描述的问题/想法已落地（无论在哪个分支实现）。
 2. **部分解决**：部分内容已落地，部分仍 open——更新 note 内容标注已解决项，保留原位。
-3. **未解决**：与本次 feature 无关或仍未推进——保留原位不动。
+3. **未解决**：内容仍未推进——保留原位不动。
 
 ### 操作
 
@@ -43,7 +43,7 @@ Feature/Release/Hotfix Finish 时的文档收敛操作细则。
 
 ---
 
-## Issues 处理（Hotfix/Bugfix Finish）
+## Issues 处理（Hotfix Finish）
 
 - 将 issue status 更新为 `closed`，填写 `Fixed In` 版本。
 - `mv issues/<name>.md → docs/changes/unreleased/fixed/<name>.md`
@@ -54,7 +54,7 @@ Feature/Release/Hotfix Finish 时的文档收敛操作细则。
 
 ### 覆盖维度
 
-检查 feature 分支的 commit 历史，按以下分类整理 `[Unreleased]` 条目：
+检查分支的 commit 历史，按以下分类整理 `[Unreleased]` 条目：
 
 | 分类 | 判定依据 |
 |------|---------|
@@ -76,12 +76,12 @@ Feature/Release/Hotfix Finish 时的文档收敛操作细则。
 
 ### 检查方法
 
-1. **State**：对照本次 feature 的 spec requirements，确认每个已实现需求在 `docs/state/` 中有对应行为描述。
-2. **Manual**：确认 `docs/manual/` 中的使用说明与实际 CLI 行为一致（命令签名、参数、示例输出）。
+1. **State**：对照本次变更涉及的需求，确认每个已实现需求在 `docs/state/` 中有对应行为描述。
+2. **Manual**：确认 `docs/manual/` 中的使用说明与实际行为一致。
 
 ### 常见遗漏
 
-- 新增命令/选项未写入 manual。
+- 新增功能未写入 manual。
 - 移除功能未从 manual 删除。
 - State 中残留已废弃模块的描述。
 
