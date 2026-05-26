@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Command;
 
-use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,7 +14,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class PresetRemoveAbilityCommand extends Command
 {
-    public function __construct(private readonly CaptureService $capture)
+    public function __construct()
     {
         parent::__construct();
     }
@@ -23,16 +22,12 @@ final class PresetRemoveAbilityCommand extends Command
     protected function configure(): void
     {
         $this->setName('preset:remove-ability');
-        $this->setDescription('Remove one ability reference from a preset and emit capture when manifest changes.');
+        $this->setDescription('Remove one ability reference from a preset.');
         $this->addArgument('preset', InputArgument::REQUIRED, 'Preset name.');
         $this->addArgument('ability', InputArgument::REQUIRED, 'Ability name.');
         $this->addOption('skill', null, InputOption::VALUE_NONE, 'Treat ability as a skill.');
         $this->addOption('rule', null, InputOption::VALUE_NONE, 'Treat ability as a rule.');
         $this->addOption('agent', null, InputOption::VALUE_NONE, 'Treat ability as an agent.');
-        $this->addOption('source-repo', null, InputOption::VALUE_OPTIONAL, 'Source repository identifier.', 'unknown/unknown');
-        $this->addOption('source-commit', null, InputOption::VALUE_OPTIONAL, 'Source commit sha.', 'unknown');
-        $this->addOption('change-id', null, InputOption::VALUE_OPTIONAL, 'Change identifier.');
-        $this->addOption('captured-at', null, InputOption::VALUE_OPTIONAL, 'Capture timestamp (ISO 8601).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -66,30 +61,8 @@ final class PresetRemoveAbilityCommand extends Command
         $all[$presetName] = $spec;
         $registry->saveToWorkspace($all);
 
-        $r = $this->capture->persistPresetManifestCapture(
-            $cwd,
-            (string) $input->getOption('source-repo'),
-            (string) $input->getOption('source-commit'),
-            (string) ($input->getOption('change-id') ?: ''),
-            (string) ($input->getOption('captured-at') ?: gmdate(DATE_ATOM)),
-        );
+        $io->writeln(sprintf('[ok] Removed %s from preset %s (%s).', $ability, $presetName, $key));
 
-        if ($r['baseline_missing']) {
-            $io->error('Could not resolve Composer baseline.');
-
-            return Command::FAILURE;
-        }
-
-        if ($r['unchanged']) {
-            $io->writeln('[ok] Manifest matches baseline (no change written).');
-
-            return Command::SUCCESS;
-        }
-
-        if ($r['path'] !== null) {
-            $io->writeln(sprintf('[ok] Change written to changes dir: %s', $r['path']));
-        }
-
-        return $r['exit_code'];
+        return Command::SUCCESS;
     }
 }

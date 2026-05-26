@@ -1,5 +1,5 @@
 ---
-description: Superpowers 插件与项目 spec 流程的集成约束。spec-planner 写 plan 或 spec-execution 执行 task 时读取。
+description: 当执行 spec planning 或 spec task 时读取。Superpowers 插件与项目 spec 流程的集成约束。
 alwaysApply: false
 ---
 

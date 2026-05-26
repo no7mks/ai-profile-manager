@@ -1,0 +1,152 @@
+---
+description: Spec gatekeeper 校验 requirements 阶段的详细指引。由 spec-gatekeeper agent 在校验 requirements.md 时读取。
+alwaysApply: false
+---
+
+# Requirements Gatekeep 指引
+
+本文件定义 requirements.md 的校验标准。Gatekeeper 按以下清单逐项检查，发现问题直接修正。
+
+---
+
+## 执行顺序
+
+1. 机械扫描
+2. 结构校验
+3. 术语表校验
+4. Requirement 条款校验
+5. Socratic Review 校验
+6. 目的性审查
+7. 将修正项写入 Gatekeep Log
+8. 生成 Clarification Round（为 design 阶段准备）
+9. Completion：向 main-agent 返回结果
+
+---
+
+## 1. 机械扫描
+
+- [ ] 无 TBD / TODO / 待定 / 占位符
+- [ ] 无空 section 或不完整的列表
+- [ ] 内部引用一致（requirement 编号、术语表中的术语在正文中使用）
+- [ ] 无 markdown 格式错误（未闭合的代码块、错误的标题层级）
+
+发现问题直接修正，不需要在 Gatekeep Log 中逐一列出机械扫描的修正。
+
+---
+
+## 2. 结构校验
+
+requirements.md 必须包含以下 section，且顺序正确：
+
+| 序号 | Section | 必要性 | 说明 |
+|------|---------|--------|------|
+| 1 | `# Requirements Document` | 必须 | 一级标题，严格匹配此文字 |
+| 2 | `## Introduction` | 必须 | 一段话说明 feature 范围，明确列出不涉及的内容 |
+| 3 | `## Glossary` | 必须 | 术语表，`- **Term**: 定义` 格式 |
+| 4 | `## Requirements` | 必须 | 需求条款，每条为 `### Requirement N: 名称` |
+
+Release spec 结构不同，必须包含：`# Release <version> Requirements`、`## 发布范围`、`## Feature 概要`、`## 已知 Issue 评估`、`## 发布判定`。
+
+### 检查项
+
+- [ ] 一级标题为 `# Requirements Document`（严格匹配）
+- [ ] Introduction 存在，描述了 feature 范围，明确了 Non-scope
+- [ ] Glossary 存在且非空
+- [ ] Requirements section 存在且包含至少一条 requirement
+- [ ] 各 section 之间使用 `---` 分隔
+
+---
+
+## 3. 术语表校验
+
+- [ ] Glossary 中的术语在正文 AC 中被实际使用（无孤立术语）
+- [ ] AC 中使用的领域概念在 Glossary 中有定义（无未定义术语）
+- [ ] 术语格式为 `- **Term**: 定义`（加粗术语名 + 冒号 + 定义）
+
+---
+
+## 4. Requirement 条款校验
+
+每条 requirement 必须包含 User Story（中文行文）和 Acceptance Criteria。
+
+### AC 语体校验
+
+- [ ] 使用 `THE <Subject> SHALL ...` 描述必须具备的行为
+- [ ] 使用 `WHEN <条件> THEN THE <Subject> SHALL ...` 描述触发条件下的行为
+- [ ] 使用 `IF <条件> THEN THE <Subject> SHALL ...` 描述异常/边界条件下的行为
+- [ ] Subject 使用 Glossary 中定义的术语（大写下划线形式）
+- [ ] AC 编号连续，无跳号
+
+### 内容边界校验
+
+Requirements 应聚焦外部可观察行为，不应包含实现细节。
+
+**不应出现**：具体库名/框架名、内部结构描述、实现策略、具体类名/方法签名。
+**可以出现**：质量属性、外部可观察的行为约束、Glossary 中定义的领域术语。
+
+> Glossary 中已定义的术语在 AC 中作为 Subject 使用是合理的。
+
+---
+
+## 5. Socratic Review 校验
+
+检查 `gk-logs.md` 中是否存在 `## Requirements Phase — Socratic Review` section。如果缺少，gatekeeper 应按 `gatekeeping/gk-log-format.mdc` 的格式补充，Q&A 至少覆盖：
+
+- 每条 requirement 是否都在描述外部可观察的行为？
+- 是否有遗漏的场景？（错误路径、边界条件、并发、幂等性等）
+- 各 requirement 之间是否存在矛盾或重叠？
+- 是否有隐含的前置假设没有显式列出？
+- 与 proposal 的 scope / non-goals 是否一致？
+- scope 边界是否清晰？
+
+---
+
+## 6. 目的性审查
+
+Requirements 的核心目的是：**让读者清楚地知道要做什么、不做什么、以及做到什么程度算完成**。
+
+### 审查清单
+
+- [ ] **Goal CR 回应**：goal.md 中 Clarification Round 的用户决策是否在 requirements 中体现。
+- [ ] **Goal 清晰度**：读完 Introduction 后能否一句话概括 feature 目标？
+- [ ] **Non-goal / Scope 边界**：是否明确了不涉及的内容？
+- [ ] **完成标准**：AC 整体是否构成充分的验收条件？
+- [ ] **可 design 性**：design 阶段的 agent 是否有足够信息开始技术方案设计？
+
+如果不达标，直接修正。修正后在 Gatekeep Log 中记录（修正类型为 `目的`）。
+
+---
+
+## 7. Gatekeep Log
+
+将校验过程中的修正项写入 requirements.md 末尾的 `## Gatekeep Log` section。
+
+---
+
+## 8. Clarification Round (CR)
+
+校验完成后，生成面向 design 阶段的 CR 问题（**3 个以上**）。
+
+CR 聚焦 **requirements 到 design 的衔接**——哪些行为描述存在多种合理的实现路径，需要用户在进入 design 前做出决策。
+
+聚焦方向：
+- AC 中是否存在多种合理的 design 路径？
+- 非功能约束是否足够明确？
+- 各 requirement 之间的交互是否有未显式约定的行为？
+- 是否有隐含的技术约束需要确认？
+- 边界条件的处理策略是否需要用户决策？
+
+**不应涉及**：scope 边界的"做不做"问题（属于 goal CR）、实现顺序/task 拆分（属于 gk-design CR）。
+
+每个问题提供 **至少 3 个选项**，写入 Gatekeep Log 的 `### Clarification Round` 小节。
+
+---
+
+## 9. Completion
+
+向 main-agent 返回：
+
+1. **校验结果摘要**：通过 / 已修正后通过，列出修正项
+2. **CR 待确认**：告知有待用户回答的 CR 问题
+
+Main-agent 收到后逐题与用户交互，将回答写入对应的 `**A:**` 行。

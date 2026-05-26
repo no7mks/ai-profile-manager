@@ -1,6 +1,6 @@
 ---
 inclusion: auto
-description: 涉及 graphify 用法的时候读取
+description: 当需要分析代码依赖关系、模块耦合度、架构可视化、影响范围评估、跨模块依赖查询、god node 检测、community 结构分析时读取
 ---
 
 # graphify — 项目知识图谱

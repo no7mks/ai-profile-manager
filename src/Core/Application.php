@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Core;
 
-use AiProfileManager\Capture\CaptureChangeIngestor;
-use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
@@ -30,12 +28,10 @@ final class Application
         KnowledgeBaseUpdater $updater,
     ): SymfonyApplication {
         $checker = new CheckService();
-        $capture = new CaptureService($checker);
-        $ingestor = new CaptureChangeIngestor();
 
         $app = new SymfonyApplication('apm', '0.6.3');
         $app->setDefaultCommand('list');
-        ConsoleRegistration::register($app, $installer, $checker, $capture, $ingestor, $updater);
+        ConsoleRegistration::register($app, $installer, $checker, $updater);
 
         return $app;
     }

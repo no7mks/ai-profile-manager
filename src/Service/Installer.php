@@ -13,6 +13,9 @@ final class Installer
     private readonly string $packageRoot;
 
     public function __construct(
+        private readonly AbilityRegistry $registry = new AbilityRegistry(__DIR__ . '/../../abilities.yaml'),
+        private readonly HookInstaller $hookInstaller = new HookInstaller(),
+        private readonly HookChecker $hookChecker = new HookChecker(),
         private readonly GitIgnoreTemplateService $gitIgnore = new GitIgnoreTemplateService(),
         private readonly ?string $templatePath = null,
         ?string $packageRoot = null,
@@ -22,19 +25,22 @@ final class Installer
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
+     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>} $items
      * @param array<int, string> $targets
      * @param string|null $presetName
      * @return array{lines: array<int, string>, exit_code: int}
      */
     public function installTyped(array $items, array $targets, ?string $presetName = null): array
     {
+        $hooks = $items['hooks'] ?? [];
+
         $lines = [];
         $lines[] = 'Installing profile items...';
         $lines[] = 'Targets: ' . implode(', ', $targets);
         $lines[] = 'Skills: ' . $this->formatList($items['skills']);
         $lines[] = 'Rules: ' . $this->formatList($items['rules']);
         $lines[] = 'Agents: ' . $this->formatList($items['agents']);
+        $lines[] = 'Hooks: ' . $this->formatList($hooks);
         $lines[] = '';
 
         $exitCode = 0;
@@ -61,6 +67,14 @@ final class Installer
                     $exitCode = 1;
                 }
             }
+            // hooks: dispatch to HookInstaller per target
+            foreach ($hooks as $hookName) {
+                $r = $this->installHook($hookName, $target);
+                $lines = array_merge($lines, $r['lines']);
+                if ($r['failed']) {
+                    $exitCode = 1;
+                }
+            }
         }
 
         $gitignoreResult = $this->installGitIgnore($items, $targets, $presetName);
@@ -72,19 +86,25 @@ final class Installer
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
+     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>} $items
      * @param array<int, string> $targets
+     * @param bool $force 是否强制卸载（跳过 drift 检查）
      * @return array{lines: array<int, string>, exit_code: int}
      */
-    public function uninstallTyped(array $items, array $targets): array
+    public function uninstallTyped(array $items, array $targets, bool $force = false): array
     {
+        $hooks = $items['hooks'] ?? [];
+
         $lines = [];
         $lines[] = 'Uninstalling profile items...';
         $lines[] = 'Targets: ' . implode(', ', $targets);
         $lines[] = 'Skills: ' . $this->formatList($items['skills']);
         $lines[] = 'Rules: ' . $this->formatList($items['rules']);
         $lines[] = 'Agents: ' . $this->formatList($items['agents']);
+        $lines[] = 'Hooks: ' . $this->formatList($hooks);
         $lines[] = '';
+
+        $exitCode = 0;
 
         foreach ($targets as $target) {
             foreach ($items['skills'] as $name) {
@@ -96,79 +116,41 @@ final class Installer
             foreach ($items['agents'] as $name) {
                 $lines = array_merge($lines, $this->uninstallAgent($name, $target));
             }
+            // hooks: dispatch to HookInstaller per target with drift check
+            foreach ($hooks as $hookName) {
+                $r = $this->uninstallHook($hookName, $target, $force);
+                $lines = array_merge($lines, $r['lines']);
+                if ($r['failed']) {
+                    $exitCode = 1;
+                }
+            }
         }
 
-        return ['lines' => $lines, 'exit_code' => 0];
+        return ['lines' => $lines, 'exit_code' => $exitCode];
     }
 
     /**
-     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}
+     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks: array<int, string>}
      */
     public function listAvailableItems(): array
     {
-        $skills = [];
-        $skillsRoot = $this->packageRoot . '/abilities/skills';
-        if (is_dir($skillsRoot)) {
-            foreach (scandir($skillsRoot) ?: [] as $entry) {
-                if ($entry === '.' || $entry === '..') {
-                    continue;
-                }
-                if (is_dir($skillsRoot . '/' . $entry)) {
-                    $skills[] = $entry;
-                }
-            }
-        }
+        $parsed = $this->registry->parse();
 
-        $agents = [];
-        $agentsRoot = $this->packageRoot . '/abilities/agents';
-        if (is_dir($agentsRoot)) {
-            foreach (scandir($agentsRoot) ?: [] as $entry) {
-                if ($entry === '.' || $entry === '..') {
-                    continue;
-                }
-                $fullPath = $agentsRoot . '/' . $entry;
-                if (!is_file($fullPath)) {
-                    continue;
-                }
-                if (!preg_match('/^(.+)\.(cursor|kiro)\.md$/', $entry, $matches)) {
-                    continue;
-                }
-                $agents[] = $matches[1];
-            }
-        }
+        $skills = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['skills']);
+        $rules = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['rules']);
+        $agents = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['agents']);
+        $hooks = array_map(static fn (AbilityEntry $e): string => $e->path, $parsed['hooks']);
 
-        $rules = [];
-        $rulesRoot = $this->packageRoot . '/abilities/rules';
-        if (is_dir($rulesRoot)) {
-            $iterator = new RecursiveIteratorIterator(
-                new RecursiveDirectoryIterator($rulesRoot, RecursiveDirectoryIterator::SKIP_DOTS)
-            );
-            foreach ($iterator as $fileInfo) {
-                if (!$fileInfo->isFile()) {
-                    continue;
-                }
-                $basename = $fileInfo->getBasename();
-                foreach (['.cursor.mdc', '.cursor.md', '.kiro.md', '.kiro.mdc'] as $suffix) {
-                    if (!str_ends_with($basename, $suffix)) {
-                        continue;
-                    }
-                    $rules[] = substr($basename, 0, -strlen($suffix));
-                    break;
-                }
-            }
-        }
-
-        $skills = array_values(array_unique($skills));
-        $agents = array_values(array_unique($agents));
-        $rules = array_values(array_unique($rules));
         sort($skills);
-        sort($agents);
         sort($rules);
+        sort($agents);
+        sort($hooks);
 
         return [
-            'skills' => $skills,
-            'rules' => $rules,
-            'agents' => $agents,
+            'skills' => array_values($skills),
+            'rules' => array_values($rules),
+            'agents' => array_values($agents),
+            'hooks' => array_values($hooks),
         ];
     }
 
@@ -282,6 +264,95 @@ final class Installer
         $base = $target === 'cursor' ? $cwd . '/.cursor' : $cwd . '/.kiro';
 
         return $base . '/agents/' . $name . '.md';
+    }
+
+    /**
+     * @return array{lines: array<int, string>, failed: bool}
+     */
+    private function installHook(string $hookName, string $target): array
+    {
+        $cwd = (string) getcwd();
+
+        if ($target === 'kiro') {
+            $sourcePath = $this->packageRoot . '/hooks/' . $hookName . '.kiro.hook';
+            $targetPath = $cwd . '/.kiro/hooks/' . $hookName . '.kiro.hook';
+
+            $result = $this->hookInstaller->installKiro($sourcePath, $targetPath);
+        } else {
+            // cursor
+            $sourceDir = $this->packageRoot . '/hooks/' . $hookName;
+            $targetDir = $cwd . '/.cursor/hooks/' . $hookName;
+            $hookRegistryPath = $cwd . '/.cursor/hooks.json';
+
+            $result = $this->hookInstaller->installCursor($sourceDir, $targetDir, $hookRegistryPath);
+        }
+
+        if ($result['status'] === 'fail') {
+            return [
+                'lines' => [sprintf('[fail] Hook %s -> %s: %s', $hookName, $target, $result['message'])],
+                'failed' => true,
+            ];
+        }
+
+        return [
+            'lines' => [sprintf('[ok] Installed hook %s -> %s', $hookName, $target)],
+            'failed' => false,
+        ];
+    }
+
+    /**
+     * @return array{lines: array<int, string>, failed: bool}
+     */
+    private function uninstallHook(string $hookName, string $target, bool $force): array
+    {
+        $cwd = (string) getcwd();
+
+        if ($target === 'kiro') {
+            $sourcePath = $this->packageRoot . '/hooks/' . $hookName . '.kiro.hook';
+            $targetPath = $cwd . '/.kiro/hooks/' . $hookName . '.kiro.hook';
+
+            // Drift check for Kiro platform
+            $checkResult = $this->hookChecker->checkKiro($sourcePath, $targetPath);
+            if ($checkResult === 'drift' && !$force) {
+                return [
+                    'lines' => [sprintf('[fail] Hook %s has drift on %s, use --force to override', $hookName, $target)],
+                    'failed' => true,
+                ];
+            }
+            if ($checkResult === 'missing') {
+                return [
+                    'lines' => [sprintf('[skip] Hook %s not found on %s', $hookName, $target)],
+                    'failed' => false,
+                ];
+            }
+
+            $result = $this->hookInstaller->uninstallKiro($targetPath);
+        } else {
+            // Cursor: no drift concept, uninstall directly
+            $targetDir = $cwd . '/.cursor/hooks/' . $hookName;
+            $hookRegistryPath = $cwd . '/.cursor/hooks.json';
+
+            $result = $this->hookInstaller->uninstallCursor($targetDir, $hookRegistryPath);
+        }
+
+        if ($result['status'] === 'fail') {
+            return [
+                'lines' => [sprintf('[fail] Hook %s -> %s: %s', $hookName, $target, $result['message'])],
+                'failed' => true,
+            ];
+        }
+
+        if ($result['status'] === 'skip') {
+            return [
+                'lines' => [sprintf('[skip] Hook %s not found on %s', $hookName, $target)],
+                'failed' => false,
+            ];
+        }
+
+        return [
+            'lines' => [sprintf('[ok] Uninstalled hook %s from %s', $hookName, $target)],
+            'failed' => false,
+        ];
     }
 
     /**

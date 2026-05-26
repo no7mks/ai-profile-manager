@@ -1,0 +1,163 @@
+---
+description: Spec gatekeeper 校验 design 阶段的详细指引。由 spec-gatekeeper agent 在校验 design.md 时读取。
+alwaysApply: false
+---
+
+# Design Gatekeep 指引
+
+本文件定义 design.md 的校验标准。Gatekeeper 按以下清单逐项检查，发现问题直接修正。
+
+---
+
+## 执行顺序
+
+0. 架构上下文加载（如 `graphify_ready`）
+1. 机械扫描
+2. 结构校验
+3. Requirements 覆盖校验
+4. Impact Analysis 校验
+5. 技术方案质量校验
+6. Socratic Review 校验
+7. 目的性审查
+8. 将修正项写入 Gatekeep Log
+9. 生成 Clarification Round（为 tasks 阶段准备）
+10. Completion：向 main-agent 返回结果
+
+---
+
+## 0. 架构上下文加载
+
+如果 `graphify_ready`，优先使用 graphify 子命令进行结构化查询，辅助后续 Impact Analysis 和技术方案质量校验。
+
+---
+
+## 1. 机械扫描
+
+- [ ] 无 TBD / TODO / 待定 / 占位符
+- [ ] 无空 section 或不完整的列表
+- [ ] 内部引用一致（requirements 编号、术语引用）
+- [ ] 代码块语法正确（语言标注、闭合）
+- [ ] 无 markdown 格式错误
+
+发现问题直接修正。
+
+---
+
+## 2. 结构校验
+
+Feature / Hotfix 的 design.md 应包含以下关键 section：
+
+| Section | 必要性 | 说明 |
+|---------|--------|------|
+| 一级标题 | 必须 | 说明本文件定位 |
+| 技术方案主体 | 必须 | 承接 requirements，给出具体技术方案 |
+| 接口 / 数据模型定义 | 必须 | 接口签名、数据模型、模块划分 |
+| `## Impact Analysis` | 必须 | 影响分析 |
+| `## Alternatives Considered` | 推荐 | 备选方案及落选理由 |
+
+Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、测试策略、收敛计划。
+
+如果包含 `## Correctness Properties`，每条 property 必须使用 `### Property N: <名称>` 格式，包含 Validates（格式 `Requirements X.Y, X.Z`，X = Requirement 编号，Y = AC 编号，可省略 .Y 仅引用 Requirement 级别）、条件、保证、违反后果四项。
+
+### 检查项
+
+- [ ] 一级标题存在
+- [ ] 技术方案主体存在，且承接了 requirements 中的需求
+- [ ] 接口签名 / 数据模型有明确定义
+- [ ] 各 section 之间使用 `---` 分隔
+
+---
+
+## 3. Requirements 覆盖校验
+
+- [ ] 每条 requirement 在 design 中都有对应的实现描述
+- [ ] 无遗漏的 requirement（特别注意错误处理、边界条件）
+- [ ] design 中的方案不超出 requirements 的范围
+
+---
+
+## 4. Impact Analysis 校验
+
+- [ ] 受影响的 state 文档条目（具体文件名及 section）
+- [ ] 如果 `graphify_ready`，是否利用 graphify 辅助识别了受影响范围
+- [ ] 现有 model / service / CLI 行为的变化
+- [ ] 是否涉及数据模型变更——如涉及，是否提醒了旧数据兼容
+- [ ] 是否涉及外部系统交互变化
+- [ ] 是否涉及配置项变更（新增、删除、默认值变化）
+
+---
+
+## 5. 技术方案质量校验
+
+- [ ] 技术选型有明确理由
+- [ ] 接口签名足够清晰，能让 task 独立执行
+- [ ] 模块间依赖关系清晰，无循环依赖
+- [ ] 无过度设计
+- [ ] 与 state 文档中描述的现有架构一致
+
+---
+
+## 6. Socratic Review 校验
+
+检查 `gk-logs.md` 中是否存在 `## Design Phase — Socratic Review` section。如果缺少，gatekeeper 应按 `gatekeeping/gk-log-format.mdc` 的格式补充，Q&A 至少覆盖：
+
+- design 是否完整覆盖了 requirements？
+- 技术选型是否合理？
+- 接口签名和数据模型是否足够清晰？
+- 模块间依赖是否会引入循环依赖或过度耦合？
+- 是否有过度设计？
+- 是否存在未经确认的重大技术选型？
+- Impact Analysis 是否充分？
+
+---
+
+## 7. 目的性审查
+
+Design 的核心目的是：**让读者清楚地知道用什么技术方案实现 requirements，以及方案的关键决策和边界**。
+
+### 审查清单
+
+- [ ] **Requirements CR 回应**：用户在 requirements GK CR 中的决策是否在 design 中体现。
+- [ ] **技术选型明确**：所有关键技术选型是否有明确结论和理由？
+- [ ] **接口定义可执行**：接口签名、数据模型是否足够具体？
+- [ ] **Requirements 全覆盖**：每条 requirement 是否都有对应的技术方案？
+- [ ] **Impact 充分评估**：影响分析是否覆盖了所有受影响的模块？
+- [ ] **可 task 化**：tasks 阶段的 agent 是否能拆出可独立执行的 task？
+
+如果不达标，直接修正。修正后在 Gatekeep Log 中记录（修正类型为 `目的`）。
+
+---
+
+## 8. Gatekeep Log
+
+将校验过程中的修正项写入 design.md 末尾的 `## Gatekeep Log` section。
+
+---
+
+## 9. Clarification Round (CR)
+
+校验完成后，生成面向 tasks 阶段的 CR 问题（**3 个以上**）。
+
+CR 聚焦 **design 到 tasks 的衔接**——哪些技术决策在拆分为具体 task 时可能存在歧义。
+
+聚焦方向：
+- 实现顺序是否有偏好？
+- 测试策略是否需要明确？
+- 是否有跨模块的依赖需要协调？
+- 技术方案是否有多种等价的拆分方式？
+- 是否有未最终确定的技术细节？
+
+**不应涉及**：行为层面的 trade-off（属于 requirements 阶段）、非功能约束的有无（属于 requirements 阶段）。
+
+每个问题提供 **至少 3 个选项**，写入 Gatekeep Log 的 `### Clarification Round` 小节。
+
+---
+
+## 10. Completion
+
+向 main-agent 返回：
+
+1. **校验结果摘要**：通过 / 已修正后通过，列出修正项
+2. **CR 待确认**：告知有待用户回答的 CR 问题
+
+Main-agent 收到后逐题与用户交互，将回答写入对应的 `**A:**` 行。

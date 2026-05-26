@@ -34,10 +34,7 @@ final class ProjectInitializer
         $this->prepareTargetDirectory($targetDir);
         $targetDir = $this->normalizedAbsolute($targetDir);
 
-        $scaffoldRoot = $this->join($this->packageRoot, 'scaffold');
-        $this->assertPathExists($scaffoldRoot, 'Internal package layout error: scaffold directory missing.');
-
-        $this->assertScaffoldSourcesPresent($scaffoldRoot);
+        $this->assertScaffoldSourcesPresent($this->packageRoot);
 
         if (!$force && $this->scaffoldTargetsExist($targetDir)) {
             throw new RuntimeException(
@@ -46,10 +43,10 @@ final class ProjectInitializer
         }
 
         $lines[] = 'Installing scaffold (docs/, issues/, AGENTS.md)...';
-        $this->mirror->mirrorDirectory($this->join($scaffoldRoot, 'docs'), $this->join($targetDir, 'docs'));
-        $this->mirror->mirrorDirectory($this->join($scaffoldRoot, 'issues'), $this->join($targetDir, 'issues'));
+        $this->mirror->mirrorDirectory($this->join($this->packageRoot, 'docs'), $this->join($targetDir, 'docs'));
+        $this->mirror->mirrorDirectory($this->join($this->packageRoot, 'issues'), $this->join($targetDir, 'issues'));
         $this->mirror->copyFile(
-            $this->join($scaffoldRoot, 'AGENTS.md'),
+            $this->join($this->packageRoot, 'AGENTS.md'),
             $this->join($targetDir, 'AGENTS.md'),
             $force
         );
@@ -73,11 +70,9 @@ final class ProjectInitializer
 
         $lines = [];
         $lines[] = 'Installing scope rules for targets: ' . implode(', ', $targets);
-        $rulesRoot = $this->join($this->packageRoot, 'abilities', 'rules');
-        $this->assertPathExists($rulesRoot, 'Internal package layout error: abilities/rules missing.');
 
         if (in_array('cursor', $targets, true)) {
-            $src = $this->join($rulesRoot, 'cursor-scope.cursor.mdc');
+            $src = $this->join($this->packageRoot, '.cursor', 'rules', 'cursor-scope.mdc');
             $dst = $this->join($targetDir, '.cursor', 'rules', 'cursor-scope.mdc');
             $this->assertPathExists($src, 'Internal package layout error: cursor-scope bundle missing.');
             if (!$force && is_file($dst)) {
@@ -91,7 +86,7 @@ final class ProjectInitializer
         }
 
         if (in_array('kiro', $targets, true)) {
-            $src = $this->join($rulesRoot, 'kiro-scope.kiro.md');
+            $src = $this->join($this->packageRoot, '.kiro', 'steering', 'kiro-scope.md');
             $dst = $this->join($targetDir, '.kiro', 'steering', 'kiro-scope.md');
             $this->assertPathExists($src, 'Internal package layout error: kiro-scope bundle missing.');
             if (!$force && is_file($dst)) {
@@ -135,12 +130,12 @@ final class ProjectInitializer
         }
     }
 
-    private function assertScaffoldSourcesPresent(string $scaffoldRoot): void
+    private function assertScaffoldSourcesPresent(string $packageRoot): void
     {
         foreach (['docs', 'issues', 'AGENTS.md'] as $leaf) {
-            $p = $this->join($scaffoldRoot, $leaf);
+            $p = $this->join($packageRoot, $leaf);
             if (!file_exists($p)) {
-                throw new RuntimeException('Internal package layout error: scaffold/' . $leaf . ' missing.');
+                throw new RuntimeException('Internal package layout error: ' . $leaf . ' missing.');
             }
         }
     }

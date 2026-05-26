@@ -6,6 +6,24 @@
 
 ## [Unreleased]
 
+### Breaking
+
+- Ability 文件从 `abilities/` 独立目录迁移到真实生效路径（`.cursor/`、`.kiro/`），不再使用后缀区分 target。
+- 新增 `abilities.yaml` 作为 ability 注册表，取代原有的目录扫描逻辑。
+- `scaffold/` 目录废弃，模板文件直接维护在项目根目录对应位置。
+
+### Removed
+
+- 移除 `capture`、`skill:capture`、`rule:capture`、`agent:capture`、`ingest` 命令及相关代码。这些命令已废弃且无替代方案，无需迁移操作。
+- 移除 `listFromFilesystem` fallback 逻辑，install/check 统一从 `abilities.yaml` 解析。
+
+### Added
+
+- 新增 hook 类型 ability 支持（Kiro 和 Cursor 双平台），可通过 `install`/`uninstall`/`check` 统一管理。
+- `show` 命令新增 `--type` 过滤选项，支持按 ability 类型筛选展示。
+- 新增 `docs/state/` 系列文档：`architecture.md`、`cli-commands.md`、`abilities-model.md`、`install-behavior.md`、`gitignore.md`。
+- 新增 `docs/manual/usage.md` 使用手册。
+
 ## [0.6.3] - 2026-05-03
 
 ### Changed

@@ -1,0 +1,125 @@
+---
+inclusion: manual
+description: 当写入或校验 gk-logs.md 时读取，定义 Socratic Review 与 Gatekeep Log 的统一格式
+---
+
+# GK Log Format
+
+定义 `gk-logs.md` 的统一写入格式，供 spec-planning（Socratic Review 步骤）和 spec-gatekeeper（校验步骤）共同遵循。
+
+---
+
+## 文件位置
+
+- `<spec-dir>/<name>/gk-logs.md`
+
+---
+
+## 时间获取
+
+写入任何时间戳前，必须先执行 `date '+%Y-%m-%d %H:%M'` 获取真实系统时间。禁止猜测或使用默认值。
+
+---
+
+## 整体结构
+
+按阶段分 `##` section。每个阶段有两个独立的 `##` section：**Socratic Review** 和 **Gatekeep Log**。两者职责不同，不可混淆：
+
+- **Socratic Review**：agent 自问自答，审视产物质量（由 spec-planning 写入）
+- **Gatekeep Log**：gatekeeper 校验记录，含修正项和合规检查（由 spec-gatekeeper 写入）
+
+### Section 顺序（强制）
+
+`##` section 必须按以下顺序排列，不可乱序：
+
+1. `## Requirements Phase — Socratic Review`
+2. `## Requirements Phase — Gatekeep Log`
+3. `## Design Phase — Socratic Review`
+4. `## Design Phase — Gatekeep Log`
+5. `## Tasks Phase — Socratic Review`
+6. `## Tasks Phase — Gatekeep Log`
+
+Bugfix 路径用 `Bugfix Phase` 替代 `Requirements Phase`，其余顺序不变。
+
+同一阶段内，Socratic Review 必须在 Gatekeep Log 之前。后续阶段追加在文件末尾。
+
+---
+
+## Socratic Review 格式
+
+```markdown
+## <Phase> Phase — Socratic Review
+
+**日期**: YYYY-MM-DD HH:mm
+
+### Q&A
+
+> **Q1**: <自问问题>
+> **A1**: <自答>
+
+> **Q2**: <自问问题>
+> **A2**: <自答>
+
+> **Q3**: <自问问题>
+> **A3**: <自答>
+
+> **Q4**: <自问问题>
+> **A4**: <自答>
+
+> **Q5**: <自问问题>
+> **A5**: <自答>
+
+### 结论
+
+<通过/发现问题需修正，及后续建议>
+```
+
+### Socratic Review 规则
+
+- **至少 5 条** Q&A，不设上限
+- 问题应覆盖：完整性、一致性、边界条件、与上游文档的对齐、scope 越界风险
+- 回答必须基于实际产物内容，不可泛泛而谈
+- 如果发现问题，在结论中说明并在产物中修正后再写入
+
+---
+
+## Gatekeep Log 格式
+
+```markdown
+## <Phase> Phase — Gatekeep Log
+
+**校验时间**: YYYY-MM-DD HH:mm
+**校验结果**: ✅ 通过 / ⚠️ 已修正后通过
+
+### 修正项
+
+（如无修正项，写"无"）
+
+- [修正类型] 修正描述
+
+### 合规检查
+
+- [x/○] 检查项描述
+```
+
+### Gatekeep Log 规则
+
+- 修正类型：`结构`、`语体`、`内容`、`格式`、`目的`
+- 合规检查项来自对应阶段的 gk-* steering/rule
+
+---
+
+## Phase 名称
+
+| 阶段 | Section 名称 |
+|------|-------------|
+| Requirements | `Requirements Phase` |
+| Bugfix | `Bugfix Phase` |
+| Design | `Design Phase` |
+| Tasks | `Tasks Phase` |
+
+---
+
+## CR 不写入 gk-logs
+
+**CR（Clarification Round）保留在源文件末尾**（requirements.md / design.md 的 `## Clarification Round` section），不写入 gk-logs.md。
