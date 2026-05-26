@@ -11,6 +11,8 @@
 - Ability 文件从 `abilities/` 独立目录迁移到真实生效路径（`.cursor/`、`.kiro/`），不再使用后缀区分 target。
 - 新增 `abilities.yaml` 作为 ability 注册表，取代原有的目录扫描逻辑。
 - `scaffold/` 目录废弃，模板文件直接维护在项目根目录对应位置。
+- Issue 体系简化：取消 L/release 系列分类，统一 `ISS-<5位随机数字>` 编号；归档位置改为 `issues/fixed/`。
+- `docs/changes/` 提升为根目录级 `changes/`。
 
 ### Removed
 
