@@ -1,6 +1,6 @@
 # PRP: Abilities Relocation
 
-**Status**: in-progress
+**Status**: implemented
 
 ---
 
