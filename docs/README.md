@@ -1,18 +1,46 @@
 # Docs
 
-`docs/` 用于承载项目文档分层。各子目录的定位、边界与写作约定统一在本文件维护。
+`docs/` 用于承载项目文档分层。各子目录的定位、边界与生命周期统一在本文件维护。
 
 ---
 
 ## 分层概览
 
-| 层 | 目录 | 回答问题 |
-|---|---|---|
-| state | `docs/state/` | 系统现在是什么（SSOT） |
-| manual | `docs/manual/` | 如何理解/使用系统（面向人） |
-| proposals | `docs/proposals/` | 为什么做（intent） |
-| notes | `docs/notes/` | 想做什么（lightweight intent） |
-| changes | `docs/changes/` | 改了什么（history） |
+| 层 | 目录 | 回答问题 | 生命周期 |
+|---|---|---|---|
+| state | `docs/state/` | 系统现在是什么（SSOT） | 持续维护，与代码同步 |
+| manual | `docs/manual/` | 如何使用系统（面向人） | 持续维护，release 前同步 |
+| proposals | `docs/proposals/` | 为什么做（intent） | draft → accepted → in-progress → implemented → released → 归档 |
+| notes | `docs/notes/` | 想做什么（lightweight intent） | 活跃 → 升级为 proposal/spec 或解决 → 归档 |
+| changes | `docs/changes/` | 改了什么（history） | unreleased → 版本归档 |
+
+---
+
+## 文档生命周期
+
+### 活跃文档
+
+- `docs/state/`：始终反映系统当前状态，feature 完成后同步更新。
+- `docs/manual/`：始终与实际行为一致，release 前确认。
+- `docs/proposals/`：活跃 proposal（status ≠ released）留在此处。
+- `docs/notes/`：未解决的想法和观察留在此处。
+
+### 归档流转
+
+当文档完成其使命时，移入 `docs/changes/`：
+
+| 来源 | 触发时机 | 归档目标 |
+|------|---------|---------|
+| `docs/notes/<name>.md` | note 已解决（实现完成或升级为 proposal） | `docs/changes/unreleased/notes/` |
+| `docs/proposals/<name>.md` | proposal status → implemented | `docs/changes/unreleased/proposals/` |
+| `issues/<name>.md` | issue closed（hotfix/bugfix 完成） | `docs/changes/unreleased/fixed/` |
+
+### Release 归档
+
+Release Finish 时：
+
+1. 将 `docs/changes/unreleased/` 整体 rename 为 `docs/changes/<version>/`
+2. 重建空的 `docs/changes/unreleased/{notes,proposals,fixed}/`
 
 ---
 
@@ -20,35 +48,22 @@
 
 ### 作用
 
-记录系统当前状态（SSOT），回答"产品交付的是什么"——直到每一个细节。任何时候，读完 state 就应该完整知道系统应有的行为与约束。
+记录系统当前状态（SSOT），回答"产品交付的是什么"——直到每一个细节。
 
 ### 粒度要求
 
-- 每个 proposal（PRP）的需求落地后，其用户可见行为、边界条件、错误处理必须在 state 中有对应描述。
-- 每个设计决策（数据模型选择、接口契约、算法策略、配置格式等）必须在 state 中记录。
-- state 的描述粒度应足以作为 functional test 和 integration test 的用例来源——读 state 即可推导出测试断言。
+- 每个 proposal 的需求落地后，其用户可见行为、边界条件、错误处理必须在 state 中有对应描述。
+- 每个设计决策（数据模型、接口契约、算法策略、配置格式等）必须在 state 中记录。
+- state 的描述粒度应足以作为 functional test 和 integration test 的用例来源。
 
 ### 边界
 
 - 应包含：架构与工程约束、接口定义、数据模型、功能行为规则、边界条件与错误场景、配置格式与默认值、设计决策及其理由。
 - 不应包含：设计过程（spec）、需求讨论（proposal）、教程说明（manual）。
 
-### 与测试的关系
+### 命名
 
-- state 是 functional test / integration test 的重要来源基础。
-- 编写测试时应以 state 描述的行为为断言依据。
-- state 中描述的每个行为规则、边界条件、错误场景，理论上都应有对应测试覆盖。
-
-### 原则
-
-- 必须与代码行为一致。
-- feature 完成后同步更新——不仅更新架构，还要更新具体行为描述。
-- proposal 实现完成时，将需求转化为 state 中的行为描述（而非仅引用 proposal）。
-
-### 命名建议
-
-- 按领域拆分：`<domain>.md`（kebab-case）。
-- 当单个领域内容过长时，可拆为子目录：`docs/state/<domain>/`。
+按领域拆分：`<domain>.md`（kebab-case）。内容过长时可拆为子目录。
 
 ---
 
@@ -56,21 +71,16 @@
 
 ### 作用
 
-记录使用与理解说明（面向人），回答如何使用、如何理解、常见操作方式。
+记录使用与理解说明（面向人），回答如何使用、常见操作方式。
 
 ### 边界
 
-- 应包含：使用说明、示例、FAQ、必要时的简要架构说明。
-- 不应定义系统规则（规则在 `state`）。
+- 应包含：使用说明、示例、FAQ。
+- 不应定义系统规则（规则在 state）。
 
-### 原则
+### 命名
 
-- 必须与实际行为一致（release 前同步）。
-- 可以更易读，但不能比 `state` 更“权威”。
-
-### 命名建议
-
-- 按主题拆分：`<topic>.md`（kebab-case）。
+按主题拆分：`<topic>.md`（kebab-case）。
 
 ---
 
@@ -78,26 +88,24 @@
 
 ### 作用
 
-管理正式需求提案（intent），说明为什么做、解决什么问题、目标与范围、生命周期状态。
-
-### 边界
-
-- 应包含：用户可见行为、错误场景的用户可见结果、Goals/Non-Goals/Scope。
-- 不应包含：内部实现细节、持久化格式、代码架构决策（这些进入 spec/design）。
+管理正式需求提案（intent），说明为什么做、解决什么问题、目标与范围。
 
 ### 生命周期
 
 `draft` → `accepted` → `in-progress` → `implemented` → `released`（另有 `rejected`、`superseded`）。
 
+- `implemented` 时移入 `docs/changes/unreleased/proposals/`。
+- `released` 在 Release Finish 时随 unreleased 整体归入版本目录。
+
 ### 分支规则
 
-- proposal 的创建、review、状态变更默认必须在 `develop` 分支进行。
-- `in-progress` 可在 feature 分支创建后标记（由 gitflow skill 的 start 流程处理），这是唯一允许在非 `develop` 分支上修改 proposal 状态的场景。
-- `implemented` / `released` 的标记与收敛由 finish 流程统一处理。
+- 创建、review、状态变更默认在 `develop` 分支。
+- `in-progress` 可在 feature 分支标记（gitflow start 流程处理）。
+- `implemented` / `released` 由 finish 流程统一处理。
 
-### 命名建议
+### 命名
 
-- `PRP-001-<slug>.md` 形式递增编号。
+`PRP-<NNN>-<slug>.md` 递增编号。
 
 ---
 
@@ -112,16 +120,14 @@
 - 应包含：零散想法、观察、后续可推进方向。
 - 不应包含：已结构化需求（proposal）、已确认缺陷（issue）、实现计划（spec）。
 
-### 规则
+### 流转
 
-- 每条 note 一个 markdown 文件。
-- 命名使用关键词，如 `feishu-batch-api.md`。
-- 分支规则：可在 `develop` 或 feature 分支创建与维护；feature 分支中的 note 应在分支合并后回到 `develop` 继续管理。
+- note → proposal：基于 note 创建 proposal 后，原 note 移入 `docs/changes/unreleased/notes/`。
+- note → 直接解决：feature 实现了 note 描述的内容后，移入 `docs/changes/unreleased/notes/`。
 
-### 流转规则
+### 命名
 
-- note → proposal：当内容成熟并需要正式立项时，在 `develop` 分支基于 note 创建 proposal（初始状态 `draft`），并将原 note 移动到 `docs/notes/resolved/` 说明已升级。
-- note → spec：当内容已明确且不需要 proposal 阶段时，直接将 note 移动到 `docs/notes/resolved/`，并在 spec 工作流中继续推进。
+每条 note 一个文件，关键词命名：`<keyword>.md`（kebab-case）。
 
 ---
 
@@ -129,46 +135,31 @@
 
 ### 作用
 
-记录已发生的版本级变更与 release 归档材料。
+归档已完成使命的文档，按版本组织历史。
 
-### 边界
+### 结构
 
-- 只记录“已经发生的变更”。
-- 不记录需求意图（proposal），不定义当前系统事实（state）。
+```
+docs/changes/
+├── unreleased/          # 当前开发周期已归档但未发布
+│   ├── notes/           # 已解决的 note
+│   ├── proposals/       # 已 implemented 的 proposal
+│   └── fixed/           # 已关闭的 issue
+└── <version>/           # Release 后的版本归档
+    ├── notes/
+    ├── proposals/
+    └── fixed/
+```
 
-### 结构约定
+### 与根 CHANGELOG.md 的关系
 
-- 仓库根 `CHANGELOG.md`：版本摘要索引。
-- `docs/changes/unreleased/`：未发布 feature 变更。
-- `docs/changes/<version>/CHANGELOG.md`：版本详细变更。
-- `docs/changes/<version>/artifacts/`：可选归档附件。
-
-### 命名建议
-
-- `unreleased` 条目：`<feature-name>.md`（kebab-case）。
-- 版本目录：`<major>.<minor>`（如 `0.2`）。
-
----
-
-## Spec Planning 入口
-
-Spec 规划统一通过 `spec-planning` skill 进行，采用“完整 skill 能力 + 轻入口 `SKILL.md` + references 承载细节”的组织方式。
-
-### 阶段与产物
-
-- 固定四阶段：`goal` → `requirements` → `design` → `tasks`
-- 对应产物：`.cursor/specs/<name>/goal.md`、`requirements.md`、`design.md`、`tasks.md`
-- 历史命名 `plan.md` 视为 `tasks.md` 同义
-
-### 执行约束
-
-- 每次只执行一个阶段，不跨步
-- 阶段完成后等待用户或 GK 介入，再进入下一阶段
+- 根 `CHANGELOG.md`：版本摘要索引，面向用户的变更概述。
+- `docs/changes/<version>/`：该版本归档的完整文档（proposal 全文、note 全文、issue 全文）。
 
 ---
 
 ## 使用原则
 
-- 先分层，再落文：文档先放对目录，再考虑模板。
-- `docs/state/` + code 是系统事实来源；其它层不要越权定义系统事实。
-- 规范统一维护在 `docs/README.md`，避免多处 README 漂移。
+- 先分层，再落文：文档先放对目录，再考虑内容。
+- `docs/state/` + code 是系统唯一事实来源；其它层不越权定义系统事实。
+- 规范统一维护在本文件，避免多处 README 漂移。

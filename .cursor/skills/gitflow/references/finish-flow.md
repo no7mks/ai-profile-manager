@@ -26,9 +26,13 @@ git branch --show-current
 
 1. 同步 develop 到 feature：`git merge --no-ff develop -m "merge develop into feature/<name>"`
 2. 解决冲突后提交，并重新跑全量测试
-3. 文档收敛：更新 state、更新 manual（使用说明与实际行为一致）、写 unreleased 变更记录、收敛 resolved notes，然后提交
+3. 文档收敛（细则见 [doc-convergence.md](doc-convergence.md)）：
+   - 收敛 notes → `docs/changes/unreleased/notes/`
+   - 更新 state / manual 一致性
+   - 写 CHANGELOG `[Unreleased]` 条目
+   - 统一提交
 4. 切回 `develop` 并合并 feature：`git merge --no-ff feature/<name> -m "merge feature/<name> into develop"`
-5. 更新 proposal 状态：`in-progress -> implemented` 并提交
+5. 更新 proposal 状态 `in-progress -> implemented`，移入 `docs/changes/unreleased/proposals/`，提交
 
 ## Release Finish
 
@@ -40,12 +44,12 @@ git branch --show-current
 步骤：
 
 1. Issue 收敛（release issues + 项目级 issues + Found In/Fixed In tag review）
-2. 文档收敛：
-   - 版本 CHANGELOG
+2. 文档收敛（细则见 [doc-convergence.md](doc-convergence.md)）：
+   - 版本 CHANGELOG：将 `[Unreleased]` 归入新版本小节
    - spec 归档
-   - proposal `implemented -> released` 并归档终态 proposal
-   - 更新根 `CHANGELOG.md`
-   - 清理已纳入 release 的 unreleased 与 resolved notes
+   - proposal `implemented -> released`
+   - `docs/changes/unreleased/` rename 为 `docs/changes/<version>/`
+   - 重建空的 `docs/changes/unreleased/{notes,proposals,fixed}/`
    - 确保 state/manual 与代码一致
 3. 更新版本号声明，测试通过
 4. 提交收敛变更，并在 release 分支预检冲突：
@@ -67,8 +71,8 @@ git branch --show-current
 
 步骤：
 
-1. Issue 收敛：置 `closed`、填写 `Fixed In`、归档 fixed
-2. 文档收敛：版本 CHANGELOG、根 CHANGELOG、spec/state/manual 同步、清理相关 resolved notes
+1. Issue 收敛：置 `closed`、填写 `Fixed In`，`mv issues/<name>.md → docs/changes/unreleased/fixed/`
+2. 文档收敛（细则见 [doc-convergence.md](doc-convergence.md)）：版本 CHANGELOG、根 CHANGELOG、spec/state/manual 同步、notes 归档
 3. 更新 patch 版本号声明并测试通过
 4. 提交收敛变更，并在 hotfix 分支预检冲突：
    - `git merge --no-ff master -m "merge master into hotfix/<version>"`
