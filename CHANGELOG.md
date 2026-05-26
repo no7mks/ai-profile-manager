@@ -6,6 +6,15 @@
 
 ## [Unreleased]
 
+### Removed
+
+- 移除 `capture`、`skill:capture`、`rule:capture`、`agent:capture`、`ingest` 命令。这些命令已废弃且无替代方案，无需迁移操作。
+
+### Added
+
+- 新增 hook 类型 ability 支持（Kiro 和 Cursor 双平台），可通过 `install`/`uninstall`/`check` 统一管理。
+- `show` 命令新增 `--type` 过滤选项，支持按 ability 类型筛选展示。
+
 ## [0.6.3] - 2026-05-03
 
 ### Changed

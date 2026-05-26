@@ -160,20 +160,20 @@
     - _Ref: Requirement 1, AC 3; Requirement 8, AC 6_
 
 - [ ] 8. 文档收敛
-  - [ ] 8.1 更新 State 文档
+  - [x] 8.1 更新 State 文档
     - 更新 `docs/state/architecture.md`：列出所有当前模块及其职责（含 AbilityRegistry、HookInstaller、HookChecker），移除 Capture/Ingest
     - 新建 `docs/state/cli-commands.md`：为每个已注册命令描述签名、正常行为、错误条件
     - 新建 `docs/state/abilities-model.md`：描述 abilities.yaml 完整格式（含 hooks section）、Preset 引用格式
     - 新建 `docs/state/install-behavior.md`：描述每种 ability 类型的安装/检查/卸载逻辑（含 hook 平台差异）
     - 新建 `docs/state/gitignore.md`：描述 Marker_Block 格式与操作规则
     - _Ref: Requirement 12, AC 1-7_
-  - [ ] 8.2 更新 Manual 文档
+  - [x] 8.2 更新 Manual 文档
     - 更新 `docs/manual/usage.md`：新增 hook 类型 ability 的安装/检查/卸载示例，移除 capture/ingest 相关内容，补充 `--type` 过滤和 `apm show --type hook` 示例
     - _Ref: Requirement 11, AC 1-2; Requirement 6, AC 5_
-  - [ ] 8.3 Migration Guide
+  - [x] 8.3 Migration Guide
     - 在 `docs/manual/usage.md` 或 `CHANGELOG.md` 中补充迁移说明：capture/ingest 命令已移除，hook 类型为新增功能，无需迁移操作
     - _Ref: Requirement 6, AC 1; Requirement 7, AC 1_
-  - [ ] 8.4 Checkpoint
+  - [-] 8.4 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（最终版本确认）
     - commit: `+(state): add state documentation for abilities-relocation`
