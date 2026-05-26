@@ -20,7 +20,7 @@ final class PresetRegistry
     /**
      * When abilities/_presets.json exists it is authoritative; otherwise use AppConfig defaults.
      *
-     * @return array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}>
+     * @return array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>}>
      */
     public function allPresets(): array
     {
@@ -35,7 +35,7 @@ final class PresetRegistry
     }
 
     /**
-     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}|null
+     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>}|null
      */
     public function getPreset(string $name): ?array
     {
@@ -45,7 +45,7 @@ final class PresetRegistry
     }
 
     /**
-     * @param array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}> $presets
+     * @param array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>}> $presets
      */
     public function saveToWorkspace(array $presets): void
     {
@@ -60,7 +60,7 @@ final class PresetRegistry
     }
 
     /**
-     * @return array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}>
+     * @return array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>}>
      */
     private function loadFromWorkspace(): array
     {
@@ -88,12 +88,19 @@ final class PresetRegistry
             $skills = isset($spec['skills']) && is_array($spec['skills']) ? array_values(array_filter($spec['skills'], 'is_string')) : [];
             $rules = isset($spec['rules']) && is_array($spec['rules']) ? array_values(array_filter($spec['rules'], 'is_string')) : [];
             $agents = isset($spec['agents']) && is_array($spec['agents']) ? array_values(array_filter($spec['agents'], 'is_string')) : [];
+            $hooks = isset($spec['hooks']) && is_array($spec['hooks']) ? array_values(array_filter($spec['hooks'], 'is_string')) : [];
 
-            $out[$name] = [
+            $entry = [
                 'skills' => $skills,
                 'rules' => $rules,
                 'agents' => $agents,
             ];
+
+            if ($hooks !== []) {
+                $entry['hooks'] = $hooks;
+            }
+
+            $out[$name] = $entry;
         }
 
         return $out;

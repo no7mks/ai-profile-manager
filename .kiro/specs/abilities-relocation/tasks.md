@@ -130,12 +130,12 @@
     - 更新 `docs/state/architecture.md`（ShowCommand 描述更新）
     - commit: `*(command): add hook display and --type filter to ShowCommand`
 
-- [ ] 7. E2E 测试
-  - [ ] 7.1 验证 Capture/Ingest 命令不可达
+- [x] 7. E2E 测试
+  - [x] 7.1 验证 Capture/Ingest 命令不可达
     - 执行 `php bin/apm capture`、`php bin/apm skill:capture`、`php bin/apm rule:capture`、`php bin/apm agent:capture`、`php bin/apm ingest`
     - 确认每个命令返回 "command not found" 错误
     - _Ref: Requirement 6, AC 5; Requirement 7, AC 1_
-  - [ ] 7.2 验证 hook install → check → uninstall 完整流程（Kiro 平台）
+  - [x] 7.2 验证 hook install → check → uninstall 完整流程（Kiro 平台）
     - 准备测试用 hook ability（在 abilities.yaml 中注册）
     - 执行 `php bin/apm install --target kiro`
     - 确认 `.kiro/hooks/` 下出现对应 hook 文件
@@ -143,18 +143,18 @@
     - 手动修改已安装 hook 文件，再次 check 确认状态为 drift
     - 执行 `php bin/apm uninstall --target kiro`，确认 hook 文件被删除
     - _Ref: Requirement 9, AC 1-4_
-  - [ ] 7.3 验证 hook install → check → uninstall 完整流程（Cursor 平台）
+  - [x] 7.3 验证 hook install → check → uninstall 完整流程（Cursor 平台）
     - 执行 `php bin/apm install --target cursor`
     - 确认 `.cursor/hooks/<name>/` 目录存在且 `.cursor/hooks.json` 中包含对应条目
     - 执行 `php bin/apm check --target cursor`，确认 hook 状态为 ok
     - 执行 `php bin/apm uninstall --target cursor`，确认目录删除且 hooks.json 中条目移除
     - _Ref: Requirement 10, AC 1-7_
-  - [ ] 7.4 验证 show 命令展示 hook
+  - [x] 7.4 验证 show 命令展示 hook
     - 执行 `php bin/apm show`，确认输出包含 Hooks 分区
     - 执行 `php bin/apm show --type hook`，确认仅输出 hook 分区
     - 执行 `php bin/apm show --type unknown`，确认返回错误并列出已知类型
     - _Ref: Requirement 11, AC 1-3_
-  - [ ] 7.5 验证 abilities.yaml 错误处理
+  - [x] 7.5 验证 abilities.yaml 错误处理
     - 构造含多个格式错误条目的 abilities.yaml
     - 执行任意命令，确认一次性报告所有错误
     - _Ref: Requirement 1, AC 3; Requirement 8, AC 6_
