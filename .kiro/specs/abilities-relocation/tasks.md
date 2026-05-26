@@ -159,7 +159,7 @@
     - 执行任意命令，确认一次性报告所有错误
     - _Ref: Requirement 1, AC 3; Requirement 8, AC 6_
 
-- [ ] 8. 文档收敛
+- [x] 8. 文档收敛
   - [x] 8.1 更新 State 文档
     - 更新 `docs/state/architecture.md`：列出所有当前模块及其职责（含 AbilityRegistry、HookInstaller、HookChecker），移除 Capture/Ingest
     - 新建 `docs/state/cli-commands.md`：为每个已注册命令描述签名、正常行为、错误条件
@@ -173,12 +173,12 @@
   - [x] 8.3 Migration Guide
     - 在 `docs/manual/usage.md` 或 `CHANGELOG.md` 中补充迁移说明：capture/ingest 命令已移除，hook 类型为新增功能，无需迁移操作
     - _Ref: Requirement 6, AC 1; Requirement 7, AC 1_
-  - [-] 8.4 Checkpoint
+  - [x] 8.4 Checkpoint
     - 运行 `./vendor/bin/phpunit`
     - 更新 `docs/state/architecture.md`（最终版本确认）
     - commit: `+(state): add state documentation for abilities-relocation`
 
-- [ ] 9. Code Review
+- [x] 9. Code Review
   - 委托给 code-reviewer sub-agent 执行
 
 ---
