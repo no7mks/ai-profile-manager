@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AiProfileManager\Tests\E2E;
 
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Process\Process;
 
 /**
  * Base class for E2E tests that invoke bin/apm as a real CLI process.
@@ -80,43 +81,21 @@ PHP;
      */
     protected function apm(array $args, array $extraEnv = []): array
     {
-        $cmd = 'php ' . escapeshellarg($this->wrapperScript);
-        foreach ($args as $arg) {
-            $cmd .= ' ' . escapeshellarg($arg);
-        }
-
-        $env = array_merge([
-            'APM_PACKAGE_ROOT' => $this->packageRoot,
-            'APM_BASELINE_ROOT' => $this->packageRoot,
-        ], $extraEnv);
-
-        $envStr = '';
-        foreach ($env as $k => $v) {
-            $envStr .= $k . '=' . escapeshellarg($v) . ' ';
-        }
-
-        $descriptors = [
-            0 => ['pipe', 'r'],
-            1 => ['pipe', 'w'],
-            2 => ['pipe', 'w'],
-        ];
-
-        $process = proc_open($envStr . $cmd, $descriptors, $pipes, $this->workspace);
-        if (!is_resource($process)) {
-            return ['exit' => 1, 'stdout' => '', 'stderr' => 'Failed to start process'];
-        }
-
-        fclose($pipes[0]);
-        $stdout = stream_get_contents($pipes[1]);
-        $stderr = stream_get_contents($pipes[2]);
-        fclose($pipes[1]);
-        fclose($pipes[2]);
-        $exit = proc_close($process);
+        $process = new Process(
+            command: ['php', $this->wrapperScript, ...$args],
+            cwd: $this->workspace,
+            env: [
+                'APM_PACKAGE_ROOT' => $this->packageRoot,
+                'APM_BASELINE_ROOT' => $this->packageRoot,
+                ...$extraEnv,
+            ],
+        );
+        $process->run();
 
         return [
-            'exit' => $exit,
-            'stdout' => $stdout !== false ? $stdout : '',
-            'stderr' => $stderr !== false ? $stderr : '',
+            'exit' => $process->getExitCode() ?? 1,
+            'stdout' => $process->getOutput(),
+            'stderr' => $process->getErrorOutput(),
         ];
     }
 

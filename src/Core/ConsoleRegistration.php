@@ -40,23 +40,23 @@ final class ConsoleRegistration
         CheckService $checker,
         KnowledgeBaseUpdater $updater,
     ): void {
-        $app->add(new InstallCommand($installer));
-        $app->add(new ShowCommand($installer, $checker));
-        $app->add(new SkillInstallCommand($installer));
-        $app->add(new RuleInstallCommand($installer));
-        $app->add(new AgentInstallCommand($installer));
-        $app->add(new SkillUninstallCommand($installer, $checker));
-        $app->add(new RuleUninstallCommand($installer, $checker));
-        $app->add(new AgentUninstallCommand($installer, $checker));
-        $app->add(new PresetUninstallCommand($installer, $checker));
-        $app->add(new SkillCheckCommand($checker));
-        $app->add(new RuleCheckCommand($checker));
-        $app->add(new AgentCheckCommand($checker));
-        $app->add(new CheckCommand($checker));
-        $app->add(new PresetCreateCommand());
-        $app->add(new PresetAddAbilityCommand());
-        $app->add(new PresetRemoveAbilityCommand());
-        $app->add(new PresetDeleteCommand());
-        $app->add(new UpdateCommand($updater));
+        $app->addCommand(new InstallCommand($installer));
+        $app->addCommand(new ShowCommand($installer, $checker));
+        $app->addCommand(new SkillInstallCommand($installer));
+        $app->addCommand(new RuleInstallCommand($installer));
+        $app->addCommand(new AgentInstallCommand($installer));
+        $app->addCommand(new SkillUninstallCommand($installer, $checker));
+        $app->addCommand(new RuleUninstallCommand($installer, $checker));
+        $app->addCommand(new AgentUninstallCommand($installer, $checker));
+        $app->addCommand(new PresetUninstallCommand($installer, $checker));
+        $app->addCommand(new SkillCheckCommand($checker));
+        $app->addCommand(new RuleCheckCommand($checker));
+        $app->addCommand(new AgentCheckCommand($checker));
+        $app->addCommand(new CheckCommand($checker));
+        $app->addCommand(new PresetCreateCommand());
+        $app->addCommand(new PresetAddAbilityCommand());
+        $app->addCommand(new PresetRemoveAbilityCommand());
+        $app->addCommand(new PresetDeleteCommand());
+        $app->addCommand(new UpdateCommand($updater));
     }
 }
