@@ -10,7 +10,7 @@ use AiProfileManager\Service\CheckService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
-final class TypedCaptureCheckCommandsTest extends TestCase
+final class TypedCheckCommandsTest extends TestCase
 {
     public function testRuleCheckRuns(): void
     {

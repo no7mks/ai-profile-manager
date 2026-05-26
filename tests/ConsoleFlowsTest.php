@@ -741,4 +741,50 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('Unknown preset', $tester->getDisplay());
     }
 
+    public function testShowCommandDisplaysPresetMappingForHooks(): void
+    {
+        $tmp = sys_get_temp_dir() . '/apm-show-hook-preset-' . bin2hex(random_bytes(4));
+        $packageRoot = sys_get_temp_dir() . '/apm-show-hook-preset-pkg-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        mkdir($packageRoot . '/hooks', 0775, true);
+        file_put_contents($packageRoot . '/hooks/check-write-length.kiro.hook', "hook content\n");
+
+        file_put_contents($packageRoot . '/abilities.yaml', implode("\n", [
+            'hooks:',
+            '  - path: check-write-length',
+            '    description: Check write length hook',
+            '    targets:',
+            '      cursor: .cursor/hooks/check-write-length',
+            '      kiro: .kiro/hooks/check-write-length.kiro.hook',
+        ]) . "\n");
+
+        // Create a preset that includes the hook
+        mkdir($tmp . '/abilities', 0775, true);
+        file_put_contents($tmp . '/abilities/_presets.json', json_encode([
+            'dev-hooks' => [
+                'skills' => [],
+                'rules' => [],
+                'agents' => [],
+                'hooks' => ['check-write-length'],
+            ],
+        ], JSON_PRETTY_PRINT) . "\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($tmp);
+
+        $registry = new AbilityRegistry($packageRoot . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
+        $cmd = new ShowCommand($installer, new CheckService());
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
+
+        chdir($old);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('check-write-length', $display);
+        self::assertStringContainsString('dev-hooks', $display);
+    }
+
 }

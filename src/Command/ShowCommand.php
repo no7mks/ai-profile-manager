@@ -116,7 +116,7 @@ final class ShowCommand extends Command
     }
 
     /**
-     * @param array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}> $presets
+     * @param array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>}> $presets
      * @return array<string, array<int, string>>
      */
     private function buildPresetMap(array $presets): array
@@ -131,6 +131,9 @@ final class ShowCommand extends Command
             }
             foreach ($spec['rules'] as $name) {
                 $map['rule:' . $name][] = $presetName;
+            }
+            foreach (($spec['hooks'] ?? []) as $name) {
+                $map['hook:' . $name][] = $presetName;
             }
         }
 
