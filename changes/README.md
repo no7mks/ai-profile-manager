@@ -40,8 +40,8 @@ changes/
 Release finish 时：
 
 1. 将 `changes/unreleased/` rename 为 `changes/<version>/`
-2. 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`
-3. 根 `CHANGELOG.md` 中将 `[Unreleased]` 内容归入新版本小节
+2. 从 `changes/<version>/CHANGELOG.md` 提炼摘要写入根 `CHANGELOG.md` 新版本小节
+3. 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`
 
 ---
 

@@ -29,7 +29,7 @@ git branch --show-current
 3. 文档收敛（按 doc-convergence steering 执行）：
    - 归档 notes
    - 确认 state / manual 一致性
-   - 更新 `changes/unreleased/CHANGELOG.md`（详细）和根 `CHANGELOG.md` `[Unreleased]`（摘要）
+   - 更新 `changes/unreleased/CHANGELOG.md`
    - 统一提交
 4. Spec 归档：`mv .kiro/specs/<spec-name>/ → changes/unreleased/specs/<spec-name>/`
 5. 切回 `develop` 并合并 feature：`git merge --no-ff feature/<name> -m "merge feature/<name> into develop"`
@@ -50,11 +50,10 @@ git branch --show-current
    - `mv` 到 `issues/fixed/`
 2. 文档收敛（按 doc-convergence steering 执行）：
    - Release 归档：`changes/unreleased/` rename 为 `changes/<version>/`
-   - 在 `changes/<version>/CHANGELOG.md` 中记录本版本修复的 issue 编号
-   - 版本 CHANGELOG：将 `[Unreleased]` 归入新版本小节
+   - 从 `changes/<version>/CHANGELOG.md` 提炼摘要写入根 `CHANGELOG.md` 新版本小节
    - Spec 归档（如有未归档的 spec）
    - proposal status → `released`
-   - 重建空的 `changes/unreleased/{notes,proposals,specs}/`
+   - 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`
    - 确认 state/manual 一致性
 3. 更新版本号声明，测试通过
 4. 提交收敛变更，并在 release 分支预检冲突：
@@ -81,8 +80,9 @@ git branch --show-current
    - Review Found In / Fixed In，替换为正式 hotfix tag
    - `mv` 到 `issues/fixed/`
 2. 文档收敛（按 doc-convergence steering 执行）：
-   - 版本 CHANGELOG、根 CHANGELOG
-   - 在 `changes/<version>/CHANGELOG.md` 中记录本版本修复的 issue 编号
+   - Release 归档：`changes/unreleased/` rename 为 `changes/<version>/`
+   - 从 `changes/<version>/CHANGELOG.md` 提炼摘要写入根 `CHANGELOG.md` 新版本小节
+   - 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`
    - 确认 state/manual 一致性
    - 归档 notes
 3. 更新 patch 版本号声明并测试通过

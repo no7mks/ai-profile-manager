@@ -1,30 +1,8 @@
 # Changelog
 
-本文件记录版本间的用户可见变更。**每次发布前**请对照 `git log` 自行整理并更新（例如相对上一 tag：`git log v0.2.0..HEAD --oneline`，将上一 tag 换成实际发布的基准）。
+本文件记录版本间的用户可见变更。Release/hotfix finish 时从 `changes/<version>/CHANGELOG.md` 提炼摘要写入此处。
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
-
-## [Unreleased]
-
-### Breaking
-
-- Ability 文件从 `abilities/` 独立目录迁移到真实生效路径（`.cursor/`、`.kiro/`），不再使用后缀区分 target。
-- 新增 `abilities.yaml` 作为 ability 注册表，取代原有的目录扫描逻辑。
-- `scaffold/` 目录废弃，模板文件直接维护在项目根目录对应位置。
-- Issue 体系简化：取消 L/release 系列分类，统一 `ISS-<5位随机数字>` 编号；归档位置改为 `issues/fixed/`。
-- `docs/changes/` 提升为根目录级 `changes/`。
-
-### Removed
-
-- 移除 `capture`、`skill:capture`、`rule:capture`、`agent:capture`、`ingest` 命令及相关代码。这些命令已废弃且无替代方案，无需迁移操作。
-- 移除 `listFromFilesystem` fallback 逻辑，install/check 统一从 `abilities.yaml` 解析。
-
-### Added
-
-- 新增 hook 类型 ability 支持（Kiro 和 Cursor 双平台），可通过 `install`/`uninstall`/`check` 统一管理。
-- `show` 命令新增 `--type` 过滤选项，支持按 ability 类型筛选展示。
-- 新增 `docs/state/` 系列文档：`architecture.md`、`cli-commands.md`、`abilities-model.md`、`install-behavior.md`、`gitignore.md`。
-- 新增 `docs/manual/usage.md` 使用手册。
 
 ## [0.6.3] - 2026-05-03
 

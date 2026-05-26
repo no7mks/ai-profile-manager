@@ -58,10 +58,11 @@ description: 文档归档操作规范——notes/proposals/specs/issues 的归�
 
 更新时机由各触发流程（gitflow finish-flow 等）保障，本章节只定义格式规范。
 
-需同时更新两处：
+需更新：
 
 - `changes/unreleased/CHANGELOG.md`（详细，含 issue 编号、spec 引用）
-- 根 `CHANGELOG.md` 的 `[Unreleased]`（面向用户的摘要）
+
+根 `CHANGELOG.md` 不维护 `[Unreleased]` 段落，release/hotfix finish 时从 `changes/unreleased/CHANGELOG.md` 提炼摘要写入新版本小节。
 
 ### 覆盖维度
 
@@ -97,5 +98,5 @@ description: 文档归档操作规范——notes/proposals/specs/issues 的归�
 ## Release 归档
 
 1. 将 `changes/unreleased/` rename 为 `changes/<version>/`。
-2. 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`。
-3. 根 `CHANGELOG.md` 中将 `[Unreleased]` 内容归入新版本小节并标注日期。
+2. 从 `changes/<version>/CHANGELOG.md` 提炼摘要写入根 `CHANGELOG.md` 新版本小节。
+3. 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`。
