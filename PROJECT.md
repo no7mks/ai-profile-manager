@@ -26,8 +26,11 @@
 # 安装依赖
 composer install
 
-# 单元测试（Unit）
+# 单元测试（Unit）— 默认 suite，不含 E2E
 ./vendor/bin/phpunit
+
+# E2E 测试（通过 bin/apm 入口验证完整生命周期）
+./vendor/bin/phpunit --testsuite e2e
 
 # 覆盖率测试（Coverage）
 ./vendor/bin/phpunit --coverage-text
