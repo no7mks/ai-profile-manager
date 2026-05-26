@@ -50,7 +50,18 @@ Release finish 时：
 | 文件 | 定位 |
 |------|------|
 | 根 `CHANGELOG.md` | 面向用户的版本摘要 |
-| `changes/<version>/CHANGELOG.md` | 面向开发者的详细变更，含 issue 编号、spec 引用 |
+| `changes/unreleased/CHANGELOG.md` | 面向开发者的详细变更，含 issue 编号、spec 引用 |
+
+### 更新时机
+
+`changes/unreleased/CHANGELOG.md` 应在变更发生时即时更新，不积压到 release finish：
+
+- feature finish 合入 develop 时
+- 在 develop 上直接做了有意义的变更时（重构、文档体系调整、配置变更等）
+- hotfix/release 分支上的修复
+- 任何影响用户可见行为或开发者工作流的改动
+
+原则：**谁做了变更谁就更新**。根 CHANGELOG `[Unreleased]` 同理。
 
 ---
 

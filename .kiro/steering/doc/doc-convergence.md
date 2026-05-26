@@ -56,6 +56,20 @@ description: 文档归档操作规范——notes/proposals/specs/issues 的归�
 
 ## 更新 CHANGELOG
 
+### 触发时机
+
+任何有意义的变更发生时即时更新，不积压到 finish：
+
+- feature finish 合入 develop
+- 在 develop 上直接做了变更（重构、文档体系调整、配置变更等）
+- hotfix/release 分支上的修复
+- 任何影响用户可见行为或开发者工作流的改动
+
+同时更新两处：
+
+- `changes/unreleased/CHANGELOG.md`（详细，含 issue 编号、spec 引用）
+- 根 `CHANGELOG.md` 的 `[Unreleased]`（面向用户的摘要）
+
 ### 覆盖维度
 
 | 分类 | 判定依据 |
