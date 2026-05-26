@@ -91,6 +91,5 @@ alwaysApply: false
 ## Release 归档
 
 1. 将 `changes/unreleased/` rename 为 `changes/<version>/`。
-2. 在 `changes/<version>/CHANGELOG.md` 中记录本版本修复的 issue 编号。
-3. 重建空的 `changes/unreleased/{notes,proposals,specs}/`（含 `.gitkeep`）。
-4. 根 `CHANGELOG.md` 中将 `[Unreleased]` 内容归入新版本小节并标注日期。
+2. 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`。
+3. 根 `CHANGELOG.md` 中将 `[Unreleased]` 内容归入新版本小节并标注日期。

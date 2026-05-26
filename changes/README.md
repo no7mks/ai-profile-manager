@@ -10,11 +10,12 @@
 changes/
 ├── README.md
 ├── unreleased/              # 当前开发周期已归档但未发布
+│   ├── CHANGELOG.md          # 详细变更日志（含 issue 编号、spec 引用）
 │   ├── notes/               # 已解决的 note
 │   ├── proposals/           # 已 implemented 的 proposal
 │   └── specs/               # 已完成的 spec
 └── <version>/               # Release 后的版本归档
-    ├── CHANGELOG.md          # 该版本详细变更日志（含 fixed issue 编号）
+    ├── CHANGELOG.md          # 该版本详细变更日志
     ├── notes/
     ├── proposals/
     └── specs/
@@ -39,9 +40,8 @@ changes/
 Release finish 时：
 
 1. 将 `changes/unreleased/` rename 为 `changes/<version>/`
-2. 在 `changes/<version>/CHANGELOG.md` 中记录本版本修复的 issue 编号
-3. 重建空的 `changes/unreleased/{notes,proposals,specs}/`（含 `.gitkeep`）
-4. 根 `CHANGELOG.md` 中将 `[Unreleased]` 内容归入新版本小节
+2. 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`
+3. 根 `CHANGELOG.md` 中将 `[Unreleased]` 内容归入新版本小节
 
 ---
 
@@ -58,6 +58,7 @@ Release finish 时：
 
 新项目初始化后，以 `.gitkeep` 占位：
 
+- `changes/unreleased/CHANGELOG.md`（空模板）
 - `changes/unreleased/notes/.gitkeep`
 - `changes/unreleased/proposals/.gitkeep`
 - `changes/unreleased/specs/.gitkeep`
