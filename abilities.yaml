@@ -17,6 +17,12 @@ rules:
       cursor: .cursor/rules/doc/writing-conventions.mdc
       kiro: .kiro/steering/doc/writing-conventions.md
 
+  - path: doc:doc-convergence
+    description: 文档归档操作规范
+    targets:
+      cursor: .cursor/rules/doc/doc-convergence.mdc
+      kiro: .kiro/steering/doc/doc-convergence.md
+
   - path: git:branch-overview
     description: GitFlow 分支模型总览
     targets:

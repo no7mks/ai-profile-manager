@@ -6,13 +6,13 @@
 
 ## 分层概览
 
-| 层 | 目录 | 回答问题 |
+| 层 | 目录 | 定位 |
 |---|---|---|
-| state | `docs/state/` | 系统现在是什么（SSOT） |
-| manual | `docs/manual/` | 如何使用系统（面向人） |
-| proposals | `docs/proposals/` | 为什么做（intent） |
-| notes | `docs/notes/` | 想做什么（lightweight intent） |
-| changes | `docs/changes/` | 改了什么（history + 归档） |
+| state | `docs/state/` | 系统当前状态（SSOT） |
+| manual | `docs/manual/` | 使用说明（面向人） |
+| proposals | `docs/proposals/` | 正式需求提案（scope + 目标 + 生命周期） |
+| notes | `docs/notes/` | 轻量暂存（观察、想法、改进方向） |
+| changes | `docs/changes/` | 归档（已完成使命的文档按版本组织） |
 
 ---
 
@@ -60,7 +60,7 @@
 
 ### 作用
 
-管理正式需求提案（intent），说明为什么做、解决什么问题、目标与范围。
+管理正式需求提案：定义做什么、范围、目标、约束，并跟踪生命周期状态。
 
 ### 生命周期
 
@@ -82,17 +82,18 @@
 
 ### 作用
 
-轻量意图暂存，记录尚未成熟为 proposal 的想法、观察与改进方向。
+轻量暂存，记录尚未成熟为 proposal 的观察、想法与改进方向。
 
 ### 边界
 
 - 应包含：零散想法、观察、后续可推进方向。
 - 不应包含：已结构化需求（proposal）、已确认缺陷（issue）、实现计划（spec）。
 
-### 流转
+### 去向
 
-- note → proposal：基于 note 创建 proposal 后，原 note 归档。
-- note → 直接解决：note 描述的内容已落地后，归档。
+- 升级为 proposal → 归档原 note。
+- 内容直接落地 → 归档原 note。
+- 归档操作见 doc-convergence steering。
 
 ### 命名
 
@@ -130,9 +131,25 @@ docs/changes/
 
 ### Release 归档
 
-Release Finish 时将 `docs/changes/unreleased/` rename 为 `docs/changes/<version>/`，然后重建空的 unreleased 子目录。
+Release 时将 `docs/changes/unreleased/` rename 为 `docs/changes/<version>/`，然后重建空的 unreleased 子目录。
 
 ### 与根 CHANGELOG.md 的关系
 
 - 根 `CHANGELOG.md`：版本摘要索引，面向用户的变更概述。
 - `docs/changes/<version>/`：该版本归档的完整文档原文。
+
+---
+
+## 初始化约定
+
+新项目通过 `apm install` 初始化时，各子目录以 `.gitkeep` 占位确保目录结构存在：
+
+- `docs/state/.gitkeep`
+- `docs/manual/.gitkeep`
+- `docs/notes/.gitkeep`
+- `docs/proposals/.gitkeep`
+- `docs/changes/unreleased/notes/.gitkeep`
+- `docs/changes/unreleased/proposals/.gitkeep`
+- `docs/changes/unreleased/fixed/.gitkeep`
+
+目录内有实际文件后，对应 `.gitkeep` 可移除。
