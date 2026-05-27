@@ -28,4 +28,15 @@ Agent 开始工作时，先识别用户本轮意图并匹配下表场景（可�
 
 - `<spec-dir>` = `.kiro/specs`
 
+## 项目目录结构
+
+| 目录 | 定位 | 详细规则 |
+|------|------|---------|
+| `docs/` | 活跃文档（state/manual/notes/proposals） | `docs/README.md` |
+| `changes/` | 归档（已完成文档按版本组织） | `changes/README.md` |
+| `issues/` | 缺陷管理 | `issues/README.md` |
+| `<spec-dir>/` | 进行中的 spec | — |
+| `.kiro/steering/` | Kiro agent steering 规则 | — |
+| `.kiro/skills/` | Kiro agent skills | — |
+
 

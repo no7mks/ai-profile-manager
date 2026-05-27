@@ -13,3 +13,15 @@ alwaysApply: true
 ## Cursor 专属配置
 
 - `<spec-dir>` = `.cursor/specs`
+
+## 项目目录结构
+
+| 目录 | 定位 | 详细规则 |
+|------|------|---------|
+| `docs/` | 活跃文档（state/manual/notes/proposals） | `docs/README.md` |
+| `changes/` | 归档（已完成文档按版本组织） | `changes/README.md` |
+| `issues/` | 缺陷管理 | `issues/README.md` |
+| `<spec-dir>/` | 进行中的 spec | — |
+| `.cursor/rules/` | Cursor agent 规则 | — |
+| `.cursor/skills/` | Cursor agent skills | — |
+| `.cursor/agents/` | Cursor agent 定义 | — |
