@@ -31,8 +31,6 @@ changes/
 | `docs/proposals/<name>.md` | proposal status → implemented | `changes/unreleased/proposals/` |
 | `.kiro/specs/<name>/` | spec 对应功能完成（gitflow finish） | `changes/unreleased/specs/` |
 
-注意：issue 不归档到 `changes/`，统一在 `issues/fixed/` 管理。
-
 ---
 
 ## Release 归档
