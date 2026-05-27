@@ -5,9 +5,22 @@ description: Kiro 平台专属规则，始终生效
 
 # Kiro Agent Rules
 
-## 强制读取
+## 项目目录结构
 
-- Agent 首次接触项目时，必须先读取根目录下的 `PROJECT.md` 获取项目的技术栈、构建命令、运行入口、敏感文件清单等项目特定信息。
+| 目录 | 定位 | 详细规则 |
+|------|------|---------|
+| `/PROJECT.md` | 项目特有信息（技术栈、构建命令、运行入口、敏感文件清单） | Agent 首次接触项目时必须先读取 |
+| `/AGENTS.md` | Agent 协作与表达规范（对话语言、读写原则、文档事实来源） | 始终遵守 |
+| `/README.md` | 项目对外介绍（面向用户的功能概述与快速上手） | — |
+| `/CHANGELOG.md` | 面向用户的版本摘要（release/hotfix finish 时从 changes 提炼） | — |
+| `/docs/` | 活跃文档（state/manual/notes/proposals） | `docs/README.md` |
+| `/changes/` | 归档（已完成文档按版本组织） | `changes/README.md` |
+| `/issues/` | 缺陷管理 | `issues/README.md` |
+| `/.kiro/specs/` | 即 `<spec-dir>`，记录进行中的 specs | — |
+| `/.kiro/steering/` | Kiro agent steering 规则 | — |
+| `/.kiro/skills/` | Kiro agent skills | — |
+| `/.kiro/agents/` | Kiro custom agents | — |
+| `/.kiro/hooks/` | Kiro agent hooks | — |
 
 ## Intent Mapping
 
@@ -23,20 +36,5 @@ Agent 开始工作时，先识别用户本轮意图并匹配下表场景（可�
 | 执行任务（Execute Task） | 激活 `spec-execution` SKILL |
 
 若意图不匹配任何场景，则认为用户意图是"自由对话"，无需额外准备。
-
-## Kiro 专属配置
-
-- `<spec-dir>` = `.kiro/specs`
-
-## 项目目录结构
-
-| 目录 | 定位 | 详细规则 |
-|------|------|---------|
-| `docs/` | 活跃文档（state/manual/notes/proposals） | `docs/README.md` |
-| `changes/` | 归档（已完成文档按版本组织） | `changes/README.md` |
-| `issues/` | 缺陷管理 | `issues/README.md` |
-| `<spec-dir>/` | 进行中的 spec | — |
-| `.kiro/steering/` | Kiro agent steering 规则 | — |
-| `.kiro/skills/` | Kiro agent skills | — |
 
 
