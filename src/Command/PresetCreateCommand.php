@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Command;
 
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -14,15 +15,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class PresetCreateCommand extends Command
 {
-    public function __construct()
+    private ?PresetRegistry $presetRegistry;
+
+    public function __construct(?PresetRegistry $presetRegistry = null)
     {
+        $this->presetRegistry = $presetRegistry;
         parent::__construct();
     }
 
     protected function configure(): void
     {
         $this->setName('preset:create');
-        $this->setDescription('Create a preset in abilities/_presets.json.');
+        $this->setDescription('Create a preset in abilities.yaml.');
         $this->addArgument('name', InputArgument::REQUIRED, 'Preset name.');
         $this->addOption('skill', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Skill names (repeatable).', []);
         $this->addOption('rule', null, InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Rule names (repeatable).', []);
@@ -33,7 +37,6 @@ final class PresetCreateCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $name = (string) $input->getArgument('name');
-        $cwd = (string) getcwd();
 
         /** @var array<int, string> $skills */
         $skills = $input->getOption('skill');
@@ -42,20 +45,27 @@ final class PresetCreateCommand extends Command
         /** @var array<int, string> $agents */
         $agents = $input->getOption('agent');
 
-        $registry = new PresetRegistry($cwd);
-        $all = $registry->allPresets();
-        if (isset($all[$name])) {
-            $io->error(sprintf('Preset already exists: %s', $name));
+        $registry = $this->presetRegistry ?? new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
+
+        // Build includes list from typed options
+        $includes = [];
+        foreach ($skills as $s) {
+            $includes[] = 'skill:' . $s;
+        }
+        foreach ($rules as $r) {
+            $includes[] = 'rule:' . $r;
+        }
+        foreach ($agents as $a) {
+            $includes[] = 'agent:' . $a;
+        }
+
+        try {
+            $registry->createPreset($name, '', $includes);
+        } catch (\RuntimeException $e) {
+            $io->error($e->getMessage());
 
             return Command::FAILURE;
         }
-
-        $all[$name] = [
-            'skills' => array_values(array_unique($skills)),
-            'rules' => array_values(array_unique($rules)),
-            'agents' => array_values(array_unique($agents)),
-        ];
-        $registry->saveToWorkspace($all);
 
         $io->writeln(sprintf('[ok] Preset created: %s', $name));
 

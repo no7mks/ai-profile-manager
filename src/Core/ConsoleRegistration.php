@@ -25,6 +25,7 @@ use AiProfileManager\Command\UpdateCommand;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
+use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
 /**
@@ -39,24 +40,37 @@ final class ConsoleRegistration
         Installer $installer,
         CheckService $checker,
         KnowledgeBaseUpdater $updater,
+        ?PresetRegistry $presetRegistry = null,
     ): void {
-        $app->addCommand(new InstallCommand($installer));
-        $app->addCommand(new ShowCommand($installer, $checker));
+        $installArgs = ['installer' => $installer];
+        $showArgs = ['installer' => $installer, 'checker' => $checker];
+        $presetUninstallArgs = ['installer' => $installer, 'checker' => $checker];
+        $checkArgs = ['checker' => $checker];
+
+        if ($presetRegistry !== null) {
+            $installArgs['presetRegistry'] = $presetRegistry;
+            $showArgs['presetRegistry'] = $presetRegistry;
+            $presetUninstallArgs['presetRegistry'] = $presetRegistry;
+            $checkArgs['presetRegistry'] = $presetRegistry;
+        }
+
+        $app->addCommand(new InstallCommand(...$installArgs));
+        $app->addCommand(new ShowCommand(...$showArgs));
         $app->addCommand(new SkillInstallCommand($installer));
         $app->addCommand(new RuleInstallCommand($installer));
         $app->addCommand(new AgentInstallCommand($installer));
         $app->addCommand(new SkillUninstallCommand($installer, $checker));
         $app->addCommand(new RuleUninstallCommand($installer, $checker));
         $app->addCommand(new AgentUninstallCommand($installer, $checker));
-        $app->addCommand(new PresetUninstallCommand($installer, $checker));
+        $app->addCommand(new PresetUninstallCommand(...$presetUninstallArgs));
         $app->addCommand(new SkillCheckCommand($checker));
         $app->addCommand(new RuleCheckCommand($checker));
         $app->addCommand(new AgentCheckCommand($checker));
-        $app->addCommand(new CheckCommand($checker));
-        $app->addCommand(new PresetCreateCommand());
-        $app->addCommand(new PresetAddAbilityCommand());
-        $app->addCommand(new PresetRemoveAbilityCommand());
-        $app->addCommand(new PresetDeleteCommand());
+        $app->addCommand(new CheckCommand(...$checkArgs));
+        $app->addCommand(new PresetCreateCommand($presetRegistry));
+        $app->addCommand(new PresetAddAbilityCommand($presetRegistry));
+        $app->addCommand(new PresetRemoveAbilityCommand($presetRegistry));
+        $app->addCommand(new PresetDeleteCommand($presetRegistry));
         $app->addCommand(new UpdateCommand($updater));
     }
 }

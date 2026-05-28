@@ -112,6 +112,7 @@ final class HookChecker
             $data['hooks'] = [];
         }
 
+        /** @var array{version: int, hooks: array<string, list<array<string, mixed>>>} $data */
         return $data;
     }
 
@@ -122,7 +123,7 @@ final class HookChecker
      */
     private function registryContainsEntry(array $registry, string $eventType, string $command): bool
     {
-        if (!isset($registry['hooks'][$eventType]) || !\is_array($registry['hooks'][$eventType])) {
+        if (!isset($registry['hooks'][$eventType])) {
             return false;
         }
 

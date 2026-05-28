@@ -9,6 +9,7 @@ use AiProfileManager\Service\DirectoryMirrorService;
 use AiProfileManager\Service\GitIgnoreTemplateService;
 use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 /**
  * Tests for Installer integration with AbilityRegistry.
@@ -16,6 +17,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class InstallerRegistryIntegrationTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string $oldCwd;
 
@@ -195,13 +198,28 @@ YAML;
     public function testInstallTypedDispatchesRuleAndAgentCorrectlyWithRegistry(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/rules/git', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/git/my-rule.cursor.mdc', "rule content\n");
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/my-agent.cursor.md', "agent content\n");
+        // Source files at paths matching registry targets (Source-is-Target layout)
+        mkdir($pkg . '/.cursor/rules/git', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/git/my-rule.mdc', "rule content\n");
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/my-agent.md', "agent content\n");
+
+        $registryYaml = <<<'YAML'
+rules:
+  - path: my-rule
+    description: A test rule
+    targets:
+      cursor: .cursor/rules/git/my-rule.mdc
+
+agents:
+  - path: my-agent
+    description: A test agent
+    targets:
+      cursor: .cursor/agents/my-agent.md
+YAML;
 
         $registryPath = $this->tmpDir . '/abilities.yaml';
-        file_put_contents($registryPath, "rules: []\n");
+        file_put_contents($registryPath, $registryYaml);
 
         $project = $this->tmpDir . '/project';
         mkdir($project, 0775, true);
@@ -226,19 +244,4 @@ YAML;
         self::assertStringContainsString('Installed agent my-agent -> cursor', $output);
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $items = scandir($dir) ?: [];
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-            $fullPath = $dir . '/' . $item;
-            is_dir($fullPath) ? $this->removeDir($fullPath) : unlink($fullPath);
-        }
-        rmdir($dir);
-    }
 }

@@ -111,6 +111,28 @@
 
 ### Sub-task 格式要求
 
+#### 粒度规则（强制）
+
+**单一职责原则**：每个 sub-task 应只完成一个原子性变更，满足以下条件之一：
+- 新增/修改/删除一个方法或函数
+- 新增/修改/删除一个类或接口
+- 修改一个文件的一组紧密耦合的改动（如构造函数参数变更 + 对应属性声明）
+- 修复一个测试文件的 fixture
+
+**拆分信号**（出现任一则应拆分）：
+- sub-task 描述中出现"并且"/"同时"/"另外"
+- sub-task 涉及超过 3 个不相关的方法/类
+- sub-task 的 bullet 列表超过 3 项且各项独立
+- sub-task 修改超过 3 个文件
+
+**允许合并的例外**：
+- 删除一组紧密耦合的废弃方法（同一类内、同一次 commit 有意义）
+- Checkpoint sub-task（本身就是聚合验证）
+
+**top-level task 数量**：当 sub-task 拆细后，top-level task 数量自然增多是正常的，不应为减少 top-level task 数量而强行合并不相关的 sub-task。
+
+**top-level task 容量上限**：每个 top-level task 的 sub-task 数量（不含 Checkpoint）原则上不超过 8 个，硬上限 10 个。超过时应拆分为多个 top-level task。
+
 #### Requirement 追溯（强制）
 
 每个实现类 sub-task 必须引用对应的 Requirement 编号。格式灵活：
@@ -139,6 +161,10 @@
 ```
 
 ### Task Dependency Graph
+
+#### 粒度前置原则
+
+生成 TDG 前，必须先确保 sub-task 已按「粒度规则」拆分到原子级别。粒度越细，可并行的 sub-task 越多，TDG 的 wave 内并行度越高。
 
 #### 并行分析原则
 

@@ -16,7 +16,7 @@ apm 系统架构与模块边界。
 | SkillUninstallCommand / RuleUninstallCommand / AgentUninstallCommand | 按类型卸载单个或多个 ability；卸载前执行 drift 检查 |
 | PresetUninstallCommand | 卸载整个 preset 中的所有 ability |
 | SkillCheckCommand / RuleCheckCommand / AgentCheckCommand | 按类型检查 ability 安装状态 |
-| PresetCreateCommand | 在 `abilities/_presets.json` 中创建新 preset |
+| PresetCreateCommand | 在 abilities.yaml 的 presets section 中创建新 preset |
 | PresetAddAbilityCommand / PresetRemoveAbilityCommand | 向 preset 添加/移除 ability 引用 |
 | PresetDeleteCommand | 删除 preset 定义 |
 | UpdateCommand | 更新本地 knowledge base 快照 |
@@ -29,7 +29,7 @@ apm 系统架构与模块边界。
 | AbilityDiffService | 对 skill/rule/agent 执行逐文件 diff（委托 AbilityDirectoryDiff）；支持 baseline 布局与 installed 布局两种模式 |
 | DirectoryMirrorService | 递归目录复制（含 overwrite）、单文件复制、目录创建；被 Installer、ProjectInitializer、HookInstaller 共用 |
 | ComposerBaselineResolver | 解析全局 Composer installed.json 定位 apm 包安装路径；支持 `APM_BASELINE_ROOT` 环境变量覆盖 |
-| PresetRegistry | Preset 定义管理：优先读取 `abilities/_presets.json`（workspace 级），fallback 到 AppConfig 硬编码默认值 |
+| PresetRegistry | Preset 定义管理：读取 abilities.yaml 的 presets section；fallback 到 AppConfig 硬编码默认值 |
 | ProjectInitializer | 项目 bootstrap：复制 scaffold（docs/、issues/、AGENTS.md）+ 安装平台 scope rules |
 | KnowledgeBaseUpdater | 将当前 ability 列表写入 `~/.config/apm/knowledge-base.json` 供外部工具查询 |
 | GitIgnoreTemplateService | 操作 `.gitignore` 中的 managed section：从模板文件按 `@apm:block` 渲染规则并 merge 到目标文件 |
@@ -57,7 +57,7 @@ abilities.yaml ──→ AbilityRegistry.parse() ──→ AbilityEntry[]
                    目标项目            目标项目   .gitignore              状态报告
                 (.cursor/ | .kiro/)  (.cursor/ | .kiro/)              (exit code)
 
-abilities/_presets.json ──→ PresetRegistry ──→ preset spec
+abilities.yaml (presets section) ──→ PresetRegistry ──→ preset spec
                                                     │
                                                     ▼
                                          Install/Uninstall/Check

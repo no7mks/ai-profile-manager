@@ -119,9 +119,21 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ## 9. Task 粒度校验
 
-- [ ] 每个 sub-task 足够具体，可独立 session 执行
-- [ ] 无过粗或过细的 task
+- [ ] 每个 sub-task 满足单一职责：只完成一个原子性变更
+- [ ] 无 sub-task 同时涉及超过 3 个不相关的方法/类
+- [ ] 无 sub-task 的 bullet 列表超过 3 项且各项独立
+- [ ] 无 sub-task 修改超过 3 个文件（Checkpoint 除外）
 - [ ] 所有 task 均为 mandatory
+- [ ] top-level task 数量与 sub-task 拆分后的规模匹配（不强制合并到少数 top-level task）
+- [ ] 每个 top-level task 的 sub-task 数量（不含 Checkpoint）不超过 10 个，原则上不超过 8 个
+
+### 粒度过粗的修正方式
+
+发现过粗的 sub-task 时：
+1. 按单一职责拆分为多个 sub-task
+2. 重新编号
+3. 更新 TDG（拆分后的 sub-task 可能可以并行）
+4. 在 Gatekeep Log 中记录修正
 
 ---
 

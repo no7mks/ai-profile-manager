@@ -5,12 +5,17 @@ declare(strict_types=1);
 namespace AiProfileManager\Tests\Command;
 
 use AiProfileManager\Command\CheckCommand;
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
+use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class CheckCommandTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
     private string|false $oldBaseline;
@@ -42,7 +47,10 @@ final class CheckCommandTest extends TestCase
         mkdir($workspace, 0775, true);
         chdir($workspace);
 
-        $cmd = new CheckCommand(new CheckService());
+        $presetRegistry = $this->createPresetRegistry($workspace, [
+            ['name' => 'my-preset', 'includes' => ['skill:graphify']],
+        ]);
+        $cmd = new CheckCommand(new CheckService(), $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'nonexistent-preset']);
 
@@ -53,13 +61,13 @@ final class CheckCommandTest extends TestCase
     public function testCheckCommandReturnsFailureOnUnknownTarget(): void
     {
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($workspace . '/abilities', 0775, true);
-        file_put_contents($workspace . '/abilities/_presets.json', json_encode([
-            'my-preset' => ['skills' => ['graphify'], 'rules' => [], 'agents' => []],
-        ]));
+        mkdir($workspace, 0775, true);
         chdir($workspace);
 
-        $cmd = new CheckCommand(new CheckService());
+        $presetRegistry = $this->createPresetRegistry($workspace, [
+            ['name' => 'my-preset', 'includes' => ['skill:graphify']],
+        ]);
+        $cmd = new CheckCommand(new CheckService(), $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'my-preset', '--target' => ['bad-target']]);
 
@@ -72,18 +80,31 @@ final class CheckCommandTest extends TestCase
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
         mkdir($baseline . '/abilities/skills/graphify', 0775, true);
-        mkdir($workspace . '/abilities', 0775, true);
+        mkdir($workspace, 0775, true);
         mkdir($workspace . '/.cursor/skills/graphify', 0775, true);
         file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
         file_put_contents($workspace . '/.cursor/skills/graphify/SKILL.md', "x\n");
-        file_put_contents($workspace . '/abilities/_presets.json', json_encode([
-            'my-preset' => ['skills' => ['graphify'], 'rules' => [], 'agents' => []],
-        ]));
+
+        // AbilityDiffService needs abilities.yaml at baseline
+        $baselineYaml = implode("\n", [
+            'version: "1"',
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+        ]);
+        file_put_contents($baseline . '/abilities.yaml', $baselineYaml . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
 
-        $cmd = new CheckCommand(new CheckService());
+        $presetRegistry = $this->createPresetRegistry($workspace, [
+            ['name' => 'my-preset', 'includes' => ['skill:graphify']],
+        ], [
+            ['path' => 'graphify', 'type' => 'skill'],
+        ]);
+        $cmd = new CheckCommand(new CheckService(), $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'my-preset', '--target' => ['cursor']]);
 
@@ -91,22 +112,42 @@ final class CheckCommandTest extends TestCase
         self::assertStringContainsString('Preset: my-preset', $tester->getDisplay());
     }
 
-    private function removeDir(string $dir): void
+    /**
+     * @param list<array{name: string, includes: list<string>}> $presets
+     * @param list<array{path: string, type: string}> $abilities
+     */
+    private function createPresetRegistry(string $dir, array $presets, array $abilities = []): PresetRegistry
     {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isDir()) {
-                rmdir($fileInfo->getPathname());
-            } else {
-                unlink($fileInfo->getPathname());
+        $lines = ['version: "1"'];
+        if ($abilities !== []) {
+            $grouped = [];
+            foreach ($abilities as $ability) {
+                $grouped[$ability['type'] . 's'][] = $ability;
+            }
+            foreach ($grouped as $section => $entries) {
+                $lines[] = "{$section}:";
+                foreach ($entries as $entry) {
+                    $lines[] = "  - path: {$entry['path']}";
+                    $lines[] = "    description: {$entry['path']}";
+                    $lines[] = "    targets:";
+                    $lines[] = "      cursor: .cursor/{$section}/{$entry['path']}";
+                    $lines[] = "      kiro: .kiro/{$section}/{$entry['path']}";
+                }
             }
         }
-        rmdir($dir);
+        $lines[] = 'presets:';
+        foreach ($presets as $preset) {
+            $lines[] = "  - name: {$preset['name']}";
+            $lines[] = "    description: {$preset['name']}";
+            $lines[] = "    includes:";
+            foreach ($preset['includes'] as $include) {
+                $lines[] = "      - {$include}";
+            }
+        }
+        $yamlPath = $dir . '/abilities.yaml';
+        file_put_contents($yamlPath, implode("\n", $lines) . "\n");
+
+        return new PresetRegistry(new AbilityRegistry($yamlPath));
     }
+
 }

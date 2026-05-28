@@ -17,9 +17,12 @@ use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class CommandEdgeCasesTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
 
@@ -106,7 +109,7 @@ final class CommandEdgeCasesTest extends TestCase
         ]);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Unknown preset', $tester->getDisplay());
+        self::assertStringContainsString('not found', $tester->getDisplay());
     }
 
     public function testPresetAddAbilityRejectsNoTypeFlag(): void
@@ -142,7 +145,7 @@ final class CommandEdgeCasesTest extends TestCase
         ]);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Unknown preset', $tester->getDisplay());
+        self::assertStringContainsString('not found', $tester->getDisplay());
     }
 
     public function testPresetRemoveAbilityRejectsNoTypeFlag(): void
@@ -164,18 +167,4 @@ final class CommandEdgeCasesTest extends TestCase
         self::assertStringContainsString('Specify exactly one', $tester->getDisplay());
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

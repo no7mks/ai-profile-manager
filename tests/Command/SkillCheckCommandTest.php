@@ -8,9 +8,12 @@ use AiProfileManager\Command\SkillCheckCommand;
 use AiProfileManager\Service\CheckService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class SkillCheckCommandTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
     private string|false $oldBaseline;
@@ -40,10 +43,19 @@ final class SkillCheckCommandTest extends TestCase
     {
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/skills/graphify', 0775, true);
+        mkdir($baseline . '/.cursor/skills/graphify', 0775, true);
         mkdir($workspace . '/.cursor/skills/graphify', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
+        file_put_contents($baseline . '/.cursor/skills/graphify/SKILL.md', "x\n");
         file_put_contents($workspace . '/.cursor/skills/graphify/SKILL.md', "x\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+        ]) . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
@@ -60,10 +72,19 @@ final class SkillCheckCommandTest extends TestCase
     {
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/skills/graphify', 0775, true);
+        mkdir($baseline . '/.cursor/skills/graphify', 0775, true);
         mkdir($workspace . '/.cursor/skills/graphify', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
+        file_put_contents($baseline . '/.cursor/skills/graphify/SKILL.md', "x\n");
         file_put_contents($workspace . '/.cursor/skills/graphify/SKILL.md', "x\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+        ]) . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
@@ -93,9 +114,18 @@ final class SkillCheckCommandTest extends TestCase
     {
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/skills/graphify', 0775, true);
+        mkdir($baseline . '/.cursor/skills/graphify', 0775, true);
         mkdir($workspace, 0775, true);
-        file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
+        file_put_contents($baseline . '/.cursor/skills/graphify/SKILL.md', "x\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+        ]) . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
@@ -108,22 +138,4 @@ final class SkillCheckCommandTest extends TestCase
         self::assertStringContainsString('miss', $tester->getDisplay());
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isDir()) {
-                rmdir($fileInfo->getPathname());
-            } else {
-                unlink($fileInfo->getPathname());
-            }
-        }
-        rmdir($dir);
-    }
 }

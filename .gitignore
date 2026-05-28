@@ -1,6 +1,7 @@
 /vendor/
 /.phpunit.result.cache
 /agent-playbook*
+/tmp-codex-handouts/
 
 # BEGIN apm-managed-gitignore v1
 /.cursor/scratchpads/

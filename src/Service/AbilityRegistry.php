@@ -19,6 +19,11 @@ final class AbilityRegistry
 
     public function __construct(private readonly string $registryPath) {}
 
+    public function getRegistryPath(): string
+    {
+        return $this->registryPath;
+    }
+
     /**
      * 解析 abilities.yaml，返回按类型分组的 ability 列表。
      *
@@ -115,6 +120,7 @@ final class AbilityRegistry
             throw AbilityRegistryException::validationErrors($errors);
         }
 
+        /** @var array{rules: list<AbilityEntry>, agents: list<AbilityEntry>, skills: list<AbilityEntry>, hooks: list<AbilityEntry>, gitignore: list<array<string, mixed>>, presets: list<array<string, mixed>>} $result */
         return $result;
     }
 

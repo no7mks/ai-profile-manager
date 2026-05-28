@@ -11,9 +11,12 @@ use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class UninstallDriftTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
     private string|false $oldBaseline;
@@ -43,10 +46,19 @@ final class UninstallDriftTest extends TestCase
     {
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/agents', 0775, true);
+        mkdir($baseline . '/.cursor/agents', 0775, true);
         mkdir($workspace . '/.cursor/agents', 0775, true);
-        file_put_contents($baseline . '/abilities/agents/reviewer.cursor.md', "base\n");
+        file_put_contents($baseline . '/.cursor/agents/reviewer.md', "base\n");
         file_put_contents($workspace . '/.cursor/agents/reviewer.md', "modified\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'agents:',
+            '  - path: reviewer',
+            '    description: reviewer',
+            '    targets:',
+            '      cursor: .cursor/agents/reviewer.md',
+        ]) . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
@@ -64,10 +76,19 @@ final class UninstallDriftTest extends TestCase
     {
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/rules/git', 0775, true);
+        mkdir($baseline . '/.cursor/rules/git', 0775, true);
         mkdir($workspace . '/.cursor/rules/git', 0775, true);
-        file_put_contents($baseline . '/abilities/rules/git/demo.cursor.mdc', "base\n");
+        file_put_contents($baseline . '/.cursor/rules/git/demo.mdc', "base\n");
         file_put_contents($workspace . '/.cursor/rules/git/demo.mdc', "modified\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'rules:',
+            '  - path: demo',
+            '    description: demo',
+            '    targets:',
+            '      cursor: .cursor/rules/git/demo.mdc',
+        ]) . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
@@ -81,18 +102,4 @@ final class UninstallDriftTest extends TestCase
         self::assertFileExists($workspace . '/.cursor/rules/git/demo.mdc');
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

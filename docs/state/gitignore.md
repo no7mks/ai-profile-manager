@@ -22,7 +22,7 @@ apm 在 `.gitignore` 中维护一个 managed section，由 BEGIN/END marker 包�
 
 ## 模板文件格式
 
-模板文件位于 `abilities/gitignore/template.gitignore`，使用 `@apm:block` 标记定义条件渲染块：
+模板文件位于 `<packageRoot>/.gitignore`，使用 `@apm:block` 标记定义条件渲染块：
 
 ```
 ## @apm:block ability=<key> target=<target>

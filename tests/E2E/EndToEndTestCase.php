@@ -6,6 +6,7 @@ namespace AiProfileManager\Tests\E2E;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 /**
  * Base class for E2E tests that invoke bin/apm as a real CLI process.
@@ -16,6 +17,8 @@ use Symfony\Component\Process\Process;
  */
 abstract class EndToEndTestCase extends TestCase
 {
+    use RemovesDirTrait;
+
     /** Workspace directory where apm commands run (simulates user's project). */
     protected string $workspace;
 
@@ -48,6 +51,7 @@ use AiProfileManager\Core\Application;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
+use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
@@ -60,7 +64,8 @@ if (\$registry !== null) {
 }
 \$installer = new Installer(...\$installerArgs);
 \$updater = new KnowledgeBaseUpdater();
-\$app = Application::createSymfonyApplication(\$installer, \$updater);
+\$presetRegistry = \$registry !== null ? new PresetRegistry(\$registry) : null;
+\$app = Application::createSymfonyApplication(\$installer, \$updater, \$presetRegistry);
 exit(\$app->run(new ArgvInput(\$argv), new ConsoleOutput()));
 PHP;
         file_put_contents($this->wrapperScript, $script);
@@ -161,27 +166,57 @@ PHP;
     }
 
     /**
+     * Create presets in abilities.yaml (appends/merges presets section).
+     *
+     * Accepts the legacy typed format used by E2E tests:
+     *   ['preset-name' => ['skills' => [...], 'rules' => [...], 'agents' => [...]]]
+     * and converts to the abilities.yaml presets section format:
+     *   presets:
+     *     - name: preset-name
+     *       description: ''
+     *       includes:
+     *         - skill:skill-name
+     *         - rule:rule-name
+     *
      * @param array<string, array<string, mixed>> $presets
      */
     protected function createPresets(array $presets): void
     {
-        $dir = $this->workspace . '/abilities';
-        if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
+        $yamlPath = $this->packageRoot . '/abilities.yaml';
+
+        // Read existing abilities.yaml content if present
+        $data = [];
+        if (file_exists($yamlPath)) {
+            $content = file_get_contents($yamlPath);
+            if ($content !== false && $content !== '') {
+                $data = \Symfony\Component\Yaml\Yaml::parse($content) ?? [];
+            }
         }
-        file_put_contents(
-            $dir . '/_presets.json',
-            json_encode($presets, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n",
-        );
+
+        // Convert legacy typed format to abilities.yaml presets section
+        $yamlPresets = [];
+        foreach ($presets as $name => $spec) {
+            $includes = [];
+            foreach (['skills' => 'skill', 'rules' => 'rule', 'agents' => 'agent', 'hooks' => 'hook'] as $key => $type) {
+                foreach (($spec[$key] ?? []) as $path) {
+                    $includes[] = "{$type}:{$path}";
+                }
+            }
+            $yamlPresets[] = [
+                'name' => $name,
+                'description' => $spec['description'] ?? '',
+                'includes' => $includes,
+            ];
+        }
+
+        $data['presets'] = $yamlPresets;
+
+        file_put_contents($yamlPath, \Symfony\Component\Yaml\Yaml::dump($data, 4, 2));
     }
 
     protected function createGitignoreTemplate(string $content): void
     {
-        $dir = $this->workspace . '/abilities/gitignore';
-        if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
-        }
-        file_put_contents($dir . '/template.gitignore', $content);
+        file_put_contents($this->packageRoot . '/.gitignore', $content);
     }
 
     protected function createAbilitiesYaml(string $content): void
@@ -206,20 +241,4 @@ PHP;
         return (string) file_get_contents($this->workspace . '/' . $relativePath);
     }
 
-    // ─── Cleanup ─────────────────────────────────────────────────────
-
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

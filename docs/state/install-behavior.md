@@ -8,8 +8,8 @@
 
 ### 安装
 
-- 源路径: `<packageRoot>/abilities/skills/<name>/`（目录）
-- 目标路径: `<workspace>/.<target>/skills/<name>/`
+- 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
+- 目标路径: `<workspace>/<targets[target]>`
   - Cursor: `.cursor/skills/<name>/`
   - Kiro: `.kiro/skills/<name>/`
 - 操作: DirectoryMirrorService 递归复制整个目录（含子目录与文件），已存在则覆盖
@@ -34,10 +34,8 @@
 
 ### 安装
 
-- 源路径查找: 在 `<packageRoot>/abilities/rules/` 下递归搜索匹配文件
-  - Cursor: `<name>.cursor.mdc` 或 `<name>.cursor.md`（优先 .mdc）
-  - Kiro: `<name>.kiro.md` 或 `<name>.kiro.mdc`（优先 .md）
-- 目标路径: 保留源文件的子目录结构
+- 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
+- 目标路径: `<workspace>/<targets[target]>`
   - Cursor: `.cursor/rules/[category/]<name>.mdc`
   - Kiro: `.kiro/steering/[category/]<name>.md`
 - 操作: 单文件复制（覆盖）
@@ -59,8 +57,8 @@
 
 ### 安装
 
-- 源路径: `<packageRoot>/abilities/agents/<name>.<target>.md`
-- 目标路径:
+- 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
+- 目标路径: `<workspace>/<targets[target]>`
   - Cursor: `.cursor/agents/<name>.md`
   - Kiro: `.kiro/agents/<name>.md`
 - 操作: 单文件复制（覆盖）
@@ -83,8 +81,8 @@
 ### Kiro 平台
 
 **安装**:
-- 源文件: `<packageRoot>/hooks/<name>.kiro.hook`（JSON 格式）
-- 目标文件: `.kiro/hooks/<name>.kiro.hook`
+- 源文件: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
+- 目标文件: `<workspace>/<targets[target]>`（如 `.kiro/hooks/<name>.kiro.hook`）
 - 操作: 文件复制；目标目录不存在时自动创建
 - 源文件不存在时返回 fail
 
@@ -105,8 +103,8 @@
 
 **安装**（两步操作）:
 1. 递归复制源目录到目标目录
-   - 源目录: `<packageRoot>/hooks/<name>/`（含 `<name>.sh` 入口脚本 + `<name>.json` 条目声明 + 辅助文件）
-   - 目标目录: `.cursor/hooks/<name>/`
+   - 源目录: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义，如 `.cursor/hooks/<name>/`）
+   - 目标目录: `<workspace>/<targets[target]>`（如 `.cursor/hooks/<name>/`）
 2. 读取 `<name>.json` 并 merge 条目到 `.cursor/hooks.json`
    - hooks.json 格式: `{"version": 1, "hooks": {"<event_type>": [{"command": "...", ...}]}}`
    - 去重规则: 以 (event_type, command) 为唯一标识，已存在则跳过
@@ -134,7 +132,7 @@
 
 ### 安装
 
-- 模板文件: `abilities/gitignore/template.gitignore`
+- 模板文件: `<packageRoot>/.gitignore`
 - 操作:
   1. GitIgnoreTemplateService.renderManagedBlock() 从模板中按 ability key 和 target 匹配 `@apm:block`
   2. GitIgnoreTemplateService.mergeManagedSection() 将渲染结果插入/更新 `.gitignore` 的 managed section

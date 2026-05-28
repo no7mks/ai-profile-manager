@@ -4,15 +4,19 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests\Service;
 
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\DirectoryMirrorService;
 use AiProfileManager\Service\GitIgnoreTemplateService;
 use AiProfileManager\Service\HookChecker;
 use AiProfileManager\Service\HookInstaller;
 use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class InstallerExtendedTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
 
@@ -120,60 +124,88 @@ final class InstallerExtendedTest extends TestCase
         self::assertStringContainsString('[skip]', $output);
     }
 
-    public function testInstallRuleWithMultipleSuffixesPicksPreferred(): void
+    public function testInstallRuleResolvesFromTargetsOnCursor(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/rules/git', 0775, true);
-        // Create both .cursor.mdc and .cursor.md for same rule
-        file_put_contents($pkg . '/abilities/rules/git/demo.cursor.mdc', "preferred\n");
-        file_put_contents($pkg . '/abilities/rules/git/demo.cursor.md', "fallback\n");
+        // Source file at the targets path relative to package root
+        mkdir($pkg . '/.cursor/rules/git', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/git/demo.mdc', "rule content\n");
+
+        // Create abilities.yaml with targets mapping
+        $yaml = <<<YAML
+version: "1"
+rules:
+  - path: "git:demo"
+    description: "test rule"
+    targets:
+      cursor: .cursor/rules/git/demo.mdc
+skills: []
+agents: []
+hooks: []
+YAML;
+        file_put_contents($pkg . '/abilities.yaml', $yaml);
 
         $proj = $this->tmpDir . '/proj';
         mkdir($proj, 0775, true);
         chdir($proj);
 
         $installer = new Installer(
+            registry: new AbilityRegistry($pkg . '/abilities.yaml'),
             gitIgnore: new GitIgnoreTemplateService(),
             packageRoot: $pkg,
             mirror: new DirectoryMirrorService(),
         );
         $result = $installer->installTyped([
             'skills' => [],
-            'rules' => ['demo'],
+            'rules' => ['git:demo'],
             'agents' => [],
         ], ['cursor']);
 
         self::assertSame(0, $result['exit_code']);
         self::assertFileExists($proj . '/.cursor/rules/git/demo.mdc');
-        // Should use the .cursor.mdc (preferred) content
-        self::assertSame("preferred\n", file_get_contents($proj . '/.cursor/rules/git/demo.mdc'));
+        self::assertSame("rule content\n", file_get_contents($proj . '/.cursor/rules/git/demo.mdc'));
     }
 
-    public function testInstallRuleKiroWithMultipleSuffixesPicksPreferred(): void
+    public function testInstallRuleResolvesFromTargetsOnKiro(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/rules/spec', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/spec/demo.kiro.md', "preferred\n");
-        file_put_contents($pkg . '/abilities/rules/spec/demo.kiro.mdc', "fallback\n");
+        // Source file at the targets path relative to package root
+        mkdir($pkg . '/.kiro/steering/spec', 0775, true);
+        file_put_contents($pkg . '/.kiro/steering/spec/demo.md', "steering content\n");
+
+        // Create abilities.yaml with targets mapping
+        $yaml = <<<YAML
+version: "1"
+rules:
+  - path: "spec:demo"
+    description: "test steering"
+    targets:
+      kiro: .kiro/steering/spec/demo.md
+skills: []
+agents: []
+hooks: []
+YAML;
+        file_put_contents($pkg . '/abilities.yaml', $yaml);
 
         $proj = $this->tmpDir . '/proj';
         mkdir($proj, 0775, true);
         chdir($proj);
 
         $installer = new Installer(
+            registry: new AbilityRegistry($pkg . '/abilities.yaml'),
             gitIgnore: new GitIgnoreTemplateService(),
             packageRoot: $pkg,
             mirror: new DirectoryMirrorService(),
         );
         $result = $installer->installTyped([
             'skills' => [],
-            'rules' => ['demo'],
+            'rules' => ['spec:demo'],
             'agents' => [],
         ], ['kiro']);
 
         self::assertSame(0, $result['exit_code']);
         self::assertFileExists($proj . '/.kiro/steering/spec/demo.md');
-        self::assertSame("preferred\n", file_get_contents($proj . '/.kiro/steering/spec/demo.md'));
+        self::assertSame("steering content\n", file_get_contents($proj . '/.kiro/steering/spec/demo.md'));
     }
 
     public function testIsInstalledOnTargetReturnsFalseWhenRuleDirMissing(): void
@@ -242,18 +274,4 @@ final class InstallerExtendedTest extends TestCase
         self::assertStringContainsString('Steering nonexistent not found on kiro', $output);
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Command;
 
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,15 +14,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class PresetDeleteCommand extends Command
 {
-    public function __construct()
+    private ?PresetRegistry $presetRegistry;
+
+    public function __construct(?PresetRegistry $presetRegistry = null)
     {
+        $this->presetRegistry = $presetRegistry;
         parent::__construct();
     }
 
     protected function configure(): void
     {
         $this->setName('preset:delete');
-        $this->setDescription('Remove a preset from abilities/_presets.json.');
+        $this->setDescription('Remove a preset from abilities.yaml.');
         $this->addArgument('name', InputArgument::REQUIRED, 'Preset name.');
     }
 
@@ -29,18 +33,16 @@ final class PresetDeleteCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $name = (string) $input->getArgument('name');
-        $cwd = (string) getcwd();
 
-        $registry = new PresetRegistry($cwd);
-        $all = $registry->allPresets();
-        if (!isset($all[$name])) {
-            $io->error(sprintf('Unknown preset: %s', $name));
+        $registry = $this->presetRegistry ?? new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
+
+        try {
+            $registry->deletePreset($name);
+        } catch (\RuntimeException $e) {
+            $io->error($e->getMessage());
 
             return Command::FAILURE;
         }
-
-        unset($all[$name]);
-        $registry->saveToWorkspace($all);
 
         $io->writeln(sprintf('[ok] Preset deleted: %s', $name));
 

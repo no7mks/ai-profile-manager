@@ -11,9 +11,12 @@ use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class InstallCommandTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
 
@@ -73,22 +76,36 @@ final class InstallCommandTest extends TestCase
     public function testInstallCommandInstallsPresetSuccessfully(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', "x\n");
+        mkdir($pkg . '/.cursor/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/graphify/SKILL.md', "x\n");
+
+        // Create abilities.yaml with skill and preset
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+            'presets:',
+            '  - name: test-preset',
+            '    description: test-preset',
+            '    includes:',
+            '      - skill:graphify',
+        ]) . "\n");
 
         $proj = $this->tmpDir . '/proj';
-        mkdir($proj . '/abilities', 0775, true);
-        file_put_contents($proj . '/abilities/_presets.json', json_encode([
-            'test-preset' => ['skills' => ['graphify'], 'rules' => [], 'agents' => []],
-        ]));
+        mkdir($proj, 0775, true);
         chdir($proj);
 
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $presetRegistry = new \AiProfileManager\Service\PresetRegistry($registry);
         $installer = new Installer(
+            registry: $registry,
             gitIgnore: new GitIgnoreTemplateService(),
             packageRoot: $pkg,
             mirror: new DirectoryMirrorService(),
         );
-        $cmd = new InstallCommand($installer);
+        $cmd = new InstallCommand($installer, presetRegistry: $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'test-preset', '--target' => ['cursor']]);
 
@@ -97,18 +114,4 @@ final class InstallCommandTest extends TestCase
         self::assertStringContainsString('Installed skill graphify', $tester->getDisplay());
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

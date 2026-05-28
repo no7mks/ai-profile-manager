@@ -18,8 +18,6 @@ description: "当用户说 /apm 或要求执行 apm 命令（init、install、ch
 | `/apm agent add <name...>` | 安装单个或多个 agent | 是 | `apm agent:install <name...> -t <target>` |
 | `/apm check <preset>` | 检查 preset 漂移 | 是 | `apm check <preset> -t <target>` |
 | `/apm check <type> <name>` | 检查 typed 能力漂移 | 是 | `apm {skill\|rule\|agent}:check <name> -t <target>` |
-| `/apm capture <preset>` | 生成 preset 变更 | 是 | `apm capture <preset> -t <target> [--yes]` |
-| `/apm capture <type> <name>` | 生成 typed 变更 | 是 | `apm {skill\|rule\|agent}:capture <name> -t <target>` |
 
 ## 何时使用本 Skill
 
@@ -27,8 +25,7 @@ description: "当用户说 /apm 或要求执行 apm 命令（init、install、ch
 
 - 初始化项目脚手架与 scope；
 - 在 `.cursor` / `.kiro` 安装或更新能力；
-- 检查或捕获本地能力改动；
-- 将 capture changes 回流到能力仓库。
+- 检查本地能力漂移状态。
 
 ## Agent 执行原则
 
@@ -37,14 +34,11 @@ description: "当用户说 /apm 或要求执行 apm 命令（init、install、ch
 3. 目标明确：涉及写入时显式带 `-t`（`cursor` 或 `kiro`），避免写错平台目录。
 4. 先小后大：不确定时先做 typed 命令（如 `skill:check <name>`），再做 preset 或全量操作。
 5. 保守覆盖：只有用户明确要求时才使用 `--force`。
-6. 需要非交互执行 capture 时可使用 `--yes`；正常对话保持可确认流程。
 
 ## 常见失败与处理
 
 - `apm: command not found`：提示用户全局安装并确认 `PATH`，再重试。
 - 命令执行但写入位置异常：优先检查 cwd 与 `-t`。
-- capture 未产出文件：可能是无差异，先看命令摘要与退出码再判断。
-- ingest 未生效：核对 `~/.apm/changes`（或 `--changes-dir`）是否存在可处理变更。
 
 ## `/apm init`（skill 命令）交付物
 

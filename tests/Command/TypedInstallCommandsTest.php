@@ -13,9 +13,12 @@ use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class TypedInstallCommandsTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
 
@@ -67,14 +70,25 @@ final class TypedInstallCommandsTest extends TestCase
     public function testAgentInstallSucceedsWithValidAgent(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/demo.cursor.md', "agent\n");
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/demo.md', "agent\n");
+
+        // Create abilities.yaml with the agent entry
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'agents:',
+            '  - path: demo',
+            '    description: demo agent',
+            '    targets:',
+            '      cursor: .cursor/agents/demo.md',
+        ]) . "\n");
 
         $proj = $this->tmpDir . '/proj';
         mkdir($proj, 0775, true);
         chdir($proj);
 
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
         $installer = new Installer(
+            registry: $registry,
             gitIgnore: new GitIgnoreTemplateService(),
             packageRoot: $pkg,
             mirror: new DirectoryMirrorService(),
@@ -90,14 +104,25 @@ final class TypedInstallCommandsTest extends TestCase
     public function testRuleInstallSucceedsWithValidRule(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/rules/git', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/git/demo.kiro.md', "rule\n");
+        mkdir($pkg . '/.kiro/steering', 0775, true);
+        file_put_contents($pkg . '/.kiro/steering/demo.md', "rule\n");
+
+        // Create abilities.yaml with the rule entry
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'rules:',
+            '  - path: demo',
+            '    description: demo rule',
+            '    targets:',
+            '      kiro: .kiro/steering/demo.md',
+        ]) . "\n");
 
         $proj = $this->tmpDir . '/proj';
         mkdir($proj, 0775, true);
         chdir($proj);
 
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
         $installer = new Installer(
+            registry: $registry,
             gitIgnore: new GitIgnoreTemplateService(),
             packageRoot: $pkg,
             mirror: new DirectoryMirrorService(),
@@ -113,14 +138,25 @@ final class TypedInstallCommandsTest extends TestCase
     public function testSkillInstallSucceedsWithValidSkill(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/skills/demo', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/demo/SKILL.md', "skill\n");
+        mkdir($pkg . '/.kiro/skills/demo', 0775, true);
+        file_put_contents($pkg . '/.kiro/skills/demo/SKILL.md', "skill\n");
+
+        // Create abilities.yaml with the skill entry
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: demo',
+            '    description: demo skill',
+            '    targets:',
+            '      kiro: .kiro/skills/demo',
+        ]) . "\n");
 
         $proj = $this->tmpDir . '/proj';
         mkdir($proj, 0775, true);
         chdir($proj);
 
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
         $installer = new Installer(
+            registry: $registry,
             gitIgnore: new GitIgnoreTemplateService(),
             packageRoot: $pkg,
             mirror: new DirectoryMirrorService(),
@@ -133,18 +169,4 @@ final class TypedInstallCommandsTest extends TestCase
         self::assertStringContainsString('Installed skill demo', $tester->getDisplay());
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }
