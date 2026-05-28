@@ -70,6 +70,26 @@ worktree 放在项目同级的 `${repo-name}-worktrees/` 目录下，按分支�
 
 ---
 
+## 未提交改动保护（强约束）
+
+核心原则：**不得在未经用户授权的情况下丢弃工作区或暂存区的改动。**
+
+以下命令会导致改动不可恢复地丢失，未经用户明确同意禁止执行：
+
+- `git checkout -- <path>`（丢弃工作区文件修改）
+- `git restore <path>`（同上，新语法）
+- `git reset --hard`（丢弃工作区 + 暂存区所有改动）
+- `git clean -f` / `git clean -fd`（删除未跟踪文件/目录）
+- `git stash drop` / `git stash clear`（销毁已暂存的改动）
+
+安全替代方案（无需授权即可使用）：
+
+- 需要切换分支但有未提交改动 → `git stash` 保存后再切换
+- 需要撤销暂存 → `git reset <path>`（仅取消 stage，不丢改动）
+- 需要查看差异 → `git diff` / `git diff --staged`
+
+---
+
 ## 非交互约束
 
 - Agent 执行的所有 git 命令必须是非交互式的，不得触发编辑器或等待用户输入
