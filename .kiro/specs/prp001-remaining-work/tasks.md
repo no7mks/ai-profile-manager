@@ -105,83 +105,83 @@
     - 运行 `vendor/bin/phpunit --filter "PresetRegistry|PresetManifest"` 查看当前状态
     - commit: `*(PresetRegistry): migrate from JSON to abilities.yaml presets section`
 
-- [-] 5. Gitignore 模板路径修复
+- [x] 5. Gitignore 模板路径修复
   - [x] 5.1 验证 Installer 中 gitignore 模板路径已正确指向 `$packageRoot/.gitignore`
     - 确认 Task 2.3 已完成此变更
     - 确认 `renderManagedBlock()` 在模板文件不存在时返回空字符串（已有逻辑）
     - 确认 `installGitIgnore()` 在 managedBody 为空时输出 `[skip]`（已有逻辑）
     - _Ref: Requirement 5, AC 1-4_
-  - [-] 5.2 Checkpoint — Gitignore 路径验证
+  - [x] 5.2 Checkpoint — Gitignore 路径验证
     - 运行 `vendor/bin/phpunit --filter "GitIgnore"` 确认无回归
     - commit: `*(Installer): gitignore template path now uses packageRoot/.gitignore`
 
-- [ ] 6. 统一测试套件修复（Unit + Integration）
-  - [ ] 6.1 修复 InstallerTest fixture 路径
+- [x] 6. 统一测试套件修复（Unit + Integration）
+  - [x] 6.1 修复 InstallerTest fixture 路径
     - 将 fixture 中 `$packageRoot/abilities/skills/<name>/` 改为 `$packageRoot/.cursor/skills/<name>/` 或 `$packageRoot/.kiro/skills/<name>/`
     - 将 fixture 中 `$packageRoot/abilities/agents/<name>.<target>.md` 改为 `$packageRoot/.cursor/agents/<name>.md`
     - 将 fixture 中 `$packageRoot/abilities/rules/` 改为对应 targets 路径
     - 更新 gitignore fixture 从 `abilities/gitignore/template.gitignore` 改为 `$packageRoot/.gitignore`
     - _Ref: Requirement 6, AC 1, 3_
-  - [ ] 6.2 修复 AbilityDiffServiceTest fixture 路径
+  - [x] 6.2 修复 AbilityDiffServiceTest fixture 路径
     - 将 baseline fixture 从 `$baseline/abilities/skills/<name>/` 改为 `$baseline/.cursor/skills/<name>/`
     - 将 baseline fixture 从 `$baseline/abilities/agents/` 改为 `$baseline/.cursor/agents/`
     - 将 baseline fixture 从 `$baseline/abilities/rules/` 改为对应 targets 路径
     - 更新 AbilityDiffService 构造调用以注入 AbilityRegistry
     - _Ref: Requirement 6, AC 2_
-  - [ ] 6.3 修复 PresetRegistryTest 和 PresetManifestCommandsTest
+  - [x] 6.3 修复 PresetRegistryTest 和 PresetManifestCommandsTest
     - 移除 `abilities/_presets.json` fixture 创建
     - 改为在 abilities.yaml fixture 中添加 presets section
     - 更新 PresetRegistry 构造调用（传入 AbilityRegistry 而非 workspaceRoot）
     - _Ref: Requirement 6, AC 4_
-  - [ ] 6.4 修复 InstallerRegistryIntegrationTest 和其他集成测试
+  - [x] 6.4 修复 InstallerRegistryIntegrationTest 和其他集成测试
     - 更新所有引用旧路径的集成测试 fixture
     - 确保 AbilityRegistry mock/fixture 与新接口一致
     - _Ref: Requirement 6, AC 1-2_
-  - [ ] 6.5 修复 CheckServiceTest 和 TypedCheckCommandsTest
+  - [x] 6.5 修复 CheckServiceTest 和 TypedCheckCommandsTest
     - 适配 `no-baseline`/`new` 状态的新行为
     - 更新 exit code 断言（`no-baseline` → 2，`new` → 0）
     - _Ref: Requirement 6, AC 1-2; CR6_
-  - [ ] 6.6 修复 Service/ 子目录下的扩展测试
+  - [x] 6.6 修复 Service/ 子目录下的扩展测试
     - `AbilityDiffRuleResolutionTest` — 移除后缀搜索相关测试，改为 targets 路径测试
     - `AbilityDiffServiceExtendedTest` — 适配新构造函数和路径逻辑
     - `InstallerExtendedTest` — 适配新路径解析
     - _Ref: Requirement 6, AC 1-2_
-  - [ ] 6.7 Checkpoint — 单元/集成测试全绿验证
+  - [x] 6.7 Checkpoint — 单元/集成测试全绿验证
     - 运行 `vendor/bin/phpunit --exclude-group e2e` 确认零失败零错误
     - 修复任何 pre-existing failure（CR4 决策：全部修复）
     - commit: `*(test): fix all unit/integration test fixtures for Source-is-Target layout`
 
-- [ ] 7. E2E 测试修复
-  - [ ] 7.1 修复 EndToEndTestCase 基础 fixture
+- [-] 7. E2E 测试修复
+  - [x] 7.1 修复 EndToEndTestCase 基础 fixture
     - `createGitignoreTemplate()` 改为在 packageRoot 下创建 `.gitignore` 文件
     - 移除所有 `abilities/` 目录 fixture 创建
     - 确保 abilities.yaml fixture 包含正确的 targets 路径
     - _Ref: Requirement 6, AC 3_
-  - [ ] 7.2 修复 PresetLifecycleTest
+  - [x] 7.2 修复 PresetLifecycleTest
     - 移除 `abilities/_presets.json` fixture
     - 改为验证 abilities.yaml presets section 的读写
     - _Ref: Requirement 6, AC 4_
-  - [ ] 7.3 修复 TypedCommandsLifecycleTest 和 ShowAndUpdateTest
+  - [x] 7.3 修复 TypedCommandsLifecycleTest 和 ShowAndUpdateTest
     - 更新 fixture 路径到新布局
     - 验证 install/check/uninstall 完整流程
     - _Ref: Requirement 6, AC 3-5_
-  - [ ] 7.4 Checkpoint — E2E 测试全绿验证
+  - [-] 7.4 Checkpoint — E2E 测试全绿验证
     - 运行 `vendor/bin/phpunit --group e2e` 确认零失败
     - 运行 `vendor/bin/phpunit` 确认全套件零失败零错误
     - commit: `*(test): fix E2E test fixtures for Source-is-Target layout`
 
 - [ ] 8. 文档收敛
-  - [ ] 8.1 更新 SSOT 文档（docs/state/ 核心文件）
+  - [~] 8.1 更新 SSOT 文档（docs/state/ 核心文件）
     - `docs/state/install-behavior.md`：源路径描述改为 `<packageRoot>/<targets[target]>`；gitignore 模板路径改为 `<packageRoot>/.gitignore`
     - `docs/state/architecture.md`：PresetRegistry 描述改为读取 abilities.yaml；数据流图移除 `abilities/_presets.json`
     - `docs/state/cli-commands.md`：preset:create/delete 描述改为操作 abilities.yaml
     - _Ref: Requirement 7, AC 1-3_
-  - [ ] 8.2 更新 SSOT 文档（docs/state/ 补充文件 + docs/design.md）
+  - [~] 8.2 更新 SSOT 文档（docs/state/ 补充文件 + docs/design.md）
     - `docs/state/abilities-model.md`：移除 "Preset 运行时存储（_presets.json）" section，改为说明 presets section 即为唯一存储
     - `docs/state/gitignore.md`：模板文件路径改为 `<packageRoot>/.gitignore`
     - `docs/design.md`：能力路径约定全部改为 Source-is-Target 模式
     - _Ref: Requirement 7, AC 4-6_
-  - [ ] 8.3 创建 apm init reference 文档
+  - [~] 8.3 创建 apm init reference 文档
     - 在 `.cursor/skills/apm/references/` 下新建 `init-workflow.md`（同步到 `.kiro/skills/apm/references/`）
     - 定义 detection phase：列出需要检查的文件和命令
     - 定义 confirmation phase：区分 auto-fillable 和 user-confirmation-required 字段
@@ -189,21 +189,21 @@
     - 定义 idempotency rules：重复执行只填充缺失内容
     - 定义 existing-content strategy：merge/skip/overwrite 决策规则
     - _Ref: Requirement 8, AC 1-6_
-  - [ ] 8.4 修正 PRP-001 proposal 状态
+  - [~] 8.4 修正 PRP-001 proposal 状态
     - 将 `changes/unreleased/proposals/PRP-001-abilities-relocation.md` 中 status 从 `implemented` 改为 `in-progress`
     - 添加注释说明 Phase 2 代码适配正在进行
     - _Ref: Requirement 9, AC 1-2_
-  - [ ] 8.5 Checkpoint — 文档收敛验证
+  - [~] 8.5 Checkpoint — 文档收敛验证
     - 检查所有修改的文档无 broken links
     - 确认 `vendor/bin/phpunit` 仍全绿（文档变更不应影响测试）
     - commit: `*(state): sync SSOT with Source-is-Target layout, add apm init reference`
 
 - [ ] 9. Code Review
-  - [ ] 9.1 委托 code-reviewer sub-agent 执行全量 code review
+  - [~] 9.1 委托 code-reviewer sub-agent 执行全量 code review
     - 基于当前分支的 diff 进行 review
     - 发现问题直接修复
     - _Ref: 全部 Requirements 的实现质量保证_
-  - [ ] 9.2 Final Checkpoint — 最终验证
+  - [~] 9.2 Final Checkpoint — 最终验证
     - 运行 `vendor/bin/phpunit` 确认全套件零失败零错误
     - 运行 `vendor/bin/phpstan analyse` 确认无静态分析错误
     - commit: `*(review): address code review findings`

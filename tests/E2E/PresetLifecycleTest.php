@@ -22,14 +22,7 @@ final class PresetLifecycleTest extends EndToEndTestCase
         $this->createAgentSource('demo-agent', 'cursor', "# Demo Agent\n");
         $this->createAgentSource('demo-agent', 'kiro', "# Demo Agent Kiro\n");
 
-        $this->createPresets([
-            'demo' => [
-                'skills' => ['demo-skill'],
-                'rules' => ['demo-rule'],
-                'agents' => ['demo-agent'],
-            ],
-        ]);
-
+        // Create abilities.yaml first (skills/rules/agents), then append presets section
         $this->createAbilitiesYaml(implode("\n", [
             'skills:',
             '  - path: demo-skill',
@@ -50,6 +43,14 @@ final class PresetLifecycleTest extends EndToEndTestCase
             '      cursor: .cursor/agents/demo-agent.md',
             '      kiro: .kiro/agents/demo-agent.md',
         ]) . "\n");
+
+        $this->createPresets([
+            'demo' => [
+                'skills' => ['demo-skill'],
+                'rules' => ['demo-rule'],
+                'agents' => ['demo-agent'],
+            ],
+        ]);
     }
 
     // ─── install → verify files ──────────────────────────────────────

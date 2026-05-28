@@ -7,6 +7,7 @@ namespace AiProfileManager\Core;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
+use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -26,12 +27,13 @@ final class Application
     public static function createSymfonyApplication(
         Installer $installer,
         KnowledgeBaseUpdater $updater,
+        ?PresetRegistry $presetRegistry = null,
     ): SymfonyApplication {
         $checker = new CheckService();
 
         $app = new SymfonyApplication('apm', '0.6.3');
         $app->setDefaultCommand('list');
-        ConsoleRegistration::register($app, $installer, $checker, $updater);
+        ConsoleRegistration::register($app, $installer, $checker, $updater, $presetRegistry);
 
         return $app;
     }
