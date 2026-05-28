@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Command;
 
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -43,23 +44,16 @@ final class PresetRemoveAbilityCommand extends Command
             return Command::FAILURE;
         }
 
-        $cwd = (string) getcwd();
-        $registry = new PresetRegistry($cwd);
-        $all = $registry->allPresets();
-        if (!isset($all[$presetName])) {
-            $io->error(sprintf('Unknown preset: %s', $presetName));
+        $registry = new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
+        $key = $input->getOption('skill') ? 'skill' : ($input->getOption('rule') ? 'rule' : 'agent');
+
+        try {
+            $registry->removeAbility($presetName, $key, $ability);
+        } catch (\RuntimeException $e) {
+            $io->error($e->getMessage());
 
             return Command::FAILURE;
         }
-
-        $spec = $all[$presetName];
-        $key = $input->getOption('skill') ? 'skills' : ($input->getOption('rule') ? 'rules' : 'agents');
-        $spec[$key] = array_values(array_filter(
-            $spec[$key],
-            fn (string $x): bool => $x !== $ability
-        ));
-        $all[$presetName] = $spec;
-        $registry->saveToWorkspace($all);
 
         $io->writeln(sprintf('[ok] Removed %s from preset %s (%s).', $ability, $presetName, $key));
 

@@ -18,6 +18,7 @@ use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
+use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -28,8 +29,9 @@ final class ConsoleFlowsTest extends TestCase
      * Helper: write a minimal abilities.yaml and return an AbilityRegistry for it.
      *
      * @param array{skills?: list<array{path: string, description?: string}>, rules?: list<array{path: string, description?: string}>, agents?: list<array{path: string, description?: string}>, hooks?: list<array{path: string, description?: string}>} $entries
+     * @param list<array{name: string, includes: list<string>, description?: string}> $presets
      */
-    private static function createRegistry(string $dir, array $entries = []): AbilityRegistry
+    private static function createRegistry(string $dir, array $entries = [], array $presets = []): AbilityRegistry
     {
         $lines = ['version: "1"'];
         foreach (['skills', 'rules', 'agents', 'hooks'] as $section) {
@@ -45,6 +47,17 @@ final class ConsoleFlowsTest extends TestCase
                 $lines[] = "    targets:";
                 $lines[] = "      cursor: .cursor/{$section}/{$path}";
                 $lines[] = "      kiro: .kiro/{$section}/{$path}";
+            }
+        }
+        if ($presets !== []) {
+            $lines[] = 'presets:';
+            foreach ($presets as $preset) {
+                $lines[] = "  - name: {$preset['name']}";
+                $lines[] = "    description: " . ($preset['description'] ?? $preset['name']);
+                $lines[] = "    includes:";
+                foreach ($preset['includes'] as $include) {
+                    $lines[] = "      - {$include}";
+                }
             }
         }
         $yamlPath = $dir . '/abilities.yaml';
@@ -85,8 +98,11 @@ final class ConsoleFlowsTest extends TestCase
 
         $registry = self::createRegistry($tmp, [
             'skills' => [['path' => 'graphify']],
+        ], [
+            ['name' => 'installable-preset', 'includes' => ['skill:graphify']],
         ]);
-        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $tmp));
+        $presetRegistry = new PresetRegistry($registry);
+        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $tmp), presetRegistry: $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'installable-preset', '--target' => ['cursor']]);
 
@@ -107,7 +123,8 @@ final class ConsoleFlowsTest extends TestCase
         chdir($tmp);
 
         $registry = self::createRegistry($tmp);
-        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $tmp));
+        $presetRegistry = new PresetRegistry($registry);
+        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $tmp), presetRegistry: $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'no-such-preset']);
 
@@ -195,28 +212,36 @@ final class ConsoleFlowsTest extends TestCase
     {
         $tmp = sys_get_temp_dir() . '/apm-flow-ch-' . bin2hex(random_bytes(4));
         $baseline = sys_get_temp_dir() . '/apm-flow-ch-base-' . bin2hex(random_bytes(4));
-        mkdir($tmp . '/abilities', 0775, true);
+        mkdir($tmp, 0775, true);
         mkdir($tmp . '/.cursor/skills/demo-skill', 0775, true);
         mkdir($baseline . '/abilities/skills/demo-skill', 0775, true);
         file_put_contents($baseline . '/abilities/skills/demo-skill/SKILL.md', "x\n");
         file_put_contents($tmp . '/.cursor/skills/demo-skill/SKILL.md', "x\n");
-        file_put_contents(
-            $tmp . '/abilities/_presets.json',
-            json_encode([
-                'known-preset' => [
-                    'skills' => ['demo-skill'],
-                    'rules' => [],
-                    'agents' => [],
-                ],
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
-        );
+
+        // AbilityDiffService needs abilities.yaml at baseline
+        $baselineYaml = implode("\n", [
+            'version: "1"',
+            'skills:',
+            '  - path: demo-skill',
+            '    description: demo-skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+        ]);
+        file_put_contents($baseline . '/abilities.yaml', $baselineYaml . "\n");
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
 
-        $cmd = new CheckCommand(new CheckService());
+        $registry = self::createRegistry($tmp, [
+            'skills' => [['path' => 'demo-skill']],
+        ], [
+            ['name' => 'known-preset', 'includes' => ['skill:demo-skill']],
+        ]);
+        $presetRegistry = new PresetRegistry($registry);
+        $cmd = new CheckCommand(new CheckService(), $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'known-preset', '--target' => ['cursor']]);
 
@@ -738,7 +763,7 @@ final class ConsoleFlowsTest extends TestCase
         chdir($old);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Unknown preset', $tester->getDisplay());
+        self::assertStringContainsString('not found', $tester->getDisplay());
     }
 
     public function testShowCommandDisplaysPresetMappingForHooks(): void

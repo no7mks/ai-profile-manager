@@ -4,151 +4,187 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Command\PresetAddAbilityCommand;
 use AiProfileManager\Command\PresetCreateCommand;
 use AiProfileManager\Command\PresetDeleteCommand;
 use AiProfileManager\Command\PresetRemoveAbilityCommand;
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Yaml\Yaml;
 
+/**
+ * Tests for preset write operations (createPreset, deletePreset, addAbility, removeAbility).
+ *
+ * These tests exercise the PresetRegistry write methods directly since the commands
+ * use a hardcoded path to abilities.yaml relative to the command file.
+ */
 final class PresetManifestCommandsTest extends TestCase
 {
+    private string $tmpDir;
+
+    protected function setUp(): void
+    {
+        $this->tmpDir = sys_get_temp_dir() . '/apm-pmb-' . bin2hex(random_bytes(4));
+        mkdir($this->tmpDir, 0775, true);
+    }
+
+    protected function tearDown(): void
+    {
+        if (is_dir($this->tmpDir)) {
+            $files = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($this->tmpDir, \FilesystemIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::CHILD_FIRST
+            );
+            foreach ($files as $file) {
+                $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
+            }
+            rmdir($this->tmpDir);
+        }
+    }
+
     public function testPresetAddAbilitySavesNewAbilityToManifest(): void
     {
-        $tmp = sys_get_temp_dir() . '/apm-pmb-' . bin2hex(random_bytes(4));
-        mkdir($tmp . '/abilities', 0775, true);
-        $json = json_encode(AppConfig::PRESET_ITEMS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
-        file_put_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, $json);
+        $yaml = <<<'YAML'
+skills:
+  - path: gitflow
+    description: GitFlow start/finish
+    targets:
+      cursor: .cursor/skills/gitflow/
+  - path: new-skill-for-test
+    description: Test skill
+    targets:
+      cursor: .cursor/skills/new-skill-for-test/
 
-        $old = getcwd();
-        self::assertNotFalse($old);
-        chdir($tmp);
+presets:
+  - name: gitflow
+    description: GitFlow 全套能力
+    includes:
+      - skill:gitflow
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
 
-        $cmd = new PresetAddAbilityCommand();
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute([
-            'preset' => 'gitflow',
-            'ability' => 'new-skill-for-test',
-            '--skill' => true,
-        ]);
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+        $registry->addAbility('gitflow', 'skill', 'new-skill-for-test');
 
-        chdir($old);
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('[ok]', $tester->getDisplay());
-
-        $saved = json_decode((string) file_get_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH), true);
-        self::assertContains('new-skill-for-test', $saved['gitflow']['skills']);
+        $preset = $registry->getPreset('gitflow');
+        self::assertNotNull($preset);
+        $paths = array_map(fn(array $inc) => $inc['type'] . ':' . $inc['path'], $preset['includes']);
+        self::assertContains('skill:new-skill-for-test', $paths);
     }
 
     public function testPresetAddAbilityNoOpWhenAbilityAlreadyPresent(): void
     {
-        $tmp = sys_get_temp_dir() . '/apm-pnop-' . bin2hex(random_bytes(4));
-        mkdir($tmp . '/abilities', 0775, true);
-        $json = json_encode(AppConfig::PRESET_ITEMS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
-        file_put_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, $json);
+        $yaml = <<<'YAML'
+skills:
+  - path: gitflow
+    description: GitFlow start/finish
+    targets:
+      cursor: .cursor/skills/gitflow/
 
-        $old = getcwd();
-        self::assertNotFalse($old);
-        chdir($tmp);
+presets:
+  - name: gitflow
+    description: GitFlow 全套能力
+    includes:
+      - skill:gitflow
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
 
-        $cmd = new PresetAddAbilityCommand();
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute([
-            'preset' => 'gitflow',
-            'ability' => 'gitflow',
-            '--skill' => true,
-        ]);
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+        $registry->addAbility('gitflow', 'skill', 'gitflow');
 
-        chdir($old);
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('already in preset', $tester->getDisplay());
+        $preset = $registry->getPreset('gitflow');
+        self::assertNotNull($preset);
+        // Should still have exactly one entry (no duplicate)
+        $skillEntries = array_filter($preset['includes'], fn($inc) => $inc['type'] === 'skill' && $inc['path'] === 'gitflow');
+        self::assertCount(1, $skillEntries);
     }
 
     public function testPresetRemoveAbilityRemovesFromManifest(): void
     {
-        $tmp = sys_get_temp_dir() . '/apm-prm-' . bin2hex(random_bytes(4));
-        mkdir($tmp . '/abilities', 0775, true);
-        $json = json_encode(AppConfig::PRESET_ITEMS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
-        file_put_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, $json);
+        $yaml = <<<'YAML'
+skills:
+  - path: gitflow
+    description: GitFlow start/finish
+    targets:
+      cursor: .cursor/skills/gitflow/
 
-        $old = getcwd();
-        self::assertNotFalse($old);
-        chdir($tmp);
+presets:
+  - name: gitflow
+    description: GitFlow 全套能力
+    includes:
+      - skill:gitflow
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
 
-        $cmd = new PresetRemoveAbilityCommand();
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute([
-            'preset' => 'gitflow',
-            'ability' => 'gitflow',
-            '--skill' => true,
-        ]);
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+        $registry->removeAbility('gitflow', 'skill', 'gitflow');
 
-        chdir($old);
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('[ok]', $tester->getDisplay());
-
-        $saved = json_decode((string) file_get_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH), true);
-        self::assertNotContains('gitflow', $saved['gitflow']['skills']);
+        $preset = $registry->getPreset('gitflow');
+        self::assertNotNull($preset);
+        self::assertSame([], $preset['includes']);
     }
 
     public function testPresetCreateSavesNewPreset(): void
     {
-        $tmp = sys_get_temp_dir() . '/apm-pcr-' . bin2hex(random_bytes(4));
-        mkdir($tmp . '/abilities', 0775, true);
-        $json = json_encode(AppConfig::PRESET_ITEMS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
-        file_put_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, $json);
+        $yaml = <<<'YAML'
+skills:
+  - path: gitflow
+    description: GitFlow start/finish
+    targets:
+      cursor: .cursor/skills/gitflow/
 
-        $old = getcwd();
-        self::assertNotFalse($old);
-        chdir($tmp);
+presets:
+  - name: gitflow
+    description: GitFlow 全套能力
+    includes:
+      - skill:gitflow
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
 
-        $presetName = 'fresh-preset-' . bin2hex(random_bytes(2));
-        $cmd = new PresetCreateCommand();
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute([
-            'name' => $presetName,
-            '--skill' => ['snap'],
-        ]);
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+        $registry->createPreset('fresh-preset', 'A fresh preset', ['skill:gitflow']);
 
-        chdir($old);
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('[ok]', $tester->getDisplay());
-
-        $saved = json_decode((string) file_get_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH), true);
-        self::assertArrayHasKey($presetName, $saved);
-        self::assertContains('snap', $saved[$presetName]['skills']);
+        $preset = $registry->getPreset('fresh-preset');
+        self::assertNotNull($preset);
+        self::assertSame('fresh-preset', $preset['name']);
+        self::assertSame('A fresh preset', $preset['description']);
+        self::assertSame(['type' => 'skill', 'path' => 'gitflow'], $preset['includes'][0]);
     }
 
     public function testPresetDeleteRemovesPresetFromManifest(): void
     {
-        $tmp = sys_get_temp_dir() . '/apm-pdel2-' . bin2hex(random_bytes(4));
-        mkdir($tmp . '/abilities', 0775, true);
-        $json = json_encode(AppConfig::PRESET_ITEMS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
-        file_put_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, $json);
+        $yaml = <<<'YAML'
+skills:
+  - path: gitflow
+    description: GitFlow start/finish
+    targets:
+      cursor: .cursor/skills/gitflow/
 
-        $old = getcwd();
-        self::assertNotFalse($old);
-        chdir($tmp);
+presets:
+  - name: gitflow
+    description: GitFlow 全套能力
+    includes:
+      - skill:gitflow
+  - name: to-delete
+    description: Will be deleted
+    includes:
+      - skill:gitflow
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
 
-        $cmd = new PresetDeleteCommand();
-        $tester = new CommandTester($cmd);
-        $exit = $tester->execute([
-            'name' => 'kiro-spec',
-        ]);
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+        $registry->deletePreset('to-delete');
 
-        chdir($old);
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('[ok]', $tester->getDisplay());
-
-        $saved = json_decode((string) file_get_contents($tmp . '/' . PresetRegistry::PRESETS_RELATIVE_PATH), true);
-        self::assertArrayNotHasKey('kiro-spec', $saved);
+        self::assertNull($registry->getPreset('to-delete'));
+        // gitflow should still exist
+        self::assertNotNull($registry->getPreset('gitflow'));
     }
 }

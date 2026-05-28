@@ -19,6 +19,11 @@ final class AbilityRegistry
 
     public function __construct(private readonly string $registryPath) {}
 
+    public function getRegistryPath(): string
+    {
+        return $this->registryPath;
+    }
+
     /**
      * 解析 abilities.yaml，返回按类型分组的 ability 列表。
      *

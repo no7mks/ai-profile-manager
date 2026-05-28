@@ -106,7 +106,7 @@ final class CommandEdgeCasesTest extends TestCase
         ]);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Unknown preset', $tester->getDisplay());
+        self::assertStringContainsString('not found', $tester->getDisplay());
     }
 
     public function testPresetAddAbilityRejectsNoTypeFlag(): void
@@ -142,7 +142,7 @@ final class CommandEdgeCasesTest extends TestCase
         ]);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Unknown preset', $tester->getDisplay());
+        self::assertStringContainsString('not found', $tester->getDisplay());
     }
 
     public function testPresetRemoveAbilityRejectsNoTypeFlag(): void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
@@ -16,8 +17,10 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class CheckCommand extends Command
 {
-    public function __construct(private readonly CheckService $checker)
-    {
+    public function __construct(
+        private readonly CheckService $checker,
+        private readonly PresetRegistry $presetRegistry = new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml')),
+    ) {
         parent::__construct();
     }
 
@@ -37,14 +40,13 @@ final class CheckCommand extends Command
         /** @var array<int, string> $targets */
         $targets = $input->getOption('target');
 
-        $registry = new PresetRegistry((string) getcwd());
-        $known = array_keys($registry->allPresets());
+        $known = array_map(fn(array $p) => $p['name'], $this->presetRegistry->allPresets());
         if (!in_array($preset, $known, true)) {
             $io->error(sprintf('Unknown preset: %s. Known presets: %s.', $preset, implode(', ', $known)));
             return Command::FAILURE;
         }
 
-        $presetSpec = $registry->getPreset($preset);
+        $presetSpec = $this->presetRegistry->getPreset($preset);
         if ($presetSpec === null) {
             return Command::FAILURE;
         }
@@ -57,7 +59,7 @@ final class CheckCommand extends Command
         }
 
         $io->writeln("Preset: {$preset}");
-        $results = $this->checker->checkTyped($presetSpec, $targets);
+        $results = $this->checker->checkTyped(PresetRegistry::toTypedSpec($presetSpec), $targets);
         foreach ($this->checker->renderResults($results) as $line) {
             $io->writeln($line);
         }
