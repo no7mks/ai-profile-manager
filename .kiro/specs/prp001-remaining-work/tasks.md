@@ -245,12 +245,12 @@
     - 确认 `vendor/bin/phpunit` 仍全绿（文档变更不应影响测试）
     - commit: `*(state): sync SSOT with Source-is-Target layout, add apm init reference`
 
-- [-] 11. Code Review
-  - [ ] 11.1 委托 code-reviewer sub-agent 执行全量 code review
+- [x] 11. Code Review
+  - [x] 11.1 委托 code-reviewer sub-agent 执行全量 code review
     - 基于当前分支的 diff 进行 review
     - 发现问题直接修复
     - _Ref: 全部 Requirements 的实现质量保证_
-  - [ ] 11.2 Final Checkpoint — 最终验证
+  - [x] 11.2 Final Checkpoint — 最终验证
     - 运行 `vendor/bin/phpunit` 确认全套件零失败零错误
     - 运行 `vendor/bin/phpstan analyse` 确认无静态分析错误
     - commit: `*(review): address code review findings`
