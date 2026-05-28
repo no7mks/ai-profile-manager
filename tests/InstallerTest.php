@@ -115,22 +115,30 @@ final class InstallerTest extends TestCase
     {
         $tmp = sys_get_temp_dir() . '/apm-installer-gi-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
-        mkdir($tmp . '/abilities/gitignore', 0775, true);
-        file_put_contents($tmp . '/abilities/gitignore/template.gitignore', implode("\n", [
-            '## @apm:block ability=skill:graphify target=cursor',
-            '/.cache/graphify/',
-            '## @apm:end',
-        ]));
 
         $pkg = sys_get_temp_dir() . '/apm-installer-gi-pkg-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/abilities/skills/graphify', 0775, true);
         file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', 'x');
+        // Template now lives at packageRoot/.gitignore
+        file_put_contents($pkg . '/.gitignore', implode("\n", [
+            '## @apm:block ability=skill:graphify target=cursor',
+            '/.cache/graphify/',
+            '## @apm:end',
+        ]));
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: Graphify skill',
+            '    targets:',
+            '      cursor: abilities/skills/graphify',
+        ]) . "\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => ['graphify'],
             'rules' => [],
@@ -403,21 +411,31 @@ final class InstallerTest extends TestCase
     public function testInstallTypedGitignoreReportsSkipWhenTemplateHasNoMatches(): void
     {
         $project = sys_get_temp_dir() . '/apm-inst-gi-skip-' . bin2hex(random_bytes(4));
-        mkdir($project . '/abilities/gitignore', 0775, true);
-        file_put_contents($project . '/abilities/gitignore/template.gitignore', implode("\n", [
+        mkdir($project, 0775, true);
+
+        $pkg = sys_get_temp_dir() . '/apm-inst-gi-skip-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', "x\n");
+        // Template at packageRoot/.gitignore with non-matching blocks
+        file_put_contents($pkg . '/.gitignore', implode("\n", [
             '## @apm:block ability=skill:other-skill target=kiro',
             '/.cache/other/',
             '## @apm:end',
         ]));
-        $pkg = sys_get_temp_dir() . '/apm-inst-gi-skip-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', "x\n");
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: Graphify skill',
+            '    targets:',
+            '      cursor: abilities/skills/graphify',
+        ]) . "\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => ['graphify'],
             'rules' => [],
