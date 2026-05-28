@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AiProfileManager\Tests;
 
 use AiProfileManager\Service\CheckService;
-use AiProfileManager\Service\HookChecker;
 use PHPUnit\Framework\TestCase;
 
 final class CheckServiceTest extends TestCase
@@ -49,17 +48,41 @@ final class CheckServiceTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-check-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-check-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/skills/demo-skill', 0775, true);
-        mkdir($baseline . '/abilities/rules/git', 0775, true);
-        mkdir($baseline . '/abilities/agents', 0775, true);
+
+        // New layout: baseline uses targets paths directly
+        mkdir($baseline . '/.cursor/skills/demo-skill', 0775, true);
+        mkdir($baseline . '/.cursor/rules/git', 0775, true);
+        mkdir($baseline . '/.cursor/agents', 0775, true);
         mkdir($workspace . '/.cursor/skills/demo-skill', 0775, true);
         mkdir($workspace . '/.cursor/rules/git', 0775, true);
         mkdir($workspace . '/.cursor/agents', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/demo-skill/SKILL.md', "v1\n");
-        file_put_contents($baseline . '/abilities/rules/git/demo-rule.cursor.mdc', "rule-base\n");
-        file_put_contents($baseline . '/abilities/agents/demo-agent.cursor.md', "agent-base\n");
+        file_put_contents($baseline . '/.cursor/skills/demo-skill/SKILL.md', "v1\n");
+        file_put_contents($baseline . '/.cursor/rules/git/demo-rule.mdc', "rule-base\n");
+        file_put_contents($baseline . '/.cursor/agents/demo-agent.md', "agent-base\n");
         file_put_contents($workspace . '/.cursor/skills/demo-skill/SKILL.md', "v1\n");
         file_put_contents($workspace . '/.cursor/rules/git/demo-rule.mdc', "rule-mod\n");
+
+        // Create abilities.yaml in baseline root
+        $yaml = <<<'YAML'
+version: "1"
+rules:
+  - path: demo-rule
+    description: test rule
+    targets:
+      cursor: .cursor/rules/git/demo-rule.mdc
+agents:
+  - path: demo-agent
+    description: test agent
+    targets:
+      cursor: .cursor/agents/demo-agent.md
+skills:
+  - path: demo-skill
+    description: test skill
+    targets:
+      cursor: .cursor/skills/demo-skill/
+hooks: []
+YAML;
+        file_put_contents($baseline . '/abilities.yaml', $yaml);
 
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
@@ -155,6 +178,9 @@ final class CheckServiceTest extends TestCase
         mkdir($workspace . '/.kiro/hooks', 0775, true);
         file_put_contents($workspace . '/.kiro/hooks/my-hook.kiro.hook', '{"name":"my-hook"}');
 
+        // Create empty abilities.yaml
+        $this->writeEmptyAbilitiesYaml($baseline);
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $oldCwd = getcwd();
@@ -194,6 +220,8 @@ final class CheckServiceTest extends TestCase
         mkdir($workspace . '/.kiro/hooks', 0775, true);
         file_put_contents($workspace . '/.kiro/hooks/drifted.kiro.hook', '{"name":"modified"}');
 
+        $this->writeEmptyAbilitiesYaml($baseline);
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $oldCwd = getcwd();
@@ -230,6 +258,8 @@ final class CheckServiceTest extends TestCase
         // No installed file in workspace
         mkdir($workspace, 0775, true);
 
+        $this->writeEmptyAbilitiesYaml($baseline);
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $oldCwd = getcwd();
@@ -261,7 +291,6 @@ final class CheckServiceTest extends TestCase
         $workspace = sys_get_temp_dir() . '/apm-check-hook-cursor-ws-' . bin2hex(random_bytes(4));
 
         mkdir($baseline . '/hooks', 0775, true);
-        // Baseline hook source (not used for cursor check directly, but must exist for path resolution)
         file_put_contents($baseline . '/hooks/check-write.kiro.hook', '{}');
 
         // Create cursor hook directory with entry script and declaration
@@ -279,6 +308,8 @@ final class CheckServiceTest extends TestCase
                 'preToolUse' => [['command' => '.cursor/hooks/check-write/check-write.sh']],
             ],
         ]));
+
+        $this->writeEmptyAbilitiesYaml($baseline);
 
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
@@ -318,6 +349,8 @@ final class CheckServiceTest extends TestCase
 
         // No cursor hook directory in workspace
         mkdir($workspace, 0775, true);
+
+        $this->writeEmptyAbilitiesYaml($baseline);
 
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
@@ -362,11 +395,25 @@ final class CheckServiceTest extends TestCase
         $baseline = sys_get_temp_dir() . '/apm-check-hook-merge-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-check-hook-merge-ws-' . bin2hex(random_bytes(4));
 
-        // Setup baseline for skill and hook
-        mkdir($baseline . '/abilities/skills/demo-skill', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/demo-skill/SKILL.md', "v1\n");
+        // Setup baseline for skill and hook (new layout)
+        mkdir($baseline . '/.kiro/skills/demo-skill', 0775, true);
+        file_put_contents($baseline . '/.kiro/skills/demo-skill/SKILL.md', "v1\n");
         mkdir($baseline . '/hooks', 0775, true);
         file_put_contents($baseline . '/hooks/my-hook.kiro.hook', '{"name":"my-hook"}');
+
+        // Create abilities.yaml in baseline root
+        $yaml = <<<'YAML'
+version: "1"
+rules: []
+agents: []
+skills:
+  - path: demo-skill
+    description: test skill
+    targets:
+      kiro: .kiro/skills/demo-skill/
+hooks: []
+YAML;
+        file_put_contents($baseline . '/abilities.yaml', $yaml);
 
         // Setup workspace
         mkdir($workspace . '/.kiro/skills/demo-skill', 0775, true);
@@ -400,6 +447,44 @@ final class CheckServiceTest extends TestCase
         self::assertSame('hook', $results[1]['type']);
         self::assertSame('unchanged', $results[0]['status']);
         self::assertSame('unchanged', $results[1]['status']);
+    }
+
+    public function testEvaluateExitCodeReturnsTwoForNoBaseline(): void
+    {
+        $service = new CheckService();
+
+        self::assertSame(2, $service->evaluateExitCode([
+            ['type' => 'skill', 'name' => 'graphify', 'target' => 'cursor', 'status' => 'no-baseline'],
+        ]));
+    }
+
+    public function testEvaluateExitCodeReturnsZeroForNew(): void
+    {
+        $service = new CheckService();
+
+        self::assertSame(0, $service->evaluateExitCode([
+            ['type' => 'skill', 'name' => 'graphify', 'target' => 'cursor', 'status' => 'new'],
+        ]));
+    }
+
+    public function testRenderResultsPrefixForNoBaseline(): void
+    {
+        $service = new CheckService();
+        $lines = $service->renderResults([
+            ['type' => 'skill', 'name' => 'a', 'target' => 'cursor', 'status' => 'no-baseline'],
+        ]);
+
+        self::assertStringContainsString('[nobl]', $lines[0]);
+    }
+
+    public function testRenderResultsPrefixForNew(): void
+    {
+        $service = new CheckService();
+        $lines = $service->renderResults([
+            ['type' => 'skill', 'name' => 'a', 'target' => 'cursor', 'status' => 'new'],
+        ]);
+
+        self::assertStringContainsString('[new]', $lines[0]);
     }
 
     public function testCheckTypedReturnsUnknownForHooksWhenBaselineMissing(): void
@@ -436,5 +521,20 @@ final class CheckServiceTest extends TestCase
         self::assertSame('hook', $results[0]['type']);
         self::assertSame('my-hook', $results[0]['name']);
         self::assertSame('unknown', $results[0]['status']);
+    }
+
+    private function writeEmptyAbilitiesYaml(string $dir): void
+    {
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        $yaml = <<<'YAML'
+version: "1"
+rules: []
+agents: []
+skills: []
+hooks: []
+YAML;
+        file_put_contents($dir . '/abilities.yaml', $yaml);
     }
 }

@@ -8,9 +8,23 @@ final class CheckService
 {
     public function __construct(
         private readonly ComposerBaselineResolver $baselineResolver = new ComposerBaselineResolver(),
-        private readonly AbilityDiffService $diffService = new AbilityDiffService(),
+        private readonly ?AbilityDiffService $diffService = null,
         private readonly HookChecker $hookChecker = new HookChecker(),
     ) {
+    }
+
+    private function createDiffService(string $baselineRoot): AbilityDiffService
+    {
+        if ($this->diffService !== null) {
+            return $this->diffService;
+        }
+
+        $registryPath = $baselineRoot . '/abilities.yaml';
+
+        return new AbilityDiffService(
+            new AbilityDirectoryDiff(),
+            new AbilityRegistry($registryPath),
+        );
     }
 
     /**
@@ -34,7 +48,7 @@ final class CheckService
             'rules' => $items['rules'],
             'agents' => $items['agents'],
         ];
-        $detailed = $this->diffService->diffForInstalledTargets($diffItems, $targets, $baselineRoot, $workspaceRoot);
+        $detailed = $this->createDiffService($baselineRoot)->diffForInstalledTargets($diffItems, $targets, $baselineRoot, $workspaceRoot);
 
         $results = array_map(
             static fn (array $item): array => [
@@ -63,7 +77,7 @@ final class CheckService
     public function evaluateExitCode(array $results): int
     {
         foreach ($results as $result) {
-            if ($result['status'] === 'modified' || $result['status'] === 'missing') {
+            if ($result['status'] === 'modified' || $result['status'] === 'missing' || $result['status'] === 'no-baseline') {
                 return 2;
             }
         }
@@ -83,6 +97,8 @@ final class CheckService
                 'unchanged' => 'ok',
                 'modified' => 'drift',
                 'missing' => 'miss',
+                'no-baseline' => 'nobl',
+                'new' => 'new',
                 default => 'todo',
             };
             $lines[] = sprintf(
