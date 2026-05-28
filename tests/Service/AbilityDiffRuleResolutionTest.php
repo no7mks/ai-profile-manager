@@ -126,30 +126,6 @@ final class AbilityDiffRuleResolutionTest extends TestCase
         self::assertSame('unchanged', $results[0]['status']);
     }
 
-    public function testDiffForCaptureRuleResolvesFromAbilitiesDir(): void
-    {
-        $baseline = $this->tmpDir . '/baseline';
-        $workspace = $this->tmpDir . '/workspace';
-
-        mkdir($baseline . '/abilities/rules/safety', 0775, true);
-        file_put_contents($baseline . '/abilities/rules/safety/cmd.cursor.mdc', "base\n");
-
-        mkdir($workspace . '/abilities/rules/safety', 0775, true);
-        file_put_contents($workspace . '/abilities/rules/safety/cmd.cursor.mdc', "modified\n");
-
-        $svc = new AbilityDiffService();
-        $results = $svc->diffForCapture(
-            ['skills' => [], 'rules' => ['cmd'], 'agents' => []],
-            ['cursor'],
-            $baseline,
-            $workspace,
-        );
-
-        self::assertCount(1, $results);
-        self::assertSame('modified', $results[0]['status']);
-        self::assertNotEmpty($results[0]['files']);
-    }
-
     public function testDiffRuleReturnsUnknownWhenBaselineHasNoRulesDir(): void
     {
         $baseline = $this->tmpDir . '/baseline';

@@ -168,48 +168,6 @@ final class AbilityDiffServiceExtendedTest extends TestCase
         self::assertSame('missing', $results[0]['status']);
     }
 
-    public function testDiffForCaptureRuleDetectsModified(): void
-    {
-        $baseline = $this->tmpDir . '/baseline';
-        $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/rules/git', 0775, true);
-        mkdir($workspace . '/abilities/rules/git', 0775, true);
-        file_put_contents($baseline . '/abilities/rules/git/bo.cursor.mdc', "base\n");
-        file_put_contents($workspace . '/abilities/rules/git/bo.cursor.mdc', "modified\n");
-
-        $svc = new AbilityDiffService();
-        $results = $svc->diffForCapture(
-            ['skills' => [], 'rules' => ['bo'], 'agents' => []],
-            ['cursor'],
-            $baseline,
-            $workspace,
-        );
-
-        self::assertCount(1, $results);
-        self::assertSame('modified', $results[0]['status']);
-    }
-
-    public function testDiffForCaptureAgentDetectsModified(): void
-    {
-        $baseline = $this->tmpDir . '/baseline';
-        $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/agents', 0775, true);
-        mkdir($workspace . '/abilities/agents', 0775, true);
-        file_put_contents($baseline . '/abilities/agents/rev.cursor.md', "base\n");
-        file_put_contents($workspace . '/abilities/agents/rev.cursor.md', "modified\n");
-
-        $svc = new AbilityDiffService();
-        $results = $svc->diffForCapture(
-            ['skills' => [], 'rules' => [], 'agents' => ['rev']],
-            ['cursor'],
-            $baseline,
-            $workspace,
-        );
-
-        self::assertCount(1, $results);
-        self::assertSame('modified', $results[0]['status']);
-    }
-
     public function testHashFilesProducesConsistentHash(): void
     {
         $svc = new AbilityDiffService();

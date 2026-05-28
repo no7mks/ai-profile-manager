@@ -19,19 +19,9 @@ final class AbilityDiffService
      * @param array<int, string> $targets
      * @return array<int, array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}>
      */
-    public function diffForCapture(array $items, array $targets, string $baselineRoot, string $workspaceRoot): array
-    {
-        return $this->diffTyped($items, $targets, $baselineRoot, $workspaceRoot, false);
-    }
-
-    /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
-     * @param array<int, string> $targets
-     * @return array<int, array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}>
-     */
     public function diffForInstalledTargets(array $items, array $targets, string $baselineRoot, string $workspaceRoot): array
     {
-        return $this->diffTyped($items, $targets, $baselineRoot, $workspaceRoot, true);
+        return $this->diffTyped($items, $targets, $baselineRoot, $workspaceRoot);
     }
 
     /**
@@ -55,18 +45,18 @@ final class AbilityDiffService
      * @param array<int, string> $targets
      * @return array<int, array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}>
      */
-    private function diffTyped(array $items, array $targets, string $baselineRoot, string $workspaceRoot, bool $installedLayout): array
+    private function diffTyped(array $items, array $targets, string $baselineRoot, string $workspaceRoot): array
     {
         $results = [];
         foreach ($targets as $target) {
             foreach ($items['skills'] as $name) {
-                $results[] = $this->diffSkill($name, $target, $baselineRoot, $workspaceRoot, $installedLayout);
+                $results[] = $this->diffSkill($name, $target, $baselineRoot, $workspaceRoot);
             }
             foreach ($items['rules'] as $name) {
-                $results[] = $this->diffRule($name, $target, $baselineRoot, $workspaceRoot, $installedLayout);
+                $results[] = $this->diffRule($name, $target, $baselineRoot, $workspaceRoot);
             }
             foreach ($items['agents'] as $name) {
-                $results[] = $this->diffAgent($name, $target, $baselineRoot, $workspaceRoot, $installedLayout);
+                $results[] = $this->diffAgent($name, $target, $baselineRoot, $workspaceRoot);
             }
         }
 
@@ -76,12 +66,10 @@ final class AbilityDiffService
     /**
      * @return array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}
      */
-    private function diffSkill(string $name, string $target, string $baselineRoot, string $workspaceRoot, bool $installedLayout): array
+    private function diffSkill(string $name, string $target, string $baselineRoot, string $workspaceRoot): array
     {
         $bDir = $baselineRoot . '/abilities/skills/' . $name;
-        $wDir = $installedLayout
-            ? $this->resolveInstalledSkillDir($workspaceRoot, $name, $target)
-            : $workspaceRoot . '/abilities/skills/' . $name;
+        $wDir = $this->resolveInstalledSkillDir($workspaceRoot, $name, $target);
         $baselineExists = is_dir($bDir);
         $workspaceExists = is_dir($wDir);
         $files = $this->directoryDiff->diffDirectories($baselineExists ? $bDir : null, $workspaceExists ? $wDir : null);
@@ -90,7 +78,7 @@ final class AbilityDiffService
             'type' => 'skill',
             'name' => $name,
             'target' => $target,
-            'status' => $this->resolveStatus($files, $baselineExists, $workspaceExists, $installedLayout),
+            'status' => $this->resolveStatus($files, $baselineExists, $workspaceExists),
             'content_hash' => $this->hashFiles($files),
             'files' => $files,
         ];
@@ -99,13 +87,11 @@ final class AbilityDiffService
     /**
      * @return array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}
      */
-    private function diffAgent(string $name, string $target, string $baselineRoot, string $workspaceRoot, bool $installedLayout): array
+    private function diffAgent(string $name, string $target, string $baselineRoot, string $workspaceRoot): array
     {
         $relative = 'agents/' . $name . '.' . $target . '.md';
         $bFile = $baselineRoot . '/abilities/' . $relative;
-        $wFile = $installedLayout
-            ? $this->resolveInstalledAgentFile($workspaceRoot, $name, $target)
-            : $workspaceRoot . '/abilities/' . $relative;
+        $wFile = $this->resolveInstalledAgentFile($workspaceRoot, $name, $target);
         $baselineExists = is_file($bFile);
         $workspaceExists = is_file($wFile);
         $files = $this->directoryDiff->diffOptionalFiles($baselineExists ? $bFile : null, $workspaceExists ? $wFile : null, $relative);
@@ -114,7 +100,7 @@ final class AbilityDiffService
             'type' => 'agent',
             'name' => $name,
             'target' => $target,
-            'status' => $this->resolveStatus($files, $baselineExists, $workspaceExists, $installedLayout),
+            'status' => $this->resolveStatus($files, $baselineExists, $workspaceExists),
             'content_hash' => $this->hashFiles($files),
             'files' => $files,
         ];
@@ -123,20 +109,16 @@ final class AbilityDiffService
     /**
      * @return array{type: string, name: string, target: string, status: string, content_hash: string, files: array<int, array<string, mixed>>}
      */
-    private function diffRule(string $name, string $target, string $baselineRoot, string $workspaceRoot, bool $installedLayout): array
+    private function diffRule(string $name, string $target, string $baselineRoot, string $workspaceRoot): array
     {
         $baselineRelative = $this->resolveRuleRelativePath($baselineRoot, $name, $target);
-        $workspaceRelative = $installedLayout
-            ? $this->resolveInstalledRuleRelativePath($workspaceRoot, $name, $target)
-            : $this->resolveRuleRelativePath($workspaceRoot, $name, $target);
+        $workspaceRelative = $this->resolveInstalledRuleRelativePath($workspaceRoot, $name, $target);
         $relative = $baselineRelative ?? $workspaceRelative
             ?? ('rules/' . $name . ($target === 'cursor' ? '.cursor.mdc' : '.kiro.md'));
         $baselineFile = $baselineRelative === null ? null : $baselineRoot . '/abilities/' . $baselineRelative;
         $workspaceFile = $workspaceRelative === null
             ? null
-            : ($installedLayout
-                ? $workspaceRoot . '/' . $workspaceRelative
-                : $workspaceRoot . '/abilities/' . $workspaceRelative);
+            : $workspaceRoot . '/' . $workspaceRelative;
         $baselineExists = $baselineFile !== null && is_file($baselineFile);
         $workspaceExists = $workspaceFile !== null && is_file($workspaceFile);
         $files = $this->directoryDiff->diffOptionalFiles($baselineExists ? $baselineFile : null, $workspaceExists ? $workspaceFile : null, $relative);
@@ -145,7 +127,7 @@ final class AbilityDiffService
             'type' => 'rule',
             'name' => $name,
             'target' => $target,
-            'status' => $this->resolveStatus($files, $baselineExists, $workspaceExists, $installedLayout),
+            'status' => $this->resolveStatus($files, $baselineExists, $workspaceExists),
             'content_hash' => $this->hashFiles($files),
             'files' => $files,
         ];
@@ -154,7 +136,7 @@ final class AbilityDiffService
     /**
      * @param array<int, array<string, mixed>> $files
      */
-    private function resolveStatus(array $files, bool $baselineExists, bool $workspaceExists, bool $installedLayout): string
+    private function resolveStatus(array $files, bool $baselineExists, bool $workspaceExists): string
     {
         if (!$baselineExists) {
             return 'unknown';
@@ -162,7 +144,7 @@ final class AbilityDiffService
         if ($files === []) {
             return 'unchanged';
         }
-        if ($installedLayout && !$workspaceExists) {
+        if (!$workspaceExists) {
             return 'missing';
         }
 
