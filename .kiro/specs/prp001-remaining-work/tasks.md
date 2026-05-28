@@ -20,33 +20,33 @@
 
 ## Tasks
 
-- [ ] 1. Capture/Ingest 死代码移除
-  - [ ] 1.1 移除 `AbilityDiffService::diffForCapture()` 方法及其调用链
+- [x] 1. Capture/Ingest 死代码移除
+  - [x] 1.1 移除 `AbilityDiffService::diffForCapture()` 方法及其调用链
     - 删除 `diffForCapture()` 公共方法
     - 删除 `diffTyped()` 中仅为 capture 服务的参数/分支（如 `$installedLayout = false` 路径）
     - 搜索全项目确认无其他 production code 引用 `diffForCapture`
     - _Ref: Requirement 4, AC 1_
-  - [ ] 1.2 移除测试中所有 capture/ingest 相关测试方法
+  - [x] 1.2 移除测试中所有 capture/ingest 相关测试方法
     - 搜索 `tests/` 目录中包含 `capture`、`ingest`、`diffForCapture` 的测试方法
     - 删除对应测试方法（不删除整个测试文件，除非文件仅含 capture 测试）
     - _Ref: Requirement 4, AC 2_
-  - [ ] 1.3 搜索并移除所有 capture/ingest 相关 import、class、interface
+  - [x] 1.3 搜索并移除所有 capture/ingest 相关 import、class、interface
     - 全项目 grep `capture`、`ingest`（排除 docs/、.kiro/specs/）
     - 确认无残留引用
     - _Ref: Requirement 4, AC 3_
-  - [ ] 1.4 Checkpoint — 死代码清理验证
+  - [x] 1.4 Checkpoint — 死代码清理验证
     - 运行 `vendor/bin/phpunit --filter "AbilityDiffService"` 确认无引用错误
     - commit: `-(service): remove capture/ingest dead code`
 
-- [ ] 2. Installer 路径适配重构
-  - [ ] 2.1 重构 `installAbilityBundle()` 统一路径解析
+- [x] 2. Installer 路径适配重构
+  - [x] 2.1 重构 `installAbilityBundle()` 统一路径解析
     - 新增内部方法 `resolveSourcePath(string $type, string $name, string $target): ?string`：从 AbilityRegistry 查找 AbilityEntry，返回 `$packageRoot/<targets[target]>` 或 null
     - 新增内部方法 `resolveDestPath(string $type, string $name, string $target, string $workspace): string`：返回 `$workspace/<targets[target]>`
     - 重写 `installAbilityBundle()` 统一处理 skill/agent/rule：查找 entry → 检查 targets 是否包含 target → 构造源/目标路径 → 复制
     - 当 entry 的 targets 不含请求的 target 时，静默跳过（不输出、不报错）
     - 当源路径不存在时，输出 `[fail] Missing ability: <type> <name> (expected <path>)`
     - _Ref: Requirement 1, AC 1-3, 4-8_
-  - [ ] 2.2 移除已废弃的私有方法
+  - [x] 2.2 移除已废弃的私有方法
     - 删除 `findRuleSourceFiles()`
     - 删除 `pickPreferredRuleSource()`
     - 删除 `installRuleBundle()`
@@ -54,64 +54,64 @@
     - 删除 `resolveInstallTargetRuleFile()`
     - 删除 `resolveInstallTargetDir()` 中的 `default` 分支（指向 `abilities/unknown-items/`）
     - _Ref: Requirement 1, AC 4-5_
-  - [ ] 2.3 移除构造函数中的 `$templatePath` 参数
+  - [x] 2.3 移除构造函数中的 `$templatePath` 参数
     - 从构造函数签名中移除 `$templatePath`
     - `installGitIgnore()` 中模板路径改为 `$this->packageRoot . '/.gitignore'`
     - _Ref: Requirement 5, AC 1; Design/Components/GitIgnoreTemplateService_
-  - [ ] 2.4 Checkpoint — Installer 重构验证
+  - [x] 2.4 Checkpoint — Installer 重构验证
     - 运行 `vendor/bin/phpunit --filter "Installer"` 查看当前失败情况（预期有 fixture 相关失败，将在 Task 6 统一修复）
     - commit: `*(Installer): adopt Source-is-Target path resolution`
 
 - [ ] 3. AbilityDiffService 路径适配重构
-  - [ ] 3.1 注入 AbilityRegistry 并重写路径解析
+  - [x] 3.1 注入 AbilityRegistry 并重写路径解析
     - 构造函数新增 `AbilityRegistry $registry` 参数
     - 重写 `diffSkill()`、`diffAgent()`、`diffRule()` 统一为：查找 AbilityEntry → `$baselineRoot/<targets[target]>` vs `$workspaceRoot/<targets[target]>`
     - 移除 `resolveRuleRelativePath()`、`pickPreferredRuleSourcePath()`
     - 移除 `resolveInstalledSkillDir()`、`resolveInstalledAgentFile()`、`resolveInstalledRuleRelativePath()`（这些方法的逻辑被 targets 字段替代）
     - _Ref: Requirement 2, AC 1-5_
-  - [ ] 3.2 扩展 `resolveStatus()` 支持 `no-baseline` 和 `new` 状态
+  - [x] 3.2 扩展 `resolveStatus()` 支持 `no-baseline` 和 `new` 状态
     - 当 baselineRoot 本身不可用（ComposerBaselineResolver 返回 null）时，所有 ability 状态为 `no-baseline`
     - 当 baselineRoot 存在但该 ability 的 `targets[target]` 路径在 baseline 中不存在时，状态为 `new`
     - `no-baseline` → exit 2（环境错误）；`new` → exit 0（用户新增，不算 drift）
     - _Ref: Requirement 2, AC 6-7; CR3, CR6_
-  - [ ] 3.3 适配 CheckService 的状态渲染和 exit code
+  - [x] 3.3 适配 CheckService 的状态渲染和 exit code
     - `CheckService::renderResults()` 新增 `no-baseline` 和 `new` 的 prefix 映射
     - `CheckService::evaluateExitCode()` 中 `no-baseline` → exit 2，`new` → exit 0
     - _Ref: Requirement 2, AC 6; CR6_
-  - [ ] 3.4 Checkpoint — AbilityDiffService 重构验证
+  - [x] 3.4 Checkpoint — AbilityDiffService 重构验证
     - 运行 `vendor/bin/phpunit --filter "AbilityDiffService|CheckService"` 查看当前状态
     - commit: `*(AbilityDiffService): adopt Source-is-Target baseline resolution`
 
 - [ ] 4. PresetRegistry 迁移到 abilities.yaml
-  - [ ] 4.1 重写 PresetRegistry 构造函数和读取逻辑
+  - [x] 4.1 重写 PresetRegistry 构造函数和读取逻辑
     - 构造函数从 `string $workspaceRoot` 改为 `AbilityRegistry $registry`
     - 在 AbilityRegistry 上新增 `public function getRegistryPath(): string` getter（返回 `$this->registryPath`）
     - `allPresets()` 从 `$registry->parse()['presets']` 读取
     - `getPreset()` 解析 `includes` 条目（第一个 `:` 为分隔符）
     - 移除 `PRESETS_RELATIVE_PATH` 常量、`loadFromWorkspace()`、`saveToWorkspace()` 方法
     - _Ref: Requirement 3, AC 1-3, 5_
-  - [ ] 4.2 实现 YAML 写入方法（createPreset / deletePreset / addAbility / removeAbility）
+  - [x] 4.2 实现 YAML 写入方法（createPreset / deletePreset / addAbility / removeAbility）
     - 使用 `Yaml::parse()` 读取整个 abilities.yaml → 修改 presets section → `Yaml::dump()` 整体重写
     - `createPreset()`: 新增 preset 条目到 presets 数组
     - `deletePreset()`: 从 presets 数组中移除指定 name 的条目
     - `addAbility()` / `removeAbility()`: 操作指定 preset 的 includes 列表
     - 引用验证：includes 中引用的 ability 必须存在于 AbilityRegistry 对应 section
     - _Ref: Requirement 3, AC 4, 6; CR1, CR7_
-  - [ ] 4.3 适配 PresetCreateCommand 和 PresetDeleteCommand
+  - [x] 4.3 适配 PresetCreateCommand 和 PresetDeleteCommand
     - 更新命令 description（移除 `abilities/_presets.json` 引用）
     - 更新命令逻辑调用 PresetRegistry 新接口
     - _Ref: Requirement 3, AC 4_
-  - [ ] 4.4 Checkpoint — PresetRegistry 迁移验证
+  - [x] 4.4 Checkpoint — PresetRegistry 迁移验证
     - 运行 `vendor/bin/phpunit --filter "PresetRegistry|PresetManifest"` 查看当前状态
     - commit: `*(PresetRegistry): migrate from JSON to abilities.yaml presets section`
 
-- [ ] 5. Gitignore 模板路径修复
-  - [ ] 5.1 验证 Installer 中 gitignore 模板路径已正确指向 `$packageRoot/.gitignore`
+- [-] 5. Gitignore 模板路径修复
+  - [x] 5.1 验证 Installer 中 gitignore 模板路径已正确指向 `$packageRoot/.gitignore`
     - 确认 Task 2.3 已完成此变更
     - 确认 `renderManagedBlock()` 在模板文件不存在时返回空字符串（已有逻辑）
     - 确认 `installGitIgnore()` 在 managedBody 为空时输出 `[skip]`（已有逻辑）
     - _Ref: Requirement 5, AC 1-4_
-  - [ ] 5.2 Checkpoint — Gitignore 路径验证
+  - [-] 5.2 Checkpoint — Gitignore 路径验证
     - 运行 `vendor/bin/phpunit --filter "GitIgnore"` 确认无回归
     - commit: `*(Installer): gitignore template path now uses packageRoot/.gitignore`
 
