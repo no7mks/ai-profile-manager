@@ -14,8 +14,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class PresetDeleteCommand extends Command
 {
-    public function __construct()
+    private ?PresetRegistry $presetRegistry;
+
+    public function __construct(?PresetRegistry $presetRegistry = null)
     {
+        $this->presetRegistry = $presetRegistry;
         parent::__construct();
     }
 
@@ -31,7 +34,7 @@ final class PresetDeleteCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $name = (string) $input->getArgument('name');
 
-        $registry = new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
+        $registry = $this->presetRegistry ?? new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
 
         try {
             $registry->deletePreset($name);

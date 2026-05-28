@@ -68,25 +68,32 @@ final class CommandErrorPathsTest extends TestCase
 
     public function testPresetCreateCommandFailsOnDuplicateName(): void
     {
-        $cmd = new PresetCreateCommand();
+        $yamlPath = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($yamlPath, "skills: []\nrules: []\nagents: []\nhooks: []\npresets:\n  - name: existing\n    description: test\n    includes: []\n");
+
+        $registry = new AbilityRegistry($yamlPath);
+        $presetRegistry = new PresetRegistry($registry);
+        $cmd = new PresetCreateCommand($presetRegistry);
         $app = new Application();
         $app->addCommand($cmd);
 
         $tester = new CommandTester($cmd);
         $tester->execute(['name' => 'existing', '--skill' => ['apm']]);
 
-        // The command uses hardcoded abilities.yaml path relative to its own file.
-        // If the preset already exists there, it will fail. Since we can't easily
-        // control that, let's just verify the command runs without fatal error.
-        // The actual error path is tested at PresetRegistry level in CoverageBumpTest.
-        self::assertContains($tester->getStatusCode(), [Command::SUCCESS, Command::FAILURE]);
+        self::assertSame(Command::FAILURE, $tester->getStatusCode());
+        self::assertStringContainsString('already exists', $tester->getDisplay());
     }
 
     // ─── PresetDeleteCommand: error path (not found) ──────────────────
 
     public function testPresetDeleteCommandFailsOnNonexistentName(): void
     {
-        $cmd = new PresetDeleteCommand();
+        $yamlPath = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($yamlPath, "skills: []\nrules: []\nagents: []\nhooks: []\npresets: []\n");
+
+        $registry = new AbilityRegistry($yamlPath);
+        $presetRegistry = new PresetRegistry($registry);
+        $cmd = new PresetDeleteCommand($presetRegistry);
         $app = new Application();
         $app->addCommand($cmd);
 
@@ -127,7 +134,12 @@ final class CommandErrorPathsTest extends TestCase
 
     public function testPresetAddAbilityCommandFailsWhenRegistryThrows(): void
     {
-        $cmd = new PresetAddAbilityCommand();
+        $yamlPath = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($yamlPath, "skills: []\nrules: []\nagents: []\nhooks: []\npresets: []\n");
+
+        $registry = new AbilityRegistry($yamlPath);
+        $presetRegistry = new PresetRegistry($registry);
+        $cmd = new PresetAddAbilityCommand($presetRegistry);
         $app = new Application();
         $app->addCommand($cmd);
 
@@ -155,7 +167,12 @@ final class CommandErrorPathsTest extends TestCase
 
     public function testPresetRemoveAbilityCommandFailsWhenRegistryThrows(): void
     {
-        $cmd = new PresetRemoveAbilityCommand();
+        $yamlPath = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($yamlPath, "skills: []\nrules: []\nagents: []\nhooks: []\npresets: []\n");
+
+        $registry = new AbilityRegistry($yamlPath);
+        $presetRegistry = new PresetRegistry($registry);
+        $cmd = new PresetRemoveAbilityCommand($presetRegistry);
         $app = new Application();
         $app->addCommand($cmd);
 

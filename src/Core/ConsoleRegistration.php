@@ -67,10 +67,10 @@ final class ConsoleRegistration
         $app->addCommand(new RuleCheckCommand($checker));
         $app->addCommand(new AgentCheckCommand($checker));
         $app->addCommand(new CheckCommand(...$checkArgs));
-        $app->addCommand(new PresetCreateCommand());
-        $app->addCommand(new PresetAddAbilityCommand());
-        $app->addCommand(new PresetRemoveAbilityCommand());
-        $app->addCommand(new PresetDeleteCommand());
+        $app->addCommand(new PresetCreateCommand($presetRegistry));
+        $app->addCommand(new PresetAddAbilityCommand($presetRegistry));
+        $app->addCommand(new PresetRemoveAbilityCommand($presetRegistry));
+        $app->addCommand(new PresetDeleteCommand($presetRegistry));
         $app->addCommand(new UpdateCommand($updater));
     }
 }

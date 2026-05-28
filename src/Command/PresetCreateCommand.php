@@ -15,8 +15,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class PresetCreateCommand extends Command
 {
-    public function __construct()
+    private ?PresetRegistry $presetRegistry;
+
+    public function __construct(?PresetRegistry $presetRegistry = null)
     {
+        $this->presetRegistry = $presetRegistry;
         parent::__construct();
     }
 
@@ -42,7 +45,7 @@ final class PresetCreateCommand extends Command
         /** @var array<int, string> $agents */
         $agents = $input->getOption('agent');
 
-        $registry = new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
+        $registry = $this->presetRegistry ?? new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
 
         // Build includes list from typed options
         $includes = [];

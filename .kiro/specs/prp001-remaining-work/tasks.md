@@ -172,23 +172,23 @@
     - 运行 `vendor/bin/phpunit` 确认全套件零失败零错误
     - commit: `*(test): fix E2E test fixtures for Source-is-Target layout`
 
-- [ ] 8. Preset 命令 AbilityRegistry 注入重构
-  - [~] 8.1 重构 PresetCreateCommand / PresetDeleteCommand 构造函数
+- [-] 8. Preset 命令 AbilityRegistry 注入重构
+  - [x] 8.1 重构 PresetCreateCommand / PresetDeleteCommand 构造函数
     - 新增构造参数 `?PresetRegistry $presetRegistry = null`
     - `execute()` 中若 `$this->presetRegistry` 已注入则直接使用，否则 fallback 到 `new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'))`（保持 CLI 独立运行兼容）
     - _目的：测试可注入 temp registry，不再写入生产 abilities.yaml_
-  - [~] 8.2 重构 PresetAddAbilityCommand / PresetRemoveAbilityCommand 构造函数
+  - [x] 8.2 重构 PresetAddAbilityCommand / PresetRemoveAbilityCommand 构造函数
     - 同 8.1 模式：构造参数注入 + fallback
-  - [~] 8.3 更新 ConsoleRegistration 传入 PresetRegistry
+  - [x] 8.3 更新 ConsoleRegistration 传入 PresetRegistry
     - `ConsoleRegistration::register()` 中 `PresetCreateCommand`、`PresetDeleteCommand`、`PresetAddAbilityCommand`、`PresetRemoveAbilityCommand` 均传入 `$presetRegistry`
-  - [~] 8.4 修复 CommandErrorPathsTest
+  - [x] 8.4 修复 CommandErrorPathsTest
     - 所有测试方法改为注入 temp 目录的 AbilityRegistry/PresetRegistry
     - 移除 `testPresetCreateCommandFailsOnDuplicateName` 中对生产文件的依赖
     - 确认测试不再触碰根目录 `abilities.yaml`
-  - [~] 8.5 清理：移除根 abilities.yaml 中被测试污染的 "existing" preset
+  - [x] 8.5 清理：移除根 abilities.yaml 中被测试污染的 "existing" preset
     - 如果 `abilities.yaml` 中存在 `name: existing` preset，删除该条目
     - 验证 `abilities.yaml` 恢复到预期状态
-  - [~] 8.6 Checkpoint — Preset 命令 DI 验证
+  - [-] 8.6 Checkpoint — Preset 命令 DI 验证
     - 运行 `vendor/bin/phpunit --filter "CommandErrorPaths|PresetCreate|PresetDelete|PresetAdd|PresetRemove"` 确认全绿
     - 运行 `git diff abilities.yaml` 确认测试未修改生产文件
     - commit: `*(command) by Kiro: inject PresetRegistry into Preset commands, fix test pollution`

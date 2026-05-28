@@ -15,8 +15,11 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class PresetRemoveAbilityCommand extends Command
 {
-    public function __construct()
+    private ?PresetRegistry $presetRegistry;
+
+    public function __construct(?PresetRegistry $presetRegistry = null)
     {
+        $this->presetRegistry = $presetRegistry;
         parent::__construct();
     }
 
@@ -44,7 +47,7 @@ final class PresetRemoveAbilityCommand extends Command
             return Command::FAILURE;
         }
 
-        $registry = new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
+        $registry = $this->presetRegistry ?? new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'));
         $key = $input->getOption('skill') ? 'skill' : ($input->getOption('rule') ? 'rule' : 'agent');
 
         try {
