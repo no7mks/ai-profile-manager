@@ -8,12 +8,15 @@ use AiProfileManager\Service\AbilityDiffService;
 use AiProfileManager\Service\AbilityDirectoryDiff;
 use AiProfileManager\Service\AbilityRegistry;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 /**
  * Tests for rule diff resolution in AbilityDiffService using targets-based path model.
  */
 final class AbilityDiffRuleResolutionTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
 
     protected function setUp(): void
@@ -224,18 +227,4 @@ final class AbilityDiffRuleResolutionTest extends TestCase
         );
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

@@ -10,9 +10,12 @@ use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class CheckCommandTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
     private string|false $oldBaseline;
@@ -147,22 +150,4 @@ final class CheckCommandTest extends TestCase
         return new PresetRegistry(new AbilityRegistry($yamlPath));
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isDir()) {
-                rmdir($fileInfo->getPathname());
-            } else {
-                unlink($fileInfo->getPathname());
-            }
-        }
-        rmdir($dir);
-    }
 }

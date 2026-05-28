@@ -8,9 +8,12 @@ use AiProfileManager\Service\AbilityEntry;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\AbilityRegistryException;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class AbilityRegistryTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
 
     protected function setUp(): void
@@ -235,19 +238,4 @@ YAML;
         self::assertSame(['cursor' => '.cursor/hooks/cursor-only/'], $result['hooks'][1]->targets);
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $items = scandir($dir) ?: [];
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-            $fullPath = $dir . '/' . $item;
-            is_dir($fullPath) ? $this->removeDir($fullPath) : unlink($fullPath);
-        }
-        rmdir($dir);
-    }
 }

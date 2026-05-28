@@ -6,9 +6,12 @@ namespace AiProfileManager\Tests\Service;
 
 use AiProfileManager\Service\HookChecker;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class HookCheckerTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
 
     protected function setUp(): void
@@ -274,24 +277,4 @@ final class HookCheckerTest extends TestCase
         self::assertSame('missing', $result);
     }
 
-    // ─── Helper ───────────────────────────────────────────────────────
-
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isDir()) {
-                rmdir($fileInfo->getPathname());
-            } else {
-                unlink($fileInfo->getPathname());
-            }
-        }
-        rmdir($dir);
-    }
 }

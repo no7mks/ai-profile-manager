@@ -6,6 +6,7 @@ namespace AiProfileManager\Tests\E2E;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 /**
  * Base class for E2E tests that invoke bin/apm as a real CLI process.
@@ -16,6 +17,8 @@ use Symfony\Component\Process\Process;
  */
 abstract class EndToEndTestCase extends TestCase
 {
+    use RemovesDirTrait;
+
     /** Workspace directory where apm commands run (simulates user's project). */
     protected string $workspace;
 
@@ -238,20 +241,4 @@ PHP;
         return (string) file_get_contents($this->workspace . '/' . $relativePath);
     }
 
-    // ─── Cleanup ─────────────────────────────────────────────────────
-
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

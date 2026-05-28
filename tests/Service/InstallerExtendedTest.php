@@ -11,9 +11,12 @@ use AiProfileManager\Service\HookChecker;
 use AiProfileManager\Service\HookInstaller;
 use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class InstallerExtendedTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string|false $oldCwd;
 
@@ -271,18 +274,4 @@ YAML;
         self::assertStringContainsString('Steering nonexistent not found on kiro', $output);
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

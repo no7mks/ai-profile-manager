@@ -22,9 +22,12 @@ use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RestoresCwdTrait;
 
 final class ConsoleFlowsTest extends TestCase
 {
+    use RestoresCwdTrait;
+
     /**
      * Helper: write a minimal abilities.yaml and return an AbilityRegistry for it.
      *

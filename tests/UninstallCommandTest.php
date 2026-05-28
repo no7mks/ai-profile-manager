@@ -15,9 +15,14 @@ use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RestoresCwdTrait;
+use AiProfileManager\Tests\Support\RestoresEnvTrait;
 
 final class UninstallCommandTest extends TestCase
 {
+    use RestoresCwdTrait;
+    use RestoresEnvTrait;
+
     public function testSkillUninstallRequiresForceWhenModified(): void
     {
         [$baseline, $workspace] = $this->prepareSkillFixture("base\n", "modified\n");

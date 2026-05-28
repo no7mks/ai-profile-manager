@@ -7,9 +7,12 @@ namespace AiProfileManager\Tests;
 use AiProfileManager\Service\HookInstaller;
 use AiProfileManager\Service\HookRegistryException;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class HookInstallerTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
 
     protected function setUp(): void
@@ -382,24 +385,4 @@ final class HookInstallerTest extends TestCase
         self::assertInstanceOf(\RuntimeException::class, $ex);
     }
 
-    // ─── Helper ───────────────────────────────────────────────────────
-
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $iterator = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST
-        );
-        foreach ($iterator as $fileInfo) {
-            if ($fileInfo->isDir()) {
-                rmdir($fileInfo->getPathname());
-            } else {
-                unlink($fileInfo->getPathname());
-            }
-        }
-        rmdir($dir);
-    }
 }

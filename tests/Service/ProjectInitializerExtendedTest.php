@@ -8,9 +8,12 @@ use AiProfileManager\Service\DirectoryMirrorService;
 use AiProfileManager\Service\ProjectInitializer;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 final class ProjectInitializerExtendedTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
 
     protected function setUp(): void
@@ -137,18 +140,4 @@ final class ProjectInitializerExtendedTest extends TestCase
         self::assertInstanceOf(ProjectInitializer::class, $init);
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $it = new \RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
-            \RecursiveIteratorIterator::CHILD_FIRST,
-        );
-        foreach ($it as $f) {
-            $f->isDir() ? rmdir($f->getPathname()) : unlink($f->getPathname());
-        }
-        rmdir($dir);
-    }
 }

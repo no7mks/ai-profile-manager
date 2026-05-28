@@ -9,9 +9,14 @@ use AiProfileManager\Command\RuleCheckCommand;
 use AiProfileManager\Service\CheckService;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RestoresCwdTrait;
+use AiProfileManager\Tests\Support\RestoresEnvTrait;
 
 final class TypedCheckCommandsTest extends TestCase
 {
+    use RestoresCwdTrait;
+    use RestoresEnvTrait;
+
     public function testRuleCheckRuns(): void
     {
         $baseline = sys_get_temp_dir() . '/apm-rcheck-base-' . bin2hex(random_bytes(4));

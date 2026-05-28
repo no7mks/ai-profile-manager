@@ -10,9 +10,12 @@ use AiProfileManager\Service\HookChecker;
 use AiProfileManager\Service\HookInstaller;
 use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RestoresCwdTrait;
 
 final class InstallerTest extends TestCase
 {
+    use RestoresCwdTrait;
+
     public function testInstallTypedMirrorsSkillAndAgentFromPackageFixture(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-pkg-' . bin2hex(random_bytes(4));

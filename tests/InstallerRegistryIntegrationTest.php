@@ -9,6 +9,7 @@ use AiProfileManager\Service\DirectoryMirrorService;
 use AiProfileManager\Service\GitIgnoreTemplateService;
 use AiProfileManager\Service\Installer;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 
 /**
  * Tests for Installer integration with AbilityRegistry.
@@ -16,6 +17,8 @@ use PHPUnit\Framework\TestCase;
  */
 final class InstallerRegistryIntegrationTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
     private string $oldCwd;
 
@@ -241,19 +244,4 @@ YAML;
         self::assertStringContainsString('Installed agent my-agent -> cursor', $output);
     }
 
-    private function removeDir(string $dir): void
-    {
-        if (!is_dir($dir)) {
-            return;
-        }
-        $items = scandir($dir) ?: [];
-        foreach ($items as $item) {
-            if ($item === '.' || $item === '..') {
-                continue;
-            }
-            $fullPath = $dir . '/' . $item;
-            is_dir($fullPath) ? $this->removeDir($fullPath) : unlink($fullPath);
-        }
-        rmdir($dir);
-    }
 }

@@ -6,9 +6,14 @@ namespace AiProfileManager\Tests;
 
 use AiProfileManager\Service\CheckService;
 use PHPUnit\Framework\TestCase;
+use AiProfileManager\Tests\Support\RestoresCwdTrait;
+use AiProfileManager\Tests\Support\RestoresEnvTrait;
 
 final class CheckServiceTest extends TestCase
 {
+    use RestoresCwdTrait;
+    use RestoresEnvTrait;
+
     public function testCheckTypedReturnsUnknownWhenBaselineMissing(): void
     {
         $composerHome = sys_get_temp_dir() . '/apm-check-no-base-' . bin2hex(random_bytes(4));
