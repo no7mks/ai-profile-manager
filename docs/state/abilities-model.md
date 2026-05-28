@@ -147,23 +147,13 @@ includes 中的每个条目使用 `type:name` 语法：
 
 ---
 
-## Preset 运行时存储（_presets.json）
+## Preset 存储
 
-运行时 preset 定义存储在 `abilities/_presets.json`，格式为 JSON：
+abilities.yaml 的 `presets` section 即为 preset 定义的**唯一存储**（SSOT）。
 
-```json
-{
-  "gitflow": {
-    "skills": ["gitflow"],
-    "rules": ["git:branch-overview", "git:git-conventions"],
-    "agents": []
-  }
-}
-```
-
-- PresetRegistry 优先读取此文件
-- 文件不存在时 fallback 到 AppConfig::PRESET_ITEMS 硬编码默认值
-- `preset:create`、`preset:add-ability`、`preset:remove-ability`、`preset:delete` 命令操作此文件
+- PresetRegistry 直接读写 abilities.yaml 中的 presets section
+- 不再使用独立的 `_presets.json` 文件
+- `preset:create`、`preset:add-ability`、`preset:remove-ability`、`preset:delete` 命令直接操作 abilities.yaml
 
 ---
 

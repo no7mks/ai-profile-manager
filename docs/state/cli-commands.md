@@ -230,7 +230,7 @@ apm 所有已注册命令的签名、行为与错误条件。
 
 **正常行为**:
 
-- 在 `abilities/_presets.json` 中创建新 preset 条目
+- 在 abilities.yaml 的 presets section 中创建新 preset 条目
 - 初始 spec 包含传入的 skill/rule/agent 列表（去重）
 
 **错误条件**:
@@ -283,7 +283,7 @@ apm 所有已注册命令的签名、行为与错误条件。
 
 **正常行为**:
 
-- 从 `abilities/_presets.json` 中删除指定 preset 条目
+- 从 abilities.yaml 的 presets section 中删除指定 preset 条目
 
 **错误条件**:
 
