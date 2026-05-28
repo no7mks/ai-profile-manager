@@ -73,22 +73,36 @@ final class InstallCommandTest extends TestCase
     public function testInstallCommandInstallsPresetSuccessfully(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', "x\n");
+        mkdir($pkg . '/.cursor/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/graphify/SKILL.md', "x\n");
+
+        // Create abilities.yaml with skill and preset
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+            'presets:',
+            '  - name: test-preset',
+            '    description: test-preset',
+            '    includes:',
+            '      - skill:graphify',
+        ]) . "\n");
 
         $proj = $this->tmpDir . '/proj';
-        mkdir($proj . '/abilities', 0775, true);
-        file_put_contents($proj . '/abilities/_presets.json', json_encode([
-            'test-preset' => ['skills' => ['graphify'], 'rules' => [], 'agents' => []],
-        ]));
+        mkdir($proj, 0775, true);
         chdir($proj);
 
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $presetRegistry = new \AiProfileManager\Service\PresetRegistry($registry);
         $installer = new Installer(
+            registry: $registry,
             gitIgnore: new GitIgnoreTemplateService(),
             packageRoot: $pkg,
             mirror: new DirectoryMirrorService(),
         );
-        $cmd = new InstallCommand($installer);
+        $cmd = new InstallCommand($installer, presetRegistry: $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'test-preset', '--target' => ['cursor']]);
 

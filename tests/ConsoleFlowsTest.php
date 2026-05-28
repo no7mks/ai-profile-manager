@@ -69,40 +69,32 @@ final class ConsoleFlowsTest extends TestCase
     public function testInstallCommandInstallsKnownPreset(): void
     {
         $tmp = sys_get_temp_dir() . '/apm-flow-i-' . bin2hex(random_bytes(4));
+        $pkg = sys_get_temp_dir() . '/apm-flow-i-pkg-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
-        mkdir($tmp . '/abilities/gitignore', 0775, true);
-        file_put_contents($tmp . '/abilities/gitignore/template.gitignore', implode("\n", [
+        mkdir($pkg, 0775, true);
+
+        // .gitignore template at package root
+        file_put_contents($pkg . '/.gitignore', implode("\n", [
             '## @apm:block ability=installable-preset target=*',
             '/.apm/gitflow/',
             '## @apm:end',
         ]));
 
-        // Create skill source fixture so Installer can find it
-        mkdir($tmp . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($tmp . '/abilities/skills/graphify/SKILL.md', "# Graphify\n");
+        // Create skill source fixture at Source-is-Target path
+        mkdir($pkg . '/.cursor/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/graphify/SKILL.md', "# Graphify\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
 
-        file_put_contents(
-            $tmp . '/abilities/_presets.json',
-            json_encode([
-                'installable-preset' => [
-                    'skills' => ['graphify'],
-                    'rules' => [],
-                    'agents' => [],
-                ],
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
-        );
-
-        $registry = self::createRegistry($tmp, [
+        $registry = self::createRegistry($pkg, [
             'skills' => [['path' => 'graphify']],
         ], [
             ['name' => 'installable-preset', 'includes' => ['skill:graphify']],
         ]);
         $presetRegistry = new PresetRegistry($registry);
-        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $tmp), presetRegistry: $presetRegistry);
+        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $pkg), presetRegistry: $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['preset' => 'installable-preset', '--target' => ['cursor']]);
 
@@ -170,12 +162,16 @@ final class ConsoleFlowsTest extends TestCase
         mkdir($pkg . '/.kiro/steering', 0775, true);
         file_put_contents($pkg . '/.cursor/rules/cursor-scope.mdc', "cursor-scope\n");
         file_put_contents($pkg . '/.kiro/steering/kiro-scope.md', "kiro-scope\n");
-        // Abilities for Installer
-        mkdir($pkg . '/abilities/skills/apm', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/apm/SKILL.md', "# APM\n");
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', "# Code Reviewer\n");
-        file_put_contents($pkg . '/abilities/agents/code-reviewer.kiro.md', "# Code Reviewer\n");
+        // Abilities for Installer at Source-is-Target paths
+        mkdir($pkg . '/.cursor/skills/apm', 0775, true);
+        mkdir($pkg . '/.kiro/skills/apm', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/apm/SKILL.md', "# APM\n");
+        file_put_contents($pkg . '/.kiro/skills/apm/SKILL.md', "# APM\n");
+        // Agents: createRegistry generates target as .cursor/agents/code-reviewer (no extension)
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        mkdir($pkg . '/.kiro/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/code-reviewer', "# Code Reviewer\n");
+        file_put_contents($pkg . '/.kiro/agents/code-reviewer', "# Code Reviewer\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -203,8 +199,8 @@ final class ConsoleFlowsTest extends TestCase
         // Default skills/agents installed
         self::assertFileExists($tmp . '/.cursor/skills/apm/SKILL.md');
         self::assertFileExists($tmp . '/.kiro/skills/apm/SKILL.md');
-        self::assertFileExists($tmp . '/.cursor/agents/code-reviewer.md');
-        self::assertFileExists($tmp . '/.kiro/agents/code-reviewer.md');
+        self::assertFileExists($tmp . '/.cursor/agents/code-reviewer');
+        self::assertFileExists($tmp . '/.kiro/agents/code-reviewer');
         self::assertStringContainsString("/apm init", $tester->getDisplay());
     }
 
@@ -261,10 +257,10 @@ final class ConsoleFlowsTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-flow-skill-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
-        // Create skill source fixture
+        // Create skill source fixture at Source-is-Target path
         $pkg = sys_get_temp_dir() . '/apm-flow-skill-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', "# Graphify\n");
+        mkdir($pkg . '/.cursor/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/graphify/SKILL.md', "# Graphify\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -290,10 +286,10 @@ final class ConsoleFlowsTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-flow-rule-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
-        // Create rule source fixture
+        // Create rule source fixture at Source-is-Target path
         $pkg = sys_get_temp_dir() . '/apm-flow-rule-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/rules/spec', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.kiro.md', "# Spec Goal\n");
+        mkdir($pkg . '/.kiro/rules', 0775, true);
+        file_put_contents($pkg . '/.kiro/rules/spec-goal', "# Spec Goal\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -319,10 +315,10 @@ final class ConsoleFlowsTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-flow-agent-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
-        // Create agent source fixture
+        // Create agent source fixture at Source-is-Target path
         $pkg = sys_get_temp_dir() . '/apm-flow-agent-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', "# Code Reviewer\n");
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/code-reviewer', "# Code Reviewer\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -371,29 +367,19 @@ final class ConsoleFlowsTest extends TestCase
     {
         $tmp = sys_get_temp_dir() . '/apm-show-' . bin2hex(random_bytes(4));
         $baseline = sys_get_temp_dir() . '/apm-show-base-' . bin2hex(random_bytes(4));
-        mkdir($tmp . '/abilities', 0775, true);
+        mkdir($tmp, 0775, true);
         mkdir($tmp . '/.cursor/skills/graphify', 0775, true);
         file_put_contents($tmp . '/.cursor/skills/graphify/SKILL.md', "x\n");
 
-        mkdir($baseline . '/abilities/skills/graphify', 0775, true);
-        mkdir($baseline . '/abilities/skills/gitflow', 0775, true);
-        mkdir($baseline . '/abilities/rules/workflow', 0775, true);
-        mkdir($baseline . '/abilities/agents', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
-        file_put_contents($baseline . '/abilities/skills/gitflow/SKILL.md', "x\n");
-        file_put_contents($baseline . '/abilities/rules/workflow/spec-goal.cursor.mdc', "x\n");
-        file_put_contents($baseline . '/abilities/agents/code-reviewer.cursor.md', "x\n");
-
-        file_put_contents(
-            $tmp . '/abilities/_presets.json',
-            json_encode([
-                'demo' => [
-                    'skills' => ['graphify'],
-                    'rules' => ['spec-goal'],
-                    'agents' => ['code-reviewer'],
-                ],
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
-        );
+        // Baseline files at Source-is-Target paths
+        mkdir($baseline . '/.cursor/skills/graphify', 0775, true);
+        mkdir($baseline . '/.cursor/skills/gitflow', 0775, true);
+        mkdir($baseline . '/.cursor/rules', 0775, true);
+        mkdir($baseline . '/.cursor/agents', 0775, true);
+        file_put_contents($baseline . '/.cursor/skills/graphify/SKILL.md', "x\n");
+        file_put_contents($baseline . '/.cursor/skills/gitflow/SKILL.md', "x\n");
+        file_put_contents($baseline . '/.cursor/rules/spec-goal', "x\n");
+        file_put_contents($baseline . '/.cursor/agents/code-reviewer', "x\n");
 
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
@@ -405,8 +391,11 @@ final class ConsoleFlowsTest extends TestCase
             'skills' => [['path' => 'graphify'], ['path' => 'gitflow']],
             'rules' => [['path' => 'spec-goal']],
             'agents' => [['path' => 'code-reviewer']],
+        ], [
+            ['name' => 'demo', 'includes' => ['skill:graphify', 'rule:spec-goal', 'agent:code-reviewer']],
         ]);
-        $cmd = new ShowCommand(new Installer(registry: $registry, packageRoot: $baseline), new CheckService());
+        $presetRegistry = new PresetRegistry($registry);
+        $cmd = new ShowCommand(new Installer(registry: $registry, packageRoot: $baseline), new CheckService(), $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor']]);
 
@@ -447,11 +436,12 @@ final class ConsoleFlowsTest extends TestCase
         $packageRoot = sys_get_temp_dir() . '/apm-show-unknown-pkg-' . bin2hex(random_bytes(4));
         mkdir($tmp . '/.cursor/skills/graphify', 0775, true);
         file_put_contents($tmp . '/.cursor/skills/graphify/SKILL.md', "x\n");
-        mkdir($packageRoot . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($packageRoot . '/abilities/skills/graphify/SKILL.md', "x\n");
+        mkdir($packageRoot, 0775, true);
 
         $oldBl = getenv('APM_BASELINE_ROOT');
+        $oldComposerHome = getenv('COMPOSER_HOME');
         putenv('APM_BASELINE_ROOT=' . $tmp . '/missing-baseline-root');
+        putenv('COMPOSER_HOME=' . $tmp . '/missing-composer-home');
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -469,6 +459,11 @@ final class ConsoleFlowsTest extends TestCase
         } else {
             putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
+        if ($oldComposerHome === false) {
+            putenv('COMPOSER_HOME');
+        } else {
+            putenv('COMPOSER_HOME=' . $oldComposerHome);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         self::assertStringContainsString('[installed] graphify', $tester->getDisplay());
@@ -480,11 +475,12 @@ final class ConsoleFlowsTest extends TestCase
         $packageRoot = sys_get_temp_dir() . '/apm-show-any-target-pkg-' . bin2hex(random_bytes(4));
         mkdir($tmp . '/.cursor/skills/graphify', 0775, true);
         file_put_contents($tmp . '/.cursor/skills/graphify/SKILL.md', "x\n");
-        mkdir($packageRoot . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($packageRoot . '/abilities/skills/graphify/SKILL.md', "x\n");
+        mkdir($packageRoot, 0775, true);
 
         $oldBl = getenv('APM_BASELINE_ROOT');
+        $oldComposerHome = getenv('COMPOSER_HOME');
         putenv('APM_BASELINE_ROOT=' . $tmp . '/missing-baseline-root');
+        putenv('COMPOSER_HOME=' . $tmp . '/missing-composer-home');
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -502,6 +498,11 @@ final class ConsoleFlowsTest extends TestCase
         } else {
             putenv('APM_BASELINE_ROOT=' . $oldBl);
         }
+        if ($oldComposerHome === false) {
+            putenv('COMPOSER_HOME');
+        } else {
+            putenv('COMPOSER_HOME=' . $oldComposerHome);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         self::assertStringContainsString('Targets: cursor, kiro', $tester->getDisplay());
@@ -515,6 +516,10 @@ final class ConsoleFlowsTest extends TestCase
         mkdir($tmp, 0775, true);
         mkdir($packageRoot, 0775, true);
 
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        $oldComposerHome = getenv('COMPOSER_HOME');
+        putenv('APM_BASELINE_ROOT=' . $tmp . '/missing-baseline-root');
+        putenv('COMPOSER_HOME=' . $tmp . '/missing-composer-home');
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -525,6 +530,16 @@ final class ConsoleFlowsTest extends TestCase
         $exit = $tester->execute(['--target' => ['cursor']]);
 
         chdir($old);
+        if ($oldBl === false) {
+            putenv('APM_BASELINE_ROOT');
+        } else {
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
+        }
+        if ($oldComposerHome === false) {
+            putenv('COMPOSER_HOME');
+        } else {
+            putenv('COMPOSER_HOME=' . $oldComposerHome);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
@@ -542,9 +557,6 @@ final class ConsoleFlowsTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-show-hooks-' . bin2hex(random_bytes(4));
         $packageRoot = sys_get_temp_dir() . '/apm-show-hooks-pkg-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
-        mkdir($packageRoot . '/abilities/skills', 0775, true);
-        mkdir($packageRoot . '/abilities/rules', 0775, true);
-        mkdir($packageRoot . '/abilities/agents', 0775, true);
         mkdir($packageRoot . '/hooks', 0775, true);
         file_put_contents($packageRoot . '/hooks/check-write-length.kiro.hook', "hook content\n");
 
@@ -558,6 +570,8 @@ final class ConsoleFlowsTest extends TestCase
             '      kiro: .kiro/hooks/check-write-length.kiro.hook',
         ]) . "\n");
 
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT=' . $packageRoot);
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -569,6 +583,11 @@ final class ConsoleFlowsTest extends TestCase
         $exit = $tester->execute(['--target' => ['cursor']]);
 
         chdir($old);
+        if ($oldBl === false) {
+            putenv('APM_BASELINE_ROOT');
+        } else {
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
@@ -584,10 +603,6 @@ final class ConsoleFlowsTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-show-type-hook-' . bin2hex(random_bytes(4));
         $packageRoot = sys_get_temp_dir() . '/apm-show-type-hook-pkg-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
-        mkdir($packageRoot . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($packageRoot . '/abilities/skills/graphify/SKILL.md', "x\n");
-        mkdir($packageRoot . '/abilities/rules', 0775, true);
-        mkdir($packageRoot . '/abilities/agents', 0775, true);
         mkdir($packageRoot . '/hooks', 0775, true);
         file_put_contents($packageRoot . '/hooks/check-write-length.kiro.hook', "hook content\n");
 
@@ -606,6 +621,8 @@ final class ConsoleFlowsTest extends TestCase
             '      kiro: .kiro/hooks/check-write-length.kiro.hook',
         ]) . "\n");
 
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT=' . $packageRoot);
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -617,6 +634,11 @@ final class ConsoleFlowsTest extends TestCase
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
 
         chdir($old);
+        if ($oldBl === false) {
+            putenv('APM_BASELINE_ROOT');
+        } else {
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
@@ -661,6 +683,10 @@ final class ConsoleFlowsTest extends TestCase
         mkdir($tmp, 0775, true);
         mkdir($packageRoot, 0775, true);
 
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        $oldComposerHome = getenv('COMPOSER_HOME');
+        putenv('APM_BASELINE_ROOT=' . $tmp . '/missing-baseline-root');
+        putenv('COMPOSER_HOME=' . $tmp . '/missing-composer-home');
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -672,6 +698,16 @@ final class ConsoleFlowsTest extends TestCase
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
 
         chdir($old);
+        if ($oldBl === false) {
+            putenv('APM_BASELINE_ROOT');
+        } else {
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
+        }
+        if ($oldComposerHome === false) {
+            putenv('COMPOSER_HOME');
+        } else {
+            putenv('COMPOSER_HOME=' . $oldComposerHome);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
@@ -699,6 +735,8 @@ final class ConsoleFlowsTest extends TestCase
             '      kiro: .kiro/hooks/check-write-length.kiro.hook',
         ]) . "\n");
 
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT=' . $packageRoot);
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
@@ -710,6 +748,11 @@ final class ConsoleFlowsTest extends TestCase
         $exit = $tester->execute(['--target' => ['cursor']]);
 
         chdir($old);
+        if ($oldBl === false) {
+            putenv('APM_BASELINE_ROOT');
+        } else {
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
@@ -781,30 +824,32 @@ final class ConsoleFlowsTest extends TestCase
             '    targets:',
             '      cursor: .cursor/hooks/check-write-length',
             '      kiro: .kiro/hooks/check-write-length.kiro.hook',
+            'presets:',
+            '  - name: dev-hooks',
+            '    description: Dev hooks preset',
+            '    includes:',
+            '      - hook:check-write-length',
         ]) . "\n");
 
-        // Create a preset that includes the hook
-        mkdir($tmp . '/abilities', 0775, true);
-        file_put_contents($tmp . '/abilities/_presets.json', json_encode([
-            'dev-hooks' => [
-                'skills' => [],
-                'rules' => [],
-                'agents' => [],
-                'hooks' => ['check-write-length'],
-            ],
-        ], JSON_PRETTY_PRINT) . "\n");
-
+        $oldBl = getenv('APM_BASELINE_ROOT');
+        putenv('APM_BASELINE_ROOT=' . $packageRoot);
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
 
         $registry = new AbilityRegistry($packageRoot . '/abilities.yaml');
+        $presetRegistry = new PresetRegistry($registry);
         $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
-        $cmd = new ShowCommand($installer, new CheckService());
+        $cmd = new ShowCommand($installer, new CheckService(), $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
 
         chdir($old);
+        if ($oldBl === false) {
+            putenv('APM_BASELINE_ROOT');
+        } else {
+            putenv('APM_BASELINE_ROOT=' . $oldBl);
+        }
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();

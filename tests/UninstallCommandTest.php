@@ -129,10 +129,20 @@ final class UninstallCommandTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-uninstall-rule-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-uninstall-rule-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/rules/git', 0775, true);
+        mkdir($baseline . '/.cursor/rules/git', 0775, true);
         mkdir($workspace . '/.cursor/rules/git', 0775, true);
-        file_put_contents($baseline . '/abilities/rules/git/demo-rule.cursor.mdc', "rule-base\n");
+        file_put_contents($baseline . '/.cursor/rules/git/demo-rule.mdc', "rule-base\n");
         file_put_contents($workspace . '/.cursor/rules/git/demo-rule.mdc', "rule-modified\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'rules:',
+            '  - path: demo-rule',
+            '    description: demo-rule',
+            '    targets:',
+            '      cursor: .cursor/rules/git/demo-rule.mdc',
+        ]) . "\n");
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $oldCwd = getcwd();
@@ -158,10 +168,20 @@ final class UninstallCommandTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-uninstall-agent-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-uninstall-agent-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/agents', 0775, true);
+        mkdir($baseline . '/.kiro/agents', 0775, true);
         mkdir($workspace . '/.kiro/agents', 0775, true);
-        file_put_contents($baseline . '/abilities/agents/demo-agent.kiro.md', "agent-base\n");
+        file_put_contents($baseline . '/.kiro/agents/demo-agent.md', "agent-base\n");
         file_put_contents($workspace . '/.kiro/agents/demo-agent.md', "agent-modified\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'agents:',
+            '  - path: demo-agent',
+            '    description: demo-agent',
+            '    targets:',
+            '      kiro: .kiro/agents/demo-agent.md',
+        ]) . "\n");
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $oldCwd = getcwd();
@@ -202,15 +222,15 @@ final class UninstallCommandTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-uninstall-mixed-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-uninstall-mixed-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/skills/demo-skill', 0775, true);
-        mkdir($baseline . '/abilities/rules/git', 0775, true);
-        mkdir($baseline . '/abilities/agents', 0775, true);
+        mkdir($baseline . '/.cursor/skills/demo-skill', 0775, true);
+        mkdir($baseline . '/.cursor/rules/git', 0775, true);
+        mkdir($baseline . '/.cursor/agents', 0775, true);
         mkdir($workspace . '/.cursor/skills/demo-skill', 0775, true);
         mkdir($workspace . '/.cursor/rules/git', 0775, true);
         mkdir($workspace . '/.cursor/agents', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/demo-skill/SKILL.md', "skill-base\n");
-        file_put_contents($baseline . '/abilities/rules/git/demo-rule.cursor.mdc', "rule-base\n");
-        file_put_contents($baseline . '/abilities/agents/demo-agent.cursor.md', "agent-base\n");
+        file_put_contents($baseline . '/.cursor/skills/demo-skill/SKILL.md', "skill-base\n");
+        file_put_contents($baseline . '/.cursor/rules/git/demo-rule.mdc', "rule-base\n");
+        file_put_contents($baseline . '/.cursor/agents/demo-agent.md', "agent-base\n");
         file_put_contents($workspace . '/.cursor/skills/demo-skill/SKILL.md', "skill-mod\n");
         file_put_contents($workspace . '/.cursor/rules/git/demo-rule.mdc', "rule-mod\n");
         file_put_contents($workspace . '/.cursor/agents/demo-agent.md', "agent-mod\n");
@@ -295,10 +315,19 @@ final class UninstallCommandTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-uninstall-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-uninstall-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/skills/demo-skill', 0775, true);
+        mkdir($baseline . '/.cursor/skills/demo-skill', 0775, true);
         mkdir($workspace . '/.cursor/skills/demo-skill', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/demo-skill/SKILL.md', $baselineContent);
+        file_put_contents($baseline . '/.cursor/skills/demo-skill/SKILL.md', $baselineContent);
         file_put_contents($workspace . '/.cursor/skills/demo-skill/SKILL.md', $installedContent);
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: demo-skill',
+            '    description: demo-skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+        ]) . "\n");
 
         return [$baseline, $workspace];
     }

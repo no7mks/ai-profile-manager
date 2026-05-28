@@ -195,13 +195,28 @@ YAML;
     public function testInstallTypedDispatchesRuleAndAgentCorrectlyWithRegistry(): void
     {
         $pkg = $this->tmpDir . '/pkg';
-        mkdir($pkg . '/abilities/rules/git', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/git/my-rule.cursor.mdc', "rule content\n");
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/my-agent.cursor.md', "agent content\n");
+        // Source files at paths matching registry targets (Source-is-Target layout)
+        mkdir($pkg . '/.cursor/rules/git', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/git/my-rule.mdc', "rule content\n");
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/my-agent.md', "agent content\n");
+
+        $registryYaml = <<<'YAML'
+rules:
+  - path: my-rule
+    description: A test rule
+    targets:
+      cursor: .cursor/rules/git/my-rule.mdc
+
+agents:
+  - path: my-agent
+    description: A test agent
+    targets:
+      cursor: .cursor/agents/my-agent.md
+YAML;
 
         $registryPath = $this->tmpDir . '/abilities.yaml';
-        file_put_contents($registryPath, "rules: []\n");
+        file_put_contents($registryPath, $registryYaml);
 
         $project = $this->tmpDir . '/project';
         mkdir($project, 0775, true);

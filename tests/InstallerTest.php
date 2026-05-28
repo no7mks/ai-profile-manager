@@ -16,10 +16,24 @@ final class InstallerTest extends TestCase
     public function testInstallTypedMirrorsSkillAndAgentFromPackageFixture(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/demo-skill', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/demo-skill/SKILL.md', "demo skill\n");
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/demo-agent.cursor.md', "demo agent\n");
+        // Source-is-Target layout: source files live at $pkg/<targets path>
+        mkdir($pkg . '/.cursor/skills/demo-skill', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/demo-skill/SKILL.md', "demo skill\n");
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/demo-agent.md', "demo agent\n");
+        // abilities.yaml declaring targets
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: demo-skill',
+            '    description: Demo skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+            'agents:',
+            '  - path: demo-agent',
+            '    description: Demo agent',
+            '    targets:',
+            '      cursor: .cursor/agents/demo-agent.md',
+        ]) . "\n");
 
         $proj = sys_get_temp_dir() . '/apm-inst-proj-' . bin2hex(random_bytes(4));
         mkdir($proj, 0775, true);
@@ -28,7 +42,8 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($proj);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => ['demo-skill'],
             'rules' => [],
@@ -50,8 +65,17 @@ final class InstallerTest extends TestCase
     public function testRulesAreRenderedAsSteeringOnKiro(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-st-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/rules/spec', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.kiro.md', 'x');
+        // Source-is-Target layout: source file at $pkg/<targets path>
+        mkdir($pkg . '/.kiro/steering/spec', 0775, true);
+        file_put_contents($pkg . '/.kiro/steering/spec/spec-goal.md', 'x');
+        // abilities.yaml declaring targets
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'rules:',
+            '  - path: spec-goal',
+            '    description: Spec goal rule',
+            '    targets:',
+            '      kiro: .kiro/steering/spec/spec-goal.md',
+        ]) . "\n");
 
         $proj = sys_get_temp_dir() . '/apm-inst-stp-' . bin2hex(random_bytes(4));
         mkdir($proj, 0775, true);
@@ -60,7 +84,8 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($proj);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => [],
             'rules' => ['spec-goal'],
@@ -78,9 +103,20 @@ final class InstallerTest extends TestCase
     public function testRuleInstallUsesCategoryFileLayoutNotNameTargetDirs(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-rule-flat-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/rules/git', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/git/branch-overview.cursor.mdc', 'cursor');
-        file_put_contents($pkg . '/abilities/rules/git/branch-overview.kiro.md', 'kiro');
+        // Source-is-Target layout: source files at $pkg/<targets path>
+        mkdir($pkg . '/.cursor/rules/git', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/git/branch-overview.mdc', 'cursor');
+        mkdir($pkg . '/.kiro/steering/git', 0775, true);
+        file_put_contents($pkg . '/.kiro/steering/git/branch-overview.md', 'kiro');
+        // abilities.yaml declaring targets
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'rules:',
+            '  - path: branch-overview',
+            '    description: Branch overview rule',
+            '    targets:',
+            '      cursor: .cursor/rules/git/branch-overview.mdc',
+            '      kiro: .kiro/steering/git/branch-overview.md',
+        ]) . "\n");
 
         $proj = sys_get_temp_dir() . '/apm-inst-rule-flat-proj-' . bin2hex(random_bytes(4));
         mkdir($proj, 0775, true);
@@ -89,7 +125,8 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($proj);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $cursor = $installer->installTyped([
             'skills' => [],
             'rules' => ['branch-overview'],
@@ -117,8 +154,9 @@ final class InstallerTest extends TestCase
         mkdir($tmp, 0775, true);
 
         $pkg = sys_get_temp_dir() . '/apm-installer-gi-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', 'x');
+        // Source-is-Target layout: source at $pkg/<targets path>
+        mkdir($pkg . '/.cursor/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/graphify/SKILL.md', 'x');
         // Template now lives at packageRoot/.gitignore
         file_put_contents($pkg . '/.gitignore', implode("\n", [
             '## @apm:block ability=skill:graphify target=cursor',
@@ -130,7 +168,7 @@ final class InstallerTest extends TestCase
             '  - path: graphify',
             '    description: Graphify skill',
             '    targets:',
-            '      cursor: abilities/skills/graphify',
+            '      cursor: .cursor/skills/graphify',
         ]) . "\n");
 
         $old = getcwd();
@@ -277,9 +315,26 @@ final class InstallerTest extends TestCase
     public function testInstallTypedReturnsFailuresWhenBundlesAreMissing(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-missing-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills', 0775, true);
-        mkdir($pkg . '/abilities/rules', 0775, true);
-        mkdir($pkg . '/abilities/agents', 0775, true);
+        mkdir($pkg, 0775, true);
+        // abilities.yaml declares entries but source files don't exist
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: missing-skill',
+            '    description: Missing skill',
+            '    targets:',
+            '      cursor: .cursor/skills/missing-skill',
+            'rules:',
+            '  - path: missing-rule',
+            '    description: Missing rule',
+            '    targets:',
+            '      cursor: .cursor/rules/missing-rule.mdc',
+            'agents:',
+            '  - path: missing-agent',
+            '    description: Missing agent',
+            '    targets:',
+            '      cursor: .cursor/agents/missing-agent.md',
+        ]) . "\n");
+
         $project = sys_get_temp_dir() . '/apm-inst-missing-proj-' . bin2hex(random_bytes(4));
         mkdir($project, 0775, true);
 
@@ -287,7 +342,8 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->installTyped([
             'skills' => ['missing-skill'],
             'rules' => ['missing-rule'],
@@ -298,9 +354,9 @@ final class InstallerTest extends TestCase
 
         self::assertSame(1, $result['exit_code']);
         $output = implode("\n", $result['lines']);
-        self::assertStringContainsString('Missing ability bundle: skill missing-skill', $output);
-        self::assertStringContainsString('Missing ability bundle: rule missing-rule', $output);
-        self::assertStringContainsString('Missing ability bundle: agent missing-agent', $output);
+        self::assertStringContainsString('Missing ability: skill missing-skill', $output);
+        self::assertStringContainsString('Missing ability: rule missing-rule', $output);
+        self::assertStringContainsString('Missing ability: agent missing-agent', $output);
     }
 
     public function testUninstallTypedRemovesInstalledItemsAndReportsMissingOnKiro(): void
@@ -345,8 +401,18 @@ final class InstallerTest extends TestCase
     public function testInstallTypedFailsWhenAgentTargetDirectoryCannotBeCreated(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-agent-fail-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/agents', 0775, true);
-        file_put_contents($pkg . '/abilities/agents/code-reviewer.cursor.md', "x\n");
+        // Source-is-Target layout: source file at $pkg/<targets path>
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/code-reviewer.md', "x\n");
+        // abilities.yaml declaring targets
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'agents:',
+            '  - path: code-reviewer',
+            '    description: Code reviewer agent',
+            '    targets:',
+            '      cursor: .cursor/agents/code-reviewer.md',
+        ]) . "\n");
+
         $project = sys_get_temp_dir() . '/apm-inst-agent-fail-proj-' . bin2hex(random_bytes(4));
         mkdir($project . '/.cursor', 0775, true);
         file_put_contents($project . '/.cursor/agents', "block dir creation\n");
@@ -355,7 +421,8 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         set_error_handler(static function (int $severity, string $message): bool {
             return str_contains($message, 'mkdir(): File exists');
         });
@@ -378,8 +445,18 @@ final class InstallerTest extends TestCase
     public function testInstallTypedFailsWhenRuleTargetDirectoryCannotBeCreated(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-inst-rule-fail-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/rules/spec', 0775, true);
-        file_put_contents($pkg . '/abilities/rules/spec/spec-goal.cursor.mdc', "x\n");
+        // Source-is-Target layout: source file at $pkg/<targets path>
+        mkdir($pkg . '/.cursor/rules/spec', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/spec/spec-goal.mdc', "x\n");
+        // abilities.yaml declaring targets
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'rules:',
+            '  - path: spec-goal',
+            '    description: Spec goal rule',
+            '    targets:',
+            '      cursor: .cursor/rules/spec/spec-goal.mdc',
+        ]) . "\n");
+
         $project = sys_get_temp_dir() . '/apm-inst-rule-fail-proj-' . bin2hex(random_bytes(4));
         mkdir($project . '/.cursor/rules', 0775, true);
         file_put_contents($project . '/.cursor/rules/spec', "block dir creation\n");
@@ -388,7 +465,8 @@ final class InstallerTest extends TestCase
         self::assertNotFalse($old);
         chdir($project);
 
-        $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         set_error_handler(static function (int $severity, string $message): bool {
             return str_contains($message, 'mkdir(): File exists');
         });
@@ -414,8 +492,9 @@ final class InstallerTest extends TestCase
         mkdir($project, 0775, true);
 
         $pkg = sys_get_temp_dir() . '/apm-inst-gi-skip-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/abilities/skills/graphify', 0775, true);
-        file_put_contents($pkg . '/abilities/skills/graphify/SKILL.md', "x\n");
+        // Source-is-Target layout: source at $pkg/<targets path>
+        mkdir($pkg . '/.cursor/skills/graphify', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/graphify/SKILL.md', "x\n");
         // Template at packageRoot/.gitignore with non-matching blocks
         file_put_contents($pkg . '/.gitignore', implode("\n", [
             '## @apm:block ability=skill:other-skill target=kiro',
@@ -427,7 +506,7 @@ final class InstallerTest extends TestCase
             '  - path: graphify',
             '    description: Graphify skill',
             '    targets:',
-            '      cursor: abilities/skills/graphify',
+            '      cursor: .cursor/skills/graphify',
         ]) . "\n");
 
         $old = getcwd();

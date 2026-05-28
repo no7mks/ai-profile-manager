@@ -40,10 +40,19 @@ final class SkillCheckCommandTest extends TestCase
     {
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/skills/graphify', 0775, true);
+        mkdir($baseline . '/.cursor/skills/graphify', 0775, true);
         mkdir($workspace . '/.cursor/skills/graphify', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
+        file_put_contents($baseline . '/.cursor/skills/graphify/SKILL.md', "x\n");
         file_put_contents($workspace . '/.cursor/skills/graphify/SKILL.md', "x\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+        ]) . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
@@ -60,10 +69,19 @@ final class SkillCheckCommandTest extends TestCase
     {
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/skills/graphify', 0775, true);
+        mkdir($baseline . '/.cursor/skills/graphify', 0775, true);
         mkdir($workspace . '/.cursor/skills/graphify', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
+        file_put_contents($baseline . '/.cursor/skills/graphify/SKILL.md', "x\n");
         file_put_contents($workspace . '/.cursor/skills/graphify/SKILL.md', "x\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+        ]) . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
@@ -93,9 +111,18 @@ final class SkillCheckCommandTest extends TestCase
     {
         $baseline = $this->tmpDir . '/baseline';
         $workspace = $this->tmpDir . '/workspace';
-        mkdir($baseline . '/abilities/skills/graphify', 0775, true);
+        mkdir($baseline . '/.cursor/skills/graphify', 0775, true);
         mkdir($workspace, 0775, true);
-        file_put_contents($baseline . '/abilities/skills/graphify/SKILL.md', "x\n");
+        file_put_contents($baseline . '/.cursor/skills/graphify/SKILL.md', "x\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: graphify',
+            '    description: graphify',
+            '    targets:',
+            '      cursor: .cursor/skills/graphify',
+        ]) . "\n");
 
         putenv('APM_BASELINE_ROOT=' . $baseline);
         chdir($workspace);
