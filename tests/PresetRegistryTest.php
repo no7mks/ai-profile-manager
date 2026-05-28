@@ -6,10 +6,13 @@ namespace AiProfileManager\Tests;
 
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\PresetRegistry;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 use PHPUnit\Framework\TestCase;
 
 final class PresetRegistryTest extends TestCase
 {
+    use RemovesDirTrait;
+
     private string $tmpDir;
 
     protected function setUp(): void
@@ -20,16 +23,7 @@ final class PresetRegistryTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (is_dir($this->tmpDir)) {
-            $files = new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($this->tmpDir, \FilesystemIterator::SKIP_DOTS),
-                \RecursiveIteratorIterator::CHILD_FIRST
-            );
-            foreach ($files as $file) {
-                $file->isDir() ? rmdir($file->getPathname()) : unlink($file->getPathname());
-            }
-            rmdir($this->tmpDir);
-        }
+        $this->removeDir($this->tmpDir);
     }
 
     public function testAllPresetsReturnsNormalizedPresets(): void
