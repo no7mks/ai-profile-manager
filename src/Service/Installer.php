@@ -24,7 +24,7 @@ final class Installer
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>} $items
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>} $items
      * @param array<int, string> $targets
      * @param string|null $presetName
      * @return array{lines: array<int, string>, exit_code: int}
@@ -77,15 +77,13 @@ final class Installer
         }
 
         $gitignoreResult = $this->installGitIgnore($items, $targets, $presetName);
-        if ($gitignoreResult !== null) {
-            $lines[] = $gitignoreResult;
-        }
+        $lines[] = $gitignoreResult;
 
         return ['lines' => $lines, 'exit_code' => $exitCode];
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: array<int, string>} $items
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>} $items
      * @param array<int, string> $targets
      * @param bool $force 是否强制卸载（跳过 drift 检查）
      * @return array{lines: array<int, string>, exit_code: int}
@@ -129,7 +127,7 @@ final class Installer
     }
 
     /**
-     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks: array<int, string>}
+     * @return array{skills: list<string>, rules: list<string>, agents: list<string>, hooks: list<string>}
      */
     public function listAvailableItems(): array
     {
@@ -146,10 +144,10 @@ final class Installer
         sort($hooks);
 
         return [
-            'skills' => array_values($skills),
-            'rules' => array_values($rules),
-            'agents' => array_values($agents),
-            'hooks' => array_values($hooks),
+            'skills' => $skills,
+            'rules' => $rules,
+            'agents' => $agents,
+            'hooks' => $hooks,
         ];
     }
 
@@ -202,7 +200,7 @@ final class Installer
             default => null,
         };
 
-        if ($section === null || !isset($parsed[$section])) {
+        if ($section === null) {
             return null;
         }
 
@@ -232,12 +230,14 @@ final class Installer
             'skill' => 'skills',
             'agent' => 'agents',
             'rule' => 'rules',
-            default => '',
+            default => null,
         };
 
-        foreach ($parsed[$section] as $e) {
-            if ($e->path === $name) {
-                return $workspace . '/' . $e->targets[$target];
+        if ($section !== null) {
+            foreach ($parsed[$section] as $e) {
+                if ($e->path === $name) {
+                    return $workspace . '/' . $e->targets[$target];
+                }
             }
         }
 
@@ -489,10 +489,10 @@ final class Installer
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>} $items
      * @param array<int, string> $targets
      */
-    private function installGitIgnore(array $items, array $targets, ?string $presetName): ?string
+    private function installGitIgnore(array $items, array $targets, ?string $presetName): string
     {
         $templatePath = $this->packageRoot . '/.gitignore';
         $abilityKeys = [];

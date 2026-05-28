@@ -39,7 +39,7 @@ final class Application
     }
 
     /**
-     * @param array<int, string> $argv
+     * @param list<string> $argv
      */
     public function run(array $argv, ?OutputInterface $output = null): int
     {

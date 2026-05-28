@@ -28,7 +28,7 @@ final class CheckService
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: list<string>} $items
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>} $items
      * @param array<int, string> $targets
      * @return array<int, array{type: string, name: string, target: string, status: string}>
      */
@@ -114,10 +114,13 @@ final class CheckService
         return $lines;
     }
 
+    /**
+     * @param array<int, array{type: string, name: string, target: string, status: string}> $results
+     */
     public function hasModified(array $results): bool
     {
         foreach ($results as $result) {
-            if (($result['status'] ?? '') === 'modified') {
+            if ($result['status'] === 'modified') {
                 return true;
             }
         }
@@ -126,7 +129,7 @@ final class CheckService
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>, hooks?: list<string>} $items
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>} $items
      * @param array<int, string> $targets
      * @return array<int, array{type: string, name: string, target: string, status: string}>
      */

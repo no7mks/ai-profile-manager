@@ -21,7 +21,7 @@ final class PresetRegistry
     public function allPresets(): array
     {
         $data = $this->registry->parse();
-        $presets = $data['presets'] ?? [];
+        $presets = $data['presets'];
 
         return array_map(fn(array $preset) => $this->normalizePreset($preset), $presets);
     }
@@ -102,7 +102,7 @@ final class PresetRegistry
 
         // Validate ability exists in registry
         $parsed = $this->registry->parse();
-        $entries = $parsed[$sectionKey] ?? [];
+        $entries = $parsed[$sectionKey];
         $exists = false;
         foreach ($entries as $entry) {
             if ($entry->path === $abilityPath) {

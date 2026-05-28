@@ -166,6 +166,7 @@ final class HookInstaller
             $data['hooks'] = [];
         }
 
+        /** @var array{version: int, hooks: array<string, list<array<string, mixed>>>} $data */
         return $data;
     }
 

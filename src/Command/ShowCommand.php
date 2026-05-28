@@ -75,7 +75,7 @@ final class ShowCommand extends Command
             $this->renderTypeSection($io, 'Rules', 'rule', $available['rules'], $installedMap, $presetMap);
         }
         if ($typeFilter === null || $typeFilter === 'hook') {
-            $this->renderTypeSection($io, 'Hooks', 'hook', $available['hooks'] ?? [], $installedMap, $presetMap);
+            $this->renderTypeSection($io, 'Hooks', 'hook', $available['hooks'], $installedMap, $presetMap);
         }
 
         return Command::SUCCESS;
