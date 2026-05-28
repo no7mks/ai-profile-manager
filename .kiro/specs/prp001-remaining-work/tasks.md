@@ -2,7 +2,7 @@
 
 ## Overview
 
-本计划将 PRP-001 Phase 2 剩余工作拆分为 10 个顶层任务，按 CR5+CR8 决策的执行顺序排列：
+本计划将 PRP-001 Phase 2 剩余工作拆分为 11 个顶层任务，按 CR5+CR8 决策的执行顺序排列：
 
 1. **死代码清理优先**（独立、无依赖）
 2. **Installer 重构**（影响面最大）
@@ -11,9 +11,10 @@
 5. **Gitignore 模板路径修复**
 6. **统一测试修复**（全套件零失败）
 7. **E2E 测试修复**
-8. **引入 PHPStan Level 8**（静态分析质量门禁）
-9. **文档收敛**（SSOT 同步 + apm init reference + PRP-001 状态）
-10. **Code Review**
+8. **Preset 命令 DI 重构**（修复测试污染生产 abilities.yaml 问题）
+9. **引入 PHPStan Level 8**（静态分析质量门禁）
+10. **文档收敛**（SSOT 同步 + apm init reference + PRP-001 状态）
+11. **Code Review**
 
 每个顶层任务结束时设置 checkpoint，验证当前阶段的测试通过状态并提交。
 
@@ -171,37 +172,58 @@
     - 运行 `vendor/bin/phpunit` 确认全套件零失败零错误
     - commit: `*(test): fix E2E test fixtures for Source-is-Target layout`
 
-- [ ] 8. 引入 PHPStan Level 8
-  - [~] 8.1 安装 PHPStan 并创建配置
+- [ ] 8. Preset 命令 AbilityRegistry 注入重构
+  - [~] 8.1 重构 PresetCreateCommand / PresetDeleteCommand 构造函数
+    - 新增构造参数 `?PresetRegistry $presetRegistry = null`
+    - `execute()` 中若 `$this->presetRegistry` 已注入则直接使用，否则 fallback 到 `new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml'))`（保持 CLI 独立运行兼容）
+    - _目的：测试可注入 temp registry，不再写入生产 abilities.yaml_
+  - [~] 8.2 重构 PresetAddAbilityCommand / PresetRemoveAbilityCommand 构造函数
+    - 同 8.1 模式：构造参数注入 + fallback
+  - [~] 8.3 更新 ConsoleRegistration 传入 PresetRegistry
+    - `ConsoleRegistration::register()` 中 `PresetCreateCommand`、`PresetDeleteCommand`、`PresetAddAbilityCommand`、`PresetRemoveAbilityCommand` 均传入 `$presetRegistry`
+  - [~] 8.4 修复 CommandErrorPathsTest
+    - 所有测试方法改为注入 temp 目录的 AbilityRegistry/PresetRegistry
+    - 移除 `testPresetCreateCommandFailsOnDuplicateName` 中对生产文件的依赖
+    - 确认测试不再触碰根目录 `abilities.yaml`
+  - [~] 8.5 清理：移除根 abilities.yaml 中被测试污染的 "existing" preset
+    - 如果 `abilities.yaml` 中存在 `name: existing` preset，删除该条目
+    - 验证 `abilities.yaml` 恢复到预期状态
+  - [~] 8.6 Checkpoint — Preset 命令 DI 验证
+    - 运行 `vendor/bin/phpunit --filter "CommandErrorPaths|PresetCreate|PresetDelete|PresetAdd|PresetRemove"` 确认全绿
+    - 运行 `git diff abilities.yaml` 确认测试未修改生产文件
+    - commit: `*(command) by Kiro: inject PresetRegistry into Preset commands, fix test pollution`
+
+- [ ] 9. 引入 PHPStan Level 8
+  - [~] 9.1 安装 PHPStan 并创建配置
     - `composer require --dev phpstan/phpstan`
     - 创建 `phpstan.neon`：level 8，paths 指向 `src/`，排除 `vendor/`
     - 配置 `phpstan.neon` 中 `parameters.memoryLimit: 512M`（避免 OOM 试错）
     - 验证：`vendor/bin/phpstan analyse --memory-limit=512M` 能正常运行（允许有 error 输出）
-  - [~] 8.2 生成 baseline 并归类错误
+  - [~] 9.2 生成 baseline 并归类错误
     - 运行 `vendor/bin/phpstan analyse --generate-baseline --memory-limit=512M` 生成 `phpstan-baseline.neon`
     - 分析 baseline 内容，按错误类型（missing type、return type、parameter type、access level 等）和文件维度归类统计
-    - 将归类结果记录为任务内注释（供 8.3 参考），不重复执行 analyse 来获取已知信息
-  - [~] 8.3 逐步消减 baseline 至零（尽可能）
-    - 按 8.2 归类结果，按错误类型批量修复（优先：missing return type → missing param type → 其他）
+    - 将归类结果记录为任务内注释（供 9.3 参考），不重复执行 analyse 来获取已知信息
+  - [~] 9.3 逐步消减 baseline 至零（尽可能）
+    - 按 9.2 归类结果，按错误类型批量修复（优先：missing return type → missing param type → 其他）
     - 每批修复后运行 `vendor/bin/phpstan analyse --memory-limit=512M` 验证
     - 如果剩余 error 涉及第三方库或修复成本过高，保留 baseline 并在 Notes 中说明原因
-  - [~] 8.4 Checkpoint — PHPStan 验证
+  - [~] 9.4 Checkpoint — PHPStan 验证
     - 运行 `vendor/bin/phpstan analyse --memory-limit=512M` 确认零错误（或仅剩 baseline 中已说明的条目）
     - 运行 `vendor/bin/phpunit` 确认测试仍全绿（类型修复不应破坏行为）
     - commit: `+(quality): introduce PHPStan level 8 with zero (or minimal) baseline`
 
-- [ ] 9. 文档收敛
-  - [~] 9.1 更新 SSOT 文档（docs/state/ 核心文件）
+- [ ] 10. 文档收敛
+  - [~] 10.1 更新 SSOT 文档（docs/state/ 核心文件）
     - `docs/state/install-behavior.md`：源路径描述改为 `<packageRoot>/<targets[target]>`；gitignore 模板路径改为 `<packageRoot>/.gitignore`
     - `docs/state/architecture.md`：PresetRegistry 描述改为读取 abilities.yaml；数据流图移除 `abilities/_presets.json`
     - `docs/state/cli-commands.md`：preset:create/delete 描述改为操作 abilities.yaml
     - _Ref: Requirement 7, AC 1-3_
-  - [~] 9.2 更新 SSOT 文档（docs/state/ 补充文件 + docs/design.md）
+  - [~] 10.2 更新 SSOT 文档（docs/state/ 补充文件 + docs/design.md）
     - `docs/state/abilities-model.md`：移除 "Preset 运行时存储（_presets.json）" section，改为说明 presets section 即为唯一存储
     - `docs/state/gitignore.md`：模板文件路径改为 `<packageRoot>/.gitignore`
     - `docs/design.md`：能力路径约定全部改为 Source-is-Target 模式
     - _Ref: Requirement 7, AC 4-6_
-  - [~] 9.3 创建 apm init reference 文档
+  - [~] 10.3 创建 apm init reference 文档
     - 在 `.cursor/skills/apm/references/` 下新建 `init-workflow.md`（同步到 `.kiro/skills/apm/references/`）
     - 定义 detection phase：列出需要检查的文件和命令
     - 定义 confirmation phase：区分 auto-fillable 和 user-confirmation-required 字段
@@ -209,21 +231,21 @@
     - 定义 idempotency rules：重复执行只填充缺失内容
     - 定义 existing-content strategy：merge/skip/overwrite 决策规则
     - _Ref: Requirement 8, AC 1-6_
-  - [~] 9.4 修正 PRP-001 proposal 状态
+  - [~] 10.4 修正 PRP-001 proposal 状态
     - 将 `changes/unreleased/proposals/PRP-001-abilities-relocation.md` 中 status 从 `implemented` 改为 `in-progress`
     - 添加注释说明 Phase 2 代码适配正在进行
     - _Ref: Requirement 9, AC 1-2_
-  - [~] 9.5 Checkpoint — 文档收敛验证
+  - [~] 10.5 Checkpoint — 文档收敛验证
     - 检查所有修改的文档无 broken links
     - 确认 `vendor/bin/phpunit` 仍全绿（文档变更不应影响测试）
     - commit: `*(state): sync SSOT with Source-is-Target layout, add apm init reference`
 
-- [ ] 10. Code Review
-  - [~] 10.1 委托 code-reviewer sub-agent 执行全量 code review
+- [ ] 11. Code Review
+  - [~] 11.1 委托 code-reviewer sub-agent 执行全量 code review
     - 基于当前分支的 diff 进行 review
     - 发现问题直接修复
     - _Ref: 全部 Requirements 的实现质量保证_
-  - [~] 10.2 Final Checkpoint — 最终验证
+  - [~] 11.2 Final Checkpoint — 最终验证
     - 运行 `vendor/bin/phpunit` 确认全套件零失败零错误
     - 运行 `vendor/bin/phpstan analyse` 确认无静态分析错误
     - commit: `*(review): address code review findings`
@@ -238,7 +260,7 @@
 - Task 6/7 的测试修复依赖 Task 2-4 的重构完成，因此放在后面
 - Task 5 较轻量（主要验证 Task 2.3 的变更），独立列出以确保 R5 的可追溯性
 - Property-based tests 使用 PHPUnit DataProvider 模拟（100+ 随机输入），在 Task 6 中随 fixture 修复一并处理
-- Task 10 的 code review 委托给 code-reviewer sub-agent，确保第三方视角的质量把关
+- Task 11 的 code review 委托给 code-reviewer sub-agent，确保第三方视角的质量把关
 - `no-baseline` exit code = 2（CR6 决策：环境错误），`new` exit code = 0（用户新增不算 drift）
 - PHPStan 运行始终使用 `--memory-limit=512M`（或 neon 中配置 memoryLimit），避免 OOM 试错循环
 - PHPStan baseline 生成后先归类错误再修复，不重复执行 analyse 仅为获取已知信息
@@ -268,14 +290,18 @@
     { "id": 16, "tasks": ["7.1"] },
     { "id": 17, "tasks": ["7.2", "7.3"] },
     { "id": 18, "tasks": ["7.4"] },
-    { "id": 19, "tasks": ["8.1"] },
-    { "id": 20, "tasks": ["8.2"] },
-    { "id": 21, "tasks": ["8.3"] },
-    { "id": 22, "tasks": ["8.4"] },
-    { "id": 23, "tasks": ["9.1", "9.2", "9.3", "9.4"] },
-    { "id": 24, "tasks": ["9.5"] },
-    { "id": 25, "tasks": ["10.1"] },
-    { "id": 26, "tasks": ["10.2"] }
+    { "id": 19, "tasks": ["8.1", "8.2"] },
+    { "id": 20, "tasks": ["8.3"] },
+    { "id": 21, "tasks": ["8.4", "8.5"] },
+    { "id": 22, "tasks": ["8.6"] },
+    { "id": 23, "tasks": ["9.1"] },
+    { "id": 24, "tasks": ["9.2"] },
+    { "id": 25, "tasks": ["9.3"] },
+    { "id": 26, "tasks": ["9.4"] },
+    { "id": 27, "tasks": ["10.1", "10.2", "10.3", "10.4"] },
+    { "id": 28, "tasks": ["10.5"] },
+    { "id": 29, "tasks": ["11.1"] },
+    { "id": 30, "tasks": ["11.2"] }
   ]
 }
 ```
