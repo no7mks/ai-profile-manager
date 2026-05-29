@@ -10,6 +10,8 @@ description: "当用户提到 graphify、知识图谱、依赖分析、模块耦
 ## 用法速查
 
 ```
+/graphify init                                        # 等同于 /graphify .（首次构建）
+/graphify update                                      # 等同于 /graphify . --update（增量更新）
 /graphify                                             # 对当前目录执行完整 pipeline
 /graphify <path>                                      # 对指定路径执行完整 pipeline
 /graphify <path> --mode deep                          # 深度提取，更多 INFERRED 边
@@ -34,6 +36,8 @@ description: "当用户提到 graphify、知识图谱、依赖分析、模块耦
 
 - 若用户输入 `/graphify --help` 或 `-h`，直接打印上方用法速查并停止，不执行任何命令
 - 若未提供路径，默认使用 `.`（当前目录），不要询问用户
+- `/graphify init` 等同于 `/graphify .`（首次构建的语义别名）
+- `/graphify update` 等同于 `/graphify . --update`（增量更新的语义别名）
 
 ## 任务路由
 
