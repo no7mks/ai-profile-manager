@@ -29,10 +29,11 @@ apm 系统架构与模块边界。
 | AbilityDiffService | 对 skill/rule/agent 执行逐文件 diff（委托 AbilityDirectoryDiff）；支持 baseline 布局与 installed 布局两种模式 |
 | DirectoryMirrorService | 递归目录复制（含 overwrite）、单文件复制、目录创建；被 Installer、ProjectInitializer、HookInstaller 共用 |
 | ComposerBaselineResolver | 解析全局 Composer installed.json 定位 apm 包安装路径；支持 `APM_BASELINE_ROOT` 环境变量覆盖 |
-| PresetRegistry | Preset 定义管理：读取 abilities.yaml 的 presets section；fallback 到 AppConfig 硬编码默认值 |
+| PresetRegistry | Preset 定义管理：读取 abilities.yaml 的 presets section |
 | ProjectInitializer | 项目 bootstrap：复制 scaffold（docs/、issues/、AGENTS.md）+ 安装平台 scope rules |
 | KnowledgeBaseUpdater | 将当前 ability 列表写入 `~/.config/apm/knowledge-base.json` 供外部工具查询 |
 | GitIgnoreTemplateService | 操作 `.gitignore` 中的 managed section：从模板文件按 `@apm:block` 渲染规则并 merge 到目标文件 |
+| Prompts（abilities.yaml section） | abilities.yaml 支持 prompts section，定义 post-install 指令消息；Installer.installTyped() 在安装完成后解析 prompts 条目并输出 post-install instructions |
 | AppConfig | 静态配置常量：KNOWN_TARGETS、DEFAULT_TARGETS、DEFAULT_SKILLS/RULES/AGENTS、KNOWN_PRESETS |
 
 ---
