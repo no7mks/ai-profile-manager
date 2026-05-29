@@ -38,7 +38,7 @@
 1. 需求来源文档
    - Feature：proposal 或 note
    - Hotfix：issue 或 note
-   - Release：本次纳入的 feature proposal 与已完成 spec
+   - Release：`changes/unreleased/` 下的 notes、proposals + `issues/` 中 status=closed 的 issue（已修复待发布）。Spec 仅为执行记录，可以参考，但不作为需求来源
 2. `docs/state/`（SSOT）
 
 ---
