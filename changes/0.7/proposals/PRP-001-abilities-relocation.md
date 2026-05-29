@@ -1,6 +1,6 @@
 # PRP: Abilities Relocation
 
-**Status**: implemented
+**Status**: released
 
 <!-- Phase 1（文件物理迁移）+ Phase 2（代码路径适配）均已完成 -->
 
