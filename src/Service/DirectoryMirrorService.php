@@ -20,6 +20,8 @@ final class DirectoryMirrorService
         }
         $this->ensureDirectory($destination);
 
+        $source = rtrim($source, '/');
+
         $iterator = new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($source, RecursiveDirectoryIterator::SKIP_DOTS),
             RecursiveIteratorIterator::SELF_FIRST
