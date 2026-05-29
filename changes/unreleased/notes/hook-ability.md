@@ -2,7 +2,7 @@
 
 需要在 apm 中支持一种新的 ability 类型：`hook`。
 
-**状态**：已实现（PRP-001 abilities-relocation feature）
+**状态**：已实现
 
 ---
 

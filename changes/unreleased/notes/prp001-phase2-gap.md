@@ -2,6 +2,8 @@
 
 PRP-001 标记为 implemented，但 Phase 2（代码适配新路径）基本未动。当前 `bin/apm install` 在真实环境中无法工作——代码仍查找已删除的 `abilities/` 目录。
 
+**状态**：已实现
+
 ---
 
 ## 现状
