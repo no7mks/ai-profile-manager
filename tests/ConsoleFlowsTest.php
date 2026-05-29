@@ -160,11 +160,13 @@ final class ConsoleFlowsTest extends TestCase
         file_put_contents($pkg . '/docs/README.md', "# Docs\n");
         file_put_contents($pkg . '/issues/README.md', "# Issues\n");
         file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
-        // Scope rules (at package root level)
+        // Scope rules (source files matching createRegistry target paths)
         mkdir($pkg . '/.cursor/rules', 0775, true);
-        mkdir($pkg . '/.kiro/steering', 0775, true);
-        file_put_contents($pkg . '/.cursor/rules/cursor-scope.mdc', "cursor-scope\n");
-        file_put_contents($pkg . '/.kiro/steering/kiro-scope.md', "kiro-scope\n");
+        mkdir($pkg . '/.kiro/rules', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/cursor-scope', "cursor-scope\n");
+        file_put_contents($pkg . '/.kiro/rules/cursor-scope', "cursor-scope\n");
+        file_put_contents($pkg . '/.cursor/rules/kiro-scope', "kiro-scope\n");
+        file_put_contents($pkg . '/.kiro/rules/kiro-scope', "kiro-scope\n");
         // Abilities for Installer at Source-is-Target paths
         mkdir($pkg . '/.cursor/skills/apm', 0775, true);
         mkdir($pkg . '/.kiro/skills/apm', 0775, true);
@@ -182,10 +184,17 @@ final class ConsoleFlowsTest extends TestCase
 
         $registry = self::createRegistry($pkg, [
             'skills' => [['path' => 'apm']],
+            'rules' => [
+                ['path' => 'cursor-scope', 'description' => 'Cursor scope'],
+                ['path' => 'kiro-scope', 'description' => 'Kiro scope'],
+            ],
             'agents' => [['path' => 'code-reviewer']],
+        ], [
+            ['name' => 'default', 'includes' => ['skill:apm', 'agent:code-reviewer', 'rule:cursor-scope', 'rule:kiro-scope']],
         ]);
+        $presetRegistry = new PresetRegistry($registry);
         $initializer = new \AiProfileManager\Service\ProjectInitializer($pkg);
-        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $pkg), $initializer);
+        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $pkg), $initializer, $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute([]);
 
@@ -196,9 +205,9 @@ final class ConsoleFlowsTest extends TestCase
         self::assertFileExists($tmp . '/docs/README.md');
         self::assertFileExists($tmp . '/issues/README.md');
         self::assertFileExists($tmp . '/AGENTS.md');
-        // Scope rules installed
-        self::assertFileExists($tmp . '/.cursor/rules/cursor-scope.mdc');
-        self::assertFileExists($tmp . '/.kiro/steering/kiro-scope.md');
+        // Scope rules installed via default preset
+        self::assertFileExists($tmp . '/.cursor/rules/cursor-scope');
+        self::assertFileExists($tmp . '/.kiro/rules/kiro-scope');
         // Default skills/agents installed
         self::assertFileExists($tmp . '/.cursor/skills/apm/SKILL.md');
         self::assertFileExists($tmp . '/.kiro/skills/apm/SKILL.md');

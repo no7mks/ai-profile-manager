@@ -153,6 +153,19 @@ prompts:
       ```
 
 presets:
+  - name: default
+    description: Bootstrap 默认安装的能力
+    includes:
+      - skill:apm
+      - agent:code-reviewer
+      - rule:cursor-scope
+      - rule:kiro-scope
+      - rule:safety:command-safety
+      - rule:safety:config-safety
+      - rule:doc:writing-conventions
+      - rule:doc:doc-convergence
+      - rule:plugin:superpowers-integration
+
   - name: gitflow
     description: GitFlow 全套能力
     includes:
@@ -177,3 +190,18 @@ presets:
       - skill:graphify
       - gitignore:graphify
       - prompt:graphify:project-section
+
+  - name: php
+    description: PHP 项目基础能力
+    includes:
+      - gitignore:php
+
+  - name: python
+    description: Python 项目基础能力
+    includes:
+      - gitignore:python
+
+  - name: kotlin
+    description: Kotlin 项目基础能力
+    includes:
+      - gitignore:kotlin
