@@ -4,44 +4,45 @@
 
 ## Quick Start
 
-```bash
-composer install
-php bin/apm --help
-```
+### Step 1 安装 apm 环境
 
-或全局安装：
+- 全局安装（推荐）：
 
 ```bash
 composer global require no7mks/ai-profile-manager
-apm --help
+apm --help # 如显示帮助则表示安装成功了
 ```
 
-## 常用命令
+- 项目内安装：
 
 ```bash
-# 无参数 install：初始化当前仓库（scaffold + apm skill）
-apm install
-
-# 预设安装
-apm install gitflow -t cursor
-
-# 查看所有可安装能力，并标记已安装项与所属 preset
-apm show -t cursor
-
-# 卸载前会先 check 是否 modified；有改动需 --force
-apm skill:uninstall graphify -t cursor --force
+composer install
+php bin/apm --help # 如显示帮助则表示安装成功了
 ```
 
-运行 `apm install`（无参数）后，使用 Agent skill 命令 `/apm init` 初始化 SSOT 基线，生成或补齐：
+### Step 2 初始化仓库并导入能力
 
-- `PROJECT.md`
-- `docs/state/` 下的项目状态文档（文件名由 AI 按项目上下文决定）
-- `docs/manual/` 下的项目手册文档（文件名由 AI 按项目上下文决定）
+在目标项目根目录初始化（生成 scaffold 并安装 `default` preset）：
 
-`/apm init` 不预设 `manual/state` 的固定文件名，只要求在两个目录里形成可用的初始化内容。
+```bash
+apm install              # 默认同时写入 cursor 和 kiro
+apm install -t kiro      # 只写入指定平台
+```
 
-## 文档边界
+再根据项目特征，导入其他 preset：
 
-- `README.md`：最小入口与快速上手。
-- `abilities/skills/apm/SKILL.md`：详细操作策略（面向 Agent 执行）。
-- 命令参数、流程细节与实际行为，请以 `--help` 和 `SKILL.md` 为准。
+```bash
+apm install gitflow -t cursor
+apm install spec-core -t kiro
+apm install php
+```
+
+可用 preset 和 ability 列表见 `apm show`。
+
+### Step 3 初始化项目上下文
+
+在 Agent 对话中激活 `apm` skill，生成项目特有的基线文件：
+
+```
+/apm init
+```
