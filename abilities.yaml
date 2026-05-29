@@ -120,6 +120,16 @@ skills:
       cursor: .cursor/skills/spec-execution/
       kiro: .kiro/skills/spec-execution/
 
+  - path: quick-plan
+    description: 快速计划生成（交互式确认 plan.md）
+    targets:
+      kiro: .kiro/skills/quick-plan/
+
+  - path: build-plan
+    description: 按已确认 plan.md 执行实施
+    targets:
+      kiro: .kiro/skills/build-plan/
+
 gitignore:
   - marker: php
     description: PHP 相关忽略规则
@@ -165,6 +175,8 @@ presets:
       - rule:doc:writing-conventions
       - rule:doc:doc-convergence
       - rule:plugin:superpowers-integration
+      - skill:quick-plan
+      - skill:build-plan
 
   - name: gitflow
     description: GitFlow 全套能力

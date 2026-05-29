@@ -4,6 +4,14 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.7.2] - 2026-05-30
+
+### Added
+
+- 新增 `quick-plan` skill：交互式快速生成 plan.md，等待用户确认后再执行。
+- 新增 `build-plan` skill：按已确认的 plan.md 逐步执行实施。
+- quick-plan 和 build-plan 注册到 `abilities.yaml` 并加入 default preset。
+
 ## [0.7.1] - 2026-05-29
 
 ### Added
