@@ -24,7 +24,7 @@ final class Installer
     }
 
     /**
-     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>} $items
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>, prompts?: list<string>} $items
      * @param array<int, string> $targets
      * @param string|null $presetName
      * @return array{lines: array<int, string>, exit_code: int}
@@ -500,13 +500,14 @@ final class Installer
     private function resolvePromptMessages(array $promptNames): array
     {
         $parsed = $this->registry->parse();
-        $prompts = $parsed['prompts'] ?? [];
+        $prompts = $parsed['prompts'];
 
         $messages = [];
         foreach ($promptNames as $name) {
             foreach ($prompts as $prompt) {
                 if (($prompt['name'] ?? '') === $name) {
-                    $messages[] = trim($prompt['message'] ?? '');
+                    $message = $prompt['message'] ?? '';
+                    $messages[] = trim((string) $message);
                     break;
                 }
             }
