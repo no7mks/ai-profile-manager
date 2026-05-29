@@ -16,7 +16,7 @@
 graphify-out/.graphify_python
 graphify-out/cache/
 graphify-out/manifest.json
-ut/graphify-out/
+graphify-out/cost.json
 ## @apm:end
 
 ## @apm:block ability=python target=*
