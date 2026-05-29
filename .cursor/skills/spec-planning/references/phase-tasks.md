@@ -79,7 +79,7 @@
 |---------|--------|
 | `## Overview` | 必须 — 概述执行策略和关键决策 |
 | `## Tasks` | 必须 — 任务列表 |
-| `## Notes` | 必须 — 执行注意事项，至少提及遵循 `spec-execution` 规则 |
+| `## Notes` | 必须 — 执行注意事项，至少提及遵循 `spec-execution` 流程 |
 | `## Task Dependency Graph` | 必须 — JSON waves 格式 |
 
 ### 顶层结构约束（Feature/Hotfix）
@@ -247,7 +247,7 @@
 
 ## Notes
 
-- 遵循 `spec-execution` 规则
+- 遵循 `spec-execution` 流程
 - commit 随 checkpoint 一起执行
 
 ## Task Dependency Graph

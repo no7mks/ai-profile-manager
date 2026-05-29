@@ -158,7 +158,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 ## 12. 执行注意事项校验
 
 - [ ] `## Notes` section 存在
-- [ ] 明确提到遵循 `spec-execution.md`
+- [ ] 明确提到遵循 `spec-execution` 流程
 - [ ] 明确说明 commit 随 checkpoint 一起执行
 - [ ] 包含当前 spec 特有的执行要点（如有）
 
