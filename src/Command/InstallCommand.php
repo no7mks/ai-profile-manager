@@ -113,12 +113,16 @@ final class InstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $io->section('Installing default skills');
-        $result = $this->installer->installTyped([
-            'skills' => ['apm'],
-            'rules' => [],
-            'agents' => ['code-reviewer'],
-        ], $targets);
+        $io->section('Installing default preset');
+        $presetSpec = $this->presetRegistry->getPreset('default');
+        if ($presetSpec === null) {
+            $io->error("Preset 'default' not found in abilities.yaml.");
+
+            return Command::FAILURE;
+        }
+
+        $items = PresetRegistry::toTypedSpec($presetSpec);
+        $result = $this->installer->installTyped($items, $targets, 'default');
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

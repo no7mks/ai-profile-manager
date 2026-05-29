@@ -47,4 +47,19 @@ final class DirectoryMirrorServiceTest extends TestCase
         $this->expectExceptionMessage('Pass --force');
         $mirror->copyFile($src, $dst, false);
     }
+
+    public function testMirrorDirectoryHandlesTrailingSlashInSource(): void
+    {
+        $src = sys_get_temp_dir() . '/apm-mirror-slash-' . bin2hex(random_bytes(4));
+        $dst = sys_get_temp_dir() . '/apm-mirror-slash-dst-' . bin2hex(random_bytes(4));
+        mkdir($src, 0775, true);
+        file_put_contents($src . '/SKILL.md', "# Skill\n");
+
+        $mirror = new DirectoryMirrorService();
+        // Source path with trailing slash — should still copy correctly
+        $mirror->mirrorDirectory($src . '/', $dst);
+
+        self::assertFileExists($dst . '/SKILL.md');
+        self::assertSame("# Skill\n", (string) file_get_contents($dst . '/SKILL.md'));
+    }
 }

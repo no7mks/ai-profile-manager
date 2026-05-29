@@ -73,6 +73,106 @@ final class InstallCommandTest extends TestCase
         self::assertStringContainsString('Unknown preset', $tester->getDisplay());
     }
 
+    public function testBootstrapInstallsDefaultPreset(): void
+    {
+        $pkg = $this->tmpDir . '/pkg';
+        mkdir($pkg . '/.cursor/skills/apm', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/apm/SKILL.md', "x\n");
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/code-reviewer.md', "x\n");
+
+        // scaffold sources required by ProjectInitializer
+        mkdir($pkg . '/docs', 0775, true);
+        file_put_contents($pkg . '/docs/README.md', "# Docs\n");
+        mkdir($pkg . '/issues', 0775, true);
+        file_put_contents($pkg . '/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
+        // scope rule for cursor target
+        mkdir($pkg . '/.cursor/rules', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/cursor-scope.mdc', "x\n");
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: apm',
+            '    description: apm skill',
+            '    targets:',
+            '      cursor: .cursor/skills/apm/',
+            'agents:',
+            '  - path: code-reviewer',
+            '    description: code review agent',
+            '    targets:',
+            '      cursor: .cursor/agents/code-reviewer.md',
+            'presets:',
+            '  - name: default',
+            '    description: Bootstrap defaults',
+            '    includes:',
+            '      - skill:apm',
+            '      - agent:code-reviewer',
+        ]) . "\n");
+
+        $proj = $this->tmpDir . '/proj';
+        mkdir($proj, 0775, true);
+        chdir($proj);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $presetRegistry = new \AiProfileManager\Service\PresetRegistry($registry);
+        $installer = new Installer(
+            registry: $registry,
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $initializer = new \AiProfileManager\Service\ProjectInitializer($pkg);
+        $cmd = new InstallCommand($installer, $initializer, $presetRegistry);
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['cursor']]);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('Installing default preset', $display);
+        self::assertStringContainsString('Installed skill apm', $display);
+        self::assertStringContainsString('Installed agent code-reviewer', $display);
+    }
+
+    public function testBootstrapFailsWhenDefaultPresetMissing(): void
+    {
+        $pkg = $this->tmpDir . '/pkg';
+        // scaffold sources required by ProjectInitializer
+        mkdir($pkg . '/docs', 0775, true);
+        file_put_contents($pkg . '/docs/README.md', "# Docs\n");
+        mkdir($pkg . '/issues', 0775, true);
+        file_put_contents($pkg . '/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
+        // scope rule for cursor target
+        mkdir($pkg . '/.cursor/rules', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/cursor-scope.mdc', "x\n");
+
+        // abilities.yaml without default preset
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills: []',
+            'presets: []',
+        ]) . "\n");
+
+        $proj = $this->tmpDir . '/proj';
+        mkdir($proj, 0775, true);
+        chdir($proj);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $presetRegistry = new \AiProfileManager\Service\PresetRegistry($registry);
+        $installer = new Installer(
+            registry: $registry,
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $initializer = new \AiProfileManager\Service\ProjectInitializer($pkg);
+        $cmd = new InstallCommand($installer, $initializer, $presetRegistry);
+        $tester = new CommandTester($cmd);
+        $exit = $tester->execute(['--target' => ['cursor']]);
+
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString("Preset 'default' not found", $tester->getDisplay());
+    }
+
     public function testInstallCommandInstallsPresetSuccessfully(): void
     {
         $pkg = $this->tmpDir . '/pkg';

@@ -8,7 +8,7 @@ use AiProfileManager\Config\PackagePaths;
 use RuntimeException;
 
 /**
- * Copies the bundled project scaffold (docs, issues, AGENTS.md) and optional platform scope rules.
+ * Copies the bundled project scaffold (docs, issues, AGENTS.md).
  */
 final class ProjectInitializer
 {
@@ -24,7 +24,7 @@ final class ProjectInitializer
     }
 
     /**
-     * @param array<int, string> $targets IDE targets (cursor, kiro). Empty means skip installing scope rules.
+     * @param array<int, string> $targets IDE targets (cursor, kiro).
      *
      * @return array<int, string>
      */
@@ -52,53 +52,6 @@ final class ProjectInitializer
         );
         $lines[] = '[ok] Scaffold installed at ' . $targetDir;
 
-        $lines = array_merge($lines, $this->installScopeRules($targetDir, $force, $targets));
-
-        return $lines;
-    }
-
-    /**
-     * @param array<int, string> $targets
-     *
-     * @return array<int, string>
-     */
-    private function installScopeRules(string $targetDir, bool $force, array $targets): array
-    {
-        if ($targets === []) {
-            return ['Skipping scope rules (no targets).'];
-        }
-
-        $lines = [];
-        $lines[] = 'Installing scope rules for targets: ' . implode(', ', $targets);
-
-        if (in_array('cursor', $targets, true)) {
-            $src = $this->join($this->packageRoot, '.cursor', 'rules', 'cursor-scope.mdc');
-            $dst = $this->join($targetDir, '.cursor', 'rules', 'cursor-scope.mdc');
-            $this->assertPathExists($src, 'Internal package layout error: cursor-scope bundle missing.');
-            if (!$force && is_file($dst)) {
-                throw new RuntimeException(
-                    'Target already has .cursor/rules/cursor-scope.mdc. Pass --force to overwrite.'
-                );
-            }
-            $this->mirror->ensureDirectory(dirname($dst));
-            $this->mirror->copyFile($src, $dst, true);
-            $lines[] = '[ok] Installed Cursor scope rule -> .cursor/rules/cursor-scope.mdc';
-        }
-
-        if (in_array('kiro', $targets, true)) {
-            $src = $this->join($this->packageRoot, '.kiro', 'steering', 'kiro-scope.md');
-            $dst = $this->join($targetDir, '.kiro', 'steering', 'kiro-scope.md');
-            $this->assertPathExists($src, 'Internal package layout error: kiro-scope bundle missing.');
-            if (!$force && is_file($dst)) {
-                throw new RuntimeException(
-                    'Target already has .kiro/steering/kiro-scope.md. Pass --force to overwrite.'
-                );
-            }
-            $this->mirror->ensureDirectory(dirname($dst));
-            $this->mirror->copyFile($src, $dst, true);
-            $lines[] = '[ok] Installed Kiro scope steering -> .kiro/steering/kiro-scope.md';
-        }
-
         return $lines;
     }
 
@@ -121,13 +74,6 @@ final class ProjectInitializer
         }
 
         return $resolved;
-    }
-
-    private function assertPathExists(string $path, string $message): void
-    {
-        if (!file_exists($path)) {
-            throw new RuntimeException($message);
-        }
     }
 
     private function assertScaffoldSourcesPresent(string $packageRoot): void

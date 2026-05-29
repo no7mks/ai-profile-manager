@@ -19,7 +19,7 @@ composer global require no7mks/ai-profile-manager
 apm install
 ```
 
-这会安装 scaffold（`docs/`、`issues/`、`AGENTS.md`）和 `apm` skill。之后使用 Agent skill 命令 `/apm init` 生成 SSOT 基线。
+这会安装 scaffold（`docs/`、`issues/`、`AGENTS.md`）和 `default` preset 中定义的 ability。之后使用 Agent skill 命令 `/apm init` 生成 SSOT 基线。
 
 ---
 

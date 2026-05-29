@@ -14,7 +14,7 @@ apm 所有已注册命令的签名、行为与错误条件。
 - 无 preset 参数时（bootstrap 模式）：
   1. 调用 ProjectInitializer 复制 scaffold（docs/、issues/、AGENTS.md）
   2. 安装平台 scope rules（cursor-scope.mdc / kiro-scope.md）
-  3. 安装默认 ability（skill:apm + agent:code-reviewer）
+  3. 安装 `default` preset 中定义的所有 ability
   4. 输出 bootstrap 完成提示
 
 **错误条件**:

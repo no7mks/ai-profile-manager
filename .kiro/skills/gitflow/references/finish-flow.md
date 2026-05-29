@@ -97,6 +97,10 @@ git branch --show-current
    - `git push origin develop`
 6. 禁止 hotfix 直接合并 develop
 
+## 分支保留（强约束）
+
+Finish 流程**不得**删除源分支（feature/release/hotfix）。分支清理由用户自行决定，Agent 不主动执行 `git branch -d` 或 `git push origin --delete`。
+
 ## Finish Completion
 
 统一输出：

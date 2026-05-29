@@ -11,22 +11,18 @@ use RuntimeException;
 
 final class ProjectInitializerTest extends TestCase
 {
-    public function testInitCopiesScaffoldAndBothScopeRules(): void
+    public function testInitCopiesScaffold(): void
     {
         $tmp = sys_get_temp_dir() . '/apm-init-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
 
-        // Create a fake package root with scaffold files at root level and scope rules
+        // Create a fake package root with scaffold files at root level
         $pkg = sys_get_temp_dir() . '/apm-init-pkg-' . bin2hex(random_bytes(4));
         mkdir($pkg . '/docs/state', 0775, true);
         mkdir($pkg . '/issues', 0775, true);
         file_put_contents($pkg . '/docs/README.md', "# Docs\n");
         file_put_contents($pkg . '/issues/README.md', "# Issues\n");
         file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
-        mkdir($pkg . '/.cursor/rules', 0775, true);
-        mkdir($pkg . '/.kiro/steering', 0775, true);
-        file_put_contents($pkg . '/.cursor/rules/cursor-scope.mdc', "cursor-scope\n");
-        file_put_contents($pkg . '/.kiro/steering/kiro-scope.md', "kiro-scope\n");
 
         $initializer = new ProjectInitializer($pkg);
         $lines = $initializer->init($tmp, false, AppConfig::DEFAULT_TARGETS);
@@ -35,13 +31,9 @@ final class ProjectInitializerTest extends TestCase
         self::assertDirectoryExists($tmp . '/docs/state');
         self::assertFileExists($tmp . '/issues/README.md');
         self::assertFileExists($tmp . '/AGENTS.md');
-        self::assertFileExists($tmp . '/.cursor/rules/cursor-scope.mdc');
-        self::assertFileExists($tmp . '/.kiro/steering/kiro-scope.md');
 
         $joined = implode("\n", $lines);
         self::assertStringContainsString('Scaffold installed', $joined);
-        self::assertStringContainsString('cursor-scope.mdc', $joined);
-        self::assertStringContainsString('kiro-scope.md', $joined);
     }
 
     public function testInitWithEmptyTargetsSkipsScopeRules(): void
@@ -64,29 +56,6 @@ final class ProjectInitializerTest extends TestCase
         $initializer->init($tmp, false, []);
 
         self::assertFileDoesNotExist($tmp . '/.cursor/rules/cursor-scope.mdc');
-        self::assertFileDoesNotExist($tmp . '/.kiro/steering/kiro-scope.md');
-    }
-
-    public function testInitWithCursorTargetOnlyInstallsCursorScope(): void
-    {
-        $tmp = sys_get_temp_dir() . '/apm-init-cur-' . bin2hex(random_bytes(4));
-        mkdir($tmp, 0775, true);
-
-        $pkg = sys_get_temp_dir() . '/apm-init-cur-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/docs/state', 0775, true);
-        mkdir($pkg . '/issues', 0775, true);
-        file_put_contents($pkg . '/docs/README.md', "# Docs\n");
-        file_put_contents($pkg . '/issues/README.md', "# Issues\n");
-        file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
-        mkdir($pkg . '/.cursor/rules', 0775, true);
-        mkdir($pkg . '/.kiro/steering', 0775, true);
-        file_put_contents($pkg . '/.cursor/rules/cursor-scope.mdc', "cursor-scope\n");
-        file_put_contents($pkg . '/.kiro/steering/kiro-scope.md', "kiro-scope\n");
-
-        $initializer = new ProjectInitializer($pkg);
-        $initializer->init($tmp, false, ['cursor']);
-
-        self::assertFileExists($tmp . '/.cursor/rules/cursor-scope.mdc');
         self::assertFileDoesNotExist($tmp . '/.kiro/steering/kiro-scope.md');
     }
 
@@ -160,28 +129,6 @@ final class ProjectInitializerTest extends TestCase
         $this->expectExceptionMessage('not a directory');
 
         $initializer->init($target, false, []);
-    }
-
-    public function testInitFailsWhenScopeRuleBundleMissing(): void
-    {
-        $pkg = sys_get_temp_dir() . '/apm-init-miss-rule-pkg-' . bin2hex(random_bytes(4));
-        mkdir($pkg . '/docs', 0775, true);
-        mkdir($pkg . '/issues', 0775, true);
-        file_put_contents($pkg . '/docs/README.md', "x\n");
-        file_put_contents($pkg . '/issues/README.md', "x\n");
-        file_put_contents($pkg . '/AGENTS.md', "x\n");
-        // Only create kiro scope, omit cursor scope
-        mkdir($pkg . '/.kiro/steering', 0775, true);
-        file_put_contents($pkg . '/.kiro/steering/kiro-scope.md', "x\n");
-
-        $target = sys_get_temp_dir() . '/apm-init-miss-rule-target-' . bin2hex(random_bytes(4));
-        mkdir($target, 0775, true);
-
-        $initializer = new ProjectInitializer($pkg);
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('cursor-scope bundle missing');
-
-        $initializer->init($target, false, ['cursor']);
     }
 
     public function testInitFailsWhenScaffoldLeafMissing(): void

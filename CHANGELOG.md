@@ -4,6 +4,21 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.7.1] - 2026-05-29
+
+### Added
+
+- 新增 `quick-release` skill，支持不走 release/hotfix 分支的快速发布流程。
+
+### Changed
+
+- `bootstrap` 命令改用 `default` preset 驱动安装，不再硬编码默认 ability 列表。
+- README Quick Start 优化可读性。
+
+### Fixed
+
+- `mirrorDirectory` 修复 trailing slash 截断问题。
+
 ## [0.7.0] - 2026-05-29
 
 ### Breaking
