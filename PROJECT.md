@@ -43,6 +43,20 @@ composer install
 
 ---
 
+## 知识图谱
+
+本项目使用 graphify 维护持久化知识图谱（`graphify-out/`）。架构、依赖、模块耦合相关问题优先查图谱，而非 grep 或逐文件阅读。
+
+```
+/graphify .                    # 构建或重建图谱
+/graphify . --update           # 增量更新（仅变更文件）
+/graphify query "<question>"   # 查询关系
+/graphify path "A" "B"         # 两个概念间的最短路径
+/graphify explain "X"          # 解释单个节点
+```
+
+---
+
 ## 版本号位置
 
 - `composer.json`：`version` 字段（若存在）

@@ -32,6 +32,7 @@ final class Installer
     public function installTyped(array $items, array $targets, ?string $presetName = null): array
     {
         $hooks = $items['hooks'] ?? [];
+        $prompts = $items['prompts'] ?? [];
 
         $lines = [];
         $lines[] = 'Installing profile items...';
@@ -78,6 +79,18 @@ final class Installer
 
         $gitignoreResult = $this->installGitIgnore($items, $targets, $presetName);
         $lines[] = $gitignoreResult;
+
+        // Prompts: output messages for agent to act on
+        if ($prompts !== []) {
+            $promptMessages = $this->resolvePromptMessages($prompts);
+            if ($promptMessages !== []) {
+                $lines[] = '';
+                $lines[] = '[prompt] Post-install instructions:';
+                foreach ($promptMessages as $message) {
+                    $lines[] = $message;
+                }
+            }
+        }
 
         return ['lines' => $lines, 'exit_code' => $exitCode];
     }
@@ -478,6 +491,28 @@ final class Installer
             unlink($fileInfo->getPathname());
         }
         rmdir($dir);
+    }
+
+    /**
+     * @param list<string> $promptNames
+     * @return list<string>
+     */
+    private function resolvePromptMessages(array $promptNames): array
+    {
+        $parsed = $this->registry->parse();
+        $prompts = $parsed['prompts'] ?? [];
+
+        $messages = [];
+        foreach ($promptNames as $name) {
+            foreach ($prompts as $prompt) {
+                if (($prompt['name'] ?? '') === $name) {
+                    $messages[] = trim($prompt['message'] ?? '');
+                    break;
+                }
+            }
+        }
+
+        return $messages;
     }
 
     /**

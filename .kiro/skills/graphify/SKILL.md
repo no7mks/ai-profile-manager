@@ -5,106 +5,72 @@ description: "当用户提到 graphify、知识图谱、依赖分析、模块耦
 
 # /graphify
 
-Turn any folder into a queryable knowledge graph with:
-- auditable confidence tags (`EXTRACTED`, `INFERRED`, `AMBIGUOUS`)
-- structural output artifacts (`graph.json`, `GRAPH_REPORT.md`)
-- optional visualization/integration output artifacts (HTML, SVG, GraphML, Neo4j, MCP)
+将任意文件夹（代码、文档、论文、图片、视频）转化为可查询的知识图谱，输出交互式 HTML、GraphRAG-ready JSON 和 GRAPH_REPORT.md。
 
-## What it is for
+## 用法速查
 
-Graphify is useful when you need a persistent map of relationships across code/docs/papers/images instead of one-off chat answers.
-
-Use it for:
-- a codebase you are new to
-- a mixed research corpus (papers + notes + screenshots + links)
-- a long-lived `/raw` workflow where retrieval should improve over time
-
-## Quick start (minimal path)
-
-Use this when users ask "run graphify here" and do not need advanced options:
-
-```bash
-/graphify .
+```
+/graphify                                             # 对当前目录执行完整 pipeline
+/graphify <path>                                      # 对指定路径执行完整 pipeline
+/graphify <path> --mode deep                          # 深度提取，更多 INFERRED 边
+/graphify <path> --update                             # 增量更新——仅重新提取变更文件
+/graphify <path> --cluster-only                       # 跳过提取，仅重新聚类
+/graphify <path> --no-viz                             # 跳过可视化，只生成报告 + JSON
+/graphify <path> --svg                                # 额外导出 graph.svg
+/graphify <path> --graphml                            # 导出 graph.graphml（Gephi/yEd）
+/graphify <path> --neo4j                              # 生成 cypher.txt 供 Neo4j 导入
+/graphify <path> --neo4j-push bolt://localhost:7687   # 直接推送到 Neo4j
+/graphify <path> --mcp                                # 启动 MCP stdio server
+/graphify <path> --watch                              # 监听文件变更，自动重建（无需 LLM）
+/graphify add <url>                                   # 抓取 URL 加入素材并更新图谱
+/graphify query "<question>"                          # BFS 遍历——广度上下文
+/graphify query "<question>" --dfs                    # DFS——追踪特定路径
+/graphify query "<question>" --budget 1500            # 限制输出 token 数
+/graphify path "A" "B"                                # 两个概念间的最短路径
+/graphify explain "X"                                 # 单节点的邻居与上下文解释
 ```
 
-Then surface:
-- where output artifacts are (`graphify-out/`)
-- top insights from report (God Nodes, Surprising Connections, Suggested Questions)
-- one suggested follow-up query
+## 调用规则
 
-## Task router (equal-weight entry)
+- 若用户输入 `/graphify --help` 或 `-h`，直接打印上方用法速查并停止，不执行任何命令
+- 若未提供路径，默认使用 `.`（当前目录），不要询问用户
 
-Pick by user intent. Keep all routes at the same level.
+## 任务路由
 
-### Build or refresh graph
+根据用户意图选择对应流程，所有路由平级：
 
-- **Initial build**: `/graphify <path>`  
-  Details: [Pipeline steps](references/pipeline-steps.md)
-- **Incremental update**: `/graphify <path> --update`  
-  Details: [Incremental update](references/incremental-and-modes.md#for---update-incremental-re-extraction)
-- **Re-cluster only**: `/graphify <path> --cluster-only`  
-  Details: [Cluster-only mode](references/incremental-and-modes.md#for---cluster-only)
-- **Deep extraction**: `/graphify <path> --mode deep`  
-  Details: [Pipeline steps](references/pipeline-steps.md#step-3---extract-entities-and-relationships)
+### 构建图谱
 
-### Query the graph
+- **完整构建**：`/graphify <path>` → [build.md](references/build.md)
+- **深度提取**：`/graphify <path> --mode deep` → [build.md](references/build.md)（设置 DEEP_MODE）
 
-- **Ask relationship question**: `/graphify query "<question>"`  
-  Details: [Query command](references/query-commands.md#for-graphify-query)
-- **Trace a path**: `/graphify path "A" "B"`  
-  Details: [Path command](references/query-commands.md#for-graphify-path)
-- **Explain one concept/node**: `/graphify explain "NodeName"`  
-  Details: [Explain command](references/query-commands.md#for-graphify-explain)
+### 增量更新
 
-### Ingest and integrations
+- **增量更新**：`/graphify <path> --update` → [update.md](references/update.md)
 
-- **Add URL to corpus**: `/graphify add <url>`  
-  Details: [Add integration](references/integrations.md#for-graphify-add)
-- **Watch filesystem changes**: `/graphify <path> --watch`  
-  Details: [Watch mode](references/integrations.md#for---watch)
-- **Git hook automation**: `graphify hook install`  
-  Details: [Git hook](references/integrations.md#for-git-commit-hook)
-- **CLAUDE.md always-on integration**: `graphify claude install`  
-  Details: [CLAUDE.md integration](references/integrations.md#for-native-claudemd-integration)
+### 查询图谱
 
-### Exports and external systems
+- **关系问题**：`/graphify query "<question>"` → [query.md](references/query.md)
+- **追踪路径**：`/graphify path "A" "B"` → [query.md](references/query.md#for-graphify-path)
+- **解释节点**：`/graphify explain "X"` → [query.md](references/query.md#for-graphify-explain)
 
-- **HTML report graph**: default on build (skip with `--no-viz`)
-- **SVG**: `/graphify <path> --svg`
-- **GraphML**: `/graphify <path> --graphml`
-- **Neo4j file export**: `/graphify <path> --neo4j`
-- **Neo4j direct push**: `/graphify <path> --neo4j-push bolt://localhost:7687`
-- **MCP server**: `/graphify <path> --mcp`  
-  Details: [Pipeline optional exports](references/pipeline-steps.md#step-7---optional-exports)
+### 导出与重组
 
-## Shared execution principles (all commands)
+- **仅重新聚类**：`/graphify <path> --cluster-only` → [export.md](references/export.md#for---cluster-only)
+- **Neo4j / SVG / GraphML / MCP**：→ [export.md](references/export.md)
 
-Apply these principles regardless of `build/query/path/explain/add`:
-- If no path is provided for path-based commands, default to `.`
-- Never fabricate edges or facts not supported by graph/source
-- Always surface uncertainty using confidence tags
-- Prefer concise results first, then offer a deeper follow-up
-- If required graph artifacts are missing, tell user what prerequisite command to run
+### 添加内容与自动化
 
-## Recommended interaction rhythm
+- **添加 URL**：`/graphify add <url>` → [ingest.md](references/ingest.md#for-graphify-add)
+- **文件监听**：`/graphify <path> --watch` → [ingest.md](references/ingest.md#for---watch)
+- **Git hook**：`graphify hook install` → [ingest.md](references/ingest.md#for-git-commit-hook)
 
-1. Build or update graph
-2. Read report highlights
-3. Navigate with `query` / `path` / `explain`
-4. Add integrations only when needed (`watch`, hooks, Neo4j, MCP)
+## 通用执行原则
 
-## Full execution references
-
-Use these as the authoritative contracts for step-by-step execution details:
-- [Pipeline steps (build/update/export flow)](references/pipeline-steps.md)
-- [Incremental and cluster-only modes](references/incremental-and-modes.md)
-- [Query commands (`query`, `path`, `explain`)](references/query-commands.md)
-- [Integrations (`add`, `--watch`, hooks, CLAUDE.md)](references/integrations.md)
-
-## Honesty Rules
-
-- Never invent an edge. If unsure, use AMBIGUOUS.
-- Never skip corpus-size warnings on large datasets.
-- Always show token cost when available in outputs.
-- Never hide cohesion scores behind symbols; show raw numbers.
-- Never run HTML viz on a graph with more than 5,000 nodes without warning.
+- 若未提供路径，默认 `.`
+- 绝不捏造边或事实——不确定时使用 AMBIGUOUS
+- 始终使用 confidence tag（`EXTRACTED`/`INFERRED`/`AMBIGUOUS`）
+- 优先给出简洁结果，再提供深入跟进
+- 若所需图谱文件不存在，告知用户先运行哪个前置命令
+- 超过 5000 节点的图谱生成 HTML 前必须警告用户
+- 始终在报告中展示 token 消耗

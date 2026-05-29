@@ -35,12 +35,6 @@ rules:
       cursor: .cursor/rules/git/git-conventions.mdc
       kiro: .kiro/steering/git/git-conventions.md
 
-  - path: graphify
-    description: 项目知识图谱使用指引
-    targets:
-      cursor: .cursor/rules/graphify.mdc
-      kiro: .kiro/steering/graphify.md
-
   - path: plugin:superpowers-integration
     description: Superpowers 插件集成约束
     targets:
@@ -139,6 +133,25 @@ gitignore:
   - marker: kotlin
     description: Kotlin 相关忽略规则
 
+prompts:
+  - name: graphify:project-section
+    message: |
+      在 PROJECT.md 的"版本号位置"章节之前插入以下内容（若"知识图谱"章节已存在则跳过）：
+
+      ---
+
+      ## 知识图谱
+
+      本项目使用 graphify 维护持久化知识图谱（`graphify-out/`）。架构、依赖、模块耦合相关问题优先查图谱。
+
+      ```
+      /graphify .                    # 构建或重建图谱
+      /graphify . --update           # 增量更新（仅变更文件）
+      /graphify query "<question>"   # 查询关系
+      /graphify path "A" "B"         # 两个概念间的最短路径
+      /graphify explain "X"          # 解释单个节点
+      ```
+
 presets:
   - name: gitflow
     description: GitFlow 全套能力
@@ -161,5 +174,6 @@ presets:
   - name: graphify
     description: Graphify 图谱能力
     includes:
-      - rule:graphify
       - skill:graphify
+      - gitignore:graphify
+      - prompt:graphify:project-section

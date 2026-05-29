@@ -97,6 +97,7 @@ final class PresetRegistry
             'rule' => 'rules',
             'agent' => 'agents',
             'hook' => 'hooks',
+            'prompt' => 'prompts',
             default => throw new \RuntimeException("Invalid ability type: {$type}"),
         };
 
@@ -104,10 +105,21 @@ final class PresetRegistry
         $parsed = $this->registry->parse();
         $entries = $parsed[$sectionKey];
         $exists = false;
-        foreach ($entries as $entry) {
-            if ($entry->path === $abilityPath) {
-                $exists = true;
-                break;
+
+        if ($type === 'prompt') {
+            // Prompts use 'name' field instead of 'path'
+            foreach ($entries as $entry) {
+                if (($entry['name'] ?? '') === $abilityPath) {
+                    $exists = true;
+                    break;
+                }
+            }
+        } else {
+            foreach ($entries as $entry) {
+                if ($entry->path === $abilityPath) {
+                    $exists = true;
+                    break;
+                }
             }
         }
         if (!$exists) {
@@ -225,13 +237,14 @@ final class PresetRegistry
      */
     public static function toTypedSpec(array $preset): array
     {
-        $result = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => []];
+        $result = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => [], 'prompts' => []];
         foreach ($preset['includes'] as $include) {
             $key = match ($include['type']) {
                 'skill' => 'skills',
                 'rule' => 'rules',
                 'agent' => 'agents',
                 'hook' => 'hooks',
+                'prompt' => 'prompts',
                 default => null,
             };
             if ($key !== null) {

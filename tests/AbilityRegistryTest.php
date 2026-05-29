@@ -208,7 +208,7 @@ YAML;
 
     public function testKnownSectionsReturnsExpectedList(): void
     {
-        $expected = ['rules', 'agents', 'skills', 'hooks', 'gitignore', 'presets'];
+        $expected = ['rules', 'agents', 'skills', 'hooks', 'gitignore', 'presets', 'prompts'];
         self::assertSame($expected, AbilityRegistry::knownSections());
     }
 

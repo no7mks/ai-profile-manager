@@ -65,6 +65,7 @@ final class AbilityRegistry
             'hooks' => [],
             'gitignore' => [],
             'presets' => [],
+            'prompts' => [],
         ];
 
         $errors = [];
@@ -76,8 +77,8 @@ final class AbilityRegistry
 
             $entries = $data[$section];
 
-            // gitignore and presets have different structures, pass through as-is
-            if ($section === 'gitignore' || $section === 'presets') {
+            // gitignore, presets, and prompts have different structures, pass through as-is
+            if ($section === 'gitignore' || $section === 'presets' || $section === 'prompts') {
                 $result[$section] = $entries;
                 continue;
             }
@@ -130,6 +131,6 @@ final class AbilityRegistry
      */
     public static function knownSections(): array
     {
-        return ['rules', 'agents', 'skills', 'hooks', 'gitignore', 'presets'];
+        return ['rules', 'agents', 'skills', 'hooks', 'gitignore', 'presets', 'prompts'];
     }
 }
