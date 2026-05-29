@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Capture\CaptureChangeIngestor;
 use AiProfileManager\Core\ConsoleRegistration;
-use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
@@ -17,14 +15,16 @@ final class ConsoleRegistrationTest extends TestCase
 {
     public function testRegisterAddsAllNamedCommands(): void
     {
-        $installer = new Installer();
+        $tmp = sys_get_temp_dir() . '/apm-reg-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+        file_put_contents($tmp . '/abilities.yaml', "skills: []\n");
+        $registry = new \AiProfileManager\Service\AbilityRegistry($tmp . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, packageRoot: $tmp);
         $checker = new CheckService();
-        $capture = new CaptureService($checker);
-        $ingestor = new CaptureChangeIngestor();
         $updater = new KnowledgeBaseUpdater();
 
         $app = new Application();
-        ConsoleRegistration::register($app, $installer, $checker, $capture, $ingestor, $updater);
+        ConsoleRegistration::register($app, $installer, $checker, $updater);
 
         $names = [
             'install',
@@ -35,17 +35,12 @@ final class ConsoleRegistrationTest extends TestCase
             'skill:check',
             'rule:check',
             'agent:check',
-            'skill:capture',
-            'rule:capture',
-            'agent:capture',
             'check',
-            'capture',
             'preset:create',
             'preset:add-ability',
             'preset:remove-ability',
             'preset:delete',
             'update',
-            'ingest',
         ];
 
         foreach ($names as $name) {

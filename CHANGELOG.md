@@ -1,10 +1,45 @@
 # Changelog
 
-本文件记录版本间的用户可见变更。**每次发布前**请对照 `git log` 自行整理并更新（例如相对上一 tag：`git log v0.2.0..HEAD --oneline`，将上一 tag 换成实际发布的基准）。
+本文件记录版本间的用户可见变更。Release/hotfix finish 时从 `changes/<version>/CHANGELOG.md` 提炼摘要写入此处。
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
-## [Unreleased]
+## [0.7.0] - 2026-05-29
+
+### Breaking
+
+- Ability 文件不再存放于独立 `abilities/` 目录，改为直接维护在真实生效路径（`.cursor/`、`.kiro/`）；新增 `abilities.yaml` 注册表取代目录扫描。
+- `scaffold/` 目录废弃，模板文件直接维护在项目根目录对应位置。
+- Issue 编号统一为 `ISS-<5位数字>`，取消 L/release 系列分类；归档位置改为 `issues/fixed/`。
+- `docs/changes/` 提升为根目录级 `changes/`。
+
+### Removed
+
+- 移除 `capture`、`skill:capture`、`rule:capture`、`agent:capture`、`ingest` 命令及相关代码。
+- 移除 `listFromFilesystem` fallback 逻辑，`install`/`check` 统一从 `abilities.yaml` 解析。
+
+### Added
+
+- 新增 hook 类型 ability 支持（Kiro / Cursor 双平台），可通过 `install`/`uninstall`/`check` 统一管理。
+- `show` 命令新增 `--type` 过滤选项，支持按 ability 类型筛选。
+- 新增 `docs/state/` 系列文档（`architecture.md`、`cli-commands.md`、`abilities-model.md`、`install-behavior.md`、`gitignore.md`）及 `docs/manual/usage.md` 使用手册。
+- 新增 `changes/` 根目录级归档体系与 `issues/fixed/` 已发布 issue 归档位置。
+- 引入 PHPStan level 8 静态分析，零 baseline。
+- 新增 `apm init` reference 文档（`init-workflow.md`），定义探测/确认/生成流程。
+
+### Changed
+
+- doc-convergence steering 路径从 `docs/changes/` 改为 `changes/`，新增 spec 归档章节。
+- gitflow finish-flow 更新：所有分支 finish 均可收敛 issue，spec 归档由 finish 流程负责。
+- Issue History 时间格式从 UTC 改为北京时区 `+08`。
+- Installer 路径解析重构为 Source-is-Target 模式，从 `abilities.yaml` targets 字段获取源路径。
+- AbilityDiffService、PresetRegistry 适配新布局，Preset 命令改为依赖注入。
+- `show` 命令 `--type` 过滤改为从 `abilities.yaml` 解析。
+
+### Fixed
+
+- 修复 E2E / 单元 / 集成测试 fixture 适配新布局。
+- 消除 PresetRegistryTest / PresetManifestCommandsTest 中重复的 removeDir 逻辑。
 
 ## [0.6.3] - 2026-05-03
 

@@ -4,98 +4,255 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
-use AiProfileManager\Config\AppConfig;
+use Symfony\Component\Yaml\Yaml;
 
 /**
- * Preset definitions: merged from workspace abilities/_presets.json (authoritative when present) and AppConfig defaults.
+ * Preset definitions read from the presets section of abilities.yaml.
  */
 final class PresetRegistry
 {
-    public const PRESETS_RELATIVE_PATH = 'abilities/_presets.json';
-
-    public function __construct(private readonly string $workspaceRoot)
+    public function __construct(private readonly AbilityRegistry $registry)
     {
     }
 
     /**
-     * When abilities/_presets.json exists it is authoritative; otherwise use AppConfig defaults.
-     *
-     * @return array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}>
+     * @return list<array{name: string, description: string, includes: list<array{type: string, path: string}>}>
      */
     public function allPresets(): array
     {
-        $path = $this->workspaceRoot . '/' . self::PRESETS_RELATIVE_PATH;
-        if (is_readable($path)) {
-            $fromFile = $this->loadFromWorkspace();
+        $data = $this->registry->parse();
+        $presets = $data['presets'];
 
-            return $fromFile !== [] ? $fromFile : AppConfig::PRESET_ITEMS;
-        }
-
-        return AppConfig::PRESET_ITEMS;
+        return array_map(fn(array $preset) => $this->normalizePreset($preset), $presets);
     }
 
     /**
-     * @return array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}|null
+     * @return array{name: string, description: string, includes: list<array{type: string, path: string}>}|null
      */
     public function getPreset(string $name): ?array
     {
         $all = $this->allPresets();
+        foreach ($all as $preset) {
+            if ($preset['name'] === $name) {
+                return $preset;
+            }
+        }
 
-        return $all[$name] ?? null;
+        return null;
     }
 
     /**
-     * @param array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}> $presets
+     * Create a new preset entry in abilities.yaml.
+     *
+     * @param string $name Preset name (must be unique)
+     * @param string $description Preset description
+     * @param list<string> $includes List of "type:path" strings
      */
-    public function saveToWorkspace(array $presets): void
+    public function createPreset(string $name, string $description, array $includes): void
     {
-        $path = $this->workspaceRoot . '/' . self::PRESETS_RELATIVE_PATH;
-        $dir = dirname($path);
-        if (!is_dir($dir)) {
-            mkdir($dir, 0775, true);
+        if ($this->getPreset($name) !== null) {
+            throw new \RuntimeException("Preset '{$name}' already exists");
         }
 
-        $json = json_encode($presets, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL;
-        file_put_contents($path, $json);
+        $data = $this->readRawYaml();
+        if (!isset($data['presets']) || !\is_array($data['presets'])) {
+            $data['presets'] = [];
+        }
+
+        $data['presets'][] = [
+            'name' => $name,
+            'description' => $description,
+            'includes' => $includes,
+        ];
+
+        $this->writeRawYaml($data);
     }
 
     /**
-     * @return array<string, array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>}>
+     * Delete a preset entry from abilities.yaml.
      */
-    private function loadFromWorkspace(): array
+    public function deletePreset(string $name): void
     {
-        $path = $this->workspaceRoot . '/' . self::PRESETS_RELATIVE_PATH;
-        if (!is_readable($path)) {
-            return [];
+        $data = $this->readRawYaml();
+        $presets = $data['presets'] ?? [];
+
+        $filtered = array_values(array_filter($presets, fn($p) => ($p['name'] ?? '') !== $name));
+
+        if (\count($filtered) === \count($presets)) {
+            throw new \RuntimeException("Preset '{$name}' not found");
         }
 
-        $raw = file_get_contents($path);
-        if ($raw === false) {
-            return [];
+        $data['presets'] = $filtered;
+        $this->writeRawYaml($data);
+    }
+
+    /**
+     * Add an ability reference to a preset's includes list.
+     */
+    public function addAbility(string $presetName, string $type, string $abilityPath): void
+    {
+        // Validate ability type
+        $sectionKey = match ($type) {
+            'skill' => 'skills',
+            'rule' => 'rules',
+            'agent' => 'agents',
+            'hook' => 'hooks',
+            'prompt' => 'prompts',
+            default => throw new \RuntimeException("Invalid ability type: {$type}"),
+        };
+
+        // Validate ability exists in registry
+        $parsed = $this->registry->parse();
+        $exists = false;
+
+        if ($type === 'prompt') {
+            // Prompts use 'name' field instead of 'path'
+            foreach ($parsed['prompts'] as $entry) {
+                if (($entry['name'] ?? '') === $abilityPath) {
+                    $exists = true;
+                    break;
+                }
+            }
+        } else {
+            /** @var list<AbilityEntry> $entries */
+            $entries = $parsed[$sectionKey];
+            foreach ($entries as $entry) {
+                if ($entry->path === $abilityPath) {
+                    $exists = true;
+                    break;
+                }
+            }
+        }
+        if (!$exists) {
+            throw new \RuntimeException("Ability '{$type}:{$abilityPath}' not found in registry");
         }
 
-        $decoded = json_decode($raw, true);
-        if (!is_array($decoded)) {
-            return [];
+        $data = $this->readRawYaml();
+        $presets = &$data['presets'];
+
+        $found = false;
+        foreach ($presets as &$preset) {
+            if (($preset['name'] ?? '') === $presetName) {
+                $entry = $type . ':' . $abilityPath;
+                if (!\in_array($entry, $preset['includes'] ?? [], true)) {
+                    $preset['includes'][] = $entry;
+                }
+                $found = true;
+                break;
+            }
+        }
+        unset($preset);
+
+        if (!$found) {
+            throw new \RuntimeException("Preset '{$presetName}' not found");
         }
 
-        $out = [];
-        foreach ($decoded as $name => $spec) {
-            if (!is_string($name) || !is_array($spec)) {
+        $this->writeRawYaml($data);
+    }
+
+    /**
+     * Remove an ability reference from a preset's includes list.
+     */
+    public function removeAbility(string $presetName, string $type, string $abilityPath): void
+    {
+        $data = $this->readRawYaml();
+        $presets = &$data['presets'];
+
+        $found = false;
+        foreach ($presets as &$preset) {
+            if (($preset['name'] ?? '') === $presetName) {
+                $entry = $type . ':' . $abilityPath;
+                $preset['includes'] = array_values(array_filter(
+                    $preset['includes'] ?? [],
+                    fn($item) => $item !== $entry
+                ));
+                $found = true;
+                break;
+            }
+        }
+        unset($preset);
+
+        if (!$found) {
+            throw new \RuntimeException("Preset '{$presetName}' not found");
+        }
+
+        $this->writeRawYaml($data);
+    }
+
+    /**
+     * @return array<string, mixed>
+     */
+    private function readRawYaml(): array
+    {
+        $path = $this->registry->getRegistryPath();
+        $content = file_get_contents($path);
+        if ($content === false) {
+            throw new \RuntimeException("Cannot read: {$path}");
+        }
+
+        return Yaml::parse($content) ?? [];
+    }
+
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function writeRawYaml(array $data): void
+    {
+        $path = $this->registry->getRegistryPath();
+        $yaml = Yaml::dump($data, 4, 2);
+        file_put_contents($path, $yaml);
+    }
+
+    /**
+     * @param array<string, mixed> $preset
+     * @return array{name: string, description: string, includes: list<array{type: string, path: string}>}
+     */
+    private function normalizePreset(array $preset): array
+    {
+        $includes = [];
+        foreach (($preset['includes'] ?? []) as $entry) {
+            if (!\is_string($entry)) {
                 continue;
             }
-
-            $skills = isset($spec['skills']) && is_array($spec['skills']) ? array_values(array_filter($spec['skills'], 'is_string')) : [];
-            $rules = isset($spec['rules']) && is_array($spec['rules']) ? array_values(array_filter($spec['rules'], 'is_string')) : [];
-            $agents = isset($spec['agents']) && is_array($spec['agents']) ? array_values(array_filter($spec['agents'], 'is_string')) : [];
-
-            $out[$name] = [
-                'skills' => $skills,
-                'rules' => $rules,
-                'agents' => $agents,
-            ];
+            $colonPos = strpos($entry, ':');
+            if ($colonPos === false) {
+                continue;
+            }
+            $type = substr($entry, 0, $colonPos);
+            $path = substr($entry, $colonPos + 1);
+            $includes[] = ['type' => $type, 'path' => $path];
         }
 
-        return $out;
+        return [
+            'name' => (string) ($preset['name'] ?? ''),
+            'description' => (string) ($preset['description'] ?? ''),
+            'includes' => $includes,
+        ];
+    }
+
+    /**
+     * Convert a preset's includes to the legacy typed format used by Installer/CheckService.
+     *
+     * @param array{name: string, description: string, includes: list<array{type: string, path: string}>} $preset
+     * @return array{skills: list<string>, rules: list<string>, agents: list<string>, hooks: list<string>, prompts: list<string>}
+     */
+    public static function toTypedSpec(array $preset): array
+    {
+        $result = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => [], 'prompts' => []];
+        foreach ($preset['includes'] as $include) {
+            $key = match ($include['type']) {
+                'skill' => 'skills',
+                'rule' => 'rules',
+                'agent' => 'agents',
+                'hook' => 'hooks',
+                'prompt' => 'prompts',
+                default => null,
+            };
+            if ($key !== null) {
+                $result[$key][] = $include['path'];
+            }
+        }
+
+        return $result;
     }
 }

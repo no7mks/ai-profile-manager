@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Core;
 
-use AiProfileManager\Capture\CaptureChangeIngestor;
-use AiProfileManager\Service\CaptureService;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\KnowledgeBaseUpdater;
+use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -28,20 +27,19 @@ final class Application
     public static function createSymfonyApplication(
         Installer $installer,
         KnowledgeBaseUpdater $updater,
+        ?PresetRegistry $presetRegistry = null,
     ): SymfonyApplication {
         $checker = new CheckService();
-        $capture = new CaptureService($checker);
-        $ingestor = new CaptureChangeIngestor();
 
-        $app = new SymfonyApplication('apm', '0.6.3');
+        $app = new SymfonyApplication('apm', '0.7.0');
         $app->setDefaultCommand('list');
-        ConsoleRegistration::register($app, $installer, $checker, $capture, $ingestor, $updater);
+        ConsoleRegistration::register($app, $installer, $checker, $updater, $presetRegistry);
 
         return $app;
     }
 
     /**
-     * @param array<int, string> $argv
+     * @param list<string> $argv
      */
     public function run(array $argv, ?OutputInterface $output = null): int
     {

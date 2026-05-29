@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\PresetRegistry;
@@ -20,6 +21,7 @@ final class PresetUninstallCommand extends Command
     public function __construct(
         private readonly Installer $installer,
         private readonly CheckService $checker,
+        private readonly PresetRegistry $presetRegistry = new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml')),
     ) {
         parent::__construct();
     }
@@ -49,18 +51,19 @@ final class PresetUninstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $registry = new PresetRegistry((string) getcwd());
-        $known = array_keys($registry->allPresets());
+        $known = array_map(fn(array $p) => $p['name'], $this->presetRegistry->allPresets());
         if (!in_array($preset, $known, true)) {
             $io->error(sprintf('Unknown preset: %s. Known presets: %s.', $preset, implode(', ', $known)));
 
             return Command::FAILURE;
         }
 
-        $spec = $registry->getPreset($preset);
-        if ($spec === null) {
+        $presetSpec = $this->presetRegistry->getPreset($preset);
+        if ($presetSpec === null) {
             return Command::FAILURE;
         }
+
+        $spec = PresetRegistry::toTypedSpec($presetSpec);
         $io->writeln(sprintf('Preset: %s', $preset));
 
         $check = $this->checker->checkTyped($spec, $targets);

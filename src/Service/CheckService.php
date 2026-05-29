@@ -8,12 +8,27 @@ final class CheckService
 {
     public function __construct(
         private readonly ComposerBaselineResolver $baselineResolver = new ComposerBaselineResolver(),
-        private readonly AbilityDiffService $diffService = new AbilityDiffService(),
+        private readonly ?AbilityDiffService $diffService = null,
+        private readonly HookChecker $hookChecker = new HookChecker(),
     ) {
     }
 
+    private function createDiffService(string $baselineRoot): AbilityDiffService
+    {
+        if ($this->diffService !== null) {
+            return $this->diffService;
+        }
+
+        $registryPath = $baselineRoot . '/abilities.yaml';
+
+        return new AbilityDiffService(
+            new AbilityDirectoryDiff(),
+            new AbilityRegistry($registryPath),
+        );
+    }
+
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>} $items
      * @param array<int, string> $targets
      * @return array<int, array{type: string, name: string, target: string, status: string}>
      */
@@ -25,9 +40,17 @@ final class CheckService
         }
 
         $workspaceRoot = (string) getcwd();
-        $detailed = $this->diffService->diffForInstalledTargets($items, $targets, $baseline['install_path'], $workspaceRoot);
+        $baselineRoot = $baseline['install_path'];
 
-        return array_map(
+        // Process skills/rules/agents via AbilityDiffService
+        $diffItems = [
+            'skills' => $items['skills'],
+            'rules' => $items['rules'],
+            'agents' => $items['agents'],
+        ];
+        $detailed = $this->createDiffService($baselineRoot)->diffForInstalledTargets($diffItems, $targets, $baselineRoot, $workspaceRoot);
+
+        $results = array_map(
             static fn (array $item): array => [
                 'type' => $item['type'],
                 'name' => $item['name'],
@@ -36,6 +59,16 @@ final class CheckService
             ],
             $detailed
         );
+
+        // Process hooks via HookChecker
+        $hooks = $items['hooks'] ?? [];
+        foreach ($targets as $target) {
+            foreach ($hooks as $hookName) {
+                $results[] = $this->checkHook($hookName, $target, $baselineRoot, $workspaceRoot);
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -44,7 +77,7 @@ final class CheckService
     public function evaluateExitCode(array $results): int
     {
         foreach ($results as $result) {
-            if ($result['status'] === 'modified' || $result['status'] === 'missing') {
+            if ($result['status'] === 'modified' || $result['status'] === 'missing' || $result['status'] === 'no-baseline') {
                 return 2;
             }
         }
@@ -64,6 +97,8 @@ final class CheckService
                 'unchanged' => 'ok',
                 'modified' => 'drift',
                 'missing' => 'miss',
+                'no-baseline' => 'nobl',
+                'new' => 'new',
                 default => 'todo',
             };
             $lines[] = sprintf(
@@ -79,10 +114,13 @@ final class CheckService
         return $lines;
     }
 
+    /**
+     * @param array<int, array{type: string, name: string, target: string, status: string}> $results
+     */
     public function hasModified(array $results): bool
     {
         foreach ($results as $result) {
-            if (($result['status'] ?? '') === 'modified') {
+            if ($result['status'] === 'modified') {
                 return true;
             }
         }
@@ -91,7 +129,7 @@ final class CheckService
     }
 
     /**
-     * @param array{skills: array<int, string>, rules: array<int, string>, agents: array<int, string>} $items
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>} $items
      * @param array<int, string> $targets
      * @return array<int, array{type: string, name: string, target: string, status: string}>
      */
@@ -108,8 +146,56 @@ final class CheckService
             foreach ($items['agents'] as $name) {
                 $results[] = ['type' => 'agent', 'name' => $name, 'target' => $target, 'status' => 'unknown'];
             }
+            foreach (($items['hooks'] ?? []) as $name) {
+                $results[] = ['type' => 'hook', 'name' => $name, 'target' => $target, 'status' => 'unknown'];
+            }
         }
 
         return $results;
+    }
+
+    /**
+     * @return array{type: string, name: string, target: string, status: string}
+     */
+    private function checkHook(string $hookName, string $target, string $baselineRoot, string $workspaceRoot): array
+    {
+        $checkerStatus = match ($target) {
+            'kiro' => $this->checkHookKiro($hookName, $baselineRoot, $workspaceRoot),
+            'cursor' => $this->checkHookCursor($hookName, $workspaceRoot),
+            default => 'missing',
+        };
+
+        return [
+            'type' => 'hook',
+            'name' => $hookName,
+            'target' => $target,
+            'status' => $this->mapHookStatus($checkerStatus),
+        ];
+    }
+
+    private function checkHookKiro(string $hookName, string $baselineRoot, string $workspaceRoot): string
+    {
+        $sourcePath = $baselineRoot . '/hooks/' . $hookName . '.kiro.hook';
+        $targetPath = $workspaceRoot . '/.kiro/hooks/' . $hookName . '.kiro.hook';
+
+        return $this->hookChecker->checkKiro($sourcePath, $targetPath);
+    }
+
+    private function checkHookCursor(string $hookName, string $workspaceRoot): string
+    {
+        $targetDir = $workspaceRoot . '/.cursor/hooks/' . $hookName . '/';
+        $hookRegistryPath = $workspaceRoot . '/.cursor/hooks.json';
+
+        return $this->hookChecker->checkCursor($targetDir, $hookRegistryPath);
+    }
+
+    private function mapHookStatus(string $checkerStatus): string
+    {
+        return match ($checkerStatus) {
+            'ok' => 'unchanged',
+            'drift' => 'modified',
+            'missing' => 'missing',
+            default => 'unknown',
+        };
     }
 }

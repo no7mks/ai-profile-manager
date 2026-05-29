@@ -27,7 +27,7 @@ final class ApplicationTest extends TestCase
 
         self::assertTrue($app->has('install'));
         self::assertTrue($app->has('show'));
-        self::assertTrue($app->has('ingest'));
+        self::assertTrue($app->has('check'));
         self::assertSame('apm', $app->getName());
     }
 }

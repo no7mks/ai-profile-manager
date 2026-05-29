@@ -5,26 +5,22 @@ declare(strict_types=1);
 namespace AiProfileManager\Tests;
 
 use AiProfileManager\Service\ComposerBaselineResolver;
+use AiProfileManager\Tests\Support\RestoresEnvTrait;
 use PHPUnit\Framework\TestCase;
 
 final class ComposerBaselineResolverTest extends TestCase
 {
+    use RestoresEnvTrait;
+
     public function testResolveUsesAipmBaselineRootEnv(): void
     {
         $root = sys_get_temp_dir() . '/apm-bl-env-' . bin2hex(random_bytes(4));
         mkdir($root, 0775, true);
 
-        $old = getenv('APM_BASELINE_ROOT');
-        putenv('APM_BASELINE_ROOT=' . $root);
+        $this->withEnv('APM_BASELINE_ROOT', $root);
 
         $resolver = new ComposerBaselineResolver();
         $out = $resolver->resolve();
-
-        if ($old === false) {
-            putenv('APM_BASELINE_ROOT');
-        } else {
-            putenv('APM_BASELINE_ROOT=' . $old);
-        }
 
         self::assertNotNull($out);
         self::assertSame('no7mks/ai-profile-manager', $out['package']);
@@ -43,24 +39,11 @@ final class ComposerBaselineResolverTest extends TestCase
             ]],
         ], JSON_UNESCAPED_SLASHES));
 
-        $oldHome = getenv('COMPOSER_HOME');
-        $oldBl = getenv('APM_BASELINE_ROOT');
-        putenv('COMPOSER_HOME=' . $composerHome);
-        putenv('APM_BASELINE_ROOT');
+        $this->withEnv('COMPOSER_HOME', $composerHome);
+        $this->withEnv('APM_BASELINE_ROOT', null);
 
         $resolver = new ComposerBaselineResolver();
         $out = $resolver->resolve();
-
-        if ($oldHome === false) {
-            putenv('COMPOSER_HOME');
-        } else {
-            putenv('COMPOSER_HOME=' . $oldHome);
-        }
-        if ($oldBl === false) {
-            putenv('APM_BASELINE_ROOT');
-        } else {
-            putenv('APM_BASELINE_ROOT=' . $oldBl);
-        }
 
         self::assertNotNull($out);
         self::assertSame('2.3.4-test', $out['version']);
@@ -91,24 +74,11 @@ final class ComposerBaselineResolverTest extends TestCase
             ]],
         ], JSON_UNESCAPED_SLASHES));
 
-        $oldHome = getenv('COMPOSER_HOME');
-        $oldBl = getenv('APM_BASELINE_ROOT');
-        putenv('COMPOSER_HOME=' . $composerHome);
-        putenv('APM_BASELINE_ROOT');
+        $this->withEnv('COMPOSER_HOME', $composerHome);
+        $this->withEnv('APM_BASELINE_ROOT', null);
 
         $resolver = new ComposerBaselineResolver();
         $out = $resolver->resolve();
-
-        if ($oldHome === false) {
-            putenv('COMPOSER_HOME');
-        } else {
-            putenv('COMPOSER_HOME=' . $oldHome);
-        }
-        if ($oldBl === false) {
-            putenv('APM_BASELINE_ROOT');
-        } else {
-            putenv('APM_BASELINE_ROOT=' . $oldBl);
-        }
 
         self::assertNotNull($out);
         self::assertSame('aaaabbbb', $out['reference'] ?? null);
@@ -119,24 +89,11 @@ final class ComposerBaselineResolverTest extends TestCase
         $composerHome = sys_get_temp_dir() . '/apm-ch-miss-' . bin2hex(random_bytes(4));
         mkdir($composerHome . '/vendor/composer', 0775, true);
 
-        $oldHome = getenv('COMPOSER_HOME');
-        $oldBl = getenv('APM_BASELINE_ROOT');
-        putenv('COMPOSER_HOME=' . $composerHome);
-        putenv('APM_BASELINE_ROOT');
+        $this->withEnv('COMPOSER_HOME', $composerHome);
+        $this->withEnv('APM_BASELINE_ROOT', null);
 
         $resolver = new ComposerBaselineResolver();
         $out = $resolver->resolve();
-
-        if ($oldHome === false) {
-            putenv('COMPOSER_HOME');
-        } else {
-            putenv('COMPOSER_HOME=' . $oldHome);
-        }
-        if ($oldBl === false) {
-            putenv('APM_BASELINE_ROOT');
-        } else {
-            putenv('APM_BASELINE_ROOT=' . $oldBl);
-        }
 
         self::assertNull($out);
     }

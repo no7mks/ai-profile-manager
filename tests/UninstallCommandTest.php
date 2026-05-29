@@ -8,14 +8,21 @@ use AiProfileManager\Command\AgentUninstallCommand;
 use AiProfileManager\Command\PresetUninstallCommand;
 use AiProfileManager\Command\RuleUninstallCommand;
 use AiProfileManager\Command\SkillUninstallCommand;
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
+use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
+use AiProfileManager\Tests\Support\RestoresCwdTrait;
+use AiProfileManager\Tests\Support\RestoresEnvTrait;
 
 final class UninstallCommandTest extends TestCase
 {
+    use RestoresCwdTrait;
+    use RestoresEnvTrait;
+
     public function testSkillUninstallRequiresForceWhenModified(): void
     {
         [$baseline, $workspace] = $this->prepareSkillFixture("base\n", "modified\n");
@@ -68,24 +75,47 @@ final class UninstallCommandTest extends TestCase
     public function testPresetUninstallRequiresForceWhenAnyItemModified(): void
     {
         [$baseline, $workspace] = $this->prepareSkillFixture("base\n", "modified\n");
-        mkdir($workspace . '/abilities', 0775, true);
-        file_put_contents(
-            $workspace . '/abilities/_presets.json',
-            json_encode([
-                'custom-preset' => [
-                    'skills' => ['demo-skill'],
-                    'rules' => [],
-                    'agents' => [],
-                ],
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
-        );
+
+        // Create abilities.yaml at baseline for AbilityDiffService
+        $baselineYaml = implode("\n", [
+            'version: "1"',
+            'skills:',
+            '  - path: demo-skill',
+            '    description: demo-skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+        ]);
+        file_put_contents($baseline . '/abilities.yaml', $baselineYaml . "\n");
+
+        // Create abilities.yaml at workspace for PresetRegistry
+        $workspaceYaml = implode("\n", [
+            'version: "1"',
+            'skills:',
+            '  - path: demo-skill',
+            '    description: demo-skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+            'presets:',
+            '  - name: custom-preset',
+            '    description: custom-preset',
+            '    includes:',
+            '      - skill:demo-skill',
+        ]);
+        file_put_contents($workspace . '/abilities.yaml', $workspaceYaml . "\n");
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $oldCwd = getcwd();
         self::assertNotFalse($oldCwd);
         chdir($workspace);
 
-        $command = new PresetUninstallCommand(new Installer(), new CheckService());
+        $workspaceRegistry = new AbilityRegistry($workspace . '/abilities.yaml');
+        $presetRegistry = new PresetRegistry($workspaceRegistry);
+        $command = new PresetUninstallCommand(
+            new Installer(registry: $workspaceRegistry),
+            new CheckService(),
+            $presetRegistry,
+        );
         $tester = new CommandTester($command);
         $exit = $tester->execute(['preset' => 'custom-preset', '--target' => ['cursor']]);
 
@@ -104,10 +134,20 @@ final class UninstallCommandTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-uninstall-rule-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-uninstall-rule-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/rules/git', 0775, true);
+        mkdir($baseline . '/.cursor/rules/git', 0775, true);
         mkdir($workspace . '/.cursor/rules/git', 0775, true);
-        file_put_contents($baseline . '/abilities/rules/git/demo-rule.cursor.mdc', "rule-base\n");
+        file_put_contents($baseline . '/.cursor/rules/git/demo-rule.mdc', "rule-base\n");
         file_put_contents($workspace . '/.cursor/rules/git/demo-rule.mdc', "rule-modified\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'rules:',
+            '  - path: demo-rule',
+            '    description: demo-rule',
+            '    targets:',
+            '      cursor: .cursor/rules/git/demo-rule.mdc',
+        ]) . "\n");
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $oldCwd = getcwd();
@@ -133,10 +173,20 @@ final class UninstallCommandTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-uninstall-agent-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-uninstall-agent-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/agents', 0775, true);
+        mkdir($baseline . '/.kiro/agents', 0775, true);
         mkdir($workspace . '/.kiro/agents', 0775, true);
-        file_put_contents($baseline . '/abilities/agents/demo-agent.kiro.md', "agent-base\n");
+        file_put_contents($baseline . '/.kiro/agents/demo-agent.md', "agent-base\n");
         file_put_contents($workspace . '/.kiro/agents/demo-agent.md', "agent-modified\n");
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'agents:',
+            '  - path: demo-agent',
+            '    description: demo-agent',
+            '    targets:',
+            '      kiro: .kiro/agents/demo-agent.md',
+        ]) . "\n");
+
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
         $oldCwd = getcwd();
@@ -177,29 +227,67 @@ final class UninstallCommandTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-uninstall-mixed-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-uninstall-mixed-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/skills/demo-skill', 0775, true);
-        mkdir($baseline . '/abilities/rules/git', 0775, true);
-        mkdir($baseline . '/abilities/agents', 0775, true);
+        mkdir($baseline . '/.cursor/skills/demo-skill', 0775, true);
+        mkdir($baseline . '/.cursor/rules/git', 0775, true);
+        mkdir($baseline . '/.cursor/agents', 0775, true);
         mkdir($workspace . '/.cursor/skills/demo-skill', 0775, true);
         mkdir($workspace . '/.cursor/rules/git', 0775, true);
         mkdir($workspace . '/.cursor/agents', 0775, true);
-        mkdir($workspace . '/abilities', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/demo-skill/SKILL.md', "skill-base\n");
-        file_put_contents($baseline . '/abilities/rules/git/demo-rule.cursor.mdc', "rule-base\n");
-        file_put_contents($baseline . '/abilities/agents/demo-agent.cursor.md', "agent-base\n");
+        file_put_contents($baseline . '/.cursor/skills/demo-skill/SKILL.md', "skill-base\n");
+        file_put_contents($baseline . '/.cursor/rules/git/demo-rule.mdc', "rule-base\n");
+        file_put_contents($baseline . '/.cursor/agents/demo-agent.md', "agent-base\n");
         file_put_contents($workspace . '/.cursor/skills/demo-skill/SKILL.md', "skill-mod\n");
         file_put_contents($workspace . '/.cursor/rules/git/demo-rule.mdc', "rule-mod\n");
         file_put_contents($workspace . '/.cursor/agents/demo-agent.md', "agent-mod\n");
-        file_put_contents(
-            $workspace . '/abilities/_presets.json',
-            json_encode([
-                'mixed-preset' => [
-                    'skills' => ['demo-skill'],
-                    'rules' => ['demo-rule'],
-                    'agents' => ['demo-agent'],
-                ],
-            ], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . PHP_EOL
-        );
+
+        // Create abilities.yaml at baseline for AbilityDiffService
+        $baselineYaml = implode("\n", [
+            'version: "1"',
+            'skills:',
+            '  - path: demo-skill',
+            '    description: demo-skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+            'rules:',
+            '  - path: demo-rule',
+            '    description: demo-rule',
+            '    targets:',
+            '      cursor: .cursor/rules/git/demo-rule.mdc',
+            'agents:',
+            '  - path: demo-agent',
+            '    description: demo-agent',
+            '    targets:',
+            '      cursor: .cursor/agents/demo-agent.md',
+        ]);
+        file_put_contents($baseline . '/abilities.yaml', $baselineYaml . "\n");
+
+        // Create abilities.yaml at workspace for PresetRegistry
+        $workspaceYaml = implode("\n", [
+            'version: "1"',
+            'skills:',
+            '  - path: demo-skill',
+            '    description: demo-skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+            'rules:',
+            '  - path: demo-rule',
+            '    description: demo-rule',
+            '    targets:',
+            '      cursor: .cursor/rules/git/demo-rule.mdc',
+            'agents:',
+            '  - path: demo-agent',
+            '    description: demo-agent',
+            '    targets:',
+            '      cursor: .cursor/agents/demo-agent.md',
+            'presets:',
+            '  - name: mixed-preset',
+            '    description: mixed-preset',
+            '    includes:',
+            '      - skill:demo-skill',
+            '      - rule:demo-rule',
+            '      - agent:demo-agent',
+        ]);
+        file_put_contents($workspace . '/abilities.yaml', $workspaceYaml . "\n");
 
         $oldBl = getenv('APM_BASELINE_ROOT');
         putenv('APM_BASELINE_ROOT=' . $baseline);
@@ -207,7 +295,8 @@ final class UninstallCommandTest extends TestCase
         self::assertNotFalse($oldCwd);
         chdir($workspace);
 
-        $command = new PresetUninstallCommand(new Installer(), new CheckService());
+        $presetRegistry = new PresetRegistry(new AbilityRegistry($workspace . '/abilities.yaml'));
+        $command = new PresetUninstallCommand(new Installer(), new CheckService(), $presetRegistry);
         $tester = new CommandTester($command);
         $exit = $tester->execute(['preset' => 'mixed-preset', '--target' => ['cursor'], '--force' => true]);
 
@@ -231,10 +320,19 @@ final class UninstallCommandTest extends TestCase
     {
         $baseline = sys_get_temp_dir() . '/apm-uninstall-base-' . bin2hex(random_bytes(4));
         $workspace = sys_get_temp_dir() . '/apm-uninstall-work-' . bin2hex(random_bytes(4));
-        mkdir($baseline . '/abilities/skills/demo-skill', 0775, true);
+        mkdir($baseline . '/.cursor/skills/demo-skill', 0775, true);
         mkdir($workspace . '/.cursor/skills/demo-skill', 0775, true);
-        file_put_contents($baseline . '/abilities/skills/demo-skill/SKILL.md', $baselineContent);
+        file_put_contents($baseline . '/.cursor/skills/demo-skill/SKILL.md', $baselineContent);
         file_put_contents($workspace . '/.cursor/skills/demo-skill/SKILL.md', $installedContent);
+
+        // abilities.yaml at baseline for AbilityDiffService
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: demo-skill',
+            '    description: demo-skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+        ]) . "\n");
 
         return [$baseline, $workspace];
     }

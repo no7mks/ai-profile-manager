@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\PresetRegistry;
 use AiProfileManager\Service\ProjectInitializer;
@@ -20,6 +21,7 @@ final class InstallCommand extends Command
     public function __construct(
         private readonly Installer $installer,
         private readonly ?ProjectInitializer $initializer = null,
+        private readonly PresetRegistry $presetRegistry = new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml')),
     ) {
         parent::__construct();
     }
@@ -68,8 +70,7 @@ final class InstallCommand extends Command
             return $this->runBootstrap($input, $io, $targets);
         }
 
-        $registry = new PresetRegistry((string) getcwd());
-        $known = array_keys($registry->allPresets());
+        $known = array_map(fn(array $p) => $p['name'], $this->presetRegistry->allPresets());
         if (!in_array($preset, $known, true)) {
             $io->error(sprintf(
                 'Unknown preset: %s. Known presets: %s.',
@@ -79,12 +80,12 @@ final class InstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $presetSpec = $registry->getPreset($preset);
+        $presetSpec = $this->presetRegistry->getPreset($preset);
         if ($presetSpec === null) {
             return Command::FAILURE;
         }
 
-        $items = $presetSpec;
+        $items = PresetRegistry::toTypedSpec($presetSpec);
         $io->writeln("Preset: {$preset}");
         $result = $this->installer->installTyped($items, $targets, $preset);
         foreach ($result['lines'] as $line) {

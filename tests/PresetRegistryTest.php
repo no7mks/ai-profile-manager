@@ -4,88 +4,170 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Config\AppConfig;
+use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\PresetRegistry;
+use AiProfileManager\Tests\Support\RemovesDirTrait;
 use PHPUnit\Framework\TestCase;
 
 final class PresetRegistryTest extends TestCase
 {
-    public function testAllPresetsFallsBackToAppConfigWhenManifestMissing(): void
+    use RemovesDirTrait;
+
+    private string $tmpDir;
+
+    protected function setUp(): void
     {
-        $root = sys_get_temp_dir() . '/apm-pr-' . bin2hex(random_bytes(4));
-        mkdir($root, 0775, true);
+        $this->tmpDir = sys_get_temp_dir() . '/apm-pr-' . bin2hex(random_bytes(4));
+        mkdir($this->tmpDir, 0775, true);
+    }
 
-        $registry = new PresetRegistry($root);
+    protected function tearDown(): void
+    {
+        $this->removeDir($this->tmpDir);
+    }
 
-        self::assertSame(AppConfig::PRESET_ITEMS, $registry->allPresets());
-        self::assertSame(AppConfig::PRESET_ITEMS['gitflow'], $registry->getPreset('gitflow'));
+    public function testAllPresetsReturnsNormalizedPresets(): void
+    {
+        $yaml = <<<'YAML'
+rules:
+  - path: git:branch-overview
+    description: GitFlow 分支模型总览
+    targets:
+      cursor: .cursor/rules/git/branch-overview.mdc
+
+skills:
+  - path: gitflow
+    description: GitFlow start/finish
+    targets:
+      cursor: .cursor/skills/gitflow/
+
+presets:
+  - name: gitflow
+    description: GitFlow 全套能力
+    includes:
+      - rule:git:branch-overview
+      - skill:gitflow
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+        $presets = $registry->allPresets();
+
+        self::assertCount(1, $presets);
+        self::assertSame('gitflow', $presets[0]['name']);
+        self::assertSame('GitFlow 全套能力', $presets[0]['description']);
+        self::assertCount(2, $presets[0]['includes']);
+        self::assertSame(['type' => 'rule', 'path' => 'git:branch-overview'], $presets[0]['includes'][0]);
+        self::assertSame(['type' => 'skill', 'path' => 'gitflow'], $presets[0]['includes'][1]);
+    }
+
+    public function testGetPresetReturnsMatchingPreset(): void
+    {
+        $yaml = <<<'YAML'
+presets:
+  - name: gitflow
+    description: GitFlow 全套能力
+    includes:
+      - rule:git:branch-overview
+      - skill:gitflow
+
+  - name: spec-core
+    description: Spec 规划与执行全套
+    includes:
+      - skill:spec-execution
+      - agent:spec-gatekeeper
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+
+        $preset = $registry->getPreset('spec-core');
+        self::assertNotNull($preset);
+        self::assertSame('spec-core', $preset['name']);
+        self::assertSame('Spec 规划与执行全套', $preset['description']);
+        self::assertSame(['type' => 'skill', 'path' => 'spec-execution'], $preset['includes'][0]);
+        self::assertSame(['type' => 'agent', 'path' => 'spec-gatekeeper'], $preset['includes'][1]);
+    }
+
+    public function testGetPresetReturnsNullForUnknownName(): void
+    {
+        $yaml = <<<'YAML'
+presets:
+  - name: gitflow
+    description: GitFlow
+    includes:
+      - skill:gitflow
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+
         self::assertNull($registry->getPreset('nonexistent'));
     }
 
-    public function testLoadFromWorkspaceOverridesAppConfig(): void
+    public function testAllPresetsReturnsEmptyWhenNoPresetsSection(): void
     {
-        $root = sys_get_temp_dir() . '/apm-pr2-' . bin2hex(random_bytes(4));
-        mkdir($root . '/abilities', 0775, true);
-        $manifest = [
-            'custom' => [
-                'skills' => ['s1'],
-                'rules' => ['r1'],
-                'agents' => [],
-            ],
-        ];
-        file_put_contents($root . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, json_encode($manifest, JSON_UNESCAPED_SLASHES));
+        $yaml = <<<'YAML'
+rules:
+  - path: safety:command-safety
+    description: Shell 命令安全约束
+    targets:
+      cursor: .cursor/rules/safety/command-safety.mdc
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
 
-        $registry = new PresetRegistry($root);
+        $registry = new PresetRegistry(new AbilityRegistry($path));
 
-        self::assertSame(['s1'], $registry->getPreset('custom')['skills']);
-        self::assertSame(['r1'], $registry->getPreset('custom')['rules']);
+        self::assertSame([], $registry->allPresets());
     }
 
-    public function testInvalidManifestJsonFallsBackToAppConfig(): void
+    public function testIncludesParsingHandlesColonInPath(): void
     {
-        $root = sys_get_temp_dir() . '/apm-pr3-' . bin2hex(random_bytes(4));
-        mkdir($root . '/abilities', 0775, true);
-        file_put_contents($root . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, '{');
+        $yaml = <<<'YAML'
+presets:
+  - name: test
+    description: Test preset
+    includes:
+      - rule:git:branch-overview
+      - rule:safety:config-safety
+      - skill:spec-execution
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
 
-        $registry = new PresetRegistry($root);
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+        $preset = $registry->getPreset('test');
 
-        self::assertSame(AppConfig::PRESET_ITEMS, $registry->allPresets());
+        self::assertNotNull($preset);
+        self::assertSame(['type' => 'rule', 'path' => 'git:branch-overview'], $preset['includes'][0]);
+        self::assertSame(['type' => 'rule', 'path' => 'safety:config-safety'], $preset['includes'][1]);
+        self::assertSame(['type' => 'skill', 'path' => 'spec-execution'], $preset['includes'][2]);
     }
 
-    public function testLoadFromWorkspaceSkipsMalformedPresetEntries(): void
+    public function testIncludesSkipsInvalidEntries(): void
     {
-        $root = sys_get_temp_dir() . '/apm-pr-mal-' . bin2hex(random_bytes(4));
-        mkdir($root . '/abilities', 0775, true);
-        file_put_contents($root . '/' . PresetRegistry::PRESETS_RELATIVE_PATH, json_encode([
-            'valid' => [
-                'skills' => ['ok'],
-                'rules' => [],
-                'agents' => [],
-            ],
-            'bad-shape' => 'not-an-object',
-        ], JSON_UNESCAPED_SLASHES));
+        $yaml = <<<'YAML'
+presets:
+  - name: test
+    description: Test preset
+    includes:
+      - rule:valid-path
+      - no-colon-entry
+      - skill:another-valid
+YAML;
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
 
-        $registry = new PresetRegistry($root);
-        self::assertSame(['ok'], $registry->getPreset('valid')['skills']);
-        self::assertNull($registry->getPreset('bad-shape'));
-    }
+        $registry = new PresetRegistry(new AbilityRegistry($path));
+        $preset = $registry->getPreset('test');
 
-    public function testSaveToWorkspaceRoundtrip(): void
-    {
-        $root = sys_get_temp_dir() . '/apm-pr4-' . bin2hex(random_bytes(4));
-        mkdir($root, 0775, true);
-
-        $registry = new PresetRegistry($root);
-        $registry->saveToWorkspace([
-            'roundtrip' => [
-                'skills' => ['a'],
-                'rules' => [],
-                'agents' => ['b'],
-            ],
-        ]);
-
-        $again = new PresetRegistry($root);
-        self::assertSame(['a'], $again->getPreset('roundtrip')['skills']);
-        self::assertSame(['b'], $again->getPreset('roundtrip')['agents']);
+        self::assertNotNull($preset);
+        self::assertCount(2, $preset['includes']);
+        self::assertSame(['type' => 'rule', 'path' => 'valid-path'], $preset['includes'][0]);
+        self::assertSame(['type' => 'skill', 'path' => 'another-valid'], $preset['includes'][1]);
     }
 }
