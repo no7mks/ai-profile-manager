@@ -116,6 +116,7 @@ slug 使用英文 kebab-case，由 agent 根据任务主题自动生成。
 * Step 数量以完成任务所需为准
 * 优先关注实施路径
 * 避免过度设计
+* 尽可能按 TDD（RED → GREEN）编排步骤：先写失败测试，再写实现让测试通过。纯配置、纯文档等无法测试的步骤除外
 * Plan 的最后几步应始终包含：
   - state 文档同步（`docs/state/`）
   - manual 文档同步（`docs/manual/`）
