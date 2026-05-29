@@ -26,7 +26,7 @@ presets:
 ```
 
 - `version`: 必填，字符串，当前固定为 `"1"`
-- 已知 section: `rules`、`agents`、`skills`、`hooks`、`gitignore`、`presets`
+- 已知 section: `rules`、`agents`、`skills`、`hooks`、`gitignore`、`presets`、`prompts`
 - 未知 section: 解析时忽略，不报错
 
 ---
@@ -93,6 +93,12 @@ hooks:
       kiro: .kiro/hooks/check-write-length.kiro.hook
       cursor: .cursor/hooks/check-write-length/
 ```
+
+> **注意**: hook 的源路径解析方式与 skill/rule/agent 不同。skill/rule/agent 使用 Source-is-Target 模式（源路径 = `<packageRoot>/<targets[target]>`），而 hook 使用硬编码路径：
+> - Kiro: `<packageRoot>/hooks/<name>.kiro.hook`
+> - Cursor: `<packageRoot>/hooks/<name>/`
+>
+> targets 字段仅用于定义安装**目标**路径，不影响源文件定位。
 
 ---
 

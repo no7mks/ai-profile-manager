@@ -34,6 +34,7 @@ final class AbilityRegistry
      *     hooks: list<AbilityEntry>,
      *     gitignore: list<array<string, mixed>>,
      *     presets: list<array<string, mixed>>,
+     *     prompts: list<array<string, mixed>>,
      * }
      * @throws AbilityRegistryException
      */
@@ -121,7 +122,7 @@ final class AbilityRegistry
             throw AbilityRegistryException::validationErrors($errors);
         }
 
-        /** @var array{rules: list<AbilityEntry>, agents: list<AbilityEntry>, skills: list<AbilityEntry>, hooks: list<AbilityEntry>, gitignore: list<array<string, mixed>>, presets: list<array<string, mixed>>} $result */
+        /** @var array{rules: list<AbilityEntry>, agents: list<AbilityEntry>, skills: list<AbilityEntry>, hooks: list<AbilityEntry>, gitignore: list<array<string, mixed>>, presets: list<array<string, mixed>>, prompts: list<array<string, mixed>>} $result */
         return $result;
     }
 

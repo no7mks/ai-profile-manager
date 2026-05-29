@@ -46,7 +46,7 @@ apm 在 `.gitignore` 中维护一个 managed section，由 BEGIN/END marker 包�
 ### 示例
 
 ```
-## @apm:block ability=skill:graphify target=*
+## @apm:block ability=graphify target=*
 .graphify/
 ## @apm:end
 
@@ -54,6 +54,8 @@ apm 在 `.gitignore` 中维护一个 managed section，由 BEGIN/END marker 包�
 .cursor/tmp/
 ## @apm:end
 ```
+
+> **注意**: `ability` 值对应 abilities.yaml gitignore section 中的 `marker` 字段（如 `php`、`graphify`），或 Installer 传入的 abilityKeys 中的条目（如 `skill:graphify`、preset 名称 `gitflow`）。模板中的 `ability` 值必须与 abilityKeys 列表中的某个条目精确匹配才会渲染。
 
 ---
 

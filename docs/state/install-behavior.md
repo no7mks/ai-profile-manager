@@ -81,8 +81,8 @@
 ### Kiro 平台
 
 **安装**:
-- 源文件: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标文件: `<workspace>/<targets[target]>`（如 `.kiro/hooks/<name>.kiro.hook`）
+- 源文件: `<packageRoot>/hooks/<name>.kiro.hook`（硬编码路径，不走 abilities.yaml targets 解析）
+- 目标文件: `<workspace>/.kiro/hooks/<name>.kiro.hook`
 - 操作: 文件复制；目标目录不存在时自动创建
 - 源文件不存在时返回 fail
 
@@ -103,8 +103,8 @@
 
 **安装**（两步操作）:
 1. 递归复制源目录到目标目录
-   - 源目录: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义，如 `.cursor/hooks/<name>/`）
-   - 目标目录: `<workspace>/<targets[target]>`（如 `.cursor/hooks/<name>/`）
+   - 源目录: `<packageRoot>/hooks/<name>/`（硬编码路径，不走 abilities.yaml targets 解析）
+   - 目标目录: `<workspace>/.cursor/hooks/<name>/`
 2. 读取 `<name>.json` 并 merge 条目到 `.cursor/hooks.json`
    - hooks.json 格式: `{"version": 1, "hooks": {"<event_type>": [{"command": "...", ...}]}}`
    - 去重规则: 以 (event_type, command) 为唯一标识，已存在则跳过
@@ -161,5 +161,5 @@ Baseline 不可用时，CheckService 返回所有 ability 状态为 `unknown`。
 
 ### Exit Code 规则
 
-- CheckService.evaluateExitCode(): 结果中存在 `modified` 或 `missing` → exit 2；否则 → exit 0
+- CheckService.evaluateExitCode(): 结果中存在 `modified`、`missing` 或 `no-baseline` → exit 2；否则 → exit 0
 - Installer.installTyped(): 任一 ability 安装失败 → exit 1；全部成功 → exit 0

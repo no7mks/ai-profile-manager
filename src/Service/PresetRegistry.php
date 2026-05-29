@@ -103,18 +103,19 @@ final class PresetRegistry
 
         // Validate ability exists in registry
         $parsed = $this->registry->parse();
-        $entries = $parsed[$sectionKey];
         $exists = false;
 
         if ($type === 'prompt') {
             // Prompts use 'name' field instead of 'path'
-            foreach ($entries as $entry) {
+            foreach ($parsed['prompts'] as $entry) {
                 if (($entry['name'] ?? '') === $abilityPath) {
                     $exists = true;
                     break;
                 }
             }
         } else {
+            /** @var list<AbilityEntry> $entries */
+            $entries = $parsed[$sectionKey];
             foreach ($entries as $entry) {
                 if ($entry->path === $abilityPath) {
                     $exists = true;
@@ -233,7 +234,7 @@ final class PresetRegistry
      * Convert a preset's includes to the legacy typed format used by Installer/CheckService.
      *
      * @param array{name: string, description: string, includes: list<array{type: string, path: string}>} $preset
-     * @return array{skills: list<string>, rules: list<string>, agents: list<string>, hooks: list<string>}
+     * @return array{skills: list<string>, rules: list<string>, agents: list<string>, hooks: list<string>, prompts: list<string>}
      */
     public static function toTypedSpec(array $preset): array
     {

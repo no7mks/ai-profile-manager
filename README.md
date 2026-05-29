@@ -1,6 +1,6 @@
 # AI Profile Manager (`apm`)
 
-`apm` 是一个用于管理 AI profile 资源（`skill`、`rule`、`agent`）的 PHP CLI。
+`apm` 是一个用于管理 AI profile 资源（`skill`、`rule`、`agent`、`hook`）的 PHP CLI。
 
 ## Quick Start
 

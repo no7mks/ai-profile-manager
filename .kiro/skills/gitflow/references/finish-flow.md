@@ -64,6 +64,7 @@ git branch --show-current
    - `git push origin master v<version>`
    - 删除预发布 tag（`-alpha*` / `-beta*`）
    - master -> develop
+   - `git push origin develop`
 6. 禁止 release 直接合并 develop
 
 ## Hotfix Finish
@@ -93,6 +94,7 @@ git branch --show-current
    - `git tag v<version>`
    - `git push origin master v<version>`
    - master -> develop
+   - `git push origin develop`
 6. 禁止 hotfix 直接合并 develop
 
 ## Finish Completion
