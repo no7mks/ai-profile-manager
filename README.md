@@ -9,9 +9,11 @@
 - 全局安装（推荐）：
 
 ```bash
-composer global require no7mks/ai-profile-manager
+composer global require no7mks/ai-profile-manager -W
 apm --help # 如显示帮助则表示安装成功了
 ```
+
+> `-W` 允许 Composer 连带升级依赖包，避免因 lock file 锁定旧版 symfony 组件而无法安装最新版本。
 
 - 项目内安装：
 
