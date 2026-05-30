@@ -72,17 +72,7 @@ description: 当用户说"执行计划"、"Build Plan"、"按 plan 开发" 等�
 
 先分析 Plan 中的步骤是否有同步执行的可能性，规划出执行批次，然后按照批次顺序执行；同一批次可以并行，但要一起执行完才能继续下一个批次。
 
-每次优先完成一个未完成步骤：
-
-```md
-- [ ] Step
-```
-
-完成后更新为：
-
-```md
-- [x] Step
-```
+执行时请使用 Kiro 系统的 `general-task-execution` sub-agent 来执行；并发场景下，每一个 Step 独立使用一个 sub-agent session。
 
 允许：
 
@@ -99,6 +89,7 @@ description: 当用户说"执行计划"、"Build Plan"、"按 plan 开发" 等�
 * 保持修改范围最小化
 * 保持现有代码风格
 * 不要擅自扩大需求范围
+* 不要在一个 sub-agent 里执行多个 step
 
 ### Step 5: 验证
 
@@ -117,6 +108,8 @@ description: 当用户说"执行计划"、"Build Plan"、"按 plan 开发" 等�
 不要为了通过验证而进行无关重构。
 
 ### Step 6: 更新计划
+
+sub-agent 完成 step 后，由主 agent 将对应步骤标记为 `[x]`。
 
 每完成一个 Step 后，更新 plan.md。
 

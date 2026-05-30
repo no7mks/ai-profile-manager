@@ -120,6 +120,18 @@ skills:
       cursor: .cursor/skills/spec-execution/
       kiro: .kiro/skills/spec-execution/
 
+  - path: lark-sheets
+    description: 飞书电子表格读写接入
+    targets:
+      cursor: .cursor/skills/lark-sheets/
+      kiro: .kiro/skills/lark-sheets/
+
+  - path: tga-query
+    description: TGA（数数系统）游戏数据查询
+    targets:
+      cursor: .cursor/skills/tga-query/
+      kiro: .kiro/skills/tga-query/
+
   - path: quick-plan
     description: 快速计划生成（交互式确认 plan.md）
     targets:
