@@ -4,6 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.7.4] - 2026-05-30
+
+### Fixed
+
+- README 全局安装命令添加 `-W` 标志，解决因 lock file 锁定旧版 symfony 导致无法升级的问题。
+
 ## [0.7.3] - 2026-05-30
 
 ### Added
