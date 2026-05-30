@@ -4,6 +4,17 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.7.3] - 2026-05-30
+
+### Added
+
+- 新增 `lark-sheets` skill：飞书电子表格读写能力（Cursor / Kiro 双平台）。
+- 新增 `tga-query` skill：TGA 数数系统游戏数据查询能力（Cursor / Kiro 双平台）。
+
+### Changed
+
+- `build-plan` skill 改用 sub-agent 执行，明确进度标记职责分离。
+
 ## [0.7.2] - 2026-05-30
 
 ### Added
