@@ -45,7 +45,7 @@ composer install
 
 ## 知识图谱
 
-本项目使用 graphify 维护持久化知识图谱（`graphify-out/`）。架构、依赖、模块耦合相关问题优先查图谱，而非 grep 或逐文件阅读。
+本项目使用 `graphify` skill 维护持久化知识图谱（`graphify-out/`）。架构、依赖、模块耦合相关问题优先查图谱，而非 grep 或逐文件阅读。
 
 ```
 /graphify init                   # 首次构建图谱

@@ -26,18 +26,17 @@
 
 1. **读取前置文件**：按「前置读取」清单获取 requirements、GK Clarification、SSOT
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 design spec 子代理，将 requirements 内容与本文件的产物格式约束作为输入，由其生成 design.md 初稿
-3. **若委托成功** → 跳至步骤 13（Socratic Review）
+3. **若委托成功** → 跳至步骤 12（Socratic Review）
 4. **若委托不可用或失败** → 继续以下手动步骤：
-5. **Graphify readiness 检测**（可选）：判断是否可用 graphify 辅助架构分析
-6. **设计架构**：确定模块划分、依赖关系、数据流
-7. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
-8. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
-9. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
-10. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
-11. **写入产物**：按文档结构写入 `design.md`
-12. **诊断检查**：对写入的 `design.md` 执行 `getDiagnostics`，有问题则修正
-13. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
-14. **输出完成报告**：按「完成后输出」格式报告
+5. **设计架构**：确定模块划分、依赖关系、数据流
+6. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
+7. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
+8. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
+9. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
+10. **写入产物**：按文档结构写入 `design.md`
+11. **诊断检查**：对写入的 `design.md` 执行 `getDiagnostics`，有问题则修正
+12. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+13. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 
@@ -53,7 +52,6 @@
 
 - 覆盖 requirements 中全部 Requirement/AC
 - Socratic Review 和 Gatekeep Log 写入 `<spec-dir>/<name>/gk-logs.md`，不写在 design.md 中
-- 可用时先做 Graphify readiness 检测，再决定是否用 graphify 辅助架构分析
 - 完成后提示可运行 GK 校验 design
 
 ---

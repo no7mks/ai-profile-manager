@@ -19,7 +19,12 @@ composer global require no7mks/ai-profile-manager
 apm install
 ```
 
-这会安装 scaffold（`docs/`、`issues/`、`AGENTS.md`）和 `default` preset 中定义的 ability。之后使用 Agent skill 命令 `/apm init` 生成 SSOT 基线。
+这会安装 scaffold 并安装 `default` preset 中定义的 ability。Scaffold 内容包括：
+
+- 复制 `docs/README.md`、`issues/README.md`、`AGENTS.md`
+- 创建子目录骨架（`docs/state/`、`docs/manual/` 等）并放置 `.gitkeep`
+
+之后使用 Agent skill 命令 `/apm init` 生成 SSOT 基线。
 
 ---
 

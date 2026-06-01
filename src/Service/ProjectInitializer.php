@@ -43,13 +43,37 @@ final class ProjectInitializer
         }
 
         $lines[] = 'Installing scaffold (docs/, issues/, AGENTS.md)...';
-        $this->mirror->mirrorDirectory($this->join($this->packageRoot, 'docs'), $this->join($targetDir, 'docs'));
-        $this->mirror->mirrorDirectory($this->join($this->packageRoot, 'issues'), $this->join($targetDir, 'issues'));
+
+        // docs/README.md
+        $this->mirror->ensureDirectory($this->join($targetDir, 'docs'));
+        $this->mirror->copyFile(
+            $this->join($this->packageRoot, 'docs', 'README.md'),
+            $this->join($targetDir, 'docs', 'README.md'),
+            $force
+        );
+
+        // docs subdirectories with .gitkeep
+        foreach (['state', 'manual', 'notes', 'proposals'] as $sub) {
+            $subDir = $this->join($targetDir, 'docs', $sub);
+            $this->mirror->ensureDirectory($subDir);
+            $this->touchGitkeep($subDir);
+        }
+
+        // issues/README.md
+        $this->mirror->ensureDirectory($this->join($targetDir, 'issues'));
+        $this->mirror->copyFile(
+            $this->join($this->packageRoot, 'issues', 'README.md'),
+            $this->join($targetDir, 'issues', 'README.md'),
+            $force
+        );
+
+        // AGENTS.md
         $this->mirror->copyFile(
             $this->join($this->packageRoot, 'AGENTS.md'),
             $this->join($targetDir, 'AGENTS.md'),
             $force
         );
+
         $lines[] = '[ok] Scaffold installed at ' . $targetDir;
 
         return $lines;
@@ -78,10 +102,14 @@ final class ProjectInitializer
 
     private function assertScaffoldSourcesPresent(string $packageRoot): void
     {
-        foreach (['docs', 'issues', 'AGENTS.md'] as $leaf) {
-            $p = $this->join($packageRoot, $leaf);
-            if (!file_exists($p)) {
-                throw new RuntimeException('Internal package layout error: ' . $leaf . ' missing.');
+        $sources = [
+            'docs' => 'docs' . DIRECTORY_SEPARATOR . 'README.md',
+            'issues' => 'issues' . DIRECTORY_SEPARATOR . 'README.md',
+            'AGENTS.md' => 'AGENTS.md',
+        ];
+        foreach ($sources as $label => $path) {
+            if (!file_exists($this->join($packageRoot, $path))) {
+                throw new RuntimeException('Internal package layout error: ' . $label . ' missing.');
             }
         }
     }
@@ -96,6 +124,14 @@ final class ProjectInitializer
     private function join(string ...$segments): string
     {
         return implode(DIRECTORY_SEPARATOR, $segments);
+    }
+
+    private function touchGitkeep(string $dir): void
+    {
+        $path = $this->join($dir, '.gitkeep');
+        if (!file_exists($path)) {
+            file_put_contents($path, '');
+        }
     }
 
 }

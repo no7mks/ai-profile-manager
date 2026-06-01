@@ -11,7 +11,6 @@ alwaysApply: false
 
 ## 执行顺序
 
-0. 架构上下文加载（如 `graphify_ready`）
 1. 机械扫描
 2. 结构校验
 3. Requirements 覆盖校验
@@ -22,12 +21,6 @@ alwaysApply: false
 8. 将修正项写入 Gatekeep Log
 9. 生成 Clarification Round（为 tasks 阶段准备）
 10. Completion：向 main-agent 返回结果
-
----
-
-## 0. 架构上下文加载
-
-如果 `graphify_ready`，优先使用 graphify 子命令进行结构化查询，辅助后续 Impact Analysis 和技术方案质量校验。
 
 ---
 
@@ -79,7 +72,6 @@ Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、�
 ## 4. Impact Analysis 校验
 
 - [ ] 受影响的 state 文档条目（具体文件名及 section）
-- [ ] 如果 `graphify_ready`，是否利用 graphify 辅助识别了受影响范围
 - [ ] 现有 model / service / CLI 行为的变化
 - [ ] 是否涉及数据模型变更——如涉及，是否提醒了旧数据兼容
 - [ ] 是否涉及外部系统交互变化
