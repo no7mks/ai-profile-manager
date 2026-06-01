@@ -148,6 +148,30 @@
 
 ---
 
+## Scaffold（项目初始化）
+
+`ProjectInitializer::init()` 在目标工作区执行一次性骨架搭建。
+
+### 行为
+
+- **显式复制指定文件**（从 apm 包根目录）:
+  - `docs/README.md`
+  - `issues/README.md`
+  - `AGENTS.md`
+- **创建目录骨架**（仅创建目录 + `.gitkeep`，不复制任何内容文件）:
+  - `docs/state/`
+  - `docs/manual/`
+  - `docs/notes/`
+  - `docs/proposals/`
+- **不再全量递归复制**: 旧实现使用 `mirrorDirectory` 将 scaffold 目录整体递归复制到工作区，会导致 apm 自身的业务文档（如 `state/*.md`、`manual/usage.md`）被错误地写入用户项目。新实现改为上述显式列表，确保只提供空骨架。
+
+### 幂等性
+
+- 目标目录已存在 `docs/`、`issues/` 或 `AGENTS.md` 时，若未传 `--force` 则抛出异常终止；传 `--force` 则覆盖。
+- `.gitkeep` 文件已存在时跳过，不重复写入。
+
+---
+
 ## 通用行为
 
 ### Baseline 解析

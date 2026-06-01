@@ -131,6 +131,54 @@ final class ProjectInitializerTest extends TestCase
         $initializer->init($target, false, []);
     }
 
+    public function testInitCreatesSkeletonOnlyWithoutCopyingBusinessDocs(): void
+    {
+        $tmp = sys_get_temp_dir() . '/apm-init-skel-' . bin2hex(random_bytes(4));
+        mkdir($tmp, 0775, true);
+
+        // Create a fake package root that mimics the real apm package layout
+        $pkg = sys_get_temp_dir() . '/apm-init-skel-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/docs/state', 0775, true);
+        mkdir($pkg . '/docs/manual', 0775, true);
+        mkdir($pkg . '/docs/notes', 0775, true);
+        mkdir($pkg . '/issues', 0775, true);
+
+        // Scaffold files that SHOULD be copied/created
+        file_put_contents($pkg . '/docs/README.md', "# Docs\n");
+        file_put_contents($pkg . '/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
+
+        // apm business docs that should NOT be copied
+        file_put_contents($pkg . '/docs/state/abilities-model.md', "# Abilities Model\n");
+        file_put_contents($pkg . '/docs/state/architecture.md', "# Architecture\n");
+        file_put_contents($pkg . '/docs/state/cli-commands.md', "# CLI Commands\n");
+        file_put_contents($pkg . '/docs/state/install-behavior.md', "# Install Behavior\n");
+        file_put_contents($pkg . '/docs/state/gitignore.md', "# Gitignore\n");
+        file_put_contents($pkg . '/docs/manual/usage.md', "# Usage\n");
+        file_put_contents($pkg . '/docs/notes/init-new-vs-existing.md', "# Notes\n");
+
+        $initializer = new ProjectInitializer($pkg);
+        $initializer->init($tmp, false, []);
+
+        // --- Expected skeleton files SHOULD exist ---
+        self::assertFileExists($tmp . '/docs/README.md');
+        self::assertFileExists($tmp . '/docs/state/.gitkeep');
+        self::assertFileExists($tmp . '/docs/manual/.gitkeep');
+        self::assertFileExists($tmp . '/docs/notes/.gitkeep');
+        self::assertFileExists($tmp . '/docs/proposals/.gitkeep');
+        self::assertFileExists($tmp . '/issues/README.md');
+        self::assertFileExists($tmp . '/AGENTS.md');
+
+        // --- apm business docs should NOT be copied ---
+        self::assertFileDoesNotExist($tmp . '/docs/state/abilities-model.md');
+        self::assertFileDoesNotExist($tmp . '/docs/state/architecture.md');
+        self::assertFileDoesNotExist($tmp . '/docs/state/cli-commands.md');
+        self::assertFileDoesNotExist($tmp . '/docs/state/install-behavior.md');
+        self::assertFileDoesNotExist($tmp . '/docs/state/gitignore.md');
+        self::assertFileDoesNotExist($tmp . '/docs/manual/usage.md');
+        self::assertFileDoesNotExist($tmp . '/docs/notes/init-new-vs-existing.md');
+    }
+
     public function testInitFailsWhenScaffoldLeafMissing(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-init-miss-scaffold-' . bin2hex(random_bytes(4));
