@@ -5,7 +5,7 @@
 | Severity | `[P1] major` |
 | Status | `closed` |
 | Found In | `v0.7.4` |
-| Fixed In | `develop` |
+| Fixed In | `v0.7.5` |
 | Related Test | `tests/ProjectInitializerTest.php` |
 
 ## Description
