@@ -3,9 +3,9 @@
 | 字段 | 值 |
 |------|-----|
 | Severity | `[P1] major` |
-| Status | `open` |
+| Status | `closed` |
 | Found In | `v0.7.4` |
-| Fixed In | |
+| Fixed In | `develop` |
 | Related Test | `tests/ProjectInitializerTest.php` |
 
 ## Description
@@ -54,3 +54,4 @@ $this->mirror->mirrorDirectory($this->join($this->packageRoot, 'docs'), $this->j
 ## History
 
 - `2026-05-30 22:00 +08` `v0.7.4` [发现] 用户首次使用 apm install 后发现 docs 目录包含 apm 自身文档
+- `2026-06-01 16:30 +08` `develop` [修复] ProjectInitializer 改为显式复制骨架文件，不再 mirrorDirectory 全量复制

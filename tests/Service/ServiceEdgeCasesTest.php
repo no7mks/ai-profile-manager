@@ -832,6 +832,8 @@ final class ServiceEdgeCasesTest extends TestCase
         $pkg = $this->tmpDir . '/pkg-boot';
         mkdir($pkg . '/docs', 0775, true);
         mkdir($pkg . '/issues', 0775, true);
+        file_put_contents($pkg . '/docs/README.md', '# Docs');
+        file_put_contents($pkg . '/issues/README.md', '# Issues');
         file_put_contents($pkg . '/AGENTS.md', 'pkg agents');
         file_put_contents($pkg . '/abilities.yaml', "skills: []\n");
 
