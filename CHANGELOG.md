@@ -4,6 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.7.6] - 2026-06-01
+
+### Changed
+
+- `quick-release` skill 步骤编号从 1 开始，新增执行协议输出，文档收敛展开为显式子步骤。
+
 ## [0.7.5] - 2026-06-01
 
 ### Fixed
