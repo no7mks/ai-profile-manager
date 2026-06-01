@@ -20,9 +20,26 @@ description: 直接从 master 或 develop 上执行快速发布，不创建 rele
 3. 文档收敛步骤参照 doc-convergence steering（`.kiro/steering/doc/doc-convergence.md`）。
 4. 不创建额外分支（但 merge/tag 阶段会在 master 与 develop 间切换）。
 
+## 执行协议
+
+每个 Step 进入时输出：
+
+```
+▶ Step N: <步骤名称>
+准备做：<本步骤要完成的事项概述>
+```
+
+每个 Step 结束时输出：
+
+```
+✓ Step N 完成：<简略总结>
+```
+
+重要的 sub-step 完成时也可输出简短总结。
+
 ---
 
-## Step 0: 环境检测
+## Step 1: 环境检测
 
 ```bash
 git branch --show-current
@@ -39,7 +56,7 @@ git branch --show-current
 
 ---
 
-## Step 1: 前置检查
+## Step 2: 前置检查
 
 以下任一失败即停止：
 
@@ -51,7 +68,7 @@ git branch --show-current
 
 ---
 
-## Step 2: 确定版本号
+## Step 3: 确定版本号
 
 1. 读取当前版本声明（`PROJECT.md` 或项目配置文件中的版本字段）。
 2. 用户提供目标版本号；未提供则询问。
@@ -59,9 +76,19 @@ git branch --show-current
 
 ---
 
-## Step 3: 文档收敛
+## Step 4: 文档收敛
 
-按 doc-convergence steering（`.kiro/steering/doc/doc-convergence.md`）执行全套归档流程，包含 notes / proposals / specs / issues 归档、CHANGELOG 更新、state/manual 一致性确认、release 归档。
+按 doc-convergence steering（`.kiro/steering/doc/doc-convergence.md`）执行全套归档流程：
+
+1. 归档 notes（已解决的 → `changes/unreleased/notes/`）
+2. 归档 proposals（status → `released`，移入 `changes/unreleased/proposals/`）
+3. 归档 specs（移入 `changes/unreleased/specs/`）
+4. 归档 issues（closed 的移入 `issues/fixed/`，更新 Fixed In 为 `v<version>`）
+5. 确认 state / manual 一致性
+6. 更新 `changes/unreleased/CHANGELOG.md`
+7. **Release 归档**：rename `changes/unreleased/` → `changes/<version>/`
+8. 从 `changes/<version>/CHANGELOG.md` 提炼摘要写入根 `CHANGELOG.md`
+9. 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`
 
 与 gitflow finish 的差异：
 
@@ -71,20 +98,20 @@ git branch --show-current
 
 ---
 
-## Step 4: 更新版本号
+## Step 5: 更新版本号
 
 1. 更新项目中所有版本号声明（`PROJECT.md`、`package.json` 等）。
 2. 提交：`*(version) by Kiro: bump version to <version>`
 
 ---
 
-## Step 5: 构建验证
+## Step 6: 构建验证
 
 再次执行全量测试 + 构建，确认版本号更新后仍通过。失败则停止。
 
 ---
 
-## Step 6: Merge 与 Tag
+## Step 7: Merge 与 Tag
 
 发布始终从 master 出发：tag 打在 master 上，最终从 master 同步回 develop。
 
@@ -110,7 +137,7 @@ git branch --show-current
 
 ---
 
-## Step 7: 清理预发布 Tag（可选）
+## Step 8: 清理预发布 Tag（可选）
 
 如存在该版本的预发布 tag（`-alpha*`、`-beta*`、`-rc*`），删除本地和远程：
 
