@@ -4,6 +4,20 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.7.5] - 2026-06-01
+
+### Fixed
+
+- scaffold 不再将 apm 自身业务文档复制到用户项目（ISS-32020）。
+
+### Added
+
+- `apm init` 新增规划式路径：对空项目通过交互引导收集选型意图并生成基线文档。
+
+### Changed
+
+- agent / steering / skill 中移除 graphify 硬编码引用，改为由 `graphify` skill 自身提供知识图谱能力。
+
 ## [0.7.4] - 2026-05-30
 
 ### Fixed
