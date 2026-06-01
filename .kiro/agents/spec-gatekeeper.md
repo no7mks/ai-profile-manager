@@ -36,22 +36,12 @@ tools: ["read", "write", "shell"]
 
 优先校验最新生成的文档（即 gk-logs.md 中没有对应 section 的文档中最靠后的阶段）。
 
-确定阶段后，执行 Graphify 就绪检测（见下方），然后通过 `discloseContext` 读取对应的校验指引，按指引执行：
+确定阶段后，通过 `discloseContext` 读取对应的校验指引，按指引执行：
 
 - Bugfix → `.kiro/steering/gatekeeping/gk-bugfix.md`
 - Requirements → `.kiro/steering/gatekeeping/gk-requirements.md`
 - Design → `.kiro/steering/gatekeeping/gk-design.md`
 - Tasks → `.kiro/steering/gatekeeping/gk-tasks.md`
-
-### Graphify 就绪检测
-
-在进入具体校验步骤之前，执行一次性检测：
-
-1. 检查 `graphify-out/GRAPH_REPORT.md` 是否存在
-2. 检查 `graphify` 命令是否可用（`which graphify`）
-3. 两者都满足 → 设置 `graphify_ready = true`；否则 `graphify_ready = false`
-
-后续所有步骤中涉及 graphify 的校验项，统一以 `graphify_ready` 为前提条件，不再重复检查文件或命令是否存在。
 
 ### Spec 类型与目录
 

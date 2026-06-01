@@ -25,15 +25,14 @@
 ## 执行步骤
 
 1. **读取前置文件**：按「前置读取」清单获取 requirements、GK Clarification、SSOT
-2. **Graphify readiness 检测**（可选）：判断是否可用 graphify 辅助架构分析
-3. **设计架构**：确定模块划分、依赖关系、数据流
-4. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
-5. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
-6. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
-7. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
-8. **写入产物**：按文档结构写入 `design.md`
-9. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
-10. **输出完成报告**：按「完成后输出」格式报告
+2. **设计架构**：确定模块划分、依赖关系、数据流
+3. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
+4. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
+5. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
+6. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
+7. **写入产物**：按文档结构写入 `design.md`
+8. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
+9. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 
@@ -49,7 +48,6 @@
 
 - 覆盖 requirements 中全部 Requirement/AC
 - Socratic Review 和 Gatekeep Log 写入 `<spec-dir>/<name>/gk-logs.md`，不写在 design.md 中
-- 可用时先做 Graphify readiness 检测，再决定是否用 graphify 辅助架构分析
 - 完成后提示可运行 GK 校验 design
 
 ---

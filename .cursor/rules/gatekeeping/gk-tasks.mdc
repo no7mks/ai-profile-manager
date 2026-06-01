@@ -16,19 +16,18 @@ alwaysApply: false
 3. Task 格式校验
 4. Requirement 追溯校验
 5. 依赖与排序校验
-6. Graphify 跨模块依赖校验（如 `graphify_ready`）
-7. Checkpoint 校验
-8. Test-first 校验
-9. Task 粒度校验
-10. E2E 测试 Task 校验
-11. Code Review Task 校验
-12. 执行注意事项校验
-13. Socratic Review 校验
-14. 目的性审查
-15. Task Dependency Graph 校验
-16. 文档收敛 Task 校验
-17. 将修正项写入 Gatekeep Log
-18. Completion：向 main-agent 返回结果
+6. Checkpoint 校验
+7. Test-first 校验
+8. Task 粒度校验
+9. E2E 测试 Task 校验
+10. Code Review Task 校验
+11. 执行注意事项校验
+12. Socratic Review 校验
+13. 目的性审查
+14. Task Dependency Graph 校验
+15. 文档收敛 Task 校验
+16. 将修正项写入 Gatekeep Log
+17. Completion：向 main-agent 返回结果
 
 ---
 
@@ -92,17 +91,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ---
 
-## 6. Graphify 跨模块依赖校验
-
-> 仅在 `graphify_ready` 时执行。
-
-- [ ] 已对核心模块执行 graphify 依赖查询
-- [ ] task 排序与模块依赖一致
-- [ ] 如发现遗漏的依赖，已调整排序或补充说明
-
----
-
-## 7. Checkpoint 校验
+## 6. Checkpoint 校验
 
 - [ ] checkpoint 作为每个 top-level task 的最后一个 sub-task
 - [ ] 包含具体的验证命令以及 commit 动作
@@ -111,13 +100,13 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ---
 
-## 8. Test-first 校验
+## 7. Test-first 校验
 
 推荐顺序：① 编写测试 → ② 确认失败 → ③ 编写实现 → ④ 确认通过。推荐而非强制。
 
 ---
 
-## 9. Task 粒度校验
+## 8. Task 粒度校验
 
 - [ ] 每个 sub-task 满足单一职责：只完成一个原子性变更
 - [ ] 无 sub-task 同时涉及超过 3 个不相关的方法/类
@@ -137,7 +126,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ---
 
-## 10. E2E 测试 Task 校验
+## 9. E2E 测试 Task 校验
 
 - [ ] E2E 测试 top-level task 存在
 - [ ] 覆盖 requirements 中的关键用户场景
@@ -146,7 +135,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ---
 
-## 11. Code Review Task 校验
+## 10. Code Review Task 校验
 
 - [ ] Code Review 是最后一个 top-level task
 - [ ] 描述为"委托给 code-reviewer sub-agent 执行"
@@ -154,7 +143,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ---
 
-## 12. 执行注意事项校验
+## 11. 执行注意事项校验
 
 - [ ] `## Notes` section 存在
 - [ ] 明确提到遵循 `spec-execution` 流程
@@ -164,7 +153,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ---
 
-## 13. Socratic Review 校验
+## 12. Socratic Review 校验
 
 检查 `gk-logs.md` 中是否存在 `## Tasks Phase — Socratic Review` section。如果缺少，gatekeeper 应按 `gatekeeping/gk-log-format.mdc` 的格式补充，Q&A 至少覆盖：
 
@@ -177,7 +166,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ---
 
-## 14. 目的性审查
+## 13. 目的性审查
 
 Tasks 的核心目的是：**提供一份可直接执行的实现计划，让执行者无需回溯 design 即可逐条完成所有实现工作**。
 
@@ -193,7 +182,7 @@ Tasks 的核心目的是：**提供一份可直接执行的实现计划，让执
 
 ---
 
-## 15. Task Dependency Graph 校验
+## 14. Task Dependency Graph 校验
 
 tasks.md 必须包含 `## Task Dependency Graph` section。
 
@@ -232,7 +221,7 @@ tasks.md 必须包含 `## Task Dependency Graph` section。
 
 ---
 
-## 16. 文档收敛 Task 校验
+## 15. 文档收敛 Task 校验
 
 Feature / Hotfix spec 必须包含文档收敛 top-level task。
 
@@ -245,13 +234,13 @@ Feature / Hotfix spec 必须包含文档收敛 top-level task。
 
 ---
 
-## 17. Gatekeep Log
+## 16. Gatekeep Log
 
 将校验过程中的修正项写入 tasks.md 末尾的 `## Gatekeep Log` section。
 
 ---
 
-## 18. Completion
+## 17. Completion
 
 向 main-agent 返回：
 
