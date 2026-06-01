@@ -31,7 +31,7 @@ final class Application
     ): SymfonyApplication {
         $checker = new CheckService();
 
-        $app = new SymfonyApplication('apm', '0.7.4');
+        $app = new SymfonyApplication('apm', '0.7.5');
         $app->setDefaultCommand('list');
         ConsoleRegistration::register($app, $installer, $checker, $updater, $presetRegistry);
 
