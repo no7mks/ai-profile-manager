@@ -16,14 +16,14 @@ description: 当执行任何 git 操作（特别是 commit 操作）时，都应
 - `-` 删除 / 移除
 - `*` 修改 / 重构 / 更新
 
-- Agent 自动生成的 commit 必须带工具标识：Kiro 用 `by Kiro`，Cursor 用 `by Cursor`，以此类推
+- Agent 自动生成的 commit 必须带工具标识：`by Kiro`
 - description 用中文描述实际工作内容（保留专有名词、代码名），避免笼统地写「完成 Task 1.2」
 
 示例：
 
 - `+(state): add architecture.md`（人工 commit，无标识）
 - `-(command) by Kiro: remove deprecated ListCommand`
-- `*(service) by Cursor: refactor delete to use soft-delete`
+- `*(service) by Kiro: refactor delete to use soft-delete`
 
 merge commit 不使用 action 前缀：`merge <source> into <target>`
 

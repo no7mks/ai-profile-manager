@@ -26,12 +26,12 @@ git branch --show-current
 
 1. 同步 develop 到 feature：`git merge --no-ff develop -m "merge develop into feature/<name>"`
 2. 解决冲突后提交，并重新跑全量测试
-3. 文档收敛（按 doc-convergence steering 执行）：
+3. 文档收敛（按 doc-convergence rule 执行）：
    - 归档 notes
    - 确认 state / manual 一致性
    - 更新 `changes/unreleased/CHANGELOG.md`
    - 统一提交
-4. Spec 归档：`mv .kiro/specs/<spec-name>/ → changes/unreleased/specs/<spec-name>/`
+4. Spec 归档：`mv .cursor/specs/<spec-name>/ → changes/unreleased/specs/<spec-name>/`
 5. 切回 `develop` 并合并 feature：`git merge --no-ff feature/<name> -m "merge feature/<name> into develop"`
 6. 归档 proposal（status `in-progress -> implemented`，移入 `changes/unreleased/proposals/`），提交
 
@@ -48,7 +48,7 @@ git branch --show-current
    - 找出 `issues/` 中 status=closed 的 issue
    - Review Found In / Fixed In，替换为正式 release tag
    - `mv` 到 `issues/fixed/`
-2. 文档收敛（按 doc-convergence steering 执行）：
+2. 文档收敛（按 doc-convergence rule 执行）：
    - Release 归档：`changes/unreleased/` rename 为 `changes/<version>/`
    - 从 `changes/<version>/CHANGELOG.md` 提炼摘要写入根 `CHANGELOG.md` 新版本小节
    - Spec 归档（如有未归档的 spec）
@@ -79,7 +79,7 @@ git branch --show-current
    - 找出 `issues/` 中 status=closed 的 issue
    - Review Found In / Fixed In，替换为正式 hotfix tag
    - `mv` 到 `issues/fixed/`
-2. 文档收敛（按 doc-convergence steering 执行）：
+2. 文档收敛（按 doc-convergence rule 执行）：
    - Release 归档：`changes/unreleased/` rename 为 `changes/<version>/`
    - 从 `changes/<version>/CHANGELOG.md` 提炼摘要写入根 `CHANGELOG.md` 新版本小节
    - 重建空的 `changes/unreleased/{notes,proposals,specs}/` 及空 `CHANGELOG.md`

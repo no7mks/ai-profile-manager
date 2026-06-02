@@ -15,9 +15,9 @@ description: 直接从 master 或 develop 上执行快速发布，不创建 rele
 
 ## 使用原则
 
-1. 执行任何 git 操作前，先读取并遵循 git 规则文件：`.kiro/steering/git/git-conventions.md`
+1. 执行任何 git 操作前，先读取并遵循 git 规则文件：`.cursor/rules/git/git-conventions.mdc`
 2. 出错即停并报告，不静默吞错。
-3. 文档收敛步骤参照 doc-convergence steering（`.kiro/steering/doc/doc-convergence.md`）。
+3. 文档收敛步骤参照 doc-convergence rule（`.cursor/rules/doc/doc-convergence.mdc`）。
 4. 不创建额外分支（但 merge/tag 阶段会在 master 与 develop 间切换）。
 
 ## 执行协议
@@ -78,11 +78,11 @@ git branch --show-current
 
 ## Step 4: 文档收敛
 
-按 doc-convergence steering（`.kiro/steering/doc/doc-convergence.md`）执行全套归档流程：
+按 doc-convergence rule（`.cursor/rules/doc/doc-convergence.mdc`）执行全套归档流程：
 
 1. 归档 notes（已解决的 → `changes/unreleased/notes/`）
 2. 归档 proposals（status → `released`，移入 `changes/unreleased/proposals/`）
-3. 归档 specs：`mv .kiro/specs/<name>/` 与根目录 `*-plan.md` → `changes/unreleased/specs/`
+3. 归档 specs：`mv .cursor/specs/<name>/` 与根目录 `*-plan.md` → `changes/unreleased/specs/`（见 doc-convergence 与 `plan:quick-plan-conventions` rule）
 4. 归档 issues（closed 的移入 `issues/fixed/`，更新 Fixed In 为 `v<version>`）
 5. 确认 state / manual 一致性
 6. 更新 `changes/unreleased/CHANGELOG.md`
@@ -94,14 +94,14 @@ git branch --show-current
 
 - Proposal status 直接标记 `released`（跳过 `implemented` 中间态，因为 quick-release 本身即发布动作）。
 
-收敛完成后统一提交：`*(doc) by Kiro: release <version> 文档收敛`
+收敛完成后统一提交：`*(doc) by Cursor: release <version> 文档收敛`
 
 ---
 
 ## Step 5: 更新版本号
 
 1. 更新项目中所有版本号声明（`PROJECT.md`、`package.json` 等）。
-2. 提交：`*(version) by Kiro: bump version to <version>`
+2. 提交：`*(version) by Cursor: bump version to <version>`
 
 ---
 

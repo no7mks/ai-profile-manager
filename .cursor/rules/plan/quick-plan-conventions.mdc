@@ -1,0 +1,109 @@
+---
+description: 当用户进入 Plan mode、快速计划、Build Plan、跳过 Spec、或需创建/执行非 Spec 四件套的 plan 时读取。约定 plan 路径、命名、模板与归档。
+alwaysApply: false
+---
+
+# Quick Plan 约定
+
+**快速计划**（非 Spec 四件套）的落盘规范。原生 Plan mode 可能写入 `.cursor/plans/`（IDE 临时文件，非项目 SSOT）；可版本管理的计划应放在 `<spec-dir>` 根下的 `<slug>-plan.md`。
+
+`<spec-dir>` = `.cursor/specs/`（见 cursor-scope）。
+
+---
+
+## 路径与命名
+
+| 类型 | 路径 | 说明 |
+|------|------|------|
+| 快速计划（进行中） | `.cursor/specs/<slug>-plan.md` | slug 为英文 kebab-case |
+| 完整 Spec | `.cursor/specs/<name>/goal.md` 等 | 子目录四阶段，见 `spec-planning` skill |
+| IDE 临时计划 | `.cursor/plans/` | 工具生成，**非**项目 SSOT |
+
+**与 spec-planning 区分**：根目录扁平的 `<slug>-plan.md` 是快速计划，**不**走 Spec 四件套；`<spec-dir>/<name>/` 子目录才是完整 Spec。
+
+---
+
+## 规划阶段
+
+**唯一产出**（除非用户明确要求完整 Spec）：`.cursor/specs/<slug>-plan.md`。
+
+禁止擅自创建：
+
+- `requirements.md` / `design.md` / `tasks.md`
+- `<spec-dir>/<name>/` Spec 子目录
+
+用户明确要求完整 Spec 时，改用 `spec-planning` skill，勿用本约定。
+
+### 计划模板
+
+```md
+# <任务名称>
+
+## Goal
+
+最终目标。
+
+## Scope
+
+本次变更范围。
+
+## Assumptions
+
+关键假设和前提条件。
+
+## Files
+
+预计涉及的文件。
+
+## Plan
+
+- [ ] Step 1
+- [ ] Step 2
+
+## Validation
+
+验证方式。
+
+## Risks
+
+已知风险和注意事项。
+```
+
+要求：
+
+- 计划简洁、Step 可执行
+- 尽可能按 TDD（RED → GREEN）编排；纯配置/文档步骤除外
+- Plan 末几步应包含：`docs/state/` 同步、`docs/manual/` 同步、code-review、final checkpoint（整体验证 + commit）
+
+### 规划终止
+
+生成 plan 后展示 Goal 与 Plan 步骤列表，说明文件路径，并等待用户确认后再进入实现。规划阶段**不得**修改 plan 以外的项目文件。
+
+### Plan mode
+
+若 IDE 已在 `.cursor/plans/` 生成计划，用户确认后须**迁移或重写**到 `.cursor/specs/<slug>-plan.md`，再进入实现阶段。
+
+---
+
+## 实施与收尾
+
+Build 由 IDE 从当前 plan 发起，上下文已是该 plan 文件，**无需**再查找或选择 `*-plan.md`。
+
+- 按 Plan 逐步实施；每完成一步更新同一 plan 文件中的 checkbox
+- 若涉及 Goal / Scope 变更，更新 plan 并等待用户确认后再继续
+
+### 完成后归档
+
+```text
+mv .cursor/specs/<slug>-plan.md → changes/unreleased/specs/<slug>-plan.md
+```
+
+若当前在 feature 分支且即将执行 gitflow finish，可跳过（finish 流程会统一处理）。
+
+---
+
+## 禁止事项
+
+- 将 `.cursor/plans/` 当作项目唯一计划来源而不迁移到 `.cursor/specs/`
+- 在快速计划流程中自动创建 Spec 四件套
+- 把根目录 `*-plan.md` 误当作 spec-planning 的 `tasks.md` 替代品而不读本约定

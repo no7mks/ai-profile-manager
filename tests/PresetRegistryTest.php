@@ -170,4 +170,43 @@ YAML;
         self::assertSame(['type' => 'rule', 'path' => 'valid-path'], $preset['includes'][0]);
         self::assertSame(['type' => 'skill', 'path' => 'another-valid'], $preset['includes'][1]);
     }
+    public function testPackageAbilitiesDefaultPresetIncludesResolve(): void
+    {
+        $path = dirname(__DIR__) . '/abilities.yaml';
+        $parsed = (new AbilityRegistry($path))->parse();
+        $preset = (new PresetRegistry(new AbilityRegistry($path)))->getPreset('default');
+
+        self::assertNotNull($preset);
+
+        $sectionByType = [
+            'rule' => 'rules',
+            'skill' => 'skills',
+            'agent' => 'agents',
+            'hook' => 'hooks',
+        ];
+
+        foreach ($preset['includes'] as $include) {
+            $section = $sectionByType[$include['type']] ?? null;
+            self::assertNotNull($section, sprintf('Unknown include type: %s', $include['type']));
+
+            $found = false;
+            foreach ($parsed[$section] as $entry) {
+                if ($entry->path === $include['path']) {
+                    $found = true;
+                    break;
+                }
+            }
+
+            self::assertTrue(
+                $found,
+                sprintf(
+                    "Ability '%s:%s' in default preset not found in abilities.yaml %s section",
+                    $include['type'],
+                    $include['path'],
+                    $section,
+                ),
+            );
+        }
+    }
+
 }
