@@ -76,6 +76,11 @@ rules:
       cursor: .cursor/rules/gatekeeping/gk-tasks.mdc
       kiro: .kiro/steering/gatekeeping/gk-tasks.md
 
+  - path: plan:quick-plan-conventions
+    description: Cursor 快速计划（非 Spec）的路径、命名、模板与归档
+    targets:
+      cursor: .cursor/rules/plan/quick-plan-conventions.mdc
+
 agents:
   - path: code-reviewer
     description: 基于 diff 的 code review agent
@@ -142,6 +147,12 @@ skills:
     targets:
       kiro: .kiro/skills/build-plan/
 
+  - path: quick-release
+    description: 直接从 master/develop 快速发布（无 release/hotfix 分支）
+    targets:
+      cursor: .cursor/skills/quick-release/
+      kiro: .kiro/skills/quick-release/
+
 gitignore:
   - marker: php
     description: PHP 相关忽略规则
@@ -187,8 +198,11 @@ presets:
       - rule:doc:writing-conventions
       - rule:doc:doc-convergence
       - rule:plugin:superpowers-integration
+      - rule:git:git-conventions
+      - rule:plan:quick-plan-conventions
       - skill:quick-plan
       - skill:build-plan
+      - skill:quick-release
 
   - name: gitflow
     description: GitFlow 全套能力

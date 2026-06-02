@@ -5,18 +5,22 @@ alwaysApply: true
 
 # Cursor Agent Rules
 
+## 项目相关信息
+
+项目特有信息见 @PROJECT.md
+
 ## 项目目录结构
 
 | 目录 | 定位 | 详细规则 |
 |------|------|---------|
-| `/PROJECT.md` | 项目特有信息（技术栈、构建命令、运行入口、敏感文件清单） | Agent 首次接触项目时必须先读取 |
-| `/AGENTS.md` | Agent 协作与表达规范（对话语言、读写原则、文档事实来源） | 每次对话开始时必须读取并遵守 |
+| `/PROJECT.md` | 项目特有信息（技术栈、构建命令、运行入口、敏感文件清单） | 已通过上方「项目相关信息」自动注入 |
+| `/AGENTS.md` | Agent 协作与表达规范（对话语言、读写原则、文档事实来源） | 始终遵守 |
 | `/README.md` | 项目对外介绍（面向用户的功能概述与快速上手） | — |
 | `/CHANGELOG.md` | 面向用户的版本摘要 | — |
 | `/docs/` | 活跃文档（state/manual/notes/proposals） | `docs/README.md` |
 | `/changes/` | 归档（已完成文档按版本组织） | `changes/README.md` |
 | `/issues/` | 缺陷管理 | `issues/README.md` |
-| `/.cursor/specs/` | 即 `<spec-dir>`，记录进行中的 specs | — |
+| `/.cursor/specs/` | 即 `<spec-dir>`：子目录为进行中 Spec；根下 `<slug>-plan.md` 为快速计划 | `plan/quick-plan-conventions.mdc` |
 | `/.cursor/rules/` | Cursor agent 规则 | — |
 | `/.cursor/skills/` | Cursor agent skills | — |
 | `/.cursor/agents/` | Cursor agent 定义 | — |

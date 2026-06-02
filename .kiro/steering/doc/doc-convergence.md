@@ -56,13 +56,21 @@ description: 文档归档操作规范——notes/proposals/specs/issues 的归�
 
 ## 更新 CHANGELOG
 
-更新时机由各触发流程（gitflow finish-flow 等）保障，本章节只定义格式规范。
+更新时机由各触发流程（gitflow finish / quick-release 等）保障；格式见下文。实施期 Agent：
 
-需更新：
+**只允许**
 
-- `changes/unreleased/CHANGELOG.md`（详细，含 issue 编号、spec 引用）
+- 维护 `changes/unreleased/CHANGELOG.md`
 
-根 `CHANGELOG.md` 不维护 `[Unreleased]` 段落，release/hotfix finish 时从 `changes/unreleased/CHANGELOG.md` 提炼摘要写入新版本小节。
+**禁止**
+
+- 编辑根 `CHANGELOG.md`
+- 编辑 `changes/<version>/` 下已发布版本目录中的 CHANGELOG 或向其追加条目
+- 在根 `CHANGELOG.md` 预写下一版本小节
+
+任务写「更新 CHANGELOG」→ `changes/unreleased/CHANGELOG.md`。
+
+根 `CHANGELOG.md` 不维护 `[Unreleased]`；release/finish 时从 `changes/<version>/CHANGELOG.md` 提炼摘要写入根文件（见「Release 归档」）。
 
 ### 覆盖维度
 

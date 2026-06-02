@@ -16,9 +16,7 @@ description: 统一执行 GitFlow 的 start/finish 流程（feature/release/hotf
 ## 使用原则
 
 1. 先识别是 **start** 还是 **finish**。
-2. 执行任何 git 操作前，先读取并遵循 git 规则文件：
-   - Cursor: `.cursor/rules/git/git-conventions.mdc`
-   - Kiro: `.kiro/steering/git/git-conventions.md`
+2. 执行任何 git 操作前，先读取并遵循 git 规则文件：`.cursor/rules/git/git-conventions.mdc`
 3. 需要分支切换时，始终处理 worktree 占用场景。
 4. 出错即停并报告，不静默吞错。
 
