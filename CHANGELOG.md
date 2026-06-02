@@ -4,6 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.7.7] - 2026-06-02
+
+### Changed
+
+- kiro-scope steering 新增 PROJECT.md 自动注入引用，Agent 无需手动首次读取。
+
 ## [0.7.6] - 2026-06-01
 
 ### Changed
