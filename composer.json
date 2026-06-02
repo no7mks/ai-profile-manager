@@ -1,6 +1,6 @@
 {
   "name": "no7mks/ai-profile-manager",
-  "version": "0.7.6",
+  "version": "0.7.7",
   "description": "CLI tool to install and update AI IDE/CLI abilities.",
   "type": "library",
   "license": "MIT",
