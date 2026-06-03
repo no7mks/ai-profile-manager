@@ -1,6 +1,14 @@
 # Abilities Model
 
-abilities.yaml 完整格式定义与 Preset 引用模型。
+ability 语义与 `abilities.yaml` 格式；界定何者不是 ability。
+
+---
+
+## Ability 定义
+
+**Ability**：在 registry 登记、**可安装**（`add`/`install`/preset/`global-setup`）且 **可卸载**（`remove`/`uninstall` 或 project 上 `cleanup`）的条目（skill / rule / agent / hook / gitignore / prompt）。`show`/`check`/`update` 只操作 ability；**preset 名不是 ability**。
+
+**不是 ability**：bootstrap/scaffold（`apm bootstrap` → `ProjectInitializer`，**不进 yaml**，cleanup 不卸）；`PROJECT.md` 与 `docs/state|manual` 内容由 init Agent 写。Deploy scope 等见 PRP-002，实现后补全本节。
 
 ---
 

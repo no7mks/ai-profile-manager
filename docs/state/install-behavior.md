@@ -148,9 +148,9 @@
 
 ---
 
-## Scaffold（项目初始化）
+## Scaffold
 
-`ProjectInitializer::init()` 在目标工作区执行一次性骨架搭建。
+Scaffold **不是** ability（不可由 `cleanup` 卸载）。由 **`apm bootstrap`** 调用 `ProjectInitializer::init()` 在目标工作区搭建骨架（与 `abilities.yaml` 无关）。
 
 ### 行为
 
