@@ -4,6 +4,22 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.9.0] - 2026-06-04
+
+### Fixed
+
+- ISS-31532: `ComposerBaselineResolver` 在 `COMPOSER_HOME` 未设置时 fallback 至 XDG 路径 `~/.config/composer`。
+- ISS-01592: `InstallationProbe` 修复带 category 的 rule 误报未安装。
+
+### Added
+
+- Windows 支持：user scope 使用 `USERPROFILE`；Composer baseline fallback `%APPDATA%\Composer`；新增 `docs/manual/install-windows.md`（Scoop）。
+- Deploy scope（`project` / `user`）、`global-setup`、`bootstrap`、`cleanup` 命令；Show/Update 重写。
+
+### Breaking
+
+- 无参 `apm install` / preset `default` 废弃；三阶段首装（`global-setup` → `bootstrap` → `/apm init`）。
+
 ## [0.8.0] - 2026-06-02
 
 ### Added

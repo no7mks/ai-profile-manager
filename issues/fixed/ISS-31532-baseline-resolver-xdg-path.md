@@ -5,7 +5,7 @@
 | Severity | `[P1] major` |
 | Status | `closed` |
 | Found In | `v0.8.0` |
-| Fixed In | `2c96333` |
+| Fixed In | `v0.9.0` |
 | Related Test | `tests/ComposerBaselineResolverTest.php` |
 
 ---

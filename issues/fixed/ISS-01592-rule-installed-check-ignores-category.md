@@ -5,7 +5,7 @@
 | Severity | `[P2] minor` |
 | Status | `closed` |
 | Found In | `v0.8.0` |
-| Fixed In | `c374c7a` |
+| Fixed In | `v0.9.0` |
 | Related Test | `tests/InstallationProbeTest.php` |
 
 ---
