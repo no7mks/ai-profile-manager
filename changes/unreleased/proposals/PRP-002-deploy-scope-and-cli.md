@@ -1,6 +1,6 @@
 # PRP: Deploy Scope and CLI Onboarding
 
-**Status**: in-progress
+**Status**: implemented
 
 定义 user/project 部署 scope、`global-setup` 清单、onboarding，以及 `show`/`update`/`cleanup`。
 
