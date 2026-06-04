@@ -2,7 +2,7 @@
 
 ## Overview
 
-D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver → Registry/Guard → Probe → Check/Show → Update → 新命令 → Install breaking。sub-task 内 RED→GREEN；Checkpoint 含 `./vendor/bin/phpunit` + `docs/state/`。R13 为 E2E 人工段；R14 在 task 14 关闭 issue。
+D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver → Registry/Guard → Probe → Check/Show → Update → 新命令 → Install breaking。sub-task 内 RED→GREEN；Checkpoint 含 `./vendor/bin/phpstan analyse` + `./vendor/bin/phpunit`（与 PROJECT.md）；`docs/state/` 仅在 sub-task 变更系统事实时更新，非每 checkpoint 重复。R13 为 E2E 人工段；R14 在 task 14 关闭 issue。
 
 ## Tasks
 
@@ -16,14 +16,14 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 1, AC 5_
   - [x] 1.4 更新 `docs/state/install-behavior.md` baseline 顺序
     - _Ref: Requirement 1, AC 6_
-  - [x] 1.5 Checkpoint — `./vendor/bin/phpunit`；commit: `+(baseline) by Cursor: XDG composer home fallback`
+  - [x] 1.5 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(baseline) by Cursor: XDG composer home fallback`
 
 - [x] 2. DeployRootResolver
   - [x] 2.1 `DeployScope` enum（`src/Config/DeployScope.php`）
     - _Ref: Requirement 3, AC 1_
   - [x] 2.2 `DeployRootResolver` + `DeployRootResolverTest`（resolve/parseScopeOption/absoluteTargetPath；非法 scope 抛 `InvalidScopeException`）
     - _Ref: Requirement 3, AC 2–3, 5_
-  - [x] 2.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(scope) by Cursor: DeployRootResolver`
+  - [x] 2.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(scope) by Cursor: DeployRootResolver`
 
 - [x] 3. Registry：scopes、global-setup、删 default
   - [x] 3.1 `AbilityEntry.scopes` 解析，默认 `[project]`
@@ -32,35 +32,35 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 4, AC 1, 4, 7_
   - [x] 3.3 `abilities.yaml`：`global-setup.includes`、per-entry `scopes`、删 preset `default`
     - _Ref: Requirement 4, AC 1–3_
-  - [x] 3.4 Checkpoint — `./vendor/bin/phpunit`；commit: `+(registry) by Cursor: global-setup and scopes`
+  - [x] 3.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(registry) by Cursor: global-setup and scopes`
 
 - [x] 4. ScopeGuard
   - [x] 4.1 `InvalidScopeException`
     - _Ref: Requirement 3, AC 4–6_
   - [x] 4.2 `ScopeGuard::assertBatchAllowed()` + 测试（零部分写入）
     - _Ref: Requirement 3, AC 6; Requirement 8, AC 4_
-  - [x] 4.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(scope) by Cursor: ScopeGuard`
+  - [x] 4.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(scope) by Cursor: ScopeGuard`
 
 - [x] 5. InstallationProbe + Installer
   - [x] 5.1 `InstallationProbe::isPresent()` + category rule 测试
     - _Ref: Requirement 2, AC 1–3_
   - [x] 5.2 `Installer` 委托 probe + `DeployRootResolver`；`uninstallProjectScope()`
     - _Ref: Requirement 2, AC 4–5; Requirement 7, AC 1_
-  - [x] 5.3 Checkpoint — `./vendor/bin/phpunit`；commit: `*(install) by Cursor: scope-aware InstallationProbe`
+  - [x] 5.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `*(install) by Cursor: scope-aware InstallationProbe`
 
 - [x] 6. CheckService scope
   - [x] 6.1 `checkTypedForScope()` + 测试
     - _Ref: Requirement 9, AC 4_
   - [x] 6.2 user scope `HookChecker` 路径
     - _Ref: Requirement 3, AC 3; design P2 Check_
-  - [x] 6.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(check) by Cursor: scope-aware checks`
+  - [x] 6.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(check) by Cursor: scope-aware checks`
 
-- [ ] 7. Show 重写
-  - [ ] 7.1 `ShowStatusPresenter` + 映射/双 scope/targets 测试
+- [x] 7. Show 重写
+  - [x] 7.1 `ShowStatusPresenter` + 映射/双 scope/targets 测试
     - _Ref: Requirement 9, AC 1–6; GK CR1_
-  - [ ] 7.2 重写 `ShowCommand` + `ShowCommandTest`（`--scope`；fallback R2）
+  - [x] 7.2 重写 `ShowCommand` + `ShowCommandTest`（`--scope`；fallback R2）
     - _Ref: Requirement 9; Requirement 2, AC 4_
-  - [ ] 7.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(show) by Cursor: three-state presenter`
+  - [x] 7.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(show) by Cursor: three-state presenter`
 
 - [ ] 8. Update 重写 + 删 KnowledgeBaseUpdater
   - [ ] 8.1 `GlobalInstallDetector` + 测试
@@ -69,28 +69,28 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 10, AC 2–4_
   - [ ] 8.3 重写 `UpdateCommand`；删 `KnowledgeBaseUpdater`、测试、DI、`architecture.md` 引用
     - _Ref: Requirement 10; design D-CR3 A_
-  - [ ] 8.4 Checkpoint — `./vendor/bin/phpunit`；commit: `+(update) by Cursor: global-only baseline update`
+  - [ ] 8.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(update) by Cursor: global-only baseline update`
 
 - [ ] 9. global-setup 命令
   - [ ] 9.1 `GlobalSetupCommandTest`（仅列表、user、幂等/force、skip、提示 init）
     - _Ref: Requirement 5, AC 1–6_
   - [ ] 9.2 `GlobalSetupCommand` + `ConsoleRegistration` DI
     - _Ref: Requirement 5, AC 1–6_
-  - [ ] 9.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(cli) by Cursor: global-setup command`
+  - [ ] 9.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: global-setup command`
 
 - [ ] 10. bootstrap + 无参 install 废弃
   - [ ] 10.1 `BootstrapCommand`（仅 `ProjectInitializer`）；更新 `BootstrapLifecycleTest`
     - _Ref: Requirement 6, AC 1–3_
   - [ ] 10.2 `InstallCommand` 无参失败 + `default` 迁移文案
     - _Ref: Requirement 8, AC 1, 4; Requirement 4, AC 3_
-  - [ ] 10.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(cli) by Cursor: bootstrap and reject bare install`
+  - [ ] 10.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: bootstrap and reject bare install`
 
 - [ ] 11. cleanup 命令
   - [ ] 11.1 `CleanupCommandTest`（registry 全枚举，仅 project 卸载）
     - _Ref: Requirement 7, AC 1–2; design D-CR4 A_
   - [ ] 11.2 `CleanupCommand` + 注册
     - _Ref: Requirement 7, AC 3_
-  - [ ] 11.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(cli) by Cursor: cleanup command`
+  - [ ] 11.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: cleanup command`
 
 - [ ] 12. install 族 scope 与同义词
   - [ ] 12.1 install/uninstall 族 `--scope` + `ScopeGuard`（D-CR2 A）
@@ -99,7 +99,7 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 8, AC 2–3, 5_
   - [ ] 12.3 preset 全量校验测试
     - _Ref: Requirement 8, AC 4_
-  - [ ] 12.4 Checkpoint — `./vendor/bin/phpunit`；commit: `+(cli) by Cursor: scope and breaking install`
+  - [ ] 12.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: scope and breaking install`
 
 - [ ] 13. E2E 测试
   - [ ] 13.1 _脚本_ `tests/test-task-13a.sh`：global-setup → bootstrap → typed add
@@ -108,7 +108,7 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 7, 9, 10_
   - [ ] 13.3 _人工_：IDE 验证 → `docs/notes/deploy-scope-platform-verification.md`
     - _Ref: Requirement 13, AC 1–4_
-  - [ ] 13.4 Checkpoint — `./vendor/bin/phpunit --testsuite e2e`；commit: `+(e2e) by Cursor: deploy scope flows`
+  - [ ] 13.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；`./vendor/bin/phpunit --testsuite e2e`；commit: `+(e2e) by Cursor: deploy scope flows`
 
 - [ ] 14. 文档收敛
   - [ ] 14.1 SSOT：`install-behavior.md`、`cli-commands.md`、`abilities-model.md`
@@ -121,7 +121,7 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 11, AC 1–7; Requirement 7, AC 3_
   - [ ] 14.5 关闭 ISS-31532、ISS-01592（`Fixed In` = shipping version）
     - _Ref: Requirement 14, AC 1–3_
-  - [ ] 14.6 Checkpoint — commit: `+(docs) by Cursor: deploy scope onboarding`
+  - [ ] 14.6 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(docs) by Cursor: deploy scope onboarding`
 
 - [ ] 15. Code Review
   - 委托给 code-reviewer sub-agent 执行
@@ -129,6 +129,7 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
 ## Notes
 
 - 遵循 `.cursor/skills/spec-execution/SKILL.md`；按 TDG wave 执行；测试输出写日志（`PROJECT.md`）。
+- Checkpoint 验证：`./vendor/bin/phpstan analyse` + `./vendor/bin/phpunit`（与 `PROJECT.md`）；task 13.4 另跑 `./vendor/bin/phpunit --testsuite e2e`；不在 checkpoint 重复 E2E 于其它 task。
 - 每个 Checkpoint sub-task 完成验证后**在同一 sub-task 内**执行 commit（message 见该 sub-task）。
 - Task 1 Checkpoint 须先于 task 2 合入（D-CR1）。
 - E2E 脚本：`.cursor/specs/deploy-scope-and-cli/tests/test-task-13*.sh`。

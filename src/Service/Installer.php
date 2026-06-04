@@ -185,10 +185,10 @@ final class Installer
 
                     $lines = array_merge(
                         $lines,
-                        match ($type) {
-                            'skill' => $this->uninstallSkill($entry->path, $target),
-                            'rule' => $this->uninstallRule($entry->path, $target),
-                            'agent' => $this->uninstallAgent($entry->path, $target),
+                        match ($section) {
+                            'skills' => $this->uninstallSkill($entry->path, $target),
+                            'rules' => $this->uninstallRule($entry->path, $target),
+                            'agents' => $this->uninstallAgent($entry->path, $target),
                             default => [],
                         },
                     );
@@ -197,6 +197,16 @@ final class Installer
         }
 
         return ['lines' => $lines, 'exit_code' => $exitCode];
+    }
+
+    public function registry(): AbilityRegistry
+    {
+        return $this->registry;
+    }
+
+    public function packageRoot(): string
+    {
+        return $this->packageRoot;
     }
 
     /**

@@ -23,10 +23,6 @@ final class ScopeGuard
         }
 
         foreach ($items as $item) {
-            if (!is_string($item)) {
-                continue;
-            }
-
             $parsed = $this->parseTypedRef($item);
             if ($parsed === null) {
                 continue;

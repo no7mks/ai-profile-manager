@@ -144,11 +144,17 @@ final class AbilityRegistry
         return ['rules', 'agents', 'skills', 'hooks', 'gitignore', 'presets', 'prompts'];
     }
 
+    /**
+     * @return list<array{type: string, path: string}>
+     */
     public function globalSetupIncludes(): array
     {
         return $this->parseTypedIncludesFromSection('global-setup');
     }
 
+    /**
+     * @return list<string>
+     */
     public function projectOnlyPaths(): array
     {
         $data = $this->parse();

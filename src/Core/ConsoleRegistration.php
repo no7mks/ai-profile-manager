@@ -43,19 +43,18 @@ final class ConsoleRegistration
         ?PresetRegistry $presetRegistry = null,
     ): void {
         $installArgs = ['installer' => $installer];
-        $showArgs = ['installer' => $installer, 'checker' => $checker];
+        $showCommand = ShowCommand::create($installer, $checker);
         $presetUninstallArgs = ['installer' => $installer, 'checker' => $checker];
         $checkArgs = ['checker' => $checker];
 
         if ($presetRegistry !== null) {
             $installArgs['presetRegistry'] = $presetRegistry;
-            $showArgs['presetRegistry'] = $presetRegistry;
             $presetUninstallArgs['presetRegistry'] = $presetRegistry;
             $checkArgs['presetRegistry'] = $presetRegistry;
         }
 
         $app->addCommand(new InstallCommand(...$installArgs));
-        $app->addCommand(new ShowCommand(...$showArgs));
+        $app->addCommand($showCommand);
         $app->addCommand(new SkillInstallCommand($installer));
         $app->addCommand(new RuleInstallCommand($installer));
         $app->addCommand(new AgentInstallCommand($installer));
