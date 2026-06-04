@@ -3,6 +3,12 @@
     bootstrap="vendor/autoload.php"
     colors="true"
     defaultTestSuite="apm"
+    failOnWarning="true"
+    failOnNotice="true"
+    failOnDeprecation="true"
+    failOnRisky="true"
+    failOnPhpunitDeprecation="true"
+    failOnPhpunitNotice="true"
 >
     <source>
         <include>

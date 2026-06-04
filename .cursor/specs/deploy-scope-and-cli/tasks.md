@@ -101,14 +101,14 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 8, AC 4_
   - [x] 12.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: scope and breaking install`
 
-- [ ] 13. E2E 测试
-  - [ ] 13.1 _脚本_ `tests/test-task-13a.sh`：global-setup → bootstrap → typed add
+- [x] 13. E2E 测试
+  - [x] 13.1 _脚本_ `tests/test-task-13a.sh`：global-setup → bootstrap → typed add
     - _Ref: Requirement 5, 6, 8_
-  - [ ] 13.2 _脚本_ `tests/test-task-13b.sh`：show 双 scope、cleanup、update 非 global 失败
+  - [x] 13.2 _脚本_ `tests/test-task-13b.sh`：show 双 scope、cleanup、update 非 global 失败
     - _Ref: Requirement 7, 9, 10_
-  - [ ] 13.3 _人工_：IDE 验证 → `docs/notes/deploy-scope-platform-verification.md`
+  - [x] 13.3 _人工_：IDE 验证 → `docs/notes/deploy-scope-platform-verification.md`
     - _Ref: Requirement 13, AC 1–4_
-  - [ ] 13.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；`./vendor/bin/phpunit --testsuite e2e`；commit: `+(e2e) by Cursor: deploy scope flows`
+  - [x] 13.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；`./vendor/bin/phpunit --testsuite e2e`；commit: `+(e2e) by Cursor: deploy scope flows`
 
 - [ ] 14. 文档收敛
   - [ ] 14.1 SSOT：`install-behavior.md`、`cli-commands.md`、`abilities-model.md`

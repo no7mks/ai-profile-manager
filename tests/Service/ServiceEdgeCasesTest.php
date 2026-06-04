@@ -830,6 +830,7 @@ final class ServiceEdgeCasesTest extends TestCase
     public function testInstallCommandBareInstallFailsWithGuidance(): void
     {
         $pkg = $this->tmpDir . '/pkg-bare';
+        mkdir($pkg, 0775, true);
         file_put_contents($pkg . '/abilities.yaml', "skills: []\n");
 
         $project = $this->tmpDir . '/project-bare';

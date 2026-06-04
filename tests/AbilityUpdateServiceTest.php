@@ -119,7 +119,6 @@ final class AbilityUpdateServiceTest extends TestCase
         putenv('HOME=' . $home);
         chdir($workspace);
 
-        mkdir($workspace . '/.cursor/skills/shared-skill', 0775, true);
         file_put_contents($workspace . '/.cursor/skills/shared-skill/SKILL.md', "# Project drift\n");
 
         $service = $this->service($baseline);

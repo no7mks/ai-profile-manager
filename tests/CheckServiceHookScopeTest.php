@@ -84,12 +84,11 @@ final class CheckServiceHookScopeTest extends TestCase
             mkdir($baseline . '/hooks', 0775, true);
         }
         file_put_contents($baseline . "/hooks/{$name}.kiro.hook", '{}');
+        mkdir($root . '/.cursor/hooks/' . $name, 0775, true);
         $hookDir = $root . "/.cursor/hooks/{$name}";
-        mkdir($hookDir, 0775, true);
         $cmd = ".cursor/hooks/{$name}/{$name}.sh";
         file_put_contents("{$hookDir}/{$name}.sh", '#!/bin/bash');
         file_put_contents("{$hookDir}/{$name}.json", json_encode(['preToolUse' => [['command' => $cmd]]]));
-        mkdir($root . '/.cursor', 0775, true);
         file_put_contents($root . '/.cursor/hooks.json', json_encode([
             'version' => 1,
             'hooks' => ['preToolUse' => [['command' => $cmd]]],

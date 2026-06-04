@@ -43,7 +43,7 @@ final class UpdateCommandTest extends TestCase
 
     public function testRejectsNonGlobalInvocation(): void
     {
-        $detector = $this->createMock(GlobalInstallDetector::class);
+        $detector = $this->createStub(GlobalInstallDetector::class);
         $detector->method('isGlobalInvocation')->willReturn(false);
 
         $service = $this->createMock(AbilityUpdateService::class);
@@ -58,14 +58,17 @@ final class UpdateCommandTest extends TestCase
 
     public function testGlobalInvocationDelegatesToService(): void
     {
-        $detector = $this->createMock(GlobalInstallDetector::class);
+        $detector = $this->createStub(GlobalInstallDetector::class);
         $detector->method('isGlobalInvocation')->willReturn(true);
 
         $service = $this->createMock(AbilityUpdateService::class);
-        $service->method('reportChanges')->with(false)->willReturn([
-            'lines' => ['All installed abilities are up to date.'],
-            'exit_code' => 0,
-        ]);
+        $service->expects(self::once())
+            ->method('reportChanges')
+            ->with(false)
+            ->willReturn([
+                'lines' => ['All installed abilities are up to date.'],
+                'exit_code' => 0,
+            ]);
 
         $tester = new CommandTester(new UpdateCommand($service, $detector));
         $exit = $tester->execute([]);
@@ -76,14 +79,17 @@ final class UpdateCommandTest extends TestCase
 
     public function testForceOptionPassedToService(): void
     {
-        $detector = $this->createMock(GlobalInstallDetector::class);
+        $detector = $this->createStub(GlobalInstallDetector::class);
         $detector->method('isGlobalInvocation')->willReturn(true);
 
         $service = $this->createMock(AbilityUpdateService::class);
-        $service->method('reportChanges')->with(true)->willReturn([
-            'lines' => ['[ok] Updated skill:demo (project) cursor'],
-            'exit_code' => 0,
-        ]);
+        $service->expects(self::once())
+            ->method('reportChanges')
+            ->with(true)
+            ->willReturn([
+                'lines' => ['[ok] Updated skill:demo (project) cursor'],
+                'exit_code' => 0,
+            ]);
 
         $tester = new CommandTester(new UpdateCommand($service, $detector));
         $exit = $tester->execute(['--force' => true]);

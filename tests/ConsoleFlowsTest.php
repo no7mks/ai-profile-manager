@@ -312,7 +312,7 @@ final class ConsoleFlowsTest extends TestCase
 
     public function testUpdateCommandRejectsNonGlobalInvocation(): void
     {
-        $detector = $this->createMock(GlobalInstallDetector::class);
+        $detector = $this->createStub(GlobalInstallDetector::class);
         $detector->method('isGlobalInvocation')->willReturn(false);
         $service = $this->createMock(AbilityUpdateService::class);
         $service->expects(self::never())->method('reportChanges');

@@ -32,6 +32,8 @@ composer install
 # E2E 测试（通过 bin/apm 入口验证完整生命周期）
 ./vendor/bin/phpunit --testsuite e2e
 
+`phpunit.xml.dist` 已启用严格模式：warning、notice、deprecation、risky、PHPUnit notice/deprecation 均视为失败。
+
 # 覆盖率测试（Coverage）
 ./vendor/bin/phpunit --coverage-text
 

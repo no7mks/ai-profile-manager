@@ -37,7 +37,7 @@ final class GlobalSetupCommandTest extends TestCase
 
     public function testDefinitionHasNoScopeOrPresetArguments(): void
     {
-        $command = new GlobalSetupCommand($this->createMock(GlobalSetupService::class));
+        $command = new GlobalSetupCommand($this->createStub(GlobalSetupService::class));
         $definition = $command->getDefinition();
 
         self::assertFalse($definition->hasOption('scope'));
@@ -146,7 +146,8 @@ final class GlobalSetupCommandTest extends TestCase
     public function testIdempotentRunStillExitsSuccess(): void
     {
         $service = $this->createMock(GlobalSetupService::class);
-        $service->method('run')
+        $service->expects(self::once())
+            ->method('run')
             ->with(false, AppConfig::DEFAULT_TARGETS)
             ->willReturn([
                 'lines' => ['[ok] skill:apm (user) cursor — already up to date'],
@@ -163,7 +164,8 @@ final class GlobalSetupCommandTest extends TestCase
     public function testMissingTargetEmitsSkipWithoutFailingRun(): void
     {
         $service = $this->createMock(GlobalSetupService::class);
-        $service->method('run')
+        $service->expects(self::once())
+            ->method('run')
             ->with(false, ['cursor'])
             ->willReturn([
                 'lines' => [
@@ -184,7 +186,7 @@ final class GlobalSetupCommandTest extends TestCase
 
     public function testSuccessOutputPromptsApmInit(): void
     {
-        $service = $this->createMock(GlobalSetupService::class);
+        $service = $this->createStub(GlobalSetupService::class);
         $service->method('run')->willReturn([
             'lines' => [
                 '[ok] Installed skill:apm (user) cursor',
@@ -203,7 +205,7 @@ final class GlobalSetupCommandTest extends TestCase
 
     public function testServiceFailurePropagatesExitCode(): void
     {
-        $service = $this->createMock(GlobalSetupService::class);
+        $service = $this->createStub(GlobalSetupService::class);
         $service->method('run')->willReturn([
             'lines' => ['[fail] Baseline not found.'],
             'exit_code' => 1,

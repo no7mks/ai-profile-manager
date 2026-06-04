@@ -56,14 +56,10 @@ final class ShowAndUpdateTest extends EndToEndTestCase
         $r = $this->apm(['show', '-t', 'cursor']);
 
         self::assertSame(0, $r['exit'], "stderr: {$r['stderr']}");
-        self::assertStringContainsString('Skills', $r['stdout']);
-        self::assertStringContainsString('graphify', $r['stdout']);
-        self::assertStringContainsString('gitflow', $r['stdout']);
-        self::assertStringContainsString('Rules', $r['stdout']);
-        self::assertStringContainsString('branch-overview', $r['stdout']);
-        self::assertStringContainsString('Agents', $r['stdout']);
-        self::assertStringContainsString('code-reviewer', $r['stdout']);
-        self::assertStringContainsString('[not-installed]', $r['stdout']);
+        self::assertStringContainsString('skill:graphify  not installed', $r['stdout']);
+        self::assertStringContainsString('skill:gitflow  not installed', $r['stdout']);
+        self::assertStringContainsString('rule:branch-overview  not installed', $r['stdout']);
+        self::assertStringContainsString('agent:code-reviewer  not installed', $r['stdout']);
     }
 
     public function testShowReflectsInstalledStatusAfterInstall(): void
@@ -73,7 +69,7 @@ final class ShowAndUpdateTest extends EndToEndTestCase
         $r = $this->apm(['show', '-t', 'cursor']);
 
         self::assertSame(0, $r['exit']);
-        self::assertStringContainsString('[installed] graphify', $r['stdout']);
+        self::assertStringContainsString('skill:graphify  installed', $r['stdout']);
     }
 
     // ─── show: type filter ───────────────────────────────────────────
@@ -83,21 +79,22 @@ final class ShowAndUpdateTest extends EndToEndTestCase
         $r = $this->apm(['show', '-t', 'cursor', '--type', 'skill']);
 
         self::assertSame(0, $r['exit']);
-        self::assertStringContainsString('Skills', $r['stdout']);
-        self::assertStringContainsString('graphify', $r['stdout']);
-        self::assertStringNotContainsString('Rules', $r['stdout']);
-        self::assertStringNotContainsString('Agents', $r['stdout']);
+        self::assertStringContainsString('skill:graphify  not installed', $r['stdout']);
+        self::assertStringContainsString('skill:gitflow  not installed', $r['stdout']);
+        self::assertStringNotContainsString('rule:', $r['stdout']);
+        self::assertStringNotContainsString('agent:', $r['stdout']);
     }
 
     // ─── show: preset mapping ────────────────────────────────────────
 
-    public function testShowDisplaysPresetMapping(): void
+    public function testShowListsPresetMemberAbilities(): void
     {
         $r = $this->apm(['show', '-t', 'cursor']);
 
         self::assertSame(0, $r['exit']);
-        // gitflow skill should show preset: gitflow
-        self::assertStringContainsString('presets: gitflow', $r['stdout']);
+        // Preset membership is not shown; preset-defined abilities still appear in the flat list.
+        self::assertStringContainsString('skill:gitflow  not installed', $r['stdout']);
+        self::assertStringContainsString('rule:branch-overview  not installed', $r['stdout']);
     }
 
     // ─── show: unknown target ────────────────────────────────────────

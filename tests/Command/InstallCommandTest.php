@@ -102,6 +102,7 @@ final class InstallCommandTest extends TestCase
     public function testDefaultPresetShowsMigrationMessage(): void
     {
         $pkg = $this->tmpDir . '/pkg';
+        mkdir($pkg, 0775, true);
         file_put_contents($pkg . '/abilities.yaml', implode("\n", [
             'skills: []',
             'presets:',
