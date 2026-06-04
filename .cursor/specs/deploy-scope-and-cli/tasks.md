@@ -6,17 +6,17 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
 
 ## Tasks
 
-- [ ] 1. Phase 1：Baseline Resolver XDG
-  - [ ] 1.1 扩展 `ComposerBaselineResolverTest`（`~/.composer` → `~/.config/composer` 回退）
+- [x] 1. Phase 1：Baseline Resolver XDG
+  - [x] 1.1 扩展 `ComposerBaselineResolverTest`（`~/.composer` → `~/.config/composer` 回退）
     - RED→GREEN：`./vendor/bin/phpunit --filter ComposerBaselineResolverTest`
     - _Ref: Requirement 1, AC 3–4_
-  - [ ] 1.2 实现 `candidateComposerHomes()` + 重构 `installedJsonPath()` in `ComposerBaselineResolver.php`
+  - [x] 1.2 实现 `candidateComposerHomes()` + 重构 `installedJsonPath()` in `ComposerBaselineResolver.php`
     - _Ref: Requirement 1, AC 1–4_
-  - [ ] 1.3 `CheckServiceTest`：XDG fixture 下非全员 `unknown`
+  - [x] 1.3 `CheckServiceTest`：XDG fixture 下非全员 `unknown`
     - _Ref: Requirement 1, AC 5_
-  - [ ] 1.4 更新 `docs/state/install-behavior.md` baseline 顺序
+  - [x] 1.4 更新 `docs/state/install-behavior.md` baseline 顺序
     - _Ref: Requirement 1, AC 6_
-  - [ ] 1.5 Checkpoint — `./vendor/bin/phpunit`；commit: `+(baseline) by Cursor: XDG composer home fallback`
+  - [x] 1.5 Checkpoint — `./vendor/bin/phpunit`；commit: `+(baseline) by Cursor: XDG composer home fallback`
 
 - [ ] 2. DeployRootResolver
   - [ ] 2.1 `DeployScope` enum（`src/Config/DeployScope.php`）

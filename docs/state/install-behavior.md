@@ -176,10 +176,15 @@ Scaffold **不是** ability（不可由 `cleanup` 卸载）。由 **`apm bootstr
 
 ### Baseline 解析
 
-ComposerBaselineResolver 按以下优先级定位 apm 包安装路径：
+ComposerBaselineResolver 按以下优先级定位 global apm 包安装路径（`install_path`）：
+
 1. 环境变量 `APM_BASELINE_ROOT`（目录存在时使用）
-2. 构造函数注入的 overrideInstallPath
-3. 全局 Composer `~/.composer/vendor/composer/installed.json` 中查找包名
+2. 构造函数注入的 `overrideInstallPath`（DI / 测试）
+3. `COMPOSER_HOME` 下的 `vendor/composer/installed.json`（已设置时仅尝试此路径）
+4. `$HOME/.composer/vendor/composer/installed.json`（首个可读时使用）
+5. `$HOME/.config/composer/vendor/composer/installed.json`（XDG fallback，首个可读时使用）
+
+步骤 3–5 在 `installed.json` 中按包名查找 global apm 包，并据此推导 `install_path`。
 
 Baseline 不可用时，CheckService 返回所有 ability 状态为 `unknown`。
 

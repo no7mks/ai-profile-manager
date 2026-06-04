@@ -104,20 +104,37 @@ final class ComposerBaselineResolver
         return null;
     }
 
+    /**
+     * @return list<string>
+     */
+    public function candidateComposerHomes(): array
+    {
+        $home = (string) getenv('HOME');
+
+        $composerHome = rtrim((string) (getenv('COMPOSER_HOME') ?: ''), DIRECTORY_SEPARATOR);
+        if ($composerHome !== '') {
+            return [$composerHome];
+        }
+
+        if ($home === '') {
+            return [];
+        }
+
+        return [
+            $home . DIRECTORY_SEPARATOR . '.composer',
+            $home . DIRECTORY_SEPARATOR . '.config' . DIRECTORY_SEPARATOR . 'composer',
+        ];
+    }
+
     private function installedJsonPath(): ?string
     {
-        $composerHome = rtrim((string) (getenv('COMPOSER_HOME') ?: ''), DIRECTORY_SEPARATOR);
-        if ($composerHome === '') {
-            $home = (string) getenv('HOME');
-            $composerHome = $home !== '' ? $home . DIRECTORY_SEPARATOR . '.composer' : '';
+        foreach ($this->candidateComposerHomes() as $composerHome) {
+            $path = $composerHome . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'composer' . DIRECTORY_SEPARATOR . 'installed.json';
+            if (is_readable($path)) {
+                return $path;
+            }
         }
 
-        if ($composerHome === '') {
-            return null;
-        }
-
-        $path = $composerHome . DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'composer' . DIRECTORY_SEPARATOR . 'installed.json';
-
-        return $path;
+        return null;
     }
 }

@@ -97,4 +97,83 @@ final class ComposerBaselineResolverTest extends TestCase
 
         self::assertNull($out);
     }
+
+    public function testResolveFallsBackToXdgConfigComposerWhenDotComposerMissing(): void
+    {
+        $home = sys_get_temp_dir() . '/apm-home-xdg-miss-' . bin2hex(random_bytes(4));
+        $this->seedXdgInstalledJson($home, '9.9.9-xdg-only');
+
+        $this->withEnv('HOME', $home);
+        $this->withEnv('APM_BASELINE_ROOT', null);
+        $this->withEnv('COMPOSER_HOME', null);
+
+        $resolver = new ComposerBaselineResolver();
+        $out = $resolver->resolve();
+
+        self::assertNotNull($out);
+        self::assertSame('no7mks/ai-profile-manager', $out['package']);
+        self::assertSame('9.9.9-xdg-only', $out['version']);
+    }
+
+    public function testResolveFallsBackToXdgConfigComposerWhenDotComposerHasNoInstalledJson(): void
+    {
+        $home = sys_get_temp_dir() . '/apm-home-xdg-empty-' . bin2hex(random_bytes(4));
+        mkdir($home . '/.composer/vendor/composer', 0775, true);
+        $this->seedXdgInstalledJson($home, '8.8.8-xdg-fallback');
+
+        $this->withEnv('HOME', $home);
+        $this->withEnv('APM_BASELINE_ROOT', null);
+        $this->withEnv('COMPOSER_HOME', null);
+
+        $resolver = new ComposerBaselineResolver();
+        $out = $resolver->resolve();
+
+        self::assertNotNull($out);
+        self::assertSame('8.8.8-xdg-fallback', $out['version']);
+    }
+
+    public function testResolvePrefersDotComposerOverXdgConfigWhenBothHaveInstalledJson(): void
+    {
+        $home = sys_get_temp_dir() . '/apm-home-xdg-prio-' . bin2hex(random_bytes(4));
+        $this->seedDotComposerInstalledJson($home, '1.1.1-dot-composer-wins');
+        $this->seedXdgInstalledJson($home, '2.2.2-xdg-should-not-win');
+
+        $this->withEnv('HOME', $home);
+        $this->withEnv('APM_BASELINE_ROOT', null);
+        $this->withEnv('COMPOSER_HOME', null);
+
+        $resolver = new ComposerBaselineResolver();
+        $out = $resolver->resolve();
+
+        self::assertNotNull($out);
+        self::assertSame('1.1.1-dot-composer-wins', $out['version']);
+    }
+
+    private function seedDotComposerInstalledJson(string $home, string $version): void
+    {
+        $composerHome = $home . '/.composer';
+        mkdir($composerHome . '/vendor/composer', 0775, true);
+        $this->writeGlobalInstalledJson($composerHome, $version);
+    }
+
+    private function seedXdgInstalledJson(string $home, string $version): void
+    {
+        $composerHome = $home . '/.config/composer';
+        mkdir($composerHome . '/vendor/composer', 0775, true);
+        $this->writeGlobalInstalledJson($composerHome, $version);
+    }
+
+    private function writeGlobalInstalledJson(string $composerHome, string $version): void
+    {
+        file_put_contents(
+            $composerHome . '/vendor/composer/installed.json',
+            json_encode([
+                'packages' => [[
+                    'name' => 'no7mks/ai-profile-manager',
+                    'version' => $version,
+                    'dist' => ['reference' => 'ref-' . $version],
+                ]],
+            ], JSON_UNESCAPED_SLASHES),
+        );
+    }
 }
