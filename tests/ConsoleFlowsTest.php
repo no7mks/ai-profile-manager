@@ -17,7 +17,8 @@ use AiProfileManager\Command\UpdateCommand;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
+use AiProfileManager\Service\AbilityUpdateService;
+use AiProfileManager\Service\GlobalInstallDetector;
 use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -351,28 +352,18 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('code-reviewer', $tester->getDisplay());
     }
 
-    public function testUpdateCommandWritesKnowledgeBase(): void
+    public function testUpdateCommandRejectsNonGlobalInvocation(): void
     {
-        $home = sys_get_temp_dir() . '/apm-flow-up-' . bin2hex(random_bytes(4));
-        mkdir($home, 0775, true);
+        $detector = $this->createMock(GlobalInstallDetector::class);
+        $detector->method('isGlobalInvocation')->willReturn(false);
+        $service = $this->createMock(AbilityUpdateService::class);
+        $service->expects(self::never())->method('reportChanges');
 
-        $oldHome = getenv('HOME');
-        try {
-            putenv('HOME=' . $home);
+        $tester = new CommandTester(new UpdateCommand($service, $detector));
+        $exit = $tester->execute([]);
 
-            $cmd = new UpdateCommand(new KnowledgeBaseUpdater());
-            $tester = new CommandTester($cmd);
-            $exit = $tester->execute([]);
-        } finally {
-            if ($oldHome === false) {
-                putenv('HOME');
-            } else {
-                putenv('HOME=' . $oldHome);
-            }
-        }
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertFileExists($home . '/.config/apm/knowledge-base.json');
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('global apm', $tester->getDisplay());
     }
 
     public function testShowCommandListsInstallableItemsWithStatus(): void

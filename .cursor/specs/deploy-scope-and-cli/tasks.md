@@ -62,14 +62,14 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 9; Requirement 2, AC 4_
   - [x] 7.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(show) by Cursor: three-state presenter`
 
-- [ ] 8. Update 重写 + 删 KnowledgeBaseUpdater
-  - [ ] 8.1 `GlobalInstallDetector` + 测试
+- [x] 8. Update 重写 + 删 KnowledgeBaseUpdater
+  - [x] 8.1 `GlobalInstallDetector` + 测试
     - _Ref: Requirement 10, AC 1_
-  - [ ] 8.2 `AbilityUpdateService`（双侧枚举；`--force` 各自覆盖）
+  - [x] 8.2 `AbilityUpdateService`（双侧枚举；`--force` 各自覆盖）
     - _Ref: Requirement 10, AC 2–4_
-  - [ ] 8.3 重写 `UpdateCommand`；删 `KnowledgeBaseUpdater`、测试、DI、`architecture.md` 引用
+  - [x] 8.3 重写 `UpdateCommand`；删 `KnowledgeBaseUpdater`、测试、DI、`architecture.md` 引用
     - _Ref: Requirement 10; design D-CR3 A_
-  - [ ] 8.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(update) by Cursor: global-only baseline update`
+  - [x] 8.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(update) by Cursor: global-only baseline update`
 
 - [ ] 9. global-setup 命令
   - [ ] 9.1 `GlobalSetupCommandTest`（仅列表、user、幂等/force、skip、提示 init）

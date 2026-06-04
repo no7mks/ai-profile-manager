@@ -50,7 +50,6 @@ require '{$vendorAutoload}';
 use AiProfileManager\Core\Application;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -63,9 +62,8 @@ if (\$registry !== null) {
     \$installerArgs['registry'] = \$registry;
 }
 \$installer = new Installer(...\$installerArgs);
-\$updater = new KnowledgeBaseUpdater();
 \$presetRegistry = \$registry !== null ? new PresetRegistry(\$registry) : null;
-\$app = Application::createSymfonyApplication(\$installer, \$updater, \$presetRegistry);
+\$app = Application::createSymfonyApplication(\$installer, \$presetRegistry);
 exit(\$app->run(new ArgvInput(\$argv), new ConsoleOutput()));
 PHP;
         file_put_contents($this->wrapperScript, $script);

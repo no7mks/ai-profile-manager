@@ -6,7 +6,6 @@ namespace AiProfileManager\Tests;
 
 use AiProfileManager\Core\Application;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
@@ -15,7 +14,7 @@ final class ApplicationRunTest extends TestCase
 {
     public function testCreateSymfonyApplicationRegistersAllCommands(): void
     {
-        $app = Application::createSymfonyApplication(new Installer(), new KnowledgeBaseUpdater());
+        $app = Application::createSymfonyApplication(new Installer());
         $app->setAutoExit(false);
 
         self::assertTrue($app->has('install'));
@@ -35,7 +34,7 @@ final class ApplicationRunTest extends TestCase
 
     public function testCreateSymfonyApplicationCanRunListCommand(): void
     {
-        $app = Application::createSymfonyApplication(new Installer(), new KnowledgeBaseUpdater());
+        $app = Application::createSymfonyApplication(new Installer());
         $app->setAutoExit(false);
         $output = new BufferedOutput();
         $exit = $app->run(new ArrayInput(['command' => 'list']), $output);
@@ -50,12 +49,9 @@ final class ApplicationRunTest extends TestCase
         self::assertInstanceOf(Application::class, $app);
     }
 
-    public function testApplicationConstructorAcceptsCustomDependencies(): void
+    public function testApplicationConstructorAcceptsCustomInstaller(): void
     {
-        $app = new Application(
-            installer: new Installer(),
-            updater: new KnowledgeBaseUpdater(),
-        );
+        $app = new Application(installer: new Installer());
         self::assertInstanceOf(Application::class, $app);
     }
 }

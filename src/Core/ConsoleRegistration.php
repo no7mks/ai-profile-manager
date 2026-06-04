@@ -24,7 +24,6 @@ use AiProfileManager\Command\SkillUninstallCommand;
 use AiProfileManager\Command\UpdateCommand;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
@@ -39,7 +38,6 @@ final class ConsoleRegistration
         SymfonyApplication $app,
         Installer $installer,
         CheckService $checker,
-        KnowledgeBaseUpdater $updater,
         ?PresetRegistry $presetRegistry = null,
     ): void {
         $installArgs = ['installer' => $installer];
@@ -70,6 +68,6 @@ final class ConsoleRegistration
         $app->addCommand(new PresetAddAbilityCommand($presetRegistry));
         $app->addCommand(new PresetRemoveAbilityCommand($presetRegistry));
         $app->addCommand(new PresetDeleteCommand($presetRegistry));
-        $app->addCommand(new UpdateCommand($updater));
+        $app->addCommand(UpdateCommand::create($installer));
     }
 }

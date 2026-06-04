@@ -13,7 +13,6 @@ use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\GitIgnoreTemplateService;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
 use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
@@ -51,11 +50,10 @@ final class CommandErrorPathsTest extends TestCase
         $registry = new AbilityRegistry($yamlPath);
         $installer = new Installer(registry: $registry, packageRoot: $this->tmpDir);
         $checker = new CheckService();
-        $updater = new KnowledgeBaseUpdater();
         $presetRegistry = new PresetRegistry($registry);
 
         $app = new Application();
-        ConsoleRegistration::register($app, $installer, $checker, $updater, $presetRegistry);
+        ConsoleRegistration::register($app, $installer, $checker, $presetRegistry);
 
         // Verify commands are registered (the presetRegistry branch was exercised)
         self::assertTrue($app->has('install'));

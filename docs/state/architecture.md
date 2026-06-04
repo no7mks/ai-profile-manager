@@ -10,7 +10,7 @@ apm 系统架构与模块边界。
 |------|------|
 | CLI Commands (ConsoleRegistration) | Symfony Console 命令注册与参数解析；统一在 `ConsoleRegistration::register()` 中完成所有命令的实例化与注入 |
 | InstallCommand | 安装 preset 中的 ability 到目标平台；无 preset 参数时执行 bootstrap（scaffold + scope rules + 默认 skill/agent） |
-| ShowCommand | 展示所有可安装 ability（skill/agent/rule/hook）及其安装状态与 preset 映射；支持 `--type` 选项按类型过滤输出 |
+| ShowCommand | 展示 conventional ability 安装状态（三态、user/project scope）；支持 `--scope`、`--type` |
 | CheckCommand | 检查指定 preset 中所有 ability 在目标平台的安装状态 |
 | SkillInstallCommand / RuleInstallCommand / AgentInstallCommand | 按类型安装单个或多个 ability |
 | SkillUninstallCommand / RuleUninstallCommand / AgentUninstallCommand | 按类型卸载单个或多个 ability；卸载前执行 drift 检查 |
@@ -19,7 +19,7 @@ apm 系统架构与模块边界。
 | PresetCreateCommand | 在 abilities.yaml 的 presets section 中创建新 preset |
 | PresetAddAbilityCommand / PresetRemoveAbilityCommand | 向 preset 添加/移除 ability 引用 |
 | PresetDeleteCommand | 删除 preset 定义 |
-| UpdateCommand | 更新本地 knowledge base 快照 |
+| UpdateCommand | 从 global baseline 报告或覆盖 user/project 已安装 conventional ability 差异；仅 global `vendor/bin` 可执行 |
 | AbilityRegistry | 解析 abilities.yaml，按 section 返回结构化 AbilityEntry 列表；验证必填字段并收集错误后一次性报告 |
 | Installer | 委托 AbilityRegistry 获取 ability 列表，按类型分发安装/卸载：skill/rule/agent 走文件复制，hook 走 HookInstaller，gitignore 走 GitIgnoreTemplateService |
 | CheckService | 对比已安装 ability 与源文件的 diff 状态；hook 委托 HookChecker；输出 exit code（有 modified/missing → 2） |
@@ -31,7 +31,8 @@ apm 系统架构与模块边界。
 | ComposerBaselineResolver | 解析全局 Composer installed.json 定位 apm 包安装路径；支持 `APM_BASELINE_ROOT` 环境变量覆盖 |
 | PresetRegistry | Preset 定义管理：读取 abilities.yaml 的 presets section |
 | ProjectInitializer | 项目 bootstrap：复制 scaffold（docs/、issues/、AGENTS.md）+ 安装平台 scope rules |
-| KnowledgeBaseUpdater | 将当前 ability 列表写入 `~/.config/apm/knowledge-base.json` 供外部工具查询 |
+| AbilityUpdateService | 枚举 user/project 已安装项，对比 baseline diff；`--force` 时从 baseline 覆盖 |
+| GlobalInstallDetector | 判断 argv[0] 是否位于 Composer global `vendor/bin` |
 | GitIgnoreTemplateService | 操作 `.gitignore` 中的 managed section：从模板文件按 `@apm:block` 渲染规则并 merge 到目标文件 |
 | Prompts（abilities.yaml section） | abilities.yaml 支持 prompts section，定义 post-install 指令消息；Installer.installTyped() 在安装完成后解析 prompts 条目并输出 post-install instructions |
 | AppConfig | 静态配置常量：KNOWN_TARGETS、DEFAULT_TARGETS、DEFAULT_SKILLS/RULES/AGENTS、KNOWN_PRESETS |

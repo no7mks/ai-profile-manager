@@ -112,18 +112,12 @@ final class ShowAndUpdateTest extends EndToEndTestCase
 
     // ─── update: writes knowledge base ───────────────────────────────
 
-    public function testUpdateWritesKnowledgeBase(): void
+    public function testUpdateRejectsNonGlobalE2eInvocation(): void
     {
-        $homeDir = $this->workspace . '/fakehome';
-        mkdir($homeDir, 0775, true);
+        $r = $this->apm(['update']);
 
-        $r = $this->apm(['update'], ['HOME' => $homeDir]);
-
-        self::assertSame(0, $r['exit'], "stderr: {$r['stderr']}");
-        self::assertFileExists($homeDir . '/.config/apm/knowledge-base.json');
-
-        $kb = json_decode(file_get_contents($homeDir . '/.config/apm/knowledge-base.json'), true);
-        self::assertIsArray($kb);
+        self::assertSame(1, $r['exit']);
+        self::assertStringContainsString('global apm', $r['stdout'] . $r['stderr']);
     }
 
     // ─── Gitignore management ────────────────────────────────────────

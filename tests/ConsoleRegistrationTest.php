@@ -7,7 +7,6 @@ namespace AiProfileManager\Tests;
 use AiProfileManager\Core\ConsoleRegistration;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 
@@ -21,10 +20,8 @@ final class ConsoleRegistrationTest extends TestCase
         $registry = new \AiProfileManager\Service\AbilityRegistry($tmp . '/abilities.yaml');
         $installer = new Installer(registry: $registry, packageRoot: $tmp);
         $checker = new CheckService();
-        $updater = new KnowledgeBaseUpdater();
-
         $app = new Application();
-        ConsoleRegistration::register($app, $installer, $checker, $updater);
+        ConsoleRegistration::register($app, $installer, $checker);
 
         $names = [
             'install',
