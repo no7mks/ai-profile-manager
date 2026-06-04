@@ -85,12 +85,12 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 8, AC 1, 4; Requirement 4, AC 3_
   - [x] 10.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: bootstrap and reject bare install`
 
-- [ ] 11. cleanup 命令
-  - [ ] 11.1 `CleanupCommandTest`（registry 全枚举，仅 project 卸载）
+- [x] 11. cleanup 命令
+  - [x] 11.1 `CleanupCommandTest`（registry 全枚举，仅 project 卸载）
     - _Ref: Requirement 7, AC 1–2; design D-CR4 A_
-  - [ ] 11.2 `CleanupCommand` + 注册
+  - [x] 11.2 `CleanupCommand` + 注册
     - _Ref: Requirement 7, AC 3_
-  - [ ] 11.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: cleanup command`
+  - [x] 11.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: cleanup command`
 
 - [ ] 12. install 族 scope 与同义词
   - [ ] 12.1 install/uninstall 族 `--scope` + `ScopeGuard`（D-CR2 A）

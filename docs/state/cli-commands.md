@@ -238,6 +238,24 @@ apm 所有已注册命令的签名、行为与错误条件。
 
 ---
 
+## cleanup
+
+**签名**: `cleanup`
+
+**正常行为**:
+
+1. 调用 `Installer::uninstallProjectScope()`：遍历 AbilityRegistry 中全部 skill、rule、agent、hook
+2. 对每个 target 用 InstallationProbe 探测 project scope 是否已安装；已安装则执行对应卸载（hook 走 `uninstallHook`）
+3. 输出卸载过程行；全部成功时提示可通过 `/apm init` 重装 project ability（user-scope `global-setup` 不变）
+
+**错误条件**:
+
+| 条件 | 响应 |
+|------|------|
+| 任一卸载步骤失败 | 输出 `[fail]` 行，exit FAILURE |
+
+---
+
 ## preset:create
 
 **签名**: `preset:create <name> [--skill NAME...] [--rule NAME...] [--agent NAME...]`

@@ -9,6 +9,7 @@ use AiProfileManager\Command\BootstrapCommand;
 use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\AgentUninstallCommand;
 use AiProfileManager\Command\CheckCommand;
+use AiProfileManager\Command\CleanupCommand;
 use AiProfileManager\Command\GlobalSetupCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
@@ -73,5 +74,6 @@ final class ConsoleRegistration
         $app->addCommand(new PresetDeleteCommand($presetRegistry));
         $app->addCommand(UpdateCommand::create($installer));
         $app->addCommand(GlobalSetupCommand::create($installer));
+        $app->addCommand(new CleanupCommand($installer));
     }
 }
