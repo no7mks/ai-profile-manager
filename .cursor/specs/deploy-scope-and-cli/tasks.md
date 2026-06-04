@@ -25,14 +25,14 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 3, AC 2–3, 5_
   - [x] 2.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(scope) by Cursor: DeployRootResolver`
 
-- [ ] 3. Registry：scopes、global-setup、删 default
-  - [ ] 3.1 `AbilityEntry.scopes` 解析，默认 `[project]`
+- [x] 3. Registry：scopes、global-setup、删 default
+  - [x] 3.1 `AbilityEntry.scopes` 解析，默认 `[project]`
     - _Ref: Requirement 3, AC 7; Requirement 4, AC 5_
-  - [ ] 3.2 `globalSetupIncludes()`、`projectOnlyPaths()`、`getEntry()` + 测试
+  - [x] 3.2 `globalSetupIncludes()`、`projectOnlyPaths()`、`getEntry()` + 测试
     - _Ref: Requirement 4, AC 1, 4, 7_
-  - [ ] 3.3 `abilities.yaml`：`global-setup.includes`、per-entry `scopes`、删 preset `default`
+  - [x] 3.3 `abilities.yaml`：`global-setup.includes`、per-entry `scopes`、删 preset `default`
     - _Ref: Requirement 4, AC 1–3_
-  - [ ] 3.4 Checkpoint — `./vendor/bin/phpunit`；commit: `+(registry) by Cursor: global-setup and scopes`
+  - [x] 3.4 Checkpoint — `./vendor/bin/phpunit`；commit: `+(registry) by Cursor: global-setup and scopes`
 
 - [ ] 4. ScopeGuard
   - [ ] 4.1 `InvalidScopeException`

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
+use AiProfileManager\Config\DeployScope;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -103,9 +104,16 @@ final class AbilityRegistry
                     $missing[] = 'targets';
                 }
 
+                $entryId = $entry['path'] ?? $entry['description'] ?? "#{$index}";
+
                 if ($missing !== []) {
-                    $entryId = $entry['path'] ?? $entry['description'] ?? "#{$index}";
                     $errors[] = "{$section}[{$entryId}]: missing required field(s): " . implode(', ', $missing);
+                    continue;
+                }
+
+                $scopesResult = self::resolveScopes($entry);
+                if (isset($scopesResult['error'])) {
+                    $errors[] = "{$section}[{$entryId}]: {$scopesResult['error']}";
                     continue;
                 }
 
@@ -114,6 +122,7 @@ final class AbilityRegistry
                     description: $entry['description'],
                     targets: $entry['targets'],
                     type: $type,
+                    scopes: $scopesResult['scopes'],
                 );
             }
         }
@@ -133,5 +142,133 @@ final class AbilityRegistry
     public static function knownSections(): array
     {
         return ['rules', 'agents', 'skills', 'hooks', 'gitignore', 'presets', 'prompts'];
+    }
+
+    public function globalSetupIncludes(): array
+    {
+        return $this->parseTypedIncludesFromSection('global-setup');
+    }
+
+    public function projectOnlyPaths(): array
+    {
+        $data = $this->parse();
+        $paths = [];
+        foreach (['rules', 'agents', 'skills', 'hooks'] as $section) {
+            foreach ($data[$section] as $entry) {
+                if ($entry->scopes === ['project']) {
+                    $paths[] = $entry->path;
+                }
+            }
+        }
+        foreach ($data['gitignore'] as $gi) {
+            if (is_string($gi['marker'] ?? null)) {
+                $paths[] = $gi['marker'];
+            }
+        }
+        foreach ($data['prompts'] as $prompt) {
+            if (is_string($prompt['name'] ?? null)) {
+                $paths[] = $prompt['name'];
+            }
+        }
+        return $paths;
+    }
+
+    public function getEntry(string $type, string $path): ?AbilityEntry
+    {
+        $section = match ($type) {
+            'rule' => 'rules', 'agent' => 'agents', 'skill' => 'skills', 'hook' => 'hooks',
+            default => null,
+        };
+        if ($section === null) {
+            return null;
+        }
+        foreach ($this->parse()[$section] as $entry) {
+            if ($entry->path === $path && $entry->type === $type) {
+                return $entry;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param array<string, mixed> $entry
+     * @return array{scopes: list<string>}|array{error: string}
+     */
+    private static function resolveScopes(array $entry): array
+    {
+        if (!isset($entry['scopes'])) {
+            return ['scopes' => ['project']];
+        }
+
+        $scopes = $entry['scopes'];
+        if (!is_array($scopes) || $scopes === []) {
+            return ['error' => 'scopes must be a non-empty list'];
+        }
+
+        $allowed = implode(', ', array_map(static fn (DeployScope $s): string => $s->value, DeployScope::cases()));
+        $resolved = [];
+
+        foreach ($scopes as $scopeIndex => $scope) {
+            if (!is_string($scope)) {
+                return ['error' => "scopes[{$scopeIndex}] must be a string"];
+            }
+
+            if (DeployScope::tryFrom($scope) === null) {
+                return ['error' => "invalid scope '{$scope}' in scopes (allowed: {$allowed})"];
+            }
+
+            $resolved[] = $scope;
+        }
+
+        return ['scopes' => $resolved];
+    }
+
+    /** @return list<array{type: string, path: string}> */
+    private function parseTypedIncludesFromSection(string $sectionKey): array
+    {
+        $data = $this->readRawYaml();
+        if (!is_array($data[$sectionKey] ?? null)) {
+            return [];
+        }
+        if (!is_array($includes = $data[$sectionKey]['includes'] ?? null)) {
+            return [];
+        }
+        $result = [];
+        foreach ($includes as $entry) {
+            if (!is_string($entry)) {
+                continue;
+            }
+            $colonPos = strpos($entry, ':');
+            if ($colonPos === false) {
+                continue;
+            }
+            $type = substr($entry, 0, $colonPos);
+            $path = substr($entry, $colonPos + 1);
+            if ($type !== '' && $path !== '') {
+                $result[] = ['type' => $type, 'path' => $path];
+            }
+        }
+        return $result;
+    }
+
+    /** @return array<string, mixed> */
+    private function readRawYaml(): array
+    {
+        if (!is_file($this->registryPath)) {
+            throw AbilityRegistryException::fileNotFound($this->registryPath);
+        }
+        $content = file_get_contents($this->registryPath);
+        if ($content === false) {
+            throw AbilityRegistryException::fileNotFound($this->registryPath);
+        }
+        try {
+            $data = Yaml::parse($content);
+        } catch (ParseException $e) {
+            throw AbilityRegistryException::invalidYaml($this->registryPath, $e->getMessage());
+        }
+        if (!is_array($data)) {
+            throw AbilityRegistryException::invalidYaml($this->registryPath, 'Root element must be a mapping');
+        }
+        return $data;
     }
 }

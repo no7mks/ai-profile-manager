@@ -69,6 +69,7 @@ YAML;
         self::assertSame('A test rule', $result['rules'][0]->description);
         self::assertSame(['cursor' => '.cursor/rules/my-rule.mdc', 'kiro' => '.kiro/steering/my-rule.md'], $result['rules'][0]->targets);
         self::assertSame('rule', $result['rules'][0]->type);
+        self::assertSame(['project'], $result['rules'][0]->scopes);
 
         self::assertCount(1, $result['agents']);
         self::assertSame('my-agent', $result['agents'][0]->path);
