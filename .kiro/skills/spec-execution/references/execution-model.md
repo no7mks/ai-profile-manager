@@ -83,7 +83,7 @@ failure
 
 - checkpoint task 必须执行其描述中指定的验证命令
 - 通过标准：测试全部通过 + 输出干净（无 compiler warning、无 deprecation warning、无异常堆栈）
-- **State 同步**：checkpoint commit 前，必须将本 top-level task 实现的功能行为、边界条件、错误处理、配置格式等更新到 `docs/state/` 对应文件
+- **State 同步**：若本 top-level task 改变了系统事实（行为、边界、配置等），在 checkpoint commit 前更新对应 `docs/state/` 文件；无变化可省略
 - 未通过 checkpoint，不得标记完成
 - checkpoint 失败时，修复问题后重新执行验证，直到通过
 
@@ -98,6 +98,10 @@ failure
 ### Code Review
 
 委托给 `code-reviewer` sub-agent 执行，不在当前 sub-agent 上下文中内联执行。
+
+### 关闭 Issue
+
+凡 task 要求将 `issues/` 下文件标为 `closed` 或填写 `Fixed In`，**必须先读取** `issues/README.md` 的规则，再改 issue 文件。
 
 ### Release Stabilize
 
@@ -123,7 +127,7 @@ failure
 
 **Issue 修复规则**：
 - 修复前必须先编写 reproduction test
-- 修复后重新执行对应测试项，确认通过后更新 issue 状态为 closed
+- 修复后重新执行对应测试项，确认通过后按上文「关闭 Issue」更新 issue（含 `Fixed In` 等字段）
 
 **Beta Tag**：
 - beta tag 由用户手动控制，agent 不可自主打

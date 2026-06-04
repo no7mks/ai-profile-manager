@@ -17,7 +17,8 @@ use AiProfileManager\Command\UpdateCommand;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
+use AiProfileManager\Service\AbilityUpdateService;
+use AiProfileManager\Service\GlobalInstallDetector;
 use AiProfileManager\Service\PresetRegistry;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
@@ -147,73 +148,31 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('Unknown targets', $tester->getDisplay());
     }
 
-    public function testInstallCommandWithoutPresetRunsBootstrap(): void
+    public function testInstallCommandWithoutPresetFailsWithGuidance(): void
     {
-        $tmp = sys_get_temp_dir() . '/apm-flow-bootstrap-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-bare-install-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
-
-        // Create a fake package root with scaffold files and abilities for the bootstrap flow
-        $pkg = sys_get_temp_dir() . '/apm-flow-bootstrap-pkg-' . bin2hex(random_bytes(4));
-        // Scaffold files (at package root level)
-        mkdir($pkg . '/docs', 0775, true);
-        mkdir($pkg . '/issues', 0775, true);
-        file_put_contents($pkg . '/docs/README.md', "# Docs\n");
-        file_put_contents($pkg . '/issues/README.md', "# Issues\n");
-        file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
-        // Scope rules (source files matching createRegistry target paths)
-        mkdir($pkg . '/.cursor/rules', 0775, true);
-        mkdir($pkg . '/.kiro/rules', 0775, true);
-        file_put_contents($pkg . '/.cursor/rules/cursor-scope', "cursor-scope\n");
-        file_put_contents($pkg . '/.kiro/rules/cursor-scope', "cursor-scope\n");
-        file_put_contents($pkg . '/.cursor/rules/kiro-scope', "kiro-scope\n");
-        file_put_contents($pkg . '/.kiro/rules/kiro-scope', "kiro-scope\n");
-        // Abilities for Installer at Source-is-Target paths
-        mkdir($pkg . '/.cursor/skills/apm', 0775, true);
-        mkdir($pkg . '/.kiro/skills/apm', 0775, true);
-        file_put_contents($pkg . '/.cursor/skills/apm/SKILL.md', "# APM\n");
-        file_put_contents($pkg . '/.kiro/skills/apm/SKILL.md', "# APM\n");
-        // Agents: createRegistry generates target as .cursor/agents/code-reviewer (no extension)
-        mkdir($pkg . '/.cursor/agents', 0775, true);
-        mkdir($pkg . '/.kiro/agents', 0775, true);
-        file_put_contents($pkg . '/.cursor/agents/code-reviewer', "# Code Reviewer\n");
-        file_put_contents($pkg . '/.kiro/agents/code-reviewer', "# Code Reviewer\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
 
-        $registry = self::createRegistry($pkg, [
-            'skills' => [['path' => 'apm']],
-            'rules' => [
-                ['path' => 'cursor-scope', 'description' => 'Cursor scope'],
-                ['path' => 'kiro-scope', 'description' => 'Kiro scope'],
-            ],
-            'agents' => [['path' => 'code-reviewer']],
-        ], [
-            ['name' => 'default', 'includes' => ['skill:apm', 'agent:code-reviewer', 'rule:cursor-scope', 'rule:kiro-scope']],
-        ]);
+        $registry = self::createRegistry($tmp);
         $presetRegistry = new PresetRegistry($registry);
-        $initializer = new \AiProfileManager\Service\ProjectInitializer($pkg);
-        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $pkg), $initializer, $presetRegistry);
+        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $tmp), presetRegistry: $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute([]);
 
         chdir($old);
 
-        self::assertSame(Command::SUCCESS, $exit);
-        // Scaffold files copied
-        self::assertFileExists($tmp . '/docs/README.md');
-        self::assertFileExists($tmp . '/issues/README.md');
-        self::assertFileExists($tmp . '/AGENTS.md');
-        // Scope rules installed via default preset
-        self::assertFileExists($tmp . '/.cursor/rules/cursor-scope');
-        self::assertFileExists($tmp . '/.kiro/rules/kiro-scope');
-        // Default skills/agents installed
-        self::assertFileExists($tmp . '/.cursor/skills/apm/SKILL.md');
-        self::assertFileExists($tmp . '/.kiro/skills/apm/SKILL.md');
-        self::assertFileExists($tmp . '/.cursor/agents/code-reviewer');
-        self::assertFileExists($tmp . '/.kiro/agents/code-reviewer');
-        self::assertStringContainsString("/apm init", $tester->getDisplay());
+        self::assertSame(Command::FAILURE, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('Install requires a preset name', $display);
+        self::assertStringContainsString('apm global-setup', $display);
+        self::assertStringContainsString('apm bootstrap', $display);
+        self::assertStringContainsString('apm add skill|rule|agent|preset', $display);
+        self::assertStringNotContainsString('Installing scaffold', $display);
+        self::assertStringNotContainsString('Installing default preset', $display);
     }
 
     public function testCheckCommandRunsForKnownPreset(): void
@@ -351,31 +310,21 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('code-reviewer', $tester->getDisplay());
     }
 
-    public function testUpdateCommandWritesKnowledgeBase(): void
+    public function testUpdateCommandRejectsNonGlobalInvocation(): void
     {
-        $home = sys_get_temp_dir() . '/apm-flow-up-' . bin2hex(random_bytes(4));
-        mkdir($home, 0775, true);
+        $detector = $this->createStub(GlobalInstallDetector::class);
+        $detector->method('isGlobalInvocation')->willReturn(false);
+        $service = $this->createMock(AbilityUpdateService::class);
+        $service->expects(self::never())->method('reportChanges');
 
-        $oldHome = getenv('HOME');
-        try {
-            putenv('HOME=' . $home);
+        $tester = new CommandTester(new UpdateCommand($service, $detector));
+        $exit = $tester->execute([]);
 
-            $cmd = new UpdateCommand(new KnowledgeBaseUpdater());
-            $tester = new CommandTester($cmd);
-            $exit = $tester->execute([]);
-        } finally {
-            if ($oldHome === false) {
-                putenv('HOME');
-            } else {
-                putenv('HOME=' . $oldHome);
-            }
-        }
-
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertFileExists($home . '/.config/apm/knowledge-base.json');
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('global apm', $tester->getDisplay());
     }
 
-    public function testShowCommandListsInstallableItemsAndPresetMapping(): void
+    public function testShowCommandListsInstallableItemsWithStatus(): void
     {
         $tmp = sys_get_temp_dir() . '/apm-show-' . bin2hex(random_bytes(4));
         $baseline = sys_get_temp_dir() . '/apm-show-base-' . bin2hex(random_bytes(4));
@@ -406,8 +355,8 @@ final class ConsoleFlowsTest extends TestCase
         ], [
             ['name' => 'demo', 'includes' => ['skill:graphify', 'rule:spec-goal', 'agent:code-reviewer']],
         ]);
-        $presetRegistry = new PresetRegistry($registry);
-        $cmd = new ShowCommand(new Installer(registry: $registry, packageRoot: $baseline), new CheckService(), $presetRegistry);
+        $installer = new Installer(registry: $registry, packageRoot: $baseline);
+        $cmd = ShowCommand::create($installer, new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor']]);
 
@@ -420,13 +369,14 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
-        self::assertStringContainsString('Skills', $display);
-        self::assertStringContainsString('[installed] graphify', $display);
-        self::assertStringContainsString('presets: demo', $display);
-        self::assertStringContainsString('Rules', $display);
-        self::assertStringContainsString('spec-goal', $display);
-        self::assertStringContainsString('Agents', $display);
-        self::assertStringContainsString('code-reviewer', $display);
+        self::assertStringContainsString('skill:graphify  installed (project)', $display);
+        self::assertStringContainsString('skill:gitflow  not installed', $display);
+        self::assertStringContainsString('rule:spec-goal  not installed', $display);
+        self::assertStringContainsString('agent:code-reviewer  not installed', $display);
+        self::assertStringNotContainsString('presets:', $display);
+        self::assertStringNotContainsString('demo', $display);
+        self::assertStringNotContainsString('[installed]', $display);
+        self::assertStringNotContainsString('Skills', $display);
     }
 
     public function testShowCommandUnknownTargetFails(): void
@@ -434,7 +384,7 @@ final class ConsoleFlowsTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-show-unk-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $registry = self::createRegistry($tmp);
-        $cmd = new ShowCommand(new Installer(registry: $registry, packageRoot: $tmp), new CheckService());
+        $cmd = ShowCommand::create(new Installer(registry: $registry, packageRoot: $tmp), new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['not-a-target']]);
 
@@ -461,7 +411,7 @@ final class ConsoleFlowsTest extends TestCase
         $registry = self::createRegistry($packageRoot, [
             'skills' => [['path' => 'graphify']],
         ]);
-        $cmd = new ShowCommand(new Installer(registry: $registry, packageRoot: $packageRoot), new CheckService());
+        $cmd = ShowCommand::create(new Installer(registry: $registry, packageRoot: $packageRoot), new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor']]);
 
@@ -478,7 +428,8 @@ final class ConsoleFlowsTest extends TestCase
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('[installed] graphify', $tester->getDisplay());
+        self::assertStringContainsString('skill:graphify  installed (project)', $tester->getDisplay());
+        self::assertStringNotContainsString('[installed]', $tester->getDisplay());
     }
 
     public function testShowCommandMarksInstalledWhenAnyTargetIsInstalled(): void
@@ -500,7 +451,7 @@ final class ConsoleFlowsTest extends TestCase
         $registry = self::createRegistry($packageRoot, [
             'skills' => [['path' => 'graphify']],
         ]);
-        $cmd = new ShowCommand(new Installer(registry: $registry, packageRoot: $packageRoot), new CheckService());
+        $cmd = ShowCommand::create(new Installer(registry: $registry, packageRoot: $packageRoot), new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor', 'kiro']]);
 
@@ -517,8 +468,10 @@ final class ConsoleFlowsTest extends TestCase
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('Targets: cursor, kiro', $tester->getDisplay());
-        self::assertStringContainsString('[installed] graphify', $tester->getDisplay());
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('skill:graphify  installed (project)', $display);
+        self::assertStringContainsString('cursor, kiro', $display);
+        self::assertStringNotContainsString('[installed]', $display);
     }
 
     public function testShowCommandRendersNoneForEmptyAbilities(): void
@@ -537,7 +490,7 @@ final class ConsoleFlowsTest extends TestCase
         chdir($tmp);
 
         $registry = self::createRegistry($packageRoot);
-        $cmd = new ShowCommand(new Installer(registry: $registry, packageRoot: $packageRoot), new CheckService());
+        $cmd = ShowCommand::create(new Installer(registry: $registry, packageRoot: $packageRoot), new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor']]);
 
@@ -554,11 +507,7 @@ final class ConsoleFlowsTest extends TestCase
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        $display = $tester->getDisplay();
-        self::assertStringContainsString('Skills', $display);
-        self::assertStringContainsString('Agents', $display);
-        self::assertStringContainsString('Rules', $display);
-        self::assertStringContainsString('  (none)', $display);
+        self::assertSame('', trim($tester->getDisplay()));
     }
 
     /**
@@ -590,7 +539,7 @@ final class ConsoleFlowsTest extends TestCase
 
         $registry = new AbilityRegistry($packageRoot . '/abilities.yaml');
         $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
-        $cmd = new ShowCommand($installer, new CheckService());
+        $cmd = ShowCommand::create($installer, new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor']]);
 
@@ -603,8 +552,8 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
-        self::assertStringContainsString('Hooks', $display);
-        self::assertStringContainsString('check-write-length', $display);
+        self::assertStringContainsString('hook:check-write-length', $display);
+        self::assertStringNotContainsString('Hooks', $display);
     }
 
     /**
@@ -641,7 +590,7 @@ final class ConsoleFlowsTest extends TestCase
 
         $registry = new AbilityRegistry($packageRoot . '/abilities.yaml');
         $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
-        $cmd = new ShowCommand($installer, new CheckService());
+        $cmd = ShowCommand::create($installer, new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
 
@@ -654,12 +603,8 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
-        self::assertStringContainsString('Hooks', $display);
-        self::assertStringContainsString('check-write-length', $display);
-        // Other sections should NOT appear
-        self::assertStringNotContainsString('Skills', $display);
-        self::assertStringNotContainsString('Agents', $display);
-        self::assertStringNotContainsString('Rules', $display);
+        self::assertStringContainsString('hook:check-write-length', $display);
+        self::assertStringNotContainsString('skill:graphify', $display);
     }
 
     /**
@@ -670,7 +615,7 @@ final class ConsoleFlowsTest extends TestCase
         $tmp = sys_get_temp_dir() . '/apm-show-type-unk-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
         $registry = self::createRegistry($tmp);
-        $cmd = new ShowCommand(new Installer(registry: $registry, packageRoot: $tmp), new CheckService());
+        $cmd = ShowCommand::create(new Installer(registry: $registry, packageRoot: $tmp), new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'banana']);
 
@@ -682,7 +627,8 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('skill', $display);
         self::assertStringContainsString('hook', $display);
         self::assertStringContainsString('gitignore', $display);
-        self::assertStringContainsString('preset', $display);
+        self::assertStringContainsString('prompt', $display);
+        self::assertStringNotContainsString('preset', $display);
     }
 
     /**
@@ -705,7 +651,7 @@ final class ConsoleFlowsTest extends TestCase
 
         $registry = self::createRegistry($packageRoot);
         $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
-        $cmd = new ShowCommand($installer, new CheckService());
+        $cmd = ShowCommand::create($installer, new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
 
@@ -722,9 +668,7 @@ final class ConsoleFlowsTest extends TestCase
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        $display = $tester->getDisplay();
-        self::assertStringContainsString('Hooks', $display);
-        self::assertStringContainsString('(none)', $display);
+        self::assertSame('', trim($tester->getDisplay()));
     }
 
     /**
@@ -755,7 +699,7 @@ final class ConsoleFlowsTest extends TestCase
 
         $registry = new AbilityRegistry($packageRoot . '/abilities.yaml');
         $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
-        $cmd = new ShowCommand($installer, new CheckService());
+        $cmd = ShowCommand::create($installer, new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor']]);
 
@@ -767,12 +711,7 @@ final class ConsoleFlowsTest extends TestCase
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        $display = $tester->getDisplay();
-        // All sections should be present
-        self::assertStringContainsString('Skills', $display);
-        self::assertStringContainsString('Agents', $display);
-        self::assertStringContainsString('Rules', $display);
-        self::assertStringContainsString('Hooks', $display);
+        self::assertStringContainsString('hook:check-write-length', $tester->getDisplay());
     }
 
     public function testPresetCreateFailsWhenPresetAlreadyExists(): void
@@ -821,7 +760,7 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('not found', $tester->getDisplay());
     }
 
-    public function testShowCommandDisplaysPresetMappingForHooks(): void
+    public function testShowCommandExcludesPresetFromHookOutput(): void
     {
         $tmp = sys_get_temp_dir() . '/apm-show-hook-preset-' . bin2hex(random_bytes(4));
         $packageRoot = sys_get_temp_dir() . '/apm-show-hook-preset-pkg-' . bin2hex(random_bytes(4));
@@ -850,9 +789,8 @@ final class ConsoleFlowsTest extends TestCase
         chdir($tmp);
 
         $registry = new AbilityRegistry($packageRoot . '/abilities.yaml');
-        $presetRegistry = new PresetRegistry($registry);
         $installer = new Installer(registry: $registry, packageRoot: $packageRoot);
-        $cmd = new ShowCommand($installer, new CheckService(), $presetRegistry);
+        $cmd = ShowCommand::create($installer, new CheckService());
         $tester = new CommandTester($cmd);
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'hook']);
 
@@ -865,8 +803,9 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
-        self::assertStringContainsString('check-write-length', $display);
-        self::assertStringContainsString('dev-hooks', $display);
+        self::assertStringContainsString('hook:check-write-length', $display);
+        self::assertStringNotContainsString('dev-hooks', $display);
+        self::assertStringNotContainsString('presets:', $display);
     }
 
 }

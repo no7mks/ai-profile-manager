@@ -25,6 +25,9 @@ abstract class EndToEndTestCase extends TestCase
     /** Package root with abilities/skills, abilities/rules, abilities/agents, hooks. */
     protected string $packageRoot;
 
+    /** Isolated HOME so user-scope probes do not leak from the developer machine. */
+    protected string $fakeHome;
+
     /** Path to the generated wrapper script. */
     private string $wrapperScript;
 
@@ -33,9 +36,11 @@ abstract class EndToEndTestCase extends TestCase
         $base = sys_get_temp_dir() . '/apm-e2e-' . bin2hex(random_bytes(6));
         $this->workspace = $base . '/workspace';
         $this->packageRoot = $base . '/pkg';
+        $this->fakeHome = $base . '/home';
 
         mkdir($this->workspace, 0775, true);
         mkdir($this->packageRoot, 0775, true);
+        mkdir($this->fakeHome, 0775, true);
 
         // Generate a wrapper script that uses the real autoloader but overrides package root
         $this->wrapperScript = $base . '/apm-e2e.php';
@@ -50,7 +55,6 @@ require '{$vendorAutoload}';
 use AiProfileManager\Core\Application;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
@@ -63,9 +67,8 @@ if (\$registry !== null) {
     \$installerArgs['registry'] = \$registry;
 }
 \$installer = new Installer(...\$installerArgs);
-\$updater = new KnowledgeBaseUpdater();
 \$presetRegistry = \$registry !== null ? new PresetRegistry(\$registry) : null;
-\$app = Application::createSymfonyApplication(\$installer, \$updater, \$presetRegistry);
+\$app = Application::createSymfonyApplication(\$installer, \$presetRegistry);
 exit(\$app->run(new ArgvInput(\$argv), new ConsoleOutput()));
 PHP;
         file_put_contents($this->wrapperScript, $script);
@@ -86,14 +89,23 @@ PHP;
      */
     protected function apm(array $args, array $extraEnv = []): array
     {
+        $env = [];
+        foreach ($_SERVER as $key => $value) {
+            if (is_string($key) && is_string($value)) {
+                $env[$key] = $value;
+            }
+        }
+        $env['HOME'] = $this->fakeHome;
+        $env['APM_PACKAGE_ROOT'] = $this->packageRoot;
+        $env['APM_BASELINE_ROOT'] = $this->packageRoot;
+        foreach ($extraEnv as $key => $value) {
+            $env[$key] = $value;
+        }
+
         $process = new Process(
             command: ['php', $this->wrapperScript, ...$args],
             cwd: $this->workspace,
-            env: [
-                'APM_PACKAGE_ROOT' => $this->packageRoot,
-                'APM_BASELINE_ROOT' => $this->packageRoot,
-                ...$extraEnv,
-            ],
+            env: $env,
         );
         $process->run();
 

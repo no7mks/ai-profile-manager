@@ -59,7 +59,7 @@
 - **所有任务均为 mandatory，禁止标记 optional（`*` 或其他标记）**
 - **Test First（RED → GREEN）编排**：每个功能 sub-task 内部先写失败测试，再写实现让测试通过。测试不拆分为独立 task
 - Checkpoint 推荐作为每个 top-level task 的最后一个 sub-task，包含验证与 commit
-- Checkpoint 必须包含 `docs/state/` 同步
+- Checkpoint 在本 task 改变了系统事实（行为、边界、配置等）时，同步相关 `docs/state/` 文件；无变化可省略
 - Socratic Review 和 Gatekeep Log 写入 `<spec-dir>/<name>/gk-logs.md`，不写在 tasks.md 中
 - 完成后提示可运行 GK 校验 tasks
 
@@ -149,10 +149,12 @@
 
 #### Checkpoint 格式（强制）
 
+验证命令须为可执行的完整 shell 命令，不得空泛（如「运行测试」「确认通过」）。**至少**列出静态分析与单元测试（具体命令见 `PROJECT.md`「构建与测试命令」）；按影响范围在 tasks.md 中追加其他验证（如 E2E、集成测试等）。
+
 ```markdown
 - [ ] 1.N Checkpoint
-  - 运行 `<具体验证命令>`
-  - 更新 `docs/state/<相关文件>.md`
+  - 运行验证：`<具体命令>`（至少静态分析 + 单元测试）
+  - （如本 task 改变了系统事实）更新 `docs/state/<相关文件>.md`
   - commit: `<scope>: <描述>`
 ```
 
@@ -231,8 +233,8 @@
     - <描述>
     - _Ref: Requirement N_
   - [ ] 1.2 Checkpoint
-    - 运行 `<验证命令>`
-    - 更新 `docs/state/<file>.md`
+    - 运行验证：`<具体命令>`（至少静态分析 + 单元测试；见 `PROJECT.md`）
+    - （如有系统事实变化）更新 `docs/state/<file>.md`
     - commit: `<scope>: <描述>`
 
 - [ ] N+1. E2E 测试

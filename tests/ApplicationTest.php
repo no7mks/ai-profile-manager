@@ -6,7 +6,6 @@ namespace AiProfileManager\Tests;
 
 use AiProfileManager\Core\Application;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
 use PHPUnit\Framework\TestCase;
 
 final class ApplicationTest extends TestCase
@@ -23,7 +22,7 @@ final class ApplicationTest extends TestCase
 
     public function testCreateSymfonyApplicationRegistersSameCommandsAsCli(): void
     {
-        $app = Application::createSymfonyApplication(new Installer(), new KnowledgeBaseUpdater());
+        $app = Application::createSymfonyApplication(new Installer());
 
         self::assertTrue($app->has('install'));
         self::assertTrue($app->has('show'));

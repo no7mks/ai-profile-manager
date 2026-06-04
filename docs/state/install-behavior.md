@@ -9,7 +9,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: `<workspace>/<targets[target]>`
+- 目标路径: `<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）
   - Cursor: `.cursor/skills/<name>/`
   - Kiro: `.kiro/skills/<name>/`
 - 操作: DirectoryMirrorService 递归复制整个目录（含子目录与文件），已存在则覆盖
@@ -35,7 +35,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: `<workspace>/<targets[target]>`
+- 目标路径: ``<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）`
   - Cursor: `.cursor/rules/[category/]<name>.mdc`
   - Kiro: `.kiro/steering/[category/]<name>.md`
 - 操作: 单文件复制（覆盖）
@@ -58,7 +58,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: `<workspace>/<targets[target]>`
+- 目标路径: ``<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）`
   - Cursor: `.cursor/agents/<name>.md`
   - Kiro: `.kiro/agents/<name>.md`
 - 操作: 单文件复制（覆盖）
@@ -174,12 +174,28 @@ Scaffold **不是** ability（不可由 `cleanup` 卸载）。由 **`apm bootstr
 
 ## 通用行为
 
+### Deploy Scope 与路径解析
+
+- **DeployRootResolver** 统一解析 project（`getcwd()`）与 user（`$HOME`）根目录；`absoluteTargetPath(scope, relativeTarget)` 将 registry `targets[target]` 拼为绝对路径。
+- **InstallationProbe** 判断 ability 是否已安装：`isPresent(type, name, target, scope)` 通过 `AbilityRegistry::getEntry()` 取 `targets[target]`，再经 DeployRootResolver 定位磁盘路径。
+  - `skill`：`is_dir(path)`
+  - `rule` / `agent`：`is_file(path)`（使用 registry 完整相对路径，禁止仅按 basename 匹配 category rule）
+  - `hook`：`is_file(path) || is_dir(path)`（兼容 Kiro 单文件与 Cursor 目录）
+- **Installer** 将 `isInstalledOnTarget()` 委托给 InstallationProbe（默认 project scope）；`uninstallSkill` / `uninstallRule` / `uninstallAgent` 通过 `resolveProjectTargetPath()` 使用 registry 路径卸载（不再递归 basename 搜索）。
+- **uninstallProjectScope()**：遍历 registry 中 skill/rule/agent/hook，对每个 target 用 InstallationProbe 探测 project scope 是否存在，存在则卸载；供后续 **cleanup** 命令批量清理 project 安装，不触及 user scope。
+- **Scope 安装 CLI**：`Installer::installTyped()` / `uninstallTyped()` 接受 `DeployScope`；install 族命令在调用前经 `ScopeGuard::assertBatchAllowed`（user scope 下 project-only 整批拒绝）。输出含 `Scope: project|user` 行。
+
 ### Baseline 解析
 
-ComposerBaselineResolver 按以下优先级定位 apm 包安装路径：
+ComposerBaselineResolver 按以下优先级定位 global apm 包安装路径（`install_path`）：
+
 1. 环境变量 `APM_BASELINE_ROOT`（目录存在时使用）
-2. 构造函数注入的 overrideInstallPath
-3. 全局 Composer `~/.composer/vendor/composer/installed.json` 中查找包名
+2. 构造函数注入的 `overrideInstallPath`（DI / 测试）
+3. `COMPOSER_HOME` 下的 `vendor/composer/installed.json`（已设置时仅尝试此路径）
+4. `$HOME/.composer/vendor/composer/installed.json`（首个可读时使用）
+5. `$HOME/.config/composer/vendor/composer/installed.json`（XDG fallback，首个可读时使用）
+
+步骤 3–5 在 `installed.json` 中按包名查找 global apm 包，并据此推导 `install_path`。
 
 Baseline 不可用时，CheckService 返回所有 ability 状态为 `unknown`。
 

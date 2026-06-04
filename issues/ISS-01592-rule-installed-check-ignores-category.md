@@ -3,10 +3,10 @@
 | 字段 | 值 |
 |------|-----|
 | Severity | `[P2] minor` |
-| Status | `open` |
+| Status | `closed` |
 | Found In | `v0.8.0` |
-| Fixed In | |
-| Related Test | |
+| Fixed In | `c374c7a` |
+| Related Test | `tests/InstallationProbeTest.php` |
 
 ---
 
@@ -48,4 +48,5 @@
 
 ## History
 
+- `2026-06-04` `c374c7a` [关闭] Phase 2：`InstallationProbe` 使用 registry 完整路径；spec `deploy-scope-and-cli`
 - `2026-06-03 17:30 +08` `v0.8.0` [发现] 调查 `plan:quick-plan-conventions` 显示 not-installed 时发现

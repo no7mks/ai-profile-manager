@@ -104,7 +104,7 @@
 
 ## 初始化约定
 
-新项目初始化后（`apm install` bootstrap），各子目录应以 `.gitkeep` 占位确保目录结构存在：
+新项目在业务仓库执行 `apm bootstrap`（或 `/apm init` 触发的 bootstrap）后，各子目录应以 `.gitkeep` 占位确保目录结构存在：
 
 - `docs/state/.gitkeep`
 - `docs/manual/.gitkeep`

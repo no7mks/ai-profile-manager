@@ -48,9 +48,7 @@ description: 文档归档操作规范——notes/proposals/specs/issues 的归�
 
 ## 归档 Issues
 
-- 将 issue status 更新为 `closed`，填写 `Fixed In`。
-- issue 文件留在 `issues/` 原位（status=closed 表示已修复未发布）。
-- release/hotfix finish 时，review tag 后 `mv issues/<name>.md → issues/fixed/<name>.md`。
+关闭 issue、填写 `Fixed In`，或 finish 后移入 `issues/fixed/`：按 `issues/README.md` 执行。
 
 ---
 

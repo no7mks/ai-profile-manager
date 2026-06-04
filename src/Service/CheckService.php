@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
+use AiProfileManager\Config\DeployScope;
+
 final class CheckService
 {
     public function __construct(
         private readonly ComposerBaselineResolver $baselineResolver = new ComposerBaselineResolver(),
         private readonly ?AbilityDiffService $diffService = null,
         private readonly HookChecker $hookChecker = new HookChecker(),
+        private readonly DeployRootResolver $rootResolver = new DeployRootResolver(),
     ) {
     }
 
@@ -34,12 +37,22 @@ final class CheckService
      */
     public function checkTyped(array $items, array $targets): array
     {
+        return $this->checkTypedForScope($items, $targets, DeployScope::Project);
+    }
+
+    /**
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>} $items
+     * @param array<int, string> $targets
+     * @return array<int, array{type: string, name: string, target: string, status: string}>
+     */
+    public function checkTypedForScope(array $items, array $targets, DeployScope $scope): array
+    {
         $baseline = $this->baselineResolver->resolve();
         if ($baseline === null) {
             return $this->buildUnknownResults($items, $targets);
         }
 
-        $workspaceRoot = (string) getcwd();
+        $workspaceRoot = $this->rootResolver->resolve($scope);
         $baselineRoot = $baseline['install_path'];
 
         // Process skills/rules/agents via AbilityDiffService

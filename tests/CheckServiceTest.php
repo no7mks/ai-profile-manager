@@ -492,6 +492,75 @@ YAML;
         self::assertStringContainsString('[new]', $lines[0]);
     }
 
+
+    public function testCheckTypedDoesNotReturnAllUnknownWhenBaselineResolvesViaXdgComposerHome(): void
+    {
+        $home = sys_get_temp_dir() . '/apm-check-xdg-home-' . bin2hex(random_bytes(4));
+        $workspace = sys_get_temp_dir() . '/apm-check-xdg-ws-' . bin2hex(random_bytes(4));
+        $baseline = $home . '/.config/composer/vendor/no7mks/ai-profile-manager';
+
+        mkdir($baseline . '/.cursor/skills/demo-skill', 0775, true);
+        mkdir($baseline . '/.cursor/rules/git', 0775, true);
+        mkdir($baseline . '/.cursor/agents', 0775, true);
+        mkdir($workspace . '/.cursor/skills/demo-skill', 0775, true);
+        mkdir($workspace . '/.cursor/rules/git', 0775, true);
+        mkdir($workspace . '/.cursor/agents', 0775, true);
+        file_put_contents($baseline . '/.cursor/skills/demo-skill/SKILL.md', "v1\n");
+        file_put_contents($baseline . '/.cursor/rules/git/demo-rule.mdc', "rule-base\n");
+        file_put_contents($baseline . '/.cursor/agents/demo-agent.md', "agent-base\n");
+        file_put_contents($workspace . '/.cursor/skills/demo-skill/SKILL.md', "v1\n");
+        file_put_contents($workspace . '/.cursor/rules/git/demo-rule.mdc', "rule-mod\n");
+
+        $yaml = <<<'YAML'
+version: "1"
+rules:
+  - path: demo-rule
+    description: test rule
+    targets:
+      cursor: .cursor/rules/git/demo-rule.mdc
+agents:
+  - path: demo-agent
+    description: test agent
+    targets:
+      cursor: .cursor/agents/demo-agent.md
+skills:
+  - path: demo-skill
+    description: test skill
+    targets:
+      cursor: .cursor/skills/demo-skill/
+hooks: []
+YAML;
+        file_put_contents($baseline . '/abilities.yaml', $yaml);
+
+        $this->seedXdgComposerInstalledJson($home);
+        mkdir($home . '/.composer/vendor/composer', 0775, true);
+
+        $this->withEnv('HOME', $home);
+        $this->withEnv('APM_BASELINE_ROOT', null);
+        $this->withEnv('COMPOSER_HOME', null);
+
+        $oldCwd = getcwd();
+        self::assertNotFalse($oldCwd);
+        chdir($workspace);
+
+        $service = new CheckService();
+        $results = $service->checkTyped([
+            'skills' => ['demo-skill'],
+            'rules' => ['demo-rule'],
+            'agents' => ['demo-agent'],
+        ], ['cursor']);
+
+        chdir($oldCwd);
+
+        self::assertCount(3, $results);
+        foreach ($results as $result) {
+            self::assertNotSame('unknown', $result['status'], 'baseline must resolve via XDG composer home');
+        }
+        self::assertSame('unchanged', $results[0]['status']);
+        self::assertSame('modified', $results[1]['status']);
+        self::assertSame('missing', $results[2]['status']);
+    }
+
     public function testCheckTypedReturnsUnknownForHooksWhenBaselineMissing(): void
     {
         $composerHome = sys_get_temp_dir() . '/apm-check-hook-nobase-' . bin2hex(random_bytes(4));
@@ -526,6 +595,23 @@ YAML;
         self::assertSame('hook', $results[0]['type']);
         self::assertSame('my-hook', $results[0]['name']);
         self::assertSame('unknown', $results[0]['status']);
+    }
+
+
+    private function seedXdgComposerInstalledJson(string $home): void
+    {
+        $composerHome = $home . '/.config/composer';
+        mkdir($composerHome . '/vendor/composer', 0775, true);
+        file_put_contents(
+            $composerHome . '/vendor/composer/installed.json',
+            json_encode([
+                'packages' => [[
+                    'name' => 'no7mks/ai-profile-manager',
+                    'version' => '1.0.0-xdg-check',
+                    'dist' => ['reference' => 'ref-xdg-check'],
+                ]],
+            ], JSON_UNESCAPED_SLASHES),
+        );
     }
 
     private function writeEmptyAbilitiesYaml(string $dir): void
