@@ -9,7 +9,8 @@ apm 系统架构与模块边界。
 | 模块 | 职责 |
 |------|------|
 | CLI Commands (ConsoleRegistration) | Symfony Console 命令注册与参数解析；统一在 `ConsoleRegistration::register()` 中完成所有命令的实例化与注入 |
-| InstallCommand | 安装 preset 中的 ability 到目标平台；无 preset 参数时执行 bootstrap（scaffold + scope rules + 默认 skill/agent） |
+| InstallCommand | 安装 preset 中的 ability 到目标平台；裸 `install` 与 `default` preset 拒绝并输出迁移指引 |
+| BootstrapCommand | 项目 scaffold（`docs/`、`issues/`、`AGENTS.md`）；不安装 preset 或 ability |
 | ShowCommand | 展示 conventional ability 安装状态（三态、user/project scope）；支持 `--scope`、`--type` |
 | CheckCommand | 检查指定 preset 中所有 ability 在目标平台的安装状态 |
 | SkillInstallCommand / RuleInstallCommand / AgentInstallCommand | 按类型安装单个或多个 ability |

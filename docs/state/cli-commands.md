@@ -6,25 +6,39 @@ apm 所有已注册命令的签名、行为与错误条件。
 
 ## install
 
-**签名**: `install [preset] [-t|--target TARGET...] [-f|--force]`
+**签名**: `install <preset> [-t|--target TARGET...]`
 
 **正常行为**:
 
-- 有 preset 参数时：从 PresetRegistry 获取 preset spec，对其中所有 ability 执行 `Installer::installTyped()`，按 target 逐一安装 skill/rule/agent/hook。
-- 无 preset 参数时（bootstrap 模式）：
-  1. 调用 ProjectInitializer 复制 scaffold（docs/、issues/、AGENTS.md）
-  2. 安装平台 scope rules（cursor-scope.mdc / kiro-scope.md）
-  3. 安装 `default` preset 中定义的所有 ability
-  4. 输出 bootstrap 完成提示
+- 从 PresetRegistry 获取 preset spec，对其中所有 ability 执行 `Installer::installTyped()`，按 target 逐一安装 skill/rule/agent/hook 等。
+
+**错误条件**:
+
+| 条件 | 响应 |
+|------|------|
+| 未提供 preset（裸 `apm install`） | 输出迁移指引（`global-setup` / `bootstrap` / `add`），exit FAILURE |
+| preset 为 `default` | 输出三步迁移文案，exit FAILURE |
+| target 不在 KNOWN_TARGETS 中 | 输出错误信息，exit FAILURE |
+| preset 不在 PresetRegistry 中 | 输出 "Unknown preset: X. Known presets: ..." ，exit FAILURE |
+| ability 源文件缺失 | 输出 `[fail]` 行，最终 exit FAILURE |
+
+---
+
+## bootstrap
+
+**签名**: `bootstrap [-t|--target TARGET...] [-f|--force]`
+
+**正常行为**:
+
+- 调用 `ProjectInitializer` 仅复制项目 scaffold（`docs/`、`issues/`、`AGENTS.md`）；不安装 preset 或 conventional ability
+- 成功结束时提示在 agent chat 中执行 `/apm init`
 
 **错误条件**:
 
 | 条件 | 响应 |
 |------|------|
 | target 不在 KNOWN_TARGETS 中 | 输出错误信息，exit FAILURE |
-| preset 不在 PresetRegistry 中 | 输出 "Unknown preset: X. Known presets: ..." ，exit FAILURE |
-| bootstrap 模式下目标已存在 docs/issues/AGENTS.md 且无 --force | 抛出 RuntimeException，exit FAILURE |
-| ability 源文件缺失 | 输出 `[fail]` 行，最终 exit FAILURE |
+| 目标已存在 scaffold 文件且无 `--force` | 输出错误信息（提示 `--force`），exit FAILURE |
 
 ---
 

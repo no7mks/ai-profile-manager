@@ -8,7 +8,6 @@ use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\PresetRegistry;
-use AiProfileManager\Service\ProjectInitializer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,9 +17,24 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class InstallCommand extends Command
 {
+    private const BARE_INSTALL_GUIDANCE = <<<'MSG'
+Install requires a preset name. Bare `apm install` is no longer supported.
+
+Use instead:
+  apm global-setup                         # user-scope abilities (once after composer global install)
+  apm bootstrap                            # project scaffold (in your repository)
+  apm add skill|rule|agent|preset <name>   # install specific abilities
+MSG;
+
+    private const DEFAULT_PRESET_MIGRATION = <<<'MSG'
+Preset "default" was removed. Use the three-step flow instead:
+  1. apm global-setup              # user-scope abilities
+  2. apm bootstrap                 # project scaffold (in your repository)
+  3. apm add preset <name>         # project abilities as needed
+MSG;
+
     public function __construct(
         private readonly Installer $installer,
-        private readonly ?ProjectInitializer $initializer = null,
         private readonly PresetRegistry $presetRegistry = new PresetRegistry(new AbilityRegistry(__DIR__ . '/../../abilities.yaml')),
     ) {
         parent::__construct();
@@ -29,19 +43,13 @@ final class InstallCommand extends Command
     protected function configure(): void
     {
         $this->setName('install');
-        $this->setDescription('Install preset items, or run project bootstrap when preset is omitted.');
-        $this->addArgument('preset', InputArgument::OPTIONAL, 'Preset name to install. Omit to run project bootstrap.');
+        $this->setDescription('Install a preset to project scope.');
+        $this->addArgument('preset', InputArgument::OPTIONAL, 'Preset name to install.');
         $this->addOption(
             'target',
             't',
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'Target IDE/CLI tool. Repeat for multiple values.'
-        );
-        $this->addOption(
-            'force',
-            'f',
-            InputOption::VALUE_NONE,
-            'Overwrite existing scaffold files when running bootstrap mode (no preset).'
         );
     }
 
@@ -67,7 +75,15 @@ final class InstallCommand extends Command
         }
 
         if ($preset === null || $preset === '') {
-            return $this->runBootstrap($input, $io, $targets);
+            $io->error(self::BARE_INSTALL_GUIDANCE);
+
+            return Command::FAILURE;
+        }
+
+        if ($preset === 'default') {
+            $io->error(self::DEFAULT_PRESET_MIGRATION);
+
+            return Command::FAILURE;
         }
 
         $known = array_map(fn(array $p) => $p['name'], $this->presetRegistry->allPresets());
@@ -93,46 +109,5 @@ final class InstallCommand extends Command
         }
 
         return $result['exit_code'] === 0 ? Command::SUCCESS : Command::FAILURE;
-    }
-
-    /**
-     * @param array<int, string> $targets
-     */
-    private function runBootstrap(InputInterface $input, SymfonyStyle $io, array $targets): int
-    {
-        $force = (bool) $input->getOption('force');
-
-        try {
-            $initializer = $this->initializer ?? ProjectInitializer::fromPackageLayout();
-            foreach ($initializer->init((string) getcwd(), $force, $targets) as $line) {
-                $io->writeln($line);
-            }
-        } catch (\Throwable $e) {
-            $io->error($e->getMessage());
-
-            return Command::FAILURE;
-        }
-
-        $io->section('Installing default preset');
-        $presetSpec = $this->presetRegistry->getPreset('default');
-        if ($presetSpec === null) {
-            $io->error("Preset 'default' not found in abilities.yaml.");
-
-            return Command::FAILURE;
-        }
-
-        $items = PresetRegistry::toTypedSpec($presetSpec);
-        $result = $this->installer->installTyped($items, $targets, 'default');
-        foreach ($result['lines'] as $line) {
-            $io->writeln($line);
-        }
-
-        if ($result['exit_code'] !== 0) {
-            return Command::FAILURE;
-        }
-
-        $io->success("Bootstrap complete. In your agent chat, run '/apm init' to complete SSOT setup.");
-
-        return Command::SUCCESS;
     }
 }

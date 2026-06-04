@@ -78,12 +78,12 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 5, AC 1–6_
   - [x] 9.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: global-setup command`
 
-- [ ] 10. bootstrap + 无参 install 废弃
-  - [ ] 10.1 `BootstrapCommand`（仅 `ProjectInitializer`）；更新 `BootstrapLifecycleTest`
+- [x] 10. bootstrap + 无参 install 废弃
+  - [x] 10.1 `BootstrapCommand`（仅 `ProjectInitializer`）；更新 `BootstrapLifecycleTest`
     - _Ref: Requirement 6, AC 1–3_
-  - [ ] 10.2 `InstallCommand` 无参失败 + `default` 迁移文案
+  - [x] 10.2 `InstallCommand` 无参失败 + `default` 迁移文案
     - _Ref: Requirement 8, AC 1, 4; Requirement 4, AC 3_
-  - [ ] 10.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: bootstrap and reject bare install`
+  - [x] 10.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: bootstrap and reject bare install`
 
 - [ ] 11. cleanup 命令
   - [ ] 11.1 `CleanupCommandTest`（registry 全枚举，仅 project 卸载）

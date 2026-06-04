@@ -148,73 +148,31 @@ final class ConsoleFlowsTest extends TestCase
         self::assertStringContainsString('Unknown targets', $tester->getDisplay());
     }
 
-    public function testInstallCommandWithoutPresetRunsBootstrap(): void
+    public function testInstallCommandWithoutPresetFailsWithGuidance(): void
     {
-        $tmp = sys_get_temp_dir() . '/apm-flow-bootstrap-' . bin2hex(random_bytes(4));
+        $tmp = sys_get_temp_dir() . '/apm-flow-bare-install-' . bin2hex(random_bytes(4));
         mkdir($tmp, 0775, true);
-
-        // Create a fake package root with scaffold files and abilities for the bootstrap flow
-        $pkg = sys_get_temp_dir() . '/apm-flow-bootstrap-pkg-' . bin2hex(random_bytes(4));
-        // Scaffold files (at package root level)
-        mkdir($pkg . '/docs', 0775, true);
-        mkdir($pkg . '/issues', 0775, true);
-        file_put_contents($pkg . '/docs/README.md', "# Docs\n");
-        file_put_contents($pkg . '/issues/README.md', "# Issues\n");
-        file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
-        // Scope rules (source files matching createRegistry target paths)
-        mkdir($pkg . '/.cursor/rules', 0775, true);
-        mkdir($pkg . '/.kiro/rules', 0775, true);
-        file_put_contents($pkg . '/.cursor/rules/cursor-scope', "cursor-scope\n");
-        file_put_contents($pkg . '/.kiro/rules/cursor-scope', "cursor-scope\n");
-        file_put_contents($pkg . '/.cursor/rules/kiro-scope', "kiro-scope\n");
-        file_put_contents($pkg . '/.kiro/rules/kiro-scope', "kiro-scope\n");
-        // Abilities for Installer at Source-is-Target paths
-        mkdir($pkg . '/.cursor/skills/apm', 0775, true);
-        mkdir($pkg . '/.kiro/skills/apm', 0775, true);
-        file_put_contents($pkg . '/.cursor/skills/apm/SKILL.md', "# APM\n");
-        file_put_contents($pkg . '/.kiro/skills/apm/SKILL.md', "# APM\n");
-        // Agents: createRegistry generates target as .cursor/agents/code-reviewer (no extension)
-        mkdir($pkg . '/.cursor/agents', 0775, true);
-        mkdir($pkg . '/.kiro/agents', 0775, true);
-        file_put_contents($pkg . '/.cursor/agents/code-reviewer', "# Code Reviewer\n");
-        file_put_contents($pkg . '/.kiro/agents/code-reviewer', "# Code Reviewer\n");
 
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($tmp);
 
-        $registry = self::createRegistry($pkg, [
-            'skills' => [['path' => 'apm']],
-            'rules' => [
-                ['path' => 'cursor-scope', 'description' => 'Cursor scope'],
-                ['path' => 'kiro-scope', 'description' => 'Kiro scope'],
-            ],
-            'agents' => [['path' => 'code-reviewer']],
-        ], [
-            ['name' => 'default', 'includes' => ['skill:apm', 'agent:code-reviewer', 'rule:cursor-scope', 'rule:kiro-scope']],
-        ]);
+        $registry = self::createRegistry($tmp);
         $presetRegistry = new PresetRegistry($registry);
-        $initializer = new \AiProfileManager\Service\ProjectInitializer($pkg);
-        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $pkg), $initializer, $presetRegistry);
+        $cmd = new InstallCommand(new Installer(registry: $registry, packageRoot: $tmp), presetRegistry: $presetRegistry);
         $tester = new CommandTester($cmd);
         $exit = $tester->execute([]);
 
         chdir($old);
 
-        self::assertSame(Command::SUCCESS, $exit);
-        // Scaffold files copied
-        self::assertFileExists($tmp . '/docs/README.md');
-        self::assertFileExists($tmp . '/issues/README.md');
-        self::assertFileExists($tmp . '/AGENTS.md');
-        // Scope rules installed via default preset
-        self::assertFileExists($tmp . '/.cursor/rules/cursor-scope');
-        self::assertFileExists($tmp . '/.kiro/rules/kiro-scope');
-        // Default skills/agents installed
-        self::assertFileExists($tmp . '/.cursor/skills/apm/SKILL.md');
-        self::assertFileExists($tmp . '/.kiro/skills/apm/SKILL.md');
-        self::assertFileExists($tmp . '/.cursor/agents/code-reviewer');
-        self::assertFileExists($tmp . '/.kiro/agents/code-reviewer');
-        self::assertStringContainsString("/apm init", $tester->getDisplay());
+        self::assertSame(Command::FAILURE, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('Install requires a preset name', $display);
+        self::assertStringContainsString('apm global-setup', $display);
+        self::assertStringContainsString('apm bootstrap', $display);
+        self::assertStringContainsString('apm add skill|rule|agent|preset', $display);
+        self::assertStringNotContainsString('Installing scaffold', $display);
+        self::assertStringNotContainsString('Installing default preset', $display);
     }
 
     public function testCheckCommandRunsForKnownPreset(): void
