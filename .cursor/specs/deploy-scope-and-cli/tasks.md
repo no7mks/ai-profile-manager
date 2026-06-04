@@ -110,21 +110,21 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 13, AC 1–4_
   - [x] 13.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；`./vendor/bin/phpunit --testsuite e2e`；commit: `+(e2e) by Cursor: deploy scope flows`
 
-- [ ] 14. 文档收敛
-  - [ ] 14.1 SSOT：`install-behavior.md`、`cli-commands.md`、`abilities-model.md`
+- [x] 14. 文档收敛
+  - [x] 14.1 SSOT：`install-behavior.md`、`cli-commands.md`、`abilities-model.md`
     - _Ref: Requirement 12, AC 3–4_
-  - [ ] 14.2 `README.md`、`docs/manual/usage.md`、`docs/README.md`
+  - [x] 14.2 `README.md`、`docs/manual/usage.md`、`docs/README.md`
     - _Ref: Requirement 12, AC 1–2_
-  - [ ] 14.3 迁移指南：无参 install/add、删 preset `default`、三阶段首装（`README` + `docs/manual/usage.md` 专节；对齐 requirements GK CR2）
+  - [x] 14.3 迁移指南：无参 install/add、删 preset `default`、三阶段首装（`README` + `docs/manual/usage.md` 专节；对齐 requirements GK CR2）
     - _Ref: Requirement 4, AC 3; Requirement 8, AC 1_
-  - [ ] 14.4 APM skill + init-workflow（cursor/kiro 副本）
+  - [x] 14.4 APM skill + init-workflow（cursor/kiro 副本）
     - _Ref: Requirement 11, AC 1–7; Requirement 7, AC 3_
-  - [ ] 14.5 关闭 ISS-31532、ISS-01592（`Fixed In` = shipping version）
+  - [x] 14.5 关闭 ISS-31532、ISS-01592（`Fixed In` = shipping version）
     - _Ref: Requirement 14, AC 1–3_
-  - [ ] 14.6 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(docs) by Cursor: deploy scope onboarding`
+  - [x] 14.6 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(docs) by Cursor: deploy scope onboarding`
 
-- [ ] 15. Code Review
-  - 委托给 code-reviewer sub-agent 执行
+- [x] 15. Code Review
+  - [x] 委托给 code-reviewer sub-agent 执行
 
 ## Notes
 

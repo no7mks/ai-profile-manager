@@ -52,21 +52,24 @@ apm 所有已注册命令的签名、行为与错误条件。
 
 ## show
 
-**签名**: `show [-t|--target TARGET...] [--type TYPE]`
+**签名**: `show [-t|--target TARGET...] [--scope project|user] [--type TYPE]`
 
 **正常行为**:
 
-1. 从 AbilityRegistry 获取所有可用 ability
-2. 通过 CheckService 获取安装状态
-3. 从 PresetRegistry 获取 preset 映射
-4. 按类型分组输出每个 ability 的安装状态与所属 preset
+1. `ShowStatusPresenter` 枚举 registry 中的 **Conventional Ability**（skill / rule / agent / hook / gitignore / prompt）；**不**输出 preset 名或 scaffold 行
+2. 对每个 ability 输出 **一行**，格式：`{type}:{name}  {status} {scopeLabel} [warn]…   {targets}`；`targets` 为可读文本（如 `cursor, kiro`）
+3. 状态相对 baseline / 磁盘探测：`not installed`、`installed`、`installed with local change`（**不**使用 update 的 `changed` / `up to date` 措辞）
+4. 未指定 `--scope` 时合并 user + project：仅 user → `(user)`；仅 project → `(project)`；双侧已装 → `(user+project)` 且附加 `[warn] installed in both user and project`
+5. 指定 `--scope` 时仅评估该 Deploy Scope
+6. Check 内态 `unknown` 时由 `InstallationProbe` fallback 到 installed / not installed
 
 **错误条件**:
 
 | 条件 | 响应 |
 |------|------|
 | target 不在 KNOWN_TARGETS 中 | 输出错误信息，exit FAILURE |
-| --type 值不在 `[rule, agent, skill, hook, gitignore, preset]` 中 | 输出 "Unknown type: X"，exit FAILURE |
+| --type 值不在 `[rule, agent, skill, hook, gitignore, prompt]` 中 | 输出 "Unknown type: X"，exit FAILURE |
+| 非法 `--scope` | `Invalid deploy scope: ...`，exit FAILURE |
 
 ---
 
@@ -368,14 +371,22 @@ apm 所有已注册命令的签名、行为与错误条件。
 
 ## update
 
-**签名**: `update`
+**签名**: `update [-f|--force]`
 
 **正常行为**:
 
-- 将 AppConfig 中的 DEFAULT_SKILLS/RULES/AGENTS、KNOWN_PRESETS、KNOWN_TARGETS 写入 `~/.config/apm/knowledge-base.json`
-- 输出写入路径
+1. `GlobalInstallDetector` 要求从 **Global APM Installation**（Composer global 的 `vendor/bin/apm`）执行；否则报错并退出
+2. `AbilityUpdateService::reportChanges()` 枚举 **User Scope** 与 **Project Scope** 中已安装的 conventional ability（skill / rule / agent / hook），与 global baseline diff
+3. 无 `--force`：仅输出 `changed: {type}:{name} ({scope}) {target}` 行，或 `All installed abilities are up to date.`
+4. 有 `--force`：对每个 changed 项从 baseline 覆盖已安装文件（user / project 各自独立处理）
+5. **不**写入 `knowledge-base.json`；**不**提供 preset 级 `--scope` 覆盖
 
-**错误条件**: 无特定错误条件（目录不存在时自动创建）。
+**错误条件**:
+
+| 条件 | 响应 |
+|------|------|
+| 非 global 安装调用 | 提示使用 global `vendor/bin/apm`，exit FAILURE |
+| baseline 不可解析 | `[fail] Baseline not found...`，exit FAILURE |
 
 ---
 

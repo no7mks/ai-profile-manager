@@ -144,52 +144,69 @@
 
 ## Tasks Phase — Socratic Review
 
-**日期**: 2026-06-03 19:08
+**日期**: 2026-06-04 14:51  
+**类型**: Re-review（首次：2026-06-03 19:08）
 
 ### Q&A
 
-> **Q1**: R1–R14 是否均被 task 引用，且 Phase 1 与 D-CR1 单独 commit 是否体现？
-> **A1**: 是。Task 1 覆盖 R1 并在 Overview/Notes 强调先于 task 2；R2–R12 映射 task 5–14；R13 为 13.3 人工；R14 为 14.4。
+> **Q1**: 更新后的 §6 Checkpoint 是否要求每个 top-level task 列出可执行的 phpstan + phpunit，且 E2E 仅留在 task 13？
+> **A1**: 是。Re-review 后 task 1–12、14 的 checkpoint 均为 `./vendor/bin/phpstan analyse` + `./vendor/bin/phpunit`；task 13.4 另加 e2e suite，其它 task checkpoint 不含 e2e。
 
-> **Q2**: 每个 top-level task 的 sub-task 数（不含 Checkpoint）是否 ≤10？
-> **A2**: 是。最多 task 8 为 4 个实现 sub-task + Checkpoint；无「并且」类合并违规。
+> **Q2**: `docs/state/` 同步是否仍被误写进每个 checkpoint？
+> **A2**: 否。state 在 1.4、14.1 等变更事实的 sub-task 内更新；Overview/Notes 明确 checkpoint 不重复 state；14.6 仅跑静态分析与单测后 commit 文档。
 
-> **Q3**: TDG 是否避免同文件并行，且 Checkpoint 在其 task 末 wave？
-> **A3**: 是。实现链分 wave（如 1.1→1.2→1.3）；Checkpoint 在各自 task 最后一 wave。
+> **Q3**: R1–R14 追溯与 D-CR1–4 编排是否仍完整？
+> **A3**: 是。结构顺序、Ref 覆盖、TDG 45 waves、D-CR2 scope 边界、D-CR3 删 KnowledgeBaseUpdater、D-CR4 cleanup 枚举均未因 checkpoint 修订而破坏。
 
-> **Q4**: E2E 是否含 R13 人工段且符合 e2e-testing 标注？
-> **A4**: 是。13.1–13.2 标 _脚本_；13.3 标 _人工_ 并写 `docs/notes/deploy-scope-platform-verification.md`。
+> **Q4**: TDG 并行合并与 Checkpoint 独占 wave 是否仍成立？
+> **A4**: 是。`8.1+8.2`、`10.1+10.2` 等合并 wave 保留；各 task checkpoint 仍在末 wave（id 4、7、11…44），无与同 wave 实现 sub-task 混排。
 
-> **Q5**: 文档收敛是否与 design Impact 一致，Code Review 为末 task？
-> **A5**: 是。14.1–14.3 覆盖 state/README/skill；task 15 委托 code-reviewer。
+> **Q5**: 文档收敛 task 14 是否仍对齐 design Impact（state/manual/迁移/skill/issue）？
+> **A5**: 是。14.1–14.5 覆盖三份 state、README/manual、迁移专节、APM skill、ISS 闭环；checkpoint 14.6 含验证命令与 commit。
 
-> **Q6**: `--scope` 是否与 D-CR2 A 一致？
-> **A6**: 是。Task 12.1 仅 install/uninstall 族；task 7.2 show 过滤；check 不新增 scope（R8.5）。
+> **Q6**: 执行中 task 1–6 已勾选完成，未完成任务 checkpoint 是否同样可执行？
+> **A6**: 是。已完成与待办 task 使用同一 checkpoint 命令模板，执行 agent 无需区分格式。
 
 ### 结论
 
-通过。可进入 GK tasks 校验；执行按 TDG wave，Task 1 Checkpoint 后再启动 Phase 2。
+通过。Re-review 仅强化 checkpoint 与 PROJECT.md 对齐；可按 TDG 继续 task 7 起执行。
 
 ---
 
 ## Tasks Phase — Gatekeep Log
 
-**校验时间**: 2026-06-03 19:10
+**校验时间**: 2026-06-04 14:51  
+**类型**: Re-review（首次：2026-06-03 19:10，⚠️ 已修正后通过）  
 **校验结果**: ⚠️ 已修正后通过
 
-### 修正项
+### 修正项（本次 Re-review）
 
-- [格式] TDG Checkpoint 独占 wave（51 waves）；移除 `"15"`；commit 改 `+/*` + `by Cursor`
-- [内容] Checkpoint 补 phpunit；新增 14.3 迁移指南；9.2/6.2 补 Ref；Notes 补 checkpoint commit
+- [内容] 全部实现类 Checkpoint（1.5–12.4、14.6）补 `./vendor/bin/phpstan analyse`，保留 `./vendor/bin/phpunit`
+- [内容] E2E Checkpoint 13.4：phpstan + unit + `--testsuite e2e`（不在其它 task checkpoint 写 e2e）
+- [内容] 文档收敛 14.6：补 phpstan + phpunit（原仅 commit）
+- [内容] Overview/Notes：checkpoint 与 PROJECT.md 对齐；state 仅在变更事实 sub-task 更新
+
+### 修正项（首次校验，2026-06-03）
+
+- [格式] TDG Checkpoint 独占 wave；移除 `"15"`；commit 改 `+/*` + `by Cursor`
+- [内容] 新增 14.3 迁移指南；9.2/6.2 补 Ref；Notes 补 checkpoint commit
+- [格式] TDG 合并 6 处并行 wave（`8.1+8.2` 等），见 19:13 人工修订
 
 ### 合规检查
 
-- [x] 结构/格式/追溯/E2E/CR15/Notes/TDG/文档收敛/Code Review 均符合 gk-tasks
+- [x] 机械扫描：无 TBD/TODO/占位符；checkbox 与标题格式正确
+- [x] 结构：15 task 顺序；末 Code Review；倒数二文档收敛；倒数三 E2E
+- [x] Task 格式：序号连续；sub-task ≤10（不含 Checkpoint）
+- [x] Requirement 追溯：R1–R14 均有引用；实现 sub-task 含 Ref
+- [x] Checkpoint：可执行 shell；phpstan + phpunit；commit 含 `by Cursor`；state 按需于 sub-task
+- [x] E2E：13.1–13.3 覆盖关键场景；_脚本_/_人工_ 标注
+- [x] Code Review：委托 sub-agent，无展开 checklist
+- [x] Notes：spec-execution、checkpoint commit、TDG 并行说明
+- [x] TDG：json 代码块；45 waves；Checkpoint 独占；并行安全
+- [x] 文档收敛：14.1–14.3 对齐 Impact；含 migration
+- [x] 目的性：Design CR、模块覆盖、验收闭环
 
 ### 非阻塞说明
 
-- R14.1 ISS-31532 于 14.5 与 finish 一并闭环，与 goal 单次发布一致。
-
-### TDG 并行修订（2026-06-03 19:13，GK 后人工修正）
-
-- GK 曾将 51 个 leaf 拆为 51 个单任务 wave（过度串行）；按 gk-tasks「先合并、Checkpoint 独占」合并 6 处并行 wave：`8.1+8.2`、`10.1+10.2`、`12.2+12.3`、`13.1+13.2`、`14.1+14.2`、`14.4+14.5`；`14.3` 仍单独（与 14.2 同改 README/manual）。
+- R14 / ISS-31532 于 14.5 与 finish 一并闭环，与 goal 单次发布一致。
+- 无新增 Clarification Round；design D-CR 已在 tasks 编排中落地。

@@ -9,7 +9,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: `<workspace>/<targets[target]>`
+- 目标路径: `<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）
   - Cursor: `.cursor/skills/<name>/`
   - Kiro: `.kiro/skills/<name>/`
 - 操作: DirectoryMirrorService 递归复制整个目录（含子目录与文件），已存在则覆盖
@@ -35,7 +35,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: `<workspace>/<targets[target]>`
+- 目标路径: ``<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）`
   - Cursor: `.cursor/rules/[category/]<name>.mdc`
   - Kiro: `.kiro/steering/[category/]<name>.md`
 - 操作: 单文件复制（覆盖）
@@ -58,7 +58,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: `<workspace>/<targets[target]>`
+- 目标路径: ``<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）`
   - Cursor: `.cursor/agents/<name>.md`
   - Kiro: `.kiro/agents/<name>.md`
 - 操作: 单文件复制（覆盖）

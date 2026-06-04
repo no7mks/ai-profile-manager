@@ -99,6 +99,10 @@ failure
 
 委托给 `code-reviewer` sub-agent 执行，不在当前 sub-agent 上下文中内联执行。
 
+### 关闭 Issue
+
+凡 task 要求将 `issues/` 下文件标为 `closed` 或填写 `Fixed In`，**必须先读取** `issues/README.md` 的规则，再改 issue 文件。
+
 ### Release Stabilize
 
 在 release 分支上执行 stabilize 阶段的测试 task 时，遵循以下额外规则：
@@ -123,7 +127,7 @@ failure
 
 **Issue 修复规则**：
 - 修复前必须先编写 reproduction test
-- 修复后重新执行对应测试项，确认通过后更新 issue 状态为 closed
+- 修复后重新执行对应测试项，确认通过后按上文「关闭 Issue」更新 issue（含 `Fixed In` 等字段）
 
 **Beta Tag**：
 - beta tag 由用户手动控制，agent 不可自主打

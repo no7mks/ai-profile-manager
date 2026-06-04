@@ -3,10 +3,10 @@
 | 字段 | 值 |
 |------|-----|
 | Severity | `[P1] major` |
-| Status | `open` |
+| Status | `closed` |
 | Found In | `v0.8.0` |
-| Fixed In | |
-| Related Test | |
+| Fixed In | `2c96333` |
+| Related Test | `tests/ComposerBaselineResolverTest.php` |
 
 ---
 
@@ -48,4 +48,5 @@
 
 ## History
 
+- `2026-06-04` `2c96333` [关闭] Phase 1：`ComposerBaselineResolver` 增加 `~/.config/composer` fallback；spec `deploy-scope-and-cli`
 - `2026-06-03 17:30 +08` `v0.8.0` [发现] 调查 `plan:quick-plan-conventions` 显示 not-installed 时发现

@@ -4,6 +4,32 @@
 
 ---
 
+## 0. Bootstrap Phase（硬性前置）
+
+在任何 Detection / 能力安装之前：
+
+1. 确认当前目录为**业务仓库根**（用户目标项目）。
+2. 执行 `apm bootstrap`（默认 `-t cursor -t kiro`，除非用户仅使用单平台）。
+3. bootstrap 仅创建 scaffold（`docs/`、`issues/`、`AGENTS.md` 等），**不**安装 preset 或 conventional ability。
+4. 若 scaffold 已存在且无 `--force`，binary 可能报错——向用户确认是否加 `--force` 或跳过。
+
+**禁止**：用无参 `apm install` 代替 bootstrap；**禁止**在 init 中将 Global Setup List（`apm` skill、`git:git-conventions` 等）以 project scope 安装——这些仅由用户事先执行的 `apm global-setup` 提供。
+
+---
+
+## 0.5 Routing（init 路径）
+
+| 条件 | 路径 |
+|------|------|
+| 存在 package manifest **且** git 至少 1 条 commit | **检测式** → Section 1–5 |
+| 否则 | **规划式** → Section 6 |
+
+两路径在 bootstrap 之后均须：Agent 根据仓库/问答**自行决定**安装哪些 preset 或 typed ability（知晓 registry 全部 preset）；**不得**使用固定「语言→preset」映射表。init 中每条 `apm install` / `apm add` **默认** `-t cursor -t kiro`。
+
+init 结束前须向用户列出 **每条** 拟执行/已执行的 apm 命令及结果。
+
+---
+
 ## 1. Detection Phase
 
 Agent 在生成任何内容前，先收集项目元数据。以下为必须检查的信息源：
@@ -54,19 +80,7 @@ Agent 内部形成一份 **metadata summary**（不输出给用户），包含�
 
 ### Routing
 
-Detection 完成后，Agent 根据以下条件判断进入哪条路径：
-
-| 条件 | 路径 | 说明 |
-|------|------|------|
-| 检测到 package manifest（`composer.json` / `package.json` / `Cargo.toml` / `pom.xml` / `build.gradle` 等）**且**存在 git history（`.git/` 目录 + 至少 1 条 commit） | **检测式路径** | 继续执行 Section 2 → 3 → 4 → 5（现有流程） |
-| 上述条件不满足（空目录、仅 `git init` 无 commit、无 manifest 等） | **规划式路径** | 跳转至 Section 6（Planning-mode Path） |
-
-**判断规则：**
-
-1. "package manifest" 指项目根目录下存在上述任一文件
-2. "git history" 指 `.git/` 目录存在且 `git log --oneline -1` 能返回至少 1 条记录
-3. 两个条件必须**同时满足**才进入检测式路径；任一不满足即进入规划式路径
-4. 幂等性：重跑 init 时，若项目已有 manifest + git history，即使上次走的是规划式路径，本次也自动切换到检测式路径
+路径选择已在 **Section 0.5** 完成。Detection 仅服务于检测式路径的元数据收集。
 
 ---
 
@@ -103,7 +117,21 @@ Detection 完成后，Agent 将字段分为两类处理：
 1. Agent 先展示 auto-filled 结果供用户审阅
 2. 对 user-confirmation-required 字段逐一询问
 3. 用户回答 "不确定" 或跳过时，填入 `TODO` 占位
-4. 用户确认后进入 Generation Phase
+4. 用户确认后进入 Ability Installation Phase，再进入 Generation Phase
+
+---
+
+## 2.5 Ability Installation Phase（检测式）
+
+在 Generation 之前或与之交错，Agent 根据 Detection 与 Confirmation 结果决定并执行 project-scope 安装：
+
+1. 仅安装 registry 中存在的 preset / typed ability；名称不得臆造。
+2. 每条命令默认 `apm install <preset> -t cursor -t kiro` 或 `apm skill:install <name> -t cursor -t kiro` 等。
+3. **不**安装 Global Setup List 中的项到 project scope。
+4. 执行前可向用户说明选型理由；执行后记录每条命令的输出（`[ok]` / `[skip]` / `[fail]`）。
+5. preset 安装失败（校验或 ScopeGuard）时整单不写入，向用户报告后调整计划。
+
+规划式路径的能力安装在 Section 6.3 之后以相同规则执行。
 
 ---
 
