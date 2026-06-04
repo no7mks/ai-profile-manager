@@ -34,6 +34,9 @@ composer install
 
 # 覆盖率测试（Coverage）
 ./vendor/bin/phpunit --coverage-text
+
+# 静态分析（PHPStan，level 8，分析 src/；配置见 phpstan.neon）
+./vendor/bin/phpstan analyse
 ```
 
 测试执行约束：

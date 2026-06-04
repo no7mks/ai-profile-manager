@@ -94,10 +94,11 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ## 6. Checkpoint 校验
 
-- [ ] checkpoint 存在（推荐作为 top-level task 的最后一个 sub-task，也可作为独立 top-level task）
-- [ ] 包含具体的验证命令以及 commit 动作
-- [ ] 不是空泛的"确认完成"
-- [ ] 如指定了 commit message，须符合 `git-conventions.md` steering 规范
+- [ ] checkpoint 作为每个 top-level task 的最后一个 sub-task
+- [ ] 验证命令为可执行的完整 shell 命令，不得空泛（如「运行测试」「确认通过」）
+- [ ] **至少**列出静态分析与单元测试的具体命令（与 `PROJECT.md` 构建/测试约定一致）
+- [ ] 如有系统事实变化，checkpoint 包含 `docs/state/` 同步（写明具体 state 文件路径）
+- [ ] 包含 commit 动作；commit message 符合 `git-conventions.md` steering 规范
 
 ---
 
