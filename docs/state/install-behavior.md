@@ -174,6 +174,16 @@ Scaffold **不是** ability（不可由 `cleanup` 卸载）。由 **`apm bootstr
 
 ## 通用行为
 
+### Deploy Scope 与路径解析
+
+- **DeployRootResolver** 统一解析 project（`getcwd()`）与 user（`$HOME`）根目录；`absoluteTargetPath(scope, relativeTarget)` 将 registry `targets[target]` 拼为绝对路径。
+- **InstallationProbe** 判断 ability 是否已安装：`isPresent(type, name, target, scope)` 通过 `AbilityRegistry::getEntry()` 取 `targets[target]`，再经 DeployRootResolver 定位磁盘路径。
+  - `skill`：`is_dir(path)`
+  - `rule` / `agent`：`is_file(path)`（使用 registry 完整相对路径，禁止仅按 basename 匹配 category rule）
+  - `hook`：`is_file(path) || is_dir(path)`（兼容 Kiro 单文件与 Cursor 目录）
+- **Installer** 将 `isInstalledOnTarget()` 委托给 InstallationProbe（默认 project scope）；`uninstallSkill` / `uninstallRule` / `uninstallAgent` 通过 `resolveProjectTargetPath()` 使用 registry 路径卸载（不再递归 basename 搜索）。
+- **uninstallProjectScope()**：遍历 registry 中 skill/rule/agent/hook，对每个 target 用 InstallationProbe 探测 project scope 是否存在，存在则卸载；供后续 **cleanup** 命令批量清理 project 安装，不触及 user scope。
+
 ### Baseline 解析
 
 ComposerBaselineResolver 按以下优先级定位 global apm 包安装路径（`install_path`）：

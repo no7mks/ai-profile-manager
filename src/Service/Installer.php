@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
+use AiProfileManager\Config\DeployScope;
 use AiProfileManager\Config\PackagePaths;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -12,6 +13,8 @@ final class Installer
 {
     private readonly string $packageRoot;
 
+    private readonly InstallationProbe $installationProbe;
+
     public function __construct(
         private readonly AbilityRegistry $registry = new AbilityRegistry(__DIR__ . '/../../abilities.yaml'),
         private readonly HookInstaller $hookInstaller = new HookInstaller(),
@@ -19,8 +22,11 @@ final class Installer
         private readonly GitIgnoreTemplateService $gitIgnore = new GitIgnoreTemplateService(),
         ?string $packageRoot = null,
         private readonly DirectoryMirrorService $mirror = new DirectoryMirrorService(),
+        private readonly DeployRootResolver $rootResolver = new DeployRootResolver(),
+        ?InstallationProbe $installationProbe = null,
     ) {
         $this->packageRoot = $packageRoot ?? PackagePaths::packageRoot();
+        $this->installationProbe = $installationProbe ?? new InstallationProbe($this->registry, $this->rootResolver);
     }
 
     /**
@@ -140,6 +146,60 @@ final class Installer
     }
 
     /**
+     * Uninstall conventional abilities present under project scope (registry-driven paths).
+     *
+     * @return array{lines: array<int, string>, exit_code: int}
+     */
+    public function uninstallProjectScope(): array
+    {
+        $scope = DeployScope::Project;
+        $parsed = $this->registry->parse();
+
+        $lines = [];
+        $lines[] = 'Uninstalling project-scope conventional abilities...';
+        $lines[] = '';
+
+        $exitCode = 0;
+        $sections = [
+            'skills' => 'skill',
+            'rules' => 'rule',
+            'agents' => 'agent',
+            'hooks' => 'hook',
+        ];
+
+        foreach ($sections as $section => $type) {
+            foreach ($parsed[$section] as $entry) {
+                foreach (array_keys($entry->targets) as $target) {
+                    if (!$this->installationProbe->isPresent($type, $entry->path, $target, $scope)) {
+                        continue;
+                    }
+
+                    if ($type === 'hook') {
+                        $r = $this->uninstallHook($entry->path, $target, true);
+                        $lines = array_merge($lines, $r['lines']);
+                        if ($r['failed']) {
+                            $exitCode = 1;
+                        }
+                        continue;
+                    }
+
+                    $lines = array_merge(
+                        $lines,
+                        match ($type) {
+                            'skill' => $this->uninstallSkill($entry->path, $target),
+                            'rule' => $this->uninstallRule($entry->path, $target),
+                            'agent' => $this->uninstallAgent($entry->path, $target),
+                            default => [],
+                        },
+                    );
+                }
+            }
+        }
+
+        return ['lines' => $lines, 'exit_code' => $exitCode];
+    }
+
+    /**
      * @return array{skills: list<string>, rules: list<string>, agents: list<string>, hooks: list<string>}
      */
     public function listAvailableItems(): array
@@ -166,37 +226,7 @@ final class Installer
 
     public function isInstalledOnTarget(string $type, string $name, string $target): bool
     {
-        if ($type === 'skill') {
-            return is_dir($this->resolveInstallTargetDir('skill', $name, $target));
-        }
-        if ($type === 'agent') {
-            return is_file($this->resolveInstallTargetAgentFile($name, $target));
-        }
-        if ($type !== 'rule') {
-            return false;
-        }
-
-        $root = $target === 'cursor'
-            ? (string) getcwd() . '/.cursor/rules'
-            : (string) getcwd() . '/.kiro/steering';
-        $suffix = $target === 'cursor' ? '.mdc' : '.md';
-        if (!is_dir($root)) {
-            return false;
-        }
-
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS)
-        );
-        foreach ($iterator as $fileInfo) {
-            if (!$fileInfo->isFile()) {
-                continue;
-            }
-            if ($fileInfo->getBasename() === $name . $suffix) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->installationProbe->isPresent($type, $name, $target, DeployScope::Project);
     }
 
     /**
@@ -304,14 +334,6 @@ final class Installer
         ];
     }
 
-    private function resolveInstallTargetAgentFile(string $name, string $target): string
-    {
-        $cwd = (string) getcwd();
-        $base = $target === 'cursor' ? $cwd . '/.cursor' : $cwd . '/.kiro';
-
-        return $base . '/agents/' . $name . '.md';
-    }
-
     /**
      * @return array{lines: array<int, string>, failed: bool}
      */
@@ -406,12 +428,12 @@ final class Installer
      */
     private function uninstallSkill(string $name, string $target): array
     {
-        $dir = $this->resolveInstallTargetDir('skill', $name, $target);
-        if (!is_dir($dir)) {
+        $path = $this->resolveProjectTargetPath('skill', $name, $target);
+        if ($path === null || !is_dir($path)) {
             return [sprintf('[miss] Skill %s not found on %s', $name, $target)];
         }
 
-        $this->removeDirectory($dir);
+        $this->removeDirectory($path);
 
         return [sprintf('[ok] Uninstalled skill %s from %s', $name, $target)];
     }
@@ -421,35 +443,16 @@ final class Installer
      */
     private function uninstallRule(string $name, string $target): array
     {
-        $root = $target === 'cursor'
-            ? (string) getcwd() . '/.cursor/rules'
-            : (string) getcwd() . '/.kiro/steering';
-        $suffix = $target === 'cursor' ? '.mdc' : '.md';
-        if (!is_dir($root)) {
-            return [sprintf('[miss] %s %s not found on %s', $target === 'kiro' ? 'Steering' : 'Rule', $name, $target)];
+        $label = $target === 'kiro' ? 'Steering' : 'Rule';
+        $okLabel = $target === 'kiro' ? 'steering' : 'rule';
+        $path = $this->resolveProjectTargetPath('rule', $name, $target);
+        if ($path === null || !is_file($path)) {
+            return [sprintf('[miss] %s %s not found on %s', $label, $name, $target)];
         }
 
-        $removed = [];
-        $iterator = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($root, RecursiveDirectoryIterator::SKIP_DOTS)
-        );
-        foreach ($iterator as $fileInfo) {
-            if (!$fileInfo->isFile()) {
-                continue;
-            }
-            if ($fileInfo->getBasename() !== $name . $suffix) {
-                continue;
-            }
-            $path = $fileInfo->getPathname();
-            if (is_file($path) && unlink($path)) {
-                $removed[] = $path;
-            }
-        }
-        if ($removed === []) {
-            return [sprintf('[miss] %s %s not found on %s', $target === 'kiro' ? 'Steering' : 'Rule', $name, $target)];
-        }
+        unlink($path);
 
-        return [sprintf('[ok] Uninstalled %s %s from %s', $target === 'kiro' ? 'steering' : 'rule', $name, $target)];
+        return [sprintf('[ok] Uninstalled %s %s from %s', $okLabel, $name, $target)];
     }
 
     /**
@@ -457,21 +460,28 @@ final class Installer
      */
     private function uninstallAgent(string $name, string $target): array
     {
-        $file = $this->resolveInstallTargetAgentFile($name, $target);
-        if (!is_file($file)) {
+        $path = $this->resolveProjectTargetPath('agent', $name, $target);
+        if ($path === null || !is_file($path)) {
             return [sprintf('[miss] Agent %s not found on %s', $name, $target)];
         }
-        unlink($file);
+        unlink($path);
 
         return [sprintf('[ok] Uninstalled agent %s from %s', $name, $target)];
     }
 
-    private function resolveInstallTargetDir(string $type, string $name, string $target): string
+    private function resolveProjectTargetPath(string $type, string $name, string $target): ?string
     {
-        $cwd = (string) getcwd();
-        $base = $target === 'cursor' ? $cwd . '/.cursor' : $cwd . '/.kiro';
+        $entry = $this->registry->getEntry($type, $name);
+        if ($entry === null) {
+            return null;
+        }
 
-        return $base . '/skills/' . $name;
+        $relative = $entry->targets[$target] ?? null;
+        if ($relative === null) {
+            return null;
+        }
+
+        return $this->rootResolver->absoluteTargetPath(DeployScope::Project, $relative);
     }
 
     private function removeDirectory(string $dir): void

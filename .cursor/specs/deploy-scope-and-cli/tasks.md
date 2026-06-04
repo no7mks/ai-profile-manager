@@ -34,19 +34,19 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 4, AC 1–3_
   - [x] 3.4 Checkpoint — `./vendor/bin/phpunit`；commit: `+(registry) by Cursor: global-setup and scopes`
 
-- [ ] 4. ScopeGuard
-  - [ ] 4.1 `InvalidScopeException`
+- [x] 4. ScopeGuard
+  - [x] 4.1 `InvalidScopeException`
     - _Ref: Requirement 3, AC 4–6_
-  - [ ] 4.2 `ScopeGuard::assertBatchAllowed()` + 测试（零部分写入）
+  - [x] 4.2 `ScopeGuard::assertBatchAllowed()` + 测试（零部分写入）
     - _Ref: Requirement 3, AC 6; Requirement 8, AC 4_
-  - [ ] 4.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(scope) by Cursor: ScopeGuard`
+  - [x] 4.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(scope) by Cursor: ScopeGuard`
 
-- [ ] 5. InstallationProbe + Installer
-  - [ ] 5.1 `InstallationProbe::isPresent()` + category rule 测试
+- [x] 5. InstallationProbe + Installer
+  - [x] 5.1 `InstallationProbe::isPresent()` + category rule 测试
     - _Ref: Requirement 2, AC 1–3_
-  - [ ] 5.2 `Installer` 委托 probe + `DeployRootResolver`；`uninstallProjectScope()`
+  - [x] 5.2 `Installer` 委托 probe + `DeployRootResolver`；`uninstallProjectScope()`
     - _Ref: Requirement 2, AC 4–5; Requirement 7, AC 1_
-  - [ ] 5.3 Checkpoint — `./vendor/bin/phpunit`；commit: `*(install) by Cursor: scope-aware InstallationProbe`
+  - [x] 5.3 Checkpoint — `./vendor/bin/phpunit`；commit: `*(install) by Cursor: scope-aware InstallationProbe`
 
 - [ ] 6. CheckService scope
   - [ ] 6.1 `checkTypedForScope()` + 测试

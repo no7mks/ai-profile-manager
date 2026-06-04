@@ -122,7 +122,14 @@ YAML;
         mkdir($pkg, 0775, true);
 
         $registryPath = $this->tmpDir . '/abilities.yaml';
-        file_put_contents($registryPath, "rules: []\n");
+        file_put_contents($registryPath, implode("\n", [
+            'skills:',
+            '  - path: demo-skill',
+            '    description: Demo skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+            'rules: []',
+        ]));
 
         $project = $this->tmpDir . '/project';
         mkdir($project . '/.cursor/skills/demo-skill', 0775, true);
