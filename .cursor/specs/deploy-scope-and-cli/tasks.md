@@ -48,12 +48,12 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 2, AC 4–5; Requirement 7, AC 1_
   - [x] 5.3 Checkpoint — `./vendor/bin/phpunit`；commit: `*(install) by Cursor: scope-aware InstallationProbe`
 
-- [ ] 6. CheckService scope
-  - [ ] 6.1 `checkTypedForScope()` + 测试
+- [x] 6. CheckService scope
+  - [x] 6.1 `checkTypedForScope()` + 测试
     - _Ref: Requirement 9, AC 4_
-  - [ ] 6.2 user scope `HookChecker` 路径
+  - [x] 6.2 user scope `HookChecker` 路径
     - _Ref: Requirement 3, AC 3; design P2 Check_
-  - [ ] 6.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(check) by Cursor: scope-aware checks`
+  - [x] 6.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(check) by Cursor: scope-aware checks`
 
 - [ ] 7. Show 重写
   - [ ] 7.1 `ShowStatusPresenter` + 映射/双 scope/targets 测试

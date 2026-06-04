@@ -60,3 +60,11 @@ Deploy scope 路径根解析与 CLI 默认行为（SSOT）；registry `scopes`�
 整批在 Guard 阶段**先全部校验、后写盘**。任一项在 user scope 下非法 → **整批失败**，调用方不得写入任何目标文件（零部分写入）。混合合法与非法项时，在**第一个**非法项处抛错，此前亦无磁盘副作用。
 
 安装命令族（task 12）在 preset / typed batch 安装前应调用 `assertBatchAllowed`；具体 CLI 接线尚未在本阶段完成。
+
+---
+
+## CheckService
+
+- **`checkTypedForScope($items, $targets, $scope)`**：`DeployRootResolver::resolve($scope)` 为已安装侧根（`project` = workspace，`user` = `$HOME`），与 baseline `install_path` 对比 skill/rule/agent（`AbilityDiffService`）与 hook（`HookChecker`）。
+- **`checkTyped()`**：等同 `checkTypedForScope(..., project)`；`check` / `skill:check` 等 CLI 仍只查 project scope，不新增 `--scope`。
+- **hook**：Kiro 目标 `{root}/.kiro/hooks/<name>.kiro.hook`；Cursor 为 `{root}/.cursor/hooks/<name>/` 与 `hooks.json`。user scope 仅以 `$HOME` 为根，与 project 安装位置分离。
