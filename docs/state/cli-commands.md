@@ -306,6 +306,27 @@ apm 所有已注册命令的签名、行为与错误条件。
 
 ---
 
+## global-setup
+
+**签名**: `global-setup [-t|--target TARGET...] [-f|--force]`
+
+**正常行为**:
+
+- 从 AbilityRegistry 的 Global Setup List 读取条目，仅安装到 **User Scope**（用户主目录下的 deploy root）
+- 不接受 preset 或 `--scope` 参数；可在任意工作目录执行
+- 无 `-t` 时默认 `['cursor', 'kiro']`；某条目在指定 target 无对应源时输出 `[skip]` 及原因，不因此失败
+- 已安装且未传 `--force` 时幂等跳过；传 `--force` 时从包内 baseline 覆盖用户 scope 已安装文件
+- 成功结束时提示在业务仓库中执行 `/apm init`
+
+**错误条件**:
+
+| 条件 | 响应 |
+|------|------|
+| target 不在 KNOWN_TARGETS 中 | 输出错误信息，exit FAILURE |
+| 安装过程中出现不可恢复错误 | 输出 `[fail]` 等行，exit FAILURE |
+
+---
+
 ## 通用行为
 
 ### target 参数

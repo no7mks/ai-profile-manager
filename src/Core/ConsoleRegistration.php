@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace AiProfileManager\Core;
 
 use AiProfileManager\Command\AgentCheckCommand;
+use AiProfileManager\Command\BootstrapCommand;
 use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\AgentUninstallCommand;
 use AiProfileManager\Command\CheckCommand;
+use AiProfileManager\Command\GlobalSetupCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
 use AiProfileManager\Command\PresetCreateCommand;
@@ -52,6 +54,7 @@ final class ConsoleRegistration
         }
 
         $app->addCommand(new InstallCommand(...$installArgs));
+        $app->addCommand(new BootstrapCommand());
         $app->addCommand($showCommand);
         $app->addCommand(new SkillInstallCommand($installer));
         $app->addCommand(new RuleInstallCommand($installer));
@@ -69,5 +72,6 @@ final class ConsoleRegistration
         $app->addCommand(new PresetRemoveAbilityCommand($presetRegistry));
         $app->addCommand(new PresetDeleteCommand($presetRegistry));
         $app->addCommand(UpdateCommand::create($installer));
+        $app->addCommand(GlobalSetupCommand::create($installer));
     }
 }

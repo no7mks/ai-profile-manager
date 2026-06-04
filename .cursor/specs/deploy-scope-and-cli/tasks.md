@@ -71,12 +71,12 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 10; design D-CR3 A_
   - [x] 8.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(update) by Cursor: global-only baseline update`
 
-- [ ] 9. global-setup 命令
-  - [ ] 9.1 `GlobalSetupCommandTest`（仅列表、user、幂等/force、skip、提示 init）
+- [x] 9. global-setup 命令
+  - [x] 9.1 `GlobalSetupCommandTest`（仅列表、user、幂等/force、skip、提示 init）
     - _Ref: Requirement 5, AC 1–6_
-  - [ ] 9.2 `GlobalSetupCommand` + `ConsoleRegistration` DI
+  - [x] 9.2 `GlobalSetupCommand` + `ConsoleRegistration` DI
     - _Ref: Requirement 5, AC 1–6_
-  - [ ] 9.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: global-setup command`
+  - [x] 9.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: global-setup command`
 
 - [ ] 10. bootstrap + 无参 install 废弃
   - [ ] 10.1 `BootstrapCommand`（仅 `ProjectInitializer`）；更新 `BootstrapLifecycleTest`
