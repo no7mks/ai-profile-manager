@@ -18,12 +18,12 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 1, AC 6_
   - [x] 1.5 Checkpoint — `./vendor/bin/phpunit`；commit: `+(baseline) by Cursor: XDG composer home fallback`
 
-- [ ] 2. DeployRootResolver
-  - [ ] 2.1 `DeployScope` enum（`src/Config/DeployScope.php`）
+- [x] 2. DeployRootResolver
+  - [x] 2.1 `DeployScope` enum（`src/Config/DeployScope.php`）
     - _Ref: Requirement 3, AC 1_
-  - [ ] 2.2 `DeployRootResolver` + `DeployRootResolverTest`（resolve/parseScopeOption/absoluteTargetPath；非法 scope 抛 `InvalidScopeException`）
+  - [x] 2.2 `DeployRootResolver` + `DeployRootResolverTest`（resolve/parseScopeOption/absoluteTargetPath；非法 scope 抛 `InvalidScopeException`）
     - _Ref: Requirement 3, AC 2–3, 5_
-  - [ ] 2.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(scope) by Cursor: DeployRootResolver`
+  - [x] 2.3 Checkpoint — `./vendor/bin/phpunit`；commit: `+(scope) by Cursor: DeployRootResolver`
 
 - [ ] 3. Registry：scopes、global-setup、删 default
   - [ ] 3.1 `AbilityEntry.scopes` 解析，默认 `[project]`
