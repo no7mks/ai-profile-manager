@@ -25,3 +25,7 @@ alwaysApply: true
 | `/.cursor/skills/` | Cursor agent skills | — |
 | `/.cursor/agents/` | Cursor agent 定义 | — |
 | `/.cursor/hooks/` | Cursor agent hooks | — |
+
+## Plan mode / 快速计划
+
+进入 **Plan mode**、**Build Plan**、或创建/执行**非 Spec 四件套**的 plan 时，**必须先读取** `@.cursor/rules/plan/quick-plan-conventions.mdc`。计划 SSOT **仅**为 `.cursor/specs/<slug>-plan.md`。`~/.cursor/plans/` 与 `.cursor/plans/` **禁止**作为计划来源；若 IDE 写入该处，**须在同一轮对话内立即**迁到 `.cursor/specs/`（详见 quick-plan 约定）。
