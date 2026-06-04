@@ -183,6 +183,7 @@ Scaffold **不是** ability（不可由 `cleanup` 卸载）。由 **`apm bootstr
   - `hook`：`is_file(path) || is_dir(path)`（兼容 Kiro 单文件与 Cursor 目录）
 - **Installer** 将 `isInstalledOnTarget()` 委托给 InstallationProbe（默认 project scope）；`uninstallSkill` / `uninstallRule` / `uninstallAgent` 通过 `resolveProjectTargetPath()` 使用 registry 路径卸载（不再递归 basename 搜索）。
 - **uninstallProjectScope()**：遍历 registry 中 skill/rule/agent/hook，对每个 target 用 InstallationProbe 探测 project scope 是否存在，存在则卸载；供后续 **cleanup** 命令批量清理 project 安装，不触及 user scope。
+- **Scope 安装 CLI**：`Installer::installTyped()` / `uninstallTyped()` 接受 `DeployScope`；install 族命令在调用前经 `ScopeGuard::assertBatchAllowed`（user scope 下 project-only 整批拒绝）。输出含 `Scope: project|user` 行。
 
 ### Baseline 解析
 

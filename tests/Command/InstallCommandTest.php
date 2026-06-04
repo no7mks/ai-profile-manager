@@ -70,7 +70,8 @@ final class InstallCommandTest extends TestCase
         $exit = $tester->execute(['preset' => 'nonexistent-preset', '--target' => ['cursor']]);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Unknown preset', $tester->getDisplay());
+        self::assertStringContainsString('requires an explicit type prefix', $tester->getDisplay());
+        self::assertStringContainsString('apm add skill', $tester->getDisplay());
     }
 
     public function testBareInstallFailsWithGuidance(): void

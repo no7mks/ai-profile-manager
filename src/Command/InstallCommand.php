@@ -17,6 +17,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class InstallCommand extends Command
 {
+    use HandlesDeployScopeOption;
     private const BARE_INSTALL_GUIDANCE = <<<'MSG'
 Install requires a preset name. Bare `apm install` is no longer supported.
 
@@ -24,6 +25,16 @@ Use instead:
   apm global-setup                         # user-scope abilities (once after composer global install)
   apm bootstrap                            # project scaffold (in your repository)
   apm add skill|rule|agent|preset <name>   # install specific abilities
+MSG;
+
+    private const UNTYPED_ADD_GUIDANCE = <<<'MSG'
+Adding an ability requires an explicit type prefix.
+
+Use instead:
+  apm add skill <name>
+  apm add rule <name>
+  apm add agent <name>
+  apm add <preset-name>              # install a preset by name
 MSG;
 
     private const DEFAULT_PRESET_MIGRATION = <<<'MSG'
@@ -43,6 +54,7 @@ MSG;
     protected function configure(): void
     {
         $this->setName('install');
+        $this->setAliases(['add']);
         $this->setDescription('Install a preset to project scope.');
         $this->addArgument('preset', InputArgument::OPTIONAL, 'Preset name to install.');
         $this->addOption(
@@ -51,6 +63,7 @@ MSG;
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'Target IDE/CLI tool. Repeat for multiple values.'
         );
+        $this->configureDeployScopeOption();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -88,11 +101,8 @@ MSG;
 
         $known = array_map(fn(array $p) => $p['name'], $this->presetRegistry->allPresets());
         if (!in_array($preset, $known, true)) {
-            $io->error(sprintf(
-                'Unknown preset: %s. Known presets: %s.',
-                $preset,
-                implode(', ', $known)
-            ));
+            $io->error(self::UNTYPED_ADD_GUIDANCE);
+
             return Command::FAILURE;
         }
 
@@ -101,9 +111,25 @@ MSG;
             return Command::FAILURE;
         }
 
+        $scope = $this->resolveDeployScopeOption($input, $io);
+        if ($scope === null) {
+            return Command::FAILURE;
+        }
+
+        $validationErrors = $this->presetRegistry->validatePresetInstall($presetSpec, $targets);
+        if ($validationErrors !== []) {
+            $io->error($validationErrors[0]);
+
+            return Command::FAILURE;
+        }
+
+        if (!$this->guardPresetInstall($this->installer, $scope, $presetSpec, $io)) {
+            return Command::FAILURE;
+        }
+
         $items = PresetRegistry::toTypedSpec($presetSpec);
         $io->writeln("Preset: {$preset}");
-        $result = $this->installer->installTyped($items, $targets, $preset);
+        $result = $this->installer->installTyped($items, $targets, $preset, $scope);
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

@@ -35,13 +35,19 @@ final class Installer
      * @param string|null $presetName
      * @return array{lines: array<int, string>, exit_code: int}
      */
-    public function installTyped(array $items, array $targets, ?string $presetName = null): array
+    public function installTyped(
+        array $items,
+        array $targets,
+        ?string $presetName = null,
+        DeployScope $scope = DeployScope::Project,
+    ): array
     {
         $hooks = $items['hooks'] ?? [];
         $prompts = $items['prompts'] ?? [];
 
         $lines = [];
         $lines[] = 'Installing profile items...';
+        $lines[] = 'Scope: ' . $scope->value;
         $lines[] = 'Targets: ' . implode(', ', $targets);
         $lines[] = 'Skills: ' . $this->formatList($items['skills']);
         $lines[] = 'Rules: ' . $this->formatList($items['rules']);
@@ -53,21 +59,21 @@ final class Installer
 
         foreach ($targets as $target) {
             foreach ($items['skills'] as $name) {
-                $r = $this->installAbilityBundle('skill', $name, $target);
+                $r = $this->installAbilityBundle('skill', $name, $target, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {
                     $exitCode = 1;
                 }
             }
             foreach ($items['rules'] as $name) {
-                $r = $this->installAbilityBundle('rule', $name, $target);
+                $r = $this->installAbilityBundle('rule', $name, $target, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {
                     $exitCode = 1;
                 }
             }
             foreach ($items['agents'] as $name) {
-                $r = $this->installAbilityBundle('agent', $name, $target);
+                $r = $this->installAbilityBundle('agent', $name, $target, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {
                     $exitCode = 1;
@@ -75,7 +81,7 @@ final class Installer
             }
             // hooks: dispatch to HookInstaller per target
             foreach ($hooks as $hookName) {
-                $r = $this->installHook($hookName, $target);
+                $r = $this->installHook($hookName, $target, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {
                     $exitCode = 1;
@@ -83,8 +89,10 @@ final class Installer
             }
         }
 
-        $gitignoreResult = $this->installGitIgnore($items, $targets, $presetName);
-        $lines[] = $gitignoreResult;
+        if ($scope === DeployScope::Project) {
+            $gitignoreResult = $this->installGitIgnore($items, $targets, $presetName);
+            $lines[] = $gitignoreResult;
+        }
 
         // Prompts: output messages for agent to act on
         if ($prompts !== []) {
@@ -107,12 +115,18 @@ final class Installer
      * @param bool $force 是否强制卸载（跳过 drift 检查）
      * @return array{lines: array<int, string>, exit_code: int}
      */
-    public function uninstallTyped(array $items, array $targets, bool $force = false): array
+    public function uninstallTyped(
+        array $items,
+        array $targets,
+        bool $force = false,
+        DeployScope $scope = DeployScope::Project,
+    ): array
     {
         $hooks = $items['hooks'] ?? [];
 
         $lines = [];
         $lines[] = 'Uninstalling profile items...';
+        $lines[] = 'Scope: ' . $scope->value;
         $lines[] = 'Targets: ' . implode(', ', $targets);
         $lines[] = 'Skills: ' . $this->formatList($items['skills']);
         $lines[] = 'Rules: ' . $this->formatList($items['rules']);
@@ -124,17 +138,17 @@ final class Installer
 
         foreach ($targets as $target) {
             foreach ($items['skills'] as $name) {
-                $lines = array_merge($lines, $this->uninstallSkill($name, $target));
+                $lines = array_merge($lines, $this->uninstallSkill($name, $target, $scope));
             }
             foreach ($items['rules'] as $name) {
-                $lines = array_merge($lines, $this->uninstallRule($name, $target));
+                $lines = array_merge($lines, $this->uninstallRule($name, $target, $scope));
             }
             foreach ($items['agents'] as $name) {
-                $lines = array_merge($lines, $this->uninstallAgent($name, $target));
+                $lines = array_merge($lines, $this->uninstallAgent($name, $target, $scope));
             }
             // hooks: dispatch to HookInstaller per target with drift check
             foreach ($hooks as $hookName) {
-                $r = $this->uninstallHook($hookName, $target, $force);
+                $r = $this->uninstallHook($hookName, $target, $force, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {
                     $exitCode = 1;
@@ -175,7 +189,7 @@ final class Installer
                     }
 
                     if ($type === 'hook') {
-                        $r = $this->uninstallHook($entry->path, $target, true);
+                        $r = $this->uninstallHook($entry->path, $target, true, $scope);
                         $lines = array_merge($lines, $r['lines']);
                         if ($r['failed']) {
                             $exitCode = 1;
@@ -186,9 +200,9 @@ final class Installer
                     $lines = array_merge(
                         $lines,
                         match ($section) {
-                            'skills' => $this->uninstallSkill($entry->path, $target),
-                            'rules' => $this->uninstallRule($entry->path, $target),
-                            'agents' => $this->uninstallAgent($entry->path, $target),
+                            'skills' => $this->uninstallSkill($entry->path, $target, $scope),
+                            'rules' => $this->uninstallRule($entry->path, $target, $scope),
+                            'agents' => $this->uninstallAgent($entry->path, $target, $scope),
                             default => [],
                         },
                     );
@@ -273,35 +287,22 @@ final class Installer
     }
 
     /**
-     * 从 AbilityRegistry 解析目标路径。
-     * 返回 $workspace/<targets[target]>。
+     * 从 AbilityRegistry 解析目标路径（scope 根 + targets[target]）。
      */
-    private function resolveDestPath(string $type, string $name, string $target, string $workspace): string
+    private function resolveDestPath(string $type, string $name, string $target, DeployScope $scope): string
     {
-        $parsed = $this->registry->parse();
-        $section = match ($type) {
-            'skill' => 'skills',
-            'agent' => 'agents',
-            'rule' => 'rules',
-            default => null,
-        };
-
-        if ($section !== null) {
-            foreach ($parsed[$section] as $e) {
-                if ($e->path === $name) {
-                    return $workspace . '/' . $e->targets[$target];
-                }
-            }
+        $entry = $this->registry->getEntry($type, $name);
+        if ($entry !== null && isset($entry->targets[$target])) {
+            return $this->rootResolver->absoluteTargetPath($scope, $entry->targets[$target]);
         }
 
-        // Fallback — should not be reached when called after resolveSourcePath succeeds
-        return $workspace . '/' . $name;
+        return $this->rootResolver->absoluteTargetPath($scope, $name);
     }
 
     /**
      * @return array{lines: array<int, string>, failed: bool}
      */
-    private function installAbilityBundle(string $type, string $name, string $target): array
+    private function installAbilityBundle(string $type, string $name, string $target, DeployScope $scope): array
     {
         $src = $this->resolveSourcePath($type, $name, $target);
 
@@ -310,7 +311,7 @@ final class Installer
             return ['lines' => [], 'failed' => false];
         }
 
-        $dst = $this->resolveDestPath($type, $name, $target, (string) getcwd());
+        $dst = $this->resolveDestPath($type, $name, $target, $scope);
 
         // 检查源路径是否存在
         $sourceExists = $type === 'skill' ? is_dir($src) : is_file($src);
@@ -347,20 +348,20 @@ final class Installer
     /**
      * @return array{lines: array<int, string>, failed: bool}
      */
-    private function installHook(string $hookName, string $target): array
+    private function installHook(string $hookName, string $target, DeployScope $scope): array
     {
-        $cwd = (string) getcwd();
+        $root = $this->rootResolver->resolve($scope);
 
         if ($target === 'kiro') {
             $sourcePath = $this->packageRoot . '/hooks/' . $hookName . '.kiro.hook';
-            $targetPath = $cwd . '/.kiro/hooks/' . $hookName . '.kiro.hook';
+            $targetPath = $root . '/.kiro/hooks/' . $hookName . '.kiro.hook';
 
             $result = $this->hookInstaller->installKiro($sourcePath, $targetPath);
         } else {
             // cursor
             $sourceDir = $this->packageRoot . '/hooks/' . $hookName;
-            $targetDir = $cwd . '/.cursor/hooks/' . $hookName;
-            $hookRegistryPath = $cwd . '/.cursor/hooks.json';
+            $targetDir = $root . '/.cursor/hooks/' . $hookName;
+            $hookRegistryPath = $root . '/.cursor/hooks.json';
 
             $result = $this->hookInstaller->installCursor($sourceDir, $targetDir, $hookRegistryPath);
         }
@@ -381,13 +382,13 @@ final class Installer
     /**
      * @return array{lines: array<int, string>, failed: bool}
      */
-    private function uninstallHook(string $hookName, string $target, bool $force): array
+    private function uninstallHook(string $hookName, string $target, bool $force, DeployScope $scope): array
     {
-        $cwd = (string) getcwd();
+        $root = $this->rootResolver->resolve($scope);
 
         if ($target === 'kiro') {
             $sourcePath = $this->packageRoot . '/hooks/' . $hookName . '.kiro.hook';
-            $targetPath = $cwd . '/.kiro/hooks/' . $hookName . '.kiro.hook';
+            $targetPath = $root . '/.kiro/hooks/' . $hookName . '.kiro.hook';
 
             // Drift check for Kiro platform
             $checkResult = $this->hookChecker->checkKiro($sourcePath, $targetPath);
@@ -407,8 +408,8 @@ final class Installer
             $result = $this->hookInstaller->uninstallKiro($targetPath);
         } else {
             // Cursor: no drift concept, uninstall directly
-            $targetDir = $cwd . '/.cursor/hooks/' . $hookName;
-            $hookRegistryPath = $cwd . '/.cursor/hooks.json';
+            $targetDir = $root . '/.cursor/hooks/' . $hookName;
+            $hookRegistryPath = $root . '/.cursor/hooks.json';
 
             $result = $this->hookInstaller->uninstallCursor($targetDir, $hookRegistryPath);
         }
@@ -436,9 +437,9 @@ final class Installer
     /**
      * @return array<int, string>
      */
-    private function uninstallSkill(string $name, string $target): array
+    private function uninstallSkill(string $name, string $target, DeployScope $scope): array
     {
-        $path = $this->resolveProjectTargetPath('skill', $name, $target);
+        $path = $this->resolveScopedTargetPath('skill', $name, $target, $scope);
         if ($path === null || !is_dir($path)) {
             return [sprintf('[miss] Skill %s not found on %s', $name, $target)];
         }
@@ -451,11 +452,11 @@ final class Installer
     /**
      * @return array<int, string>
      */
-    private function uninstallRule(string $name, string $target): array
+    private function uninstallRule(string $name, string $target, DeployScope $scope): array
     {
         $label = $target === 'kiro' ? 'Steering' : 'Rule';
         $okLabel = $target === 'kiro' ? 'steering' : 'rule';
-        $path = $this->resolveProjectTargetPath('rule', $name, $target);
+        $path = $this->resolveScopedTargetPath('rule', $name, $target, $scope);
         if ($path === null || !is_file($path)) {
             return [sprintf('[miss] %s %s not found on %s', $label, $name, $target)];
         }
@@ -468,9 +469,9 @@ final class Installer
     /**
      * @return array<int, string>
      */
-    private function uninstallAgent(string $name, string $target): array
+    private function uninstallAgent(string $name, string $target, DeployScope $scope): array
     {
-        $path = $this->resolveProjectTargetPath('agent', $name, $target);
+        $path = $this->resolveScopedTargetPath('agent', $name, $target, $scope);
         if ($path === null || !is_file($path)) {
             return [sprintf('[miss] Agent %s not found on %s', $name, $target)];
         }
@@ -479,7 +480,7 @@ final class Installer
         return [sprintf('[ok] Uninstalled agent %s from %s', $name, $target)];
     }
 
-    private function resolveProjectTargetPath(string $type, string $name, string $target): ?string
+    private function resolveScopedTargetPath(string $type, string $name, string $target, DeployScope $scope): ?string
     {
         $entry = $this->registry->getEntry($type, $name);
         if ($entry === null) {
@@ -491,7 +492,7 @@ final class Installer
             return null;
         }
 
-        return $this->rootResolver->absoluteTargetPath(DeployScope::Project, $relative);
+        return $this->rootResolver->absoluteTargetPath($scope, $relative);
     }
 
     private function removeDirectory(string $dir): void

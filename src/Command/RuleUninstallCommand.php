@@ -16,6 +16,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class RuleUninstallCommand extends Command
 {
+    use HandlesDeployScopeOption;
     public function __construct(
         private readonly Installer $installer,
         private readonly CheckService $checker,
@@ -26,10 +27,12 @@ final class RuleUninstallCommand extends Command
     protected function configure(): void
     {
         $this->setName('rule:uninstall');
+        $this->setAliases(['rule:remove']);
         $this->setDescription('Uninstall rules from target IDE/CLI tools.');
         $this->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to uninstall.');
         $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
         $this->addOption('force', 'f', InputOption::VALUE_NONE, 'Force uninstall even when modified drift is detected.');
+        $this->configureDeployScopeOption();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -49,8 +52,13 @@ final class RuleUninstallCommand extends Command
             return Command::FAILURE;
         }
 
+        $scope = $this->resolveDeployScopeOption($input, $io);
+        if ($scope === null) {
+            return Command::FAILURE;
+        }
+
         $items = ['skills' => [], 'rules' => $rules, 'agents' => []];
-        $check = $this->checker->checkTyped($items, $targets);
+        $check = $this->checker->checkTypedForScope($items, $targets, $scope);
         if (!$input->getOption('force') && $this->checker->hasModified($check)) {
             foreach ($this->checker->renderResults(array_values(array_filter($check, static fn (array $r): bool => $r['status'] === 'modified'))) as $line) {
                 $io->writeln($line);
@@ -60,7 +68,7 @@ final class RuleUninstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $result = $this->installer->uninstallTyped($items, $targets);
+        $result = $this->installer->uninstallTyped($items, $targets, (bool) $input->getOption('force'), $scope);
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

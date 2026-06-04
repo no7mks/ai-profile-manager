@@ -92,14 +92,14 @@ D-CR1：Task 1（R1）单独 commit 后再做 Phase 2。依赖链：Resolver →
     - _Ref: Requirement 7, AC 3_
   - [x] 11.3 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: cleanup command`
 
-- [ ] 12. install 族 scope 与同义词
-  - [ ] 12.1 install/uninstall 族 `--scope` + `ScopeGuard`（D-CR2 A）
+- [x] 12. install 族 scope 与同义词
+  - [x] 12.1 install/uninstall 族 `--scope` + `ScopeGuard`（D-CR2 A）
     - _Ref: Requirement 3, AC 1–6_
-  - [ ] 12.2 `remove` 别名；typed add 缺 type 失败
+  - [x] 12.2 `remove` 别名；typed add 缺 type 失败
     - _Ref: Requirement 8, AC 2–3, 5_
-  - [ ] 12.3 preset 全量校验测试
+  - [x] 12.3 preset 全量校验测试
     - _Ref: Requirement 8, AC 4_
-  - [ ] 12.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: scope and breaking install`
+  - [x] 12.4 Checkpoint — `./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；commit: `+(cli) by Cursor: scope and breaking install`
 
 - [ ] 13. E2E 测试
   - [ ] 13.1 _脚本_ `tests/test-task-13a.sh`：global-setup → bootstrap → typed add

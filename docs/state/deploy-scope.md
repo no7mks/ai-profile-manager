@@ -59,7 +59,7 @@ Deploy scope 路径根解析与 CLI 默认行为（SSOT）；registry `scopes`�
 
 整批在 Guard 阶段**先全部校验、后写盘**。任一项在 user scope 下非法 → **整批失败**，调用方不得写入任何目标文件（零部分写入）。混合合法与非法项时，在**第一个**非法项处抛错，此前亦无磁盘副作用。
 
-安装命令族（task 12）在 preset / typed batch 安装前应调用 `assertBatchAllowed`；具体 CLI 接线尚未在本阶段完成。
+CLI 安装族在写盘前调用 `assertBatchAllowed`：`install`（别名 `add`）、`skill:install` / `rule:install` / `agent:install`（及 `skill:add` 等）、`preset:uninstall`（别名 `preset:remove`）通过 `HandlesDeployScopeOption` 解析 `--scope`（默认 `project`）。`install` 另在 Guard 前执行 `PresetRegistry::validatePresetInstall`（缺失 ability bundle → 失败，零写入）。
 
 ---
 
