@@ -11,7 +11,7 @@
 ```
 <project-root>/
 ├── PROJECT.md                   # 项目上下文（技术栈、构建命令、版本号位置、敏感文件）
-├── AGENTS.md                    # Agent 协作与表达规范
+├── AGENTS.md                    # Agent 协作与表达规范（由 bootstrap 创建，内容由用户维护）
 ├── README.md                    # 面向用户的项目介绍与快速上手
 ├── CHANGELOG.md                 # 面向用户的版本摘要
 ├── docs/
@@ -21,6 +21,10 @@
 │       └── <至少 1 个文件>       #   内容：常用命令、发布流程、排障入口
 ├── changes/                     # 归档：已完成文档按版本组织
 ├── issues/                      # 缺陷管理
+├── .kiro/                       # Kiro 平台配置（由 bootstrap + ability 安装管理）
+│   └── steering/                #   scope 规则、steering 文件
+├── .cursor/                     # Cursor 平台配置（由 bootstrap + ability 安装管理）
+│   └── rules/                   #   scope 规则、rule 文件
 ```
 
 ### 内容规格
@@ -34,6 +38,8 @@
 | `docs/manual/<file>` | 常用命令（build/test/run）、发布流程、排障入口 |
 | `changes/` | 目录存在即可；已有内容不动 |
 | `issues/` | 目录存在即可；已有内容不动 |
+| `AGENTS.md` | 由 bootstrap 创建骨架；init 不修改已有内容 |
+| `.kiro/` / `.cursor/` | 由 bootstrap 创建目录结构，ability 安装写入具体文件；init 不直接操作 |
 
 ### 文件命名
 
@@ -171,7 +177,7 @@ Detection 完成后，Agent 根据以下条件**二选一**进入对应路径：
 
 ### 5.2 Generation
 
-按 Section 1（Target Structure）约定的规格生成或补齐文件。
+按 Section 1（Target Structure）约定的规格生成或补齐文件。具体内容要求见 Section 1「内容规格」表——特别是 `docs/state/` 需包含当前版本、活跃分支、最近变更摘要，`docs/manual/` 需包含常用命令、发布流程、排障入口。
 
 完成后进入 Section 7（Ability 推荐）。
 
@@ -281,3 +287,25 @@ Generation 完成后，Agent 向用户展示生成的文件摘要并询问：
 - 用户说"全部安装" → 全部执行
 - 用户指定部分 → 只装指定的
 - 用户说"不需要" / "跳过" → 结束流程，不安装
+
+---
+
+## 8. 结束总则
+
+init 流程结束前，Agent 须向用户汇报本次执行的**所有 apm 命令及结果**，包括：
+
+- Bootstrap 阶段的 `apm bootstrap` 输出
+- Scope 规则安装（`apm rule:install kiro-scope` / `cursor-scope`）输出
+- Ability 推荐阶段的各条 `apm install` 输出
+
+格式示例：
+
+```
+本次执行的 apm 命令：
+
+1. apm bootstrap -t cursor -t kiro          [ok]
+2. apm rule:install kiro-scope -t kiro      [ok]
+3. apm rule:install cursor-scope -t cursor  [ok]
+4. apm install spec-core -t cursor -t kiro  [ok]
+5. apm install gitflow -t cursor -t kiro    [skip: already installed]
+```
