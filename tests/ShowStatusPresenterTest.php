@@ -241,6 +241,45 @@ YAML;
         self::assertStringNotContainsString('changed', $joined);
     }
 
+    public function testGitignorePresentWhenWorkspaceIsSymlink(): void
+    {
+        if (!function_exists('symlink')) {
+            self::markTestSkipped('symlink() is not available');
+        }
+
+        $real = sys_get_temp_dir() . '/apm-show-real-' . bin2hex(random_bytes(4));
+        $link = sys_get_temp_dir() . '/apm-show-link-' . bin2hex(random_bytes(4));
+        mkdir($real, 0775, true);
+        if (!@symlink($real, $link)) {
+            self::markTestSkipped('Could not create workspace symlink');
+        }
+
+        $baseline = sys_get_temp_dir() . '/apm-show-sym-base-' . bin2hex(random_bytes(4));
+        mkdir($baseline, 0775, true);
+        file_put_contents($baseline . '/.gitignore', "## @apm:block ability=php target=*\n/node_modules/\n## @apm:end\n");
+        file_put_contents($real . '/.gitignore', "# BEGIN apm-managed-gitignore v1\n/node_modules/\n# END apm-managed-gitignore v1\n");
+        $yaml = <<<'YAML'
+version: "1"
+rules: []
+agents: []
+skills: []
+hooks: []
+gitignore:
+  - marker: php
+    description: PHP
+YAML;
+        file_put_contents($baseline . '/abilities.yaml', $yaml);
+        $presenter = $this->presenter($baseline . '/abilities.yaml', $baseline);
+        $rows = $this->runInWorkspace($link, $baseline, static fn (): array => $presenter->rows(
+            DeployScope::Project,
+            ['cursor'],
+            'gitignore',
+        ));
+
+        self::assertCount(1, $rows);
+        self::assertSame('installed', $rows[0]->status);
+    }
+
     public function testEnumeratesGitignoreAndPrompt(): void
     {
         $baseline = sys_get_temp_dir() . '/apm-show-mix-base-' . bin2hex(random_bytes(4));
@@ -273,12 +312,14 @@ YAML;
     private function presenter(string $registryPath, string $packageRoot): ShowStatusPresenter
     {
         $registry = new AbilityRegistry($registryPath);
+        $rootResolver = new DeployRootResolver();
 
         return new ShowStatusPresenter(
             $registry,
             new CheckService(),
-            new InstallationProbe($registry, new DeployRootResolver()),
+            new InstallationProbe($registry, $rootResolver),
             $packageRoot,
+            $rootResolver,
         );
     }
 

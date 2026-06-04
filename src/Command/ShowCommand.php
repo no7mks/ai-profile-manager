@@ -40,6 +40,7 @@ final class ShowCommand extends Command
                 $checker,
                 new InstallationProbe($registry, $scopeResolver),
                 $installer->packageRoot(),
+                $scopeResolver,
             ),
             $scopeResolver,
         );

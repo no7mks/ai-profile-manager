@@ -13,6 +13,7 @@ final class ShowStatusPresenter
         private readonly CheckService $checkService,
         private readonly InstallationProbe $probe,
         private readonly string $packageRoot,
+        private readonly DeployRootResolver $rootResolver = new DeployRootResolver(),
         private readonly GitIgnoreTemplateService $gitIgnore = new GitIgnoreTemplateService(),
     ) {}
 
@@ -184,7 +185,7 @@ final class ShowStatusPresenter
         }
 
         if ($ability['type'] === 'prompt') {
-            return $scope === DeployScope::Project ? 'not installed' : 'not installed';
+            return 'not installed';
         }
 
         $checkTargets = array_values(array_intersect($targets, $ability['registryTargets']));
@@ -271,7 +272,7 @@ final class ShowStatusPresenter
             return false;
         }
 
-        $gitignorePath = getcwd() . '/.gitignore';
+        $gitignorePath = $this->rootResolver->resolve(DeployScope::Project) . '/.gitignore';
         if (!is_file($gitignorePath)) {
             return false;
         }
