@@ -122,8 +122,9 @@ final class PresetLifecycleTest extends EndToEndTestCase
         $r = $this->apm(['show', '-t', 'cursor']);
 
         self::assertSame(0, $r['exit'], "stderr: {$r['stderr']}");
-        self::assertStringContainsString('[installed]', $r['stdout']);
-        self::assertStringContainsString('demo-skill', $r['stdout']);
+        self::assertStringContainsString('skill:demo-skill  installed', $r['stdout']);
+        self::assertStringContainsString('rule:demo-rule  installed', $r['stdout']);
+        self::assertStringContainsString('agent:demo-agent  installed', $r['stdout']);
     }
 
     // ─── install → uninstall → verify files removed ──────────────────
@@ -205,7 +206,8 @@ final class PresetLifecycleTest extends EndToEndTestCase
         $r = $this->apm(['install', 'nonexistent', '-t', 'cursor']);
 
         self::assertSame(1, $r['exit']);
-        self::assertStringContainsString('Unknown preset', $r['stdout']);
+        self::assertStringContainsString('requires an explicit type prefix', $r['stdout']);
+        self::assertStringContainsString('apm add skill', $r['stdout']);
     }
 
     // ─── Unknown target ──────────────────────────────────────────────

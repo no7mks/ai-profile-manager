@@ -32,7 +32,8 @@ final class UninstallCommandTest extends TestCase
         self::assertNotFalse($oldCwd);
         chdir($workspace);
 
-        $command = new SkillUninstallCommand(new Installer(), new CheckService());
+        $registry = new AbilityRegistry($baseline . '/abilities.yaml');
+        $command = new SkillUninstallCommand(new Installer(registry: $registry), new CheckService());
         $tester = new CommandTester($command);
         $exit = $tester->execute(['skills' => ['demo-skill'], '--target' => ['cursor']]);
 
@@ -57,7 +58,8 @@ final class UninstallCommandTest extends TestCase
         self::assertNotFalse($oldCwd);
         chdir($workspace);
 
-        $command = new SkillUninstallCommand(new Installer(), new CheckService());
+        $registry = new AbilityRegistry($baseline . '/abilities.yaml');
+        $command = new SkillUninstallCommand(new Installer(registry: $registry), new CheckService());
         $tester = new CommandTester($command);
         $exit = $tester->execute(['skills' => ['demo-skill'], '--target' => ['cursor'], '--force' => true]);
 
@@ -154,7 +156,8 @@ final class UninstallCommandTest extends TestCase
         self::assertNotFalse($oldCwd);
         chdir($workspace);
 
-        $command = new RuleUninstallCommand(new Installer(), new CheckService());
+        $registry = new AbilityRegistry($baseline . '/abilities.yaml');
+        $command = new RuleUninstallCommand(new Installer(registry: $registry), new CheckService());
         $tester = new CommandTester($command);
         $exit = $tester->execute(['rules' => ['demo-rule'], '--target' => ['cursor'], '--force' => true]);
 
@@ -193,7 +196,8 @@ final class UninstallCommandTest extends TestCase
         self::assertNotFalse($oldCwd);
         chdir($workspace);
 
-        $command = new AgentUninstallCommand(new Installer(), new CheckService());
+        $registry = new AbilityRegistry($baseline . '/abilities.yaml');
+        $command = new AgentUninstallCommand(new Installer(registry: $registry), new CheckService());
         $tester = new CommandTester($command);
         $exit = $tester->execute(['agents' => ['demo-agent'], '--target' => ['kiro'], '--force' => true]);
 
@@ -295,8 +299,13 @@ final class UninstallCommandTest extends TestCase
         self::assertNotFalse($oldCwd);
         chdir($workspace);
 
-        $presetRegistry = new PresetRegistry(new AbilityRegistry($workspace . '/abilities.yaml'));
-        $command = new PresetUninstallCommand(new Installer(), new CheckService(), $presetRegistry);
+        $workspaceRegistry = new AbilityRegistry($workspace . '/abilities.yaml');
+        $presetRegistry = new PresetRegistry($workspaceRegistry);
+        $command = new PresetUninstallCommand(
+            new Installer(registry: $workspaceRegistry),
+            new CheckService(),
+            $presetRegistry,
+        );
         $tester = new CommandTester($command);
         $exit = $tester->execute(['preset' => 'mixed-preset', '--target' => ['cursor'], '--force' => true]);
 

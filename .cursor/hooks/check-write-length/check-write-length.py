@@ -6,7 +6,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-MAX_LINES = 200
+MAX_LINES = 400
 LOG_PATH = Path(__file__).with_name("check-write-length.log")
 WARN_ZH = (
     "⚠️ 提醒：即将写入的内容超过 {lines} 行（上限 {max_lines} 行）。"

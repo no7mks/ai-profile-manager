@@ -50,6 +50,8 @@ conflicts resolved:
 
 - 禁止 rebase 改写历史
 - 禁止 squash merge
+- 禁止 pull request
+- 使用 GitFlow（有 `/gitflow` skill）
 - 跨分支合并禁止 fast-forward（必须 `--no-ff`），同分支同步（如 pull 同名远程分支）允许 fast-forward
 - merge commit 应清晰表达来源分支与目标分支
 

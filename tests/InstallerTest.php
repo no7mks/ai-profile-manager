@@ -238,9 +238,9 @@ final class InstallerTest extends TestCase
         $project = sys_get_temp_dir() . '/apm-inst-is-installed-proj-' . bin2hex(random_bytes(4));
         mkdir($project . '/.cursor/skills/graphify', 0775, true);
         mkdir($project . '/.cursor/agents', 0775, true);
-        mkdir($project . '/.cursor/rules/spec', 0775, true);
+        mkdir($project . '/.cursor/rules/doc', 0775, true);
         file_put_contents($project . '/.cursor/agents/code-reviewer.md', 'x');
-        file_put_contents($project . '/.cursor/rules/spec/spec-goal.mdc', 'x');
+        file_put_contents($project . '/.cursor/rules/doc/writing-conventions.mdc', 'x');
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -249,7 +249,7 @@ final class InstallerTest extends TestCase
         $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         self::assertTrue($installer->isInstalledOnTarget('skill', 'graphify', 'cursor'));
         self::assertTrue($installer->isInstalledOnTarget('agent', 'code-reviewer', 'cursor'));
-        self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-goal', 'cursor'));
+        self::assertTrue($installer->isInstalledOnTarget('rule', 'doc:writing-conventions', 'cursor'));
         self::assertFalse($installer->isInstalledOnTarget('skill', 'missing-skill', 'cursor'));
 
         chdir($old);
@@ -260,16 +260,16 @@ final class InstallerTest extends TestCase
         $pkg = sys_get_temp_dir() . '/apm-inst-is-installed-kiro-' . bin2hex(random_bytes(4));
         mkdir($pkg, 0775, true);
         $project = sys_get_temp_dir() . '/apm-inst-is-installed-kiro-proj-' . bin2hex(random_bytes(4));
-        mkdir($project . '/.kiro/steering/spec', 0775, true);
-        file_put_contents($project . '/.kiro/steering/spec/spec-goal.md', 'x');
+        mkdir($project . '/.kiro/steering/doc', 0775, true);
+        file_put_contents($project . '/.kiro/steering/doc/writing-conventions.md', 'x');
 
         $old = getcwd();
         self::assertNotFalse($old);
         chdir($project);
 
         $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
-        self::assertTrue($installer->isInstalledOnTarget('rule', 'spec-goal', 'kiro'));
-        self::assertFalse($installer->isInstalledOnTarget('unknown', 'spec-goal', 'kiro'));
+        self::assertTrue($installer->isInstalledOnTarget('rule', 'doc:writing-conventions', 'kiro'));
+        self::assertFalse($installer->isInstalledOnTarget('unknown', 'doc:writing-conventions', 'kiro'));
 
         chdir($old);
     }
@@ -369,12 +369,12 @@ final class InstallerTest extends TestCase
         $project = sys_get_temp_dir() . '/apm-inst-uninstall-proj-' . bin2hex(random_bytes(4));
         mkdir($project . '/.cursor/skills/graphify/sub', 0775, true);
         mkdir($project . '/.cursor/agents', 0775, true);
-        mkdir($project . '/.cursor/rules/spec', 0775, true);
-        mkdir($project . '/.kiro/steering/spec', 0775, true);
+        mkdir($project . '/.cursor/rules/doc', 0775, true);
+        mkdir($project . '/.kiro/steering/doc', 0775, true);
         file_put_contents($project . '/.cursor/skills/graphify/sub/file.txt', 'x');
         file_put_contents($project . '/.cursor/agents/code-reviewer.md', 'x');
-        file_put_contents($project . '/.cursor/rules/spec/spec-goal.mdc', 'x');
-        file_put_contents($project . '/.kiro/steering/spec/other.md', 'x');
+        file_put_contents($project . '/.cursor/rules/doc/writing-conventions.mdc', 'x');
+        file_put_contents($project . '/.kiro/steering/doc/other.md', 'x');
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -383,7 +383,7 @@ final class InstallerTest extends TestCase
         $installer = new Installer(gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
         $result = $installer->uninstallTyped([
             'skills' => ['graphify'],
-            'rules' => ['spec-goal'],
+            'rules' => ['doc:writing-conventions'],
             'agents' => ['code-reviewer'],
         ], ['cursor', 'kiro']);
 
@@ -392,12 +392,12 @@ final class InstallerTest extends TestCase
         self::assertSame(0, $result['exit_code']);
         $output = implode("\n", $result['lines']);
         self::assertStringContainsString('Uninstalled skill graphify from cursor', $output);
-        self::assertStringContainsString('Uninstalled rule spec-goal from cursor', $output);
+        self::assertStringContainsString('Uninstalled rule doc:writing-conventions from cursor', $output);
         self::assertStringContainsString('Uninstalled agent code-reviewer from cursor', $output);
-        self::assertStringContainsString('Steering spec-goal not found on kiro', $output);
+        self::assertStringContainsString('Steering doc:writing-conventions not found on kiro', $output);
         self::assertStringContainsString('Agent code-reviewer not found on kiro', $output);
         self::assertDirectoryDoesNotExist($project . '/.cursor/skills/graphify');
-        self::assertFileDoesNotExist($project . '/.cursor/rules/spec/spec-goal.mdc');
+        self::assertFileDoesNotExist($project . '/.cursor/rules/doc/writing-conventions.mdc');
         self::assertFileDoesNotExist($project . '/.cursor/agents/code-reviewer.md');
     }
 
@@ -1025,4 +1025,122 @@ final class InstallerTest extends TestCase
         $output = implode("\n", $result['lines']);
         self::assertStringContainsString('[skip]', $output);
     }
+
+    public function testIsInstalledOnTargetDistinguishesCategoryRulesByRegistryPath(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-cat-rule-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'rules:',
+            '  - path: doc:writing-conventions',
+            '    description: Doc rule',
+            '    targets:',
+            '      cursor: .cursor/rules/doc/writing-conventions.mdc',
+            '  - path: safety:writing-conventions',
+            '    description: Safety rule',
+            '    targets:',
+            '      cursor: .cursor/rules/safety/writing-conventions.mdc',
+        ]) . "\n");
+
+        $project = sys_get_temp_dir() . '/apm-inst-cat-rule-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.cursor/rules/safety', 0775, true);
+        file_put_contents($project . '/.cursor/rules/safety/writing-conventions.mdc', 'safety only');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(
+            registry: $registry,
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+
+        self::assertFalse($installer->isInstalledOnTarget('rule', 'doc:writing-conventions', 'cursor'));
+        self::assertTrue($installer->isInstalledOnTarget('rule', 'safety:writing-conventions', 'cursor'));
+
+        chdir($old);
+    }
+
+    public function testUninstallProjectScopeRemovesPresentConventionalAbilities(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-scope-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: demo-skill',
+            '    description: Demo',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+            'rules:',
+            '  - path: git:demo-rule',
+            '    description: Rule',
+            '    targets:',
+            '      cursor: .cursor/rules/git/demo-rule.mdc',
+            'agents: []',
+            'hooks: []',
+        ]) . "\n");
+
+        $project = sys_get_temp_dir() . '/apm-uninst-scope-proj-' . bin2hex(random_bytes(4));
+        mkdir($project . '/.cursor/skills/demo-skill', 0775, true);
+        mkdir($project . '/.cursor/rules/git', 0775, true);
+        file_put_contents($project . '/.cursor/skills/demo-skill/SKILL.md', 'x');
+        file_put_contents($project . '/.cursor/rules/git/demo-rule.mdc', 'x');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(
+            registry: $registry,
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+
+        $result = $installer->uninstallProjectScope();
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('Uninstalling project-scope conventional abilities', $output);
+        self::assertStringContainsString('Uninstalled skill demo-skill from cursor', $output);
+        self::assertStringContainsString('Uninstalled rule git:demo-rule from cursor', $output);
+        self::assertDirectoryDoesNotExist($project . '/.cursor/skills/demo-skill');
+        self::assertFileDoesNotExist($project . '/.cursor/rules/git/demo-rule.mdc');
+    }
+
+    public function testUninstallProjectScopeSkipsAbsentAbilities(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-uninst-scope-empty-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+        file_put_contents($pkg . '/abilities.yaml', "skills: []\nrules: []\nagents: []\nhooks: []\n");
+
+        $project = sys_get_temp_dir() . '/apm-uninst-scope-empty-proj-' . bin2hex(random_bytes(4));
+        mkdir($project, 0775, true);
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($project);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(
+            registry: $registry,
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+
+        $result = $installer->uninstallProjectScope();
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        self::assertStringNotContainsString('[ok]', implode("\n", $result['lines']));
+    }
+
 }

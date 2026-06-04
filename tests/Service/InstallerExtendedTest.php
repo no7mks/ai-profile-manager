@@ -229,25 +229,37 @@ YAML;
     {
         $pkg = $this->tmpDir . '/pkg';
         mkdir($pkg, 0775, true);
+        $yaml = <<<'YAML'
+rules:
+  - path: spec:demo
+    description: Demo steering
+    targets:
+      kiro: .kiro/steering/spec/demo.md
+skills: []
+agents: []
+hooks: []
+YAML;
+        file_put_contents($pkg . '/abilities.yaml', $yaml);
         $proj = $this->tmpDir . '/proj';
         mkdir($proj . '/.kiro/steering/spec', 0775, true);
         file_put_contents($proj . '/.kiro/steering/spec/demo.md', "x\n");
         chdir($proj);
 
         $installer = new Installer(
+            registry: new AbilityRegistry($pkg . '/abilities.yaml'),
             gitIgnore: new GitIgnoreTemplateService(),
             packageRoot: $pkg,
             mirror: new DirectoryMirrorService(),
         );
         $result = $installer->uninstallTyped([
             'skills' => [],
-            'rules' => ['demo'],
+            'rules' => ['spec:demo'],
             'agents' => [],
         ], ['kiro']);
 
         self::assertSame(0, $result['exit_code']);
         $output = implode("\n", $result['lines']);
-        self::assertStringContainsString('Uninstalled steering demo from kiro', $output);
+        self::assertStringContainsString('Uninstalled steering spec:demo from kiro', $output);
     }
 
     public function testUninstallRuleOnKiroMissReportsCorrectLabel(): void

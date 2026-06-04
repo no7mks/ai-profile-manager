@@ -74,19 +74,18 @@ Main-agent 负责调度和验收，不直接写代码。
 6. 如果 §2.4.2 = NO，或 §2.4.4 = 明确说过，输出："§2.4.6 判定：合规。继续。"
 7. 输出："§2.4.7 wave <id> 审查完成。"
 
-### 2.5 Wave 汇总与 Commit
+### 2.5 Wave 汇总
 
 1. 输出："§2.5.1 汇总 wave <id> 执行结果……"
 2. Review 当前 wave 所有 sub-agent 结果
 3. 标记 tasks.md 中对应 sub-task 进度
-4. **Commit 粒度（Cursor 特有）**：以 top-level task 为 commit 粒度。并行 wave 内 sub-agent 不 commit，由 main-agent 全部完成后逐 task stage + commit
-5. 若范围内还有下一个 wave → 回到 §2.3 执行下一个 wave
-6. 若所有 wave 已完成 → 进入 §2.6
+4. 若范围内还有下一个 wave → 回到 §2.3 执行下一个 wave
+5. 若所有 wave 已完成 → 进入 §2.6
 
 ### 2.6 完成与硬停止
 
 1. 输出："§2.6.1 所有 wave 执行完毕，汇总最终结果……"
-2. 确认 tasks.md 进度标记完整
+2. 确认 tasks.md 进度标记完整，并 commit `tasks.md`（将 sub-task checkbox 进度纳入版本控制）
 3. **硬停止**：完成当前 top-level task 或执行范围后，**禁止**自动执行下一个 task/wave。不得以"让我继续下一个"、"接下来执行"等措辞自行推进。必须停下来，等待用户显式发出下一步指令（如 next wave、next task、继续执行）。标记完成后的唯一允许动作是向用户汇报当前进度。
 4. 输出："§2.6.4 当前进度：<已完成的 task/wave>。等待用户指令。"
 

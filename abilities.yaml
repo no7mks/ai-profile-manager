@@ -1,95 +1,148 @@
 version: "1"
 
+global-setup:
+  includes:
+    - skill:apm
+    - skill:quick-plan
+    - skill:build-plan
+    - skill:quick-release
+    - agent:code-reviewer
+    - rule:doc:writing-conventions
+    - rule:doc:doc-convergence
+    - rule:safety:command-safety
+    - rule:safety:config-safety
+    - rule:git:git-conventions
+    - rule:plan:quick-plan-conventions
+
 rules:
   - path: cursor-scope
     description: Cursor 平台专属规则
+    scopes:
+      - project
     targets:
       cursor: .cursor/rules/cursor-scope.mdc
 
   - path: kiro-scope
     description: Kiro 平台专属规则
+    scopes:
+      - project
     targets:
       kiro: .kiro/steering/kiro-scope.md
 
   - path: doc:writing-conventions
     description: 文档书写规范
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/rules/doc/writing-conventions.mdc
       kiro: .kiro/steering/doc/writing-conventions.md
 
   - path: doc:doc-convergence
     description: 文档归档操作规范
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/rules/doc/doc-convergence.mdc
       kiro: .kiro/steering/doc/doc-convergence.md
 
   - path: git:branch-overview
     description: GitFlow 分支模型总览
+    scopes:
+      - project
     targets:
       cursor: .cursor/rules/git/branch-overview.mdc
       kiro: .kiro/steering/git/branch-overview.md
 
   - path: git:git-conventions
     description: 日常 git 操作的基础规则
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/rules/git/git-conventions.mdc
       kiro: .kiro/steering/git/git-conventions.md
 
   - path: plugin:superpowers-integration
     description: Superpowers 插件集成约束
+    scopes:
+      - project
     targets:
       cursor: .cursor/rules/plugin/superpowers-integration.mdc
 
   - path: safety:command-safety
     description: Shell 命令安全约束
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/rules/safety/command-safety.mdc
       kiro: .kiro/steering/safety/command-safety.md
 
   - path: safety:config-safety
     description: 配置文件与敏感凭据安全约束
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/rules/safety/config-safety.mdc
       kiro: .kiro/steering/safety/config-safety.md
 
   - path: spec:e2e-testing
     description: E2E 测试执行规范
+    scopes:
+      - project
     targets:
       cursor: .cursor/rules/spec/e2e-testing.mdc
       kiro: .kiro/steering/spec/e2e-testing.md
 
   - path: gatekeeping:gk-design
     description: Spec gatekeeper design 校验指引
+    scopes:
+      - project
     targets:
       cursor: .cursor/rules/gatekeeping/gk-design.mdc
       kiro: .kiro/steering/gatekeeping/gk-design.md
 
   - path: gatekeeping:gk-requirements
     description: Spec gatekeeper requirements 校验指引
+    scopes:
+      - project
     targets:
       cursor: .cursor/rules/gatekeeping/gk-requirements.mdc
       kiro: .kiro/steering/gatekeeping/gk-requirements.md
 
   - path: gatekeeping:gk-tasks
     description: Spec gatekeeper tasks 校验指引
+    scopes:
+      - project
     targets:
       cursor: .cursor/rules/gatekeeping/gk-tasks.mdc
       kiro: .kiro/steering/gatekeeping/gk-tasks.md
 
   - path: plan:quick-plan-conventions
     description: Cursor 快速计划（非 Spec）的路径、命名、模板与归档
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/rules/plan/quick-plan-conventions.mdc
 
 agents:
   - path: code-reviewer
     description: 基于 diff 的 code review agent
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/agents/code-reviewer.md
       kiro: .kiro/agents/code-reviewer.md
 
   - path: spec-gatekeeper
     description: Spec 文档质量校验
+    scopes:
+      - project
     targets:
       cursor: .cursor/agents/spec-gatekeeper.md
       kiro: .kiro/agents/spec-gatekeeper.md
@@ -97,58 +150,82 @@ agents:
 skills:
   - path: apm
     description: apm CLI 的 Agent 执行手册
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/skills/apm/
       kiro: .kiro/skills/apm/
 
   - path: gitflow
     description: GitFlow start/finish 统一执行
+    scopes:
+      - project
     targets:
       cursor: .cursor/skills/gitflow/
       kiro: .kiro/skills/gitflow/
 
   - path: graphify
     description: Graphify 知识图谱构建与查询
+    scopes:
+      - project
     targets:
       cursor: .cursor/skills/graphify/
       kiro: .kiro/skills/graphify/
 
   - path: spec-planning
     description: Spec planning 四阶段统一工作流
+    scopes:
+      - project
     targets:
       cursor: .cursor/skills/spec-planning/
       kiro: .kiro/skills/spec-planning/
 
   - path: spec-execution
     description: Spec task 执行规范
+    scopes:
+      - project
     targets:
       cursor: .cursor/skills/spec-execution/
       kiro: .kiro/skills/spec-execution/
 
   - path: lark-sheets
     description: 飞书电子表格读写接入
+    scopes:
+      - project
     targets:
       cursor: .cursor/skills/lark-sheets/
       kiro: .kiro/skills/lark-sheets/
 
   - path: tga-query
     description: TGA（数数系统）游戏数据查询
+    scopes:
+      - project
     targets:
       cursor: .cursor/skills/tga-query/
       kiro: .kiro/skills/tga-query/
 
   - path: quick-plan
     description: 快速计划生成（交互式确认 plan.md）
+    scopes:
+      - user
+      - project
     targets:
       kiro: .kiro/skills/quick-plan/
 
   - path: build-plan
     description: 按已确认 plan.md 执行实施
+    scopes:
+      - user
+      - project
     targets:
       kiro: .kiro/skills/build-plan/
 
   - path: quick-release
     description: 直接从 master/develop 快速发布（无 release/hotfix 分支）
+    scopes:
+      - user
+      - project
     targets:
       cursor: .cursor/skills/quick-release/
       kiro: .kiro/skills/quick-release/
@@ -186,24 +263,6 @@ prompts:
       ```
 
 presets:
-  - name: default
-    description: Bootstrap 默认安装的能力
-    includes:
-      - skill:apm
-      - agent:code-reviewer
-      - rule:cursor-scope
-      - rule:kiro-scope
-      - rule:safety:command-safety
-      - rule:safety:config-safety
-      - rule:doc:writing-conventions
-      - rule:doc:doc-convergence
-      - rule:plugin:superpowers-integration
-      - rule:git:git-conventions
-      - rule:plan:quick-plan-conventions
-      - skill:quick-plan
-      - skill:build-plan
-      - skill:quick-release
-
   - name: gitflow
     description: GitFlow 全套能力
     includes:

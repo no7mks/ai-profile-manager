@@ -825,22 +825,16 @@ final class ServiceEdgeCasesTest extends TestCase
         self::assertStringNotContainsString('Installed', $output);
     }
 
-    // ─── InstallCommand: bootstrap failure path ───────────────────────
+    // ─── InstallCommand: bare install rejected ────────────────────────
 
-    public function testInstallCommandBootstrapFailsWhenInitThrows(): void
+    public function testInstallCommandBareInstallFailsWithGuidance(): void
     {
-        $pkg = $this->tmpDir . '/pkg-boot';
-        mkdir($pkg . '/docs', 0775, true);
-        mkdir($pkg . '/issues', 0775, true);
-        file_put_contents($pkg . '/docs/README.md', '# Docs');
-        file_put_contents($pkg . '/issues/README.md', '# Issues');
-        file_put_contents($pkg . '/AGENTS.md', 'pkg agents');
+        $pkg = $this->tmpDir . '/pkg-bare';
+        mkdir($pkg, 0775, true);
         file_put_contents($pkg . '/abilities.yaml', "skills: []\n");
 
-        // Create a project dir that already has scaffold (will cause error without --force)
-        $project = $this->tmpDir . '/project-boot';
-        mkdir($project . '/docs', 0775, true);
-        file_put_contents($project . '/AGENTS.md', 'existing');
+        $project = $this->tmpDir . '/project-bare';
+        mkdir($project, 0775, true);
 
         $old = getcwd();
         self::assertNotFalse($old);
@@ -854,21 +848,17 @@ final class ServiceEdgeCasesTest extends TestCase
             mirror: new DirectoryMirrorService(),
         );
 
-        // Create a ProjectInitializer that will throw (scaffold targets exist without --force)
-        $initializer = new ProjectInitializer($pkg);
-
-        $cmd = new InstallCommand($installer, $initializer);
-        $app = new Application();
-        $app->addCommand($cmd);
-
+        $cmd = new InstallCommand($installer);
         $tester = new CommandTester($cmd);
-        // No preset argument → bootstrap mode; scaffold exists → throws
         $exit = $tester->execute([]);
 
         chdir($old);
 
         self::assertSame(\Symfony\Component\Console\Command\Command::FAILURE, $exit);
-        self::assertStringContainsString('already contains', $tester->getDisplay());
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('Install requires a preset name', $display);
+        self::assertStringContainsString('apm bootstrap', $display);
+        self::assertStringNotContainsString('already contains', $display);
     }
 
     // ─── Helper ───────────────────────────────────────────────────────

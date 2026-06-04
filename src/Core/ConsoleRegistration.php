@@ -5,9 +5,12 @@ declare(strict_types=1);
 namespace AiProfileManager\Core;
 
 use AiProfileManager\Command\AgentCheckCommand;
+use AiProfileManager\Command\BootstrapCommand;
 use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\AgentUninstallCommand;
 use AiProfileManager\Command\CheckCommand;
+use AiProfileManager\Command\CleanupCommand;
+use AiProfileManager\Command\GlobalSetupCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetAddAbilityCommand;
 use AiProfileManager\Command\PresetCreateCommand;
@@ -24,7 +27,6 @@ use AiProfileManager\Command\SkillUninstallCommand;
 use AiProfileManager\Command\UpdateCommand;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
-use AiProfileManager\Service\KnowledgeBaseUpdater;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
@@ -39,23 +41,22 @@ final class ConsoleRegistration
         SymfonyApplication $app,
         Installer $installer,
         CheckService $checker,
-        KnowledgeBaseUpdater $updater,
         ?PresetRegistry $presetRegistry = null,
     ): void {
         $installArgs = ['installer' => $installer];
-        $showArgs = ['installer' => $installer, 'checker' => $checker];
+        $showCommand = ShowCommand::create($installer, $checker);
         $presetUninstallArgs = ['installer' => $installer, 'checker' => $checker];
         $checkArgs = ['checker' => $checker];
 
         if ($presetRegistry !== null) {
             $installArgs['presetRegistry'] = $presetRegistry;
-            $showArgs['presetRegistry'] = $presetRegistry;
             $presetUninstallArgs['presetRegistry'] = $presetRegistry;
             $checkArgs['presetRegistry'] = $presetRegistry;
         }
 
         $app->addCommand(new InstallCommand(...$installArgs));
-        $app->addCommand(new ShowCommand(...$showArgs));
+        $app->addCommand(new BootstrapCommand());
+        $app->addCommand($showCommand);
         $app->addCommand(new SkillInstallCommand($installer));
         $app->addCommand(new RuleInstallCommand($installer));
         $app->addCommand(new AgentInstallCommand($installer));
@@ -71,6 +72,8 @@ final class ConsoleRegistration
         $app->addCommand(new PresetAddAbilityCommand($presetRegistry));
         $app->addCommand(new PresetRemoveAbilityCommand($presetRegistry));
         $app->addCommand(new PresetDeleteCommand($presetRegistry));
-        $app->addCommand(new UpdateCommand($updater));
+        $app->addCommand(UpdateCommand::create($installer));
+        $app->addCommand(GlobalSetupCommand::create($installer));
+        $app->addCommand(new CleanupCommand($installer));
     }
 }

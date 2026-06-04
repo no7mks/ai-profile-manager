@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class RuleInstallCommand extends Command
 {
+    use HandlesDeployScopeOption;
     public function __construct(private readonly Installer $installer)
     {
         parent::__construct();
@@ -23,6 +24,7 @@ final class RuleInstallCommand extends Command
     protected function configure(): void
     {
         $this->setName('rule:install');
+        $this->setAliases(['rule:add']);
         $this->setDescription('Install rules into target IDE/CLI tools.');
         $this->addArgument('rules', InputArgument::IS_ARRAY, 'Rule names to install.');
         $this->addOption(
@@ -31,6 +33,7 @@ final class RuleInstallCommand extends Command
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'Target IDE/CLI tool. Repeat for multiple values.'
         );
+        $this->configureDeployScopeOption();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -55,11 +58,17 @@ final class RuleInstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $result = $this->installer->installTyped([
-            'skills' => [],
-            'rules' => $rules,
-            'agents' => [],
-        ], $targets);
+        $scope = $this->resolveDeployScopeOption($input, $io);
+        if ($scope === null) {
+            return Command::FAILURE;
+        }
+
+        $typed = ['skills' => [], 'rules' => $rules, 'agents' => []];
+        if (!$this->guardInstallBatch($this->installer, $scope, $typed, $io)) {
+            return Command::FAILURE;
+        }
+
+        $result = $this->installer->installTyped($typed, $targets, null, $scope);
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

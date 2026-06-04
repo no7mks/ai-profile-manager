@@ -236,6 +236,50 @@ final class PresetRegistry
      * @param array{name: string, description: string, includes: list<array{type: string, path: string}>} $preset
      * @return array{skills: list<string>, rules: list<string>, agents: list<string>, hooks: list<string>, prompts: list<string>}
      */
+    /**
+     * @param array{name: string, description: string, includes: list<array{type: string, path: string}>} $preset
+     * @return list<string>
+     */
+    public static function presetIncludesToBatchRefs(array $preset): array
+    {
+        $refs = [];
+        foreach ($preset['includes'] as $include) {
+            $refs[] = $include['type'] . ':' . $include['path'];
+        }
+
+        return $refs;
+    }
+
+    /**
+     * @param array{skills: list<string>, rules: list<string>, agents: list<string>, hooks?: list<string>, prompts?: list<string>} $typed
+     * @return list<string>
+     */
+    public static function typedSpecToBatchRefs(array $typed): array
+    {
+        $refs = [];
+        foreach ($typed['skills'] as $path) {
+            $refs[] = 'skill:' . $path;
+        }
+        foreach ($typed['rules'] as $path) {
+            $refs[] = 'rule:' . $path;
+        }
+        foreach ($typed['agents'] as $path) {
+            $refs[] = 'agent:' . $path;
+        }
+        foreach ($typed['hooks'] ?? [] as $path) {
+            $refs[] = 'hook:' . $path;
+        }
+        foreach ($typed['prompts'] ?? [] as $path) {
+            $refs[] = 'prompt:' . $path;
+        }
+
+        return $refs;
+    }
+
+    /**
+     * @param array{name: string, description: string, includes: list<array{type: string, path: string}>} $preset
+     * @return array{skills: list<string>, rules: list<string>, agents: list<string>, hooks: list<string>, prompts: list<string>}
+     */
     public static function toTypedSpec(array $preset): array
     {
         $result = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => [], 'prompts' => []];
@@ -254,5 +298,53 @@ final class PresetRegistry
         }
 
         return $result;
+    }
+
+    /**
+     * Validate all preset includes before any install writes.
+     * Missing targets for a requested IDE align with Installer skip policy (not an error).
+     *
+     * @param array{name: string, description: string, includes: list<array{type: string, path: string}>} $preset
+     * @param array<int, string> $targets
+     * @return list<string>
+     */
+    public function validatePresetInstall(array $preset, array $targets): array
+    {
+        $errors = [];
+
+        foreach ($preset['includes'] as $include) {
+            $ref = $include['type'] . ':' . $include['path'];
+            $type = $include['type'];
+            $path = $include['path'];
+
+            if (!\in_array($type, ['skill', 'rule', 'agent', 'hook', 'prompt'], true)) {
+                $errors[] = "Invalid preset include (unknown type): {$ref}";
+                continue;
+            }
+
+            if ($type === 'prompt') {
+                if (!$this->promptExists($path)) {
+                    $errors[] = "Ability '{$ref}' not found in registry";
+                }
+                continue;
+            }
+
+            if ($this->registry->getEntry($type, $path) === null) {
+                $errors[] = "Ability '{$ref}' not found in registry";
+            }
+        }
+
+        return $errors;
+    }
+
+    private function promptExists(string $name): bool
+    {
+        foreach ($this->registry->parse()['prompts'] as $prompt) {
+            if (($prompt['name'] ?? '') === $name) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

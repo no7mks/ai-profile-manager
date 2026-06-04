@@ -170,43 +170,35 @@ YAML;
         self::assertSame(['type' => 'rule', 'path' => 'valid-path'], $preset['includes'][0]);
         self::assertSame(['type' => 'skill', 'path' => 'another-valid'], $preset['includes'][1]);
     }
-    public function testPackageAbilitiesDefaultPresetIncludesResolve(): void
+    public function testPackageAbilitiesGlobalSetupIncludesResolve(): void
     {
         $path = dirname(__DIR__) . '/abilities.yaml';
-        $parsed = (new AbilityRegistry($path))->parse();
-        $preset = (new PresetRegistry(new AbilityRegistry($path)))->getPreset('default');
+        $registry = new AbilityRegistry($path);
+        $includes = $registry->globalSetupIncludes();
 
-        self::assertNotNull($preset);
+        self::assertNotEmpty($includes);
 
-        $sectionByType = [
-            'rule' => 'rules',
-            'skill' => 'skills',
-            'agent' => 'agents',
-            'hook' => 'hooks',
-        ];
+        foreach ($includes as $include) {
+            $entry = $registry->getEntry($include['type'], $include['path']);
 
-        foreach ($preset['includes'] as $include) {
-            $section = $sectionByType[$include['type']] ?? null;
-            self::assertNotNull($section, sprintf('Unknown include type: %s', $include['type']));
-
-            $found = false;
-            foreach ($parsed[$section] as $entry) {
-                if ($entry->path === $include['path']) {
-                    $found = true;
-                    break;
-                }
-            }
-
-            self::assertTrue(
-                $found,
+            self::assertNotNull(
+                $entry,
                 sprintf(
-                    "Ability '%s:%s' in default preset not found in abilities.yaml %s section",
+                    "Ability '%s:%s' in global-setup not found in abilities.yaml",
                     $include['type'],
                     $include['path'],
-                    $section,
                 ),
             );
+            self::assertSame(['user', 'project'], $entry->scopes);
         }
+    }
+
+    public function testPackageAbilitiesHasNoDefaultPreset(): void
+    {
+        $path = dirname(__DIR__) . '/abilities.yaml';
+        $preset = (new PresetRegistry(new AbilityRegistry($path)))->getPreset('default');
+
+        self::assertNull($preset);
     }
 
 }

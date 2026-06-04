@@ -15,6 +15,7 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class AgentInstallCommand extends Command
 {
+    use HandlesDeployScopeOption;
     public function __construct(private readonly Installer $installer)
     {
         parent::__construct();
@@ -23,6 +24,7 @@ final class AgentInstallCommand extends Command
     protected function configure(): void
     {
         $this->setName('agent:install');
+        $this->setAliases(['agent:add']);
         $this->setDescription('Install sub-agents into target IDE/CLI tools.');
         $this->addArgument('agents', InputArgument::IS_ARRAY, 'Agent names to install.');
         $this->addOption(
@@ -31,6 +33,7 @@ final class AgentInstallCommand extends Command
             InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
             'Target IDE/CLI tool. Repeat for multiple values.'
         );
+        $this->configureDeployScopeOption();
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -55,11 +58,17 @@ final class AgentInstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $result = $this->installer->installTyped([
-            'skills' => [],
-            'rules' => [],
-            'agents' => $agents,
-        ], $targets);
+        $scope = $this->resolveDeployScopeOption($input, $io);
+        if ($scope === null) {
+            return Command::FAILURE;
+        }
+
+        $typed = ['skills' => [], 'rules' => [], 'agents' => $agents];
+        if (!$this->guardInstallBatch($this->installer, $scope, $typed, $io)) {
+            return Command::FAILURE;
+        }
+
+        $result = $this->installer->installTyped($typed, $targets, null, $scope);
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

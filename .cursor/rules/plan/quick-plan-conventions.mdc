@@ -5,9 +5,11 @@ alwaysApply: false
 
 # Quick Plan 约定
 
-**快速计划**（非 Spec 四件套）的落盘规范。原生 Plan mode 可能写入 `.cursor/plans/`（IDE 临时文件，非项目 SSOT）；可版本管理的计划应放在 `<spec-dir>` 根下的 `<slug>-plan.md`。
+**快速计划**（非 Spec 四件套）的落盘规范。计划 SSOT **仅**允许 `<spec-dir>` 根下的 `<slug>-plan.md`。
 
 `<spec-dir>` = `.cursor/specs/`（见 cursor-scope）。
+
+**禁止**将 `~/.cursor/plans/` 或仓库内 `.cursor/plans/` 作为计划来源或停留位置。IDE / CreatePlan 若写入上述路径，Agent **须在同一轮对话内立即**迁移或重写到 `.cursor/specs/<slug>-plan.md`，并向用户说明新路径；**不得**等待用户确认后再迁移，**不得**仅引用临时路径作为 SSOT。
 
 ---
 
@@ -15,9 +17,9 @@ alwaysApply: false
 
 | 类型 | 路径 | 说明 |
 |------|------|------|
-| 快速计划（进行中） | `.cursor/specs/<slug>-plan.md` | slug 为英文 kebab-case |
+| 快速计划（进行中） | `.cursor/specs/<slug>-plan.md` | slug 为英文 kebab-case；**唯一**合法 SSOT |
 | 完整 Spec | `.cursor/specs/<name>/goal.md` 等 | 子目录四阶段，见 `spec-planning` skill |
-| IDE 临时计划 | `.cursor/plans/` | 工具生成，**非**项目 SSOT |
+| `~/.cursor/plans/`、`.cursor/plans/` | — | **禁止停留**；发现即迁走到 `.cursor/specs/<slug>-plan.md` |
 
 **与 spec-planning 区分**：根目录扁平的 `<slug>-plan.md` 是快速计划，**不**走 Spec 四件套；`<spec-dir>/<name>/` 子目录才是完整 Spec。
 
@@ -77,11 +79,13 @@ alwaysApply: false
 
 ### 规划终止
 
-生成 plan 后展示 Goal 与 Plan 步骤列表，说明文件路径，并等待用户确认后再进入实现。规划阶段**不得**修改 plan 以外的项目文件。
+生成 plan 后展示 Goal 与 Plan 步骤列表，并给出 **`.cursor/specs/<slug>-plan.md` 的仓库内路径**（不得仅给出 `~/.cursor/plans/` 路径）。等待用户确认后再进入实现。规划阶段**不得**修改 plan 以外的项目文件（迁移计划到 `.cursor/specs/` 除外）。
 
-### Plan mode
+### Plan mode / IDE 临时路径
 
-若 IDE 已在 `.cursor/plans/` 生成计划，用户确认后须**迁移或重写**到 `.cursor/specs/<slug>-plan.md`，再进入实现阶段。
+1. 规划阶段**唯一产出**须已落在 `.cursor/specs/<slug>-plan.md`。
+2. 若当前对话中发现计划仅在 `~/.cursor/plans/` 或 `.cursor/plans/`，**立即**迁移或重写到 `.cursor/specs/<slug>-plan.md`（可删 frontmatter，按本文件模板整理），再继续规划或等待用户确认实现。
+3. 「用户确认」仅 gate **进入实现**；**不** gate 迁移——迁移不得推迟到确认之后。
 
 ---
 
@@ -104,6 +108,7 @@ mv .cursor/specs/<slug>-plan.md → changes/unreleased/specs/<slug>-plan.md
 
 ## 禁止事项
 
-- 将 `.cursor/plans/` 当作项目唯一计划来源而不迁移到 `.cursor/specs/`
+- 使用或保留 `~/.cursor/plans/`、`.cursor/plans/` 作为计划 SSOT（须**立即**迁到 `.cursor/specs/<slug>-plan.md`）
+- 向用户仅展示临时 plan 路径而不完成迁移
 - 在快速计划流程中自动创建 Spec 四件套
 - 把根目录 `*-plan.md` 误当作 spec-planning 的 `tasks.md` 替代品而不读本约定
