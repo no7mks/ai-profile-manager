@@ -74,14 +74,13 @@ Main-agent 负责调度和验收，不直接写代码。
 6. 如果 §2.4.2 = NO，或 §2.4.4 = 明确说过，输出："§2.4.6 判定：合规。继续。"
 7. 输出："§2.4.7 wave <id> 审查完成。"
 
-### 2.5 Wave 汇总与 Commit
+### 2.5 Wave 汇总
 
 1. 输出："§2.5.1 汇总 wave <id> 执行结果……"
 2. Review 当前 wave 所有 sub-agent 结果
 3. 标记 tasks.md 中对应 sub-task 进度
-4. **Commit 粒度（Cursor 特有）**：以 top-level task 为 commit 粒度。并行 wave 内 sub-agent 不 commit，由 main-agent 全部完成后逐 task stage + commit
-5. 若范围内还有下一个 wave → 回到 §2.3 执行下一个 wave
-6. 若所有 wave 已完成 → 进入 §2.6
+4. 若范围内还有下一个 wave → 回到 §2.3 执行下一个 wave
+5. 若所有 wave 已完成 → 进入 §2.6
 
 ### 2.6 完成与硬停止
 
