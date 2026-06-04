@@ -44,7 +44,7 @@ description: "当用户说 /apm 或要求执行 apm 命令（init、global-setup
 
 ## 常见失败与处理
 
-- `apm: command not found`：提示 `composer global require` 并检查 `PATH`。
+- `apm: command not found`：提示 `composer global require` 并检查 `PATH`（Windows 见 `docs/manual/install-windows.md`）。
 - 无参 `apm install` / `default` preset：引导三阶段首装（`global-setup` → `bootstrap` → init/显式 preset）。
 - `update` 失败：确认使用 global `vendor/bin/apm`。
 

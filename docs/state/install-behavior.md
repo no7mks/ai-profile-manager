@@ -9,7 +9,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: `<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）
+- 目标路径: `<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = User Root；见 `deploy-scope.md`）
   - Cursor: `.cursor/skills/<name>/`
   - Kiro: `.kiro/skills/<name>/`
 - 操作: DirectoryMirrorService 递归复制整个目录（含子目录与文件），已存在则覆盖
@@ -35,7 +35,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: ``<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）`
+- 目标路径: ``<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = User Root；见 `deploy-scope.md`）`
   - Cursor: `.cursor/rules/[category/]<name>.mdc`
   - Kiro: `.kiro/steering/[category/]<name>.md`
 - 操作: 单文件复制（覆盖）
@@ -58,7 +58,7 @@
 ### 安装
 
 - 源路径: `<packageRoot>/<targets[target]>`（Source-is-Target 模式，abilities.yaml targets 字段定义）
-- 目标路径: ``<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = `$HOME`；见 `deploy-scope.md`）`
+- 目标路径: ``<deployRoot>/<targets[target]>`（project = workspace `getcwd()`，user = User Root；见 `deploy-scope.md`）`
   - Cursor: `.cursor/agents/<name>.md`
   - Kiro: `.kiro/agents/<name>.md`
 - 操作: 单文件复制（覆盖）
@@ -176,7 +176,7 @@ Scaffold **不是** ability（不可由 `cleanup` 卸载）。由 **`apm bootstr
 
 ### Deploy Scope 与路径解析
 
-- **DeployRootResolver** 统一解析 project（`getcwd()`）与 user（`$HOME`）根目录；`absoluteTargetPath(scope, relativeTarget)` 将 registry `targets[target]` 拼为绝对路径。
+- **DeployRootResolver** 统一解析 project（`getcwd()`）与 user（User Root，见 `deploy-scope.md`）根目录；`absoluteTargetPath(scope, relativeTarget)` 将 registry `targets[target]` 拼为绝对路径。Windows user scope 示例：`%USERPROFILE%\.cursor\skills\<name>\`。
 - **InstallationProbe** 判断 ability 是否已安装：`isPresent(type, name, target, scope)` 通过 `AbilityRegistry::getEntry()` 取 `targets[target]`，再经 DeployRootResolver 定位磁盘路径。
   - `skill`：`is_dir(path)`
   - `rule` / `agent`：`is_file(path)`（使用 registry 完整相对路径，禁止仅按 basename 匹配 category rule）
@@ -192,10 +192,11 @@ ComposerBaselineResolver 按以下优先级定位 global apm 包安装路径（`
 1. 环境变量 `APM_BASELINE_ROOT`（目录存在时使用）
 2. 构造函数注入的 `overrideInstallPath`（DI / 测试）
 3. `COMPOSER_HOME` 下的 `vendor/composer/installed.json`（已设置时仅尝试此路径）
-4. `$HOME/.composer/vendor/composer/installed.json`（首个可读时使用）
-5. `$HOME/.config/composer/vendor/composer/installed.json`（XDG fallback，首个可读时使用）
+4. 平台 fallback（`COMPOSER_HOME` 未设置时，按序取首个可读的 `installed.json`）：
+   - **Unix**：`$HOME/.composer` → `$HOME/.config/composer`（XDG）
+   - **Windows**：`%APPDATA%\Composer` → `%USERPROFILE%\.composer`（User Root 由 `UserHomeResolver` 解析；不使用 `HOME`）
 
-步骤 3–5 在 `installed.json` 中按包名查找 global apm 包，并据此推导 `install_path`。
+步骤 3–4 在 `installed.json` 中按包名查找 global apm 包，并据此推导 `install_path`。
 
 Baseline 不可用时，CheckService 返回所有 ability 状态为 `unknown`。
 

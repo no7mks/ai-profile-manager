@@ -7,6 +7,7 @@ namespace AiProfileManager\Tests;
 use AiProfileManager\Config\DeployScope;
 use AiProfileManager\Service\DeployRootResolver;
 use AiProfileManager\Service\InvalidScopeException;
+use AiProfileManager\Service\UserHomeResolver;
 use AiProfileManager\Tests\Support\RestoresEnvTrait;
 use PHPUnit\Framework\TestCase;
 
@@ -91,6 +92,36 @@ final class DeployRootResolverTest extends TestCase
 
         self::assertSame(
             $home . DIRECTORY_SEPARATOR . '.cursor' . DIRECTORY_SEPARATOR . 'skills' . DIRECTORY_SEPARATOR . 'demo',
+            $path,
+        );
+    }
+
+    public function testResolveUserOnWindowsUsesUserProfileNotMsysHome(): void
+    {
+        $profile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'apm-win-deploy-' . bin2hex(random_bytes(4));
+        mkdir($profile, 0775, true);
+        $this->withEnv('USERPROFILE', $profile);
+        $this->withEnv('HOME', '/c/Users/msys');
+        $this->withEnv('HOMEDRIVE', null);
+        $this->withEnv('HOMEPATH', null);
+
+        $resolver = new DeployRootResolver(new UserHomeResolver(isWindows: true));
+        $root = $resolver->resolve(DeployScope::User);
+
+        self::assertSame($profile, $root);
+    }
+
+    public function testAbsoluteTargetPathOnWindowsUsesUserProfile(): void
+    {
+        $profile = 'C:\\Users\\testuser';
+        $this->withEnv('USERPROFILE', $profile);
+        $this->withEnv('HOME', '/c/Users/testuser');
+
+        $resolver = new DeployRootResolver(new UserHomeResolver(isWindows: true));
+        $path = $resolver->absoluteTargetPath(DeployScope::User, '.cursor/skills/demo/');
+
+        self::assertSame(
+            $profile . DIRECTORY_SEPARATOR . '.cursor' . DIRECTORY_SEPARATOR . 'skills' . DIRECTORY_SEPARATOR . 'demo',
             $path,
         );
     }

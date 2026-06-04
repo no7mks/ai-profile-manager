@@ -7,6 +7,7 @@
 
 ## Added
 
+- Windows：user scope 使用 `USERPROFILE`（忽略 MSYS `HOME`）；Composer baseline fallback `%APPDATA%\Composer`；manual `docs/manual/install-windows.md`（Scoop）。
 - Deploy scope（`project` / `user`）、`global-setup`、`bootstrap`、`cleanup` 命令；Show/Update 重写。
 - Breaking：无参 `apm install` / preset `default` 废弃；三阶段首装（`global-setup` → `bootstrap` → `/apm init`）。
 

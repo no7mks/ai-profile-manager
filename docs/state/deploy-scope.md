@@ -11,7 +11,14 @@ Deploy scope 路径根解析与 CLI 默认行为（SSOT）；registry `scopes`�
 | Scope | 根目录 | 解析方式 |
 |-------|--------|----------|
 | `project`（**Project Scope**） | **Workspace Root** | `getcwd()`；`realpath` 可用时规范化 |
-| `user`（**User Scope**） | **User Root** | 环境变量 `HOME`；未设置时运行时错误 |
+| `user`（**User Scope**） | **User Root** | 见下表；由 `UserHomeResolver` 统一解析，未设置时运行时错误 |
+
+**User Root**（`DeployRootResolver` / `UserHomeResolver`）：
+
+| 平台 | 解析顺序 | 说明 |
+|------|----------|------|
+| Windows | `USERPROFILE` → `HOMEDRIVE` + `HOMEPATH` | **不使用** `HOME`（含 Git Bash MSYS 路径，避免与 `%USERPROFILE%\.cursor` 不一致） |
+| Unix | `HOME` | 与既有行为一致 |
 
 ---
 
@@ -65,6 +72,6 @@ CLI 安装族在写盘前调用 `assertBatchAllowed`：`install`（别名 `add`�
 
 ## CheckService
 
-- **`checkTypedForScope($items, $targets, $scope)`**：`DeployRootResolver::resolve($scope)` 为已安装侧根（`project` = workspace，`user` = `$HOME`），与 baseline `install_path` 对比 skill/rule/agent（`AbilityDiffService`）与 hook（`HookChecker`）。
+- **`checkTypedForScope($items, $targets, $scope)`**：`DeployRootResolver::resolve($scope)` 为已安装侧根（`project` = workspace，`user` = User Root），与 baseline `install_path` 对比 skill/rule/agent（`AbilityDiffService`）与 hook（`HookChecker`）。
 - **`checkTyped()`**：等同 `checkTypedForScope(..., project)`；`check` / `skill:check` 等 CLI 仍只查 project scope，不新增 `--scope`。
-- **hook**：Kiro 目标 `{root}/.kiro/hooks/<name>.kiro.hook`；Cursor 为 `{root}/.cursor/hooks/<name>/` 与 `hooks.json`。user scope 仅以 `$HOME` 为根，与 project 安装位置分离。
+- **hook**：Kiro 目标 `{root}/.kiro/hooks/<name>.kiro.hook`；Cursor 为 `{root}/.cursor/hooks/<name>/` 与 `hooks.json`。user scope 以 User Root 为根（Windows：`%USERPROFILE%`；Unix：`$HOME`），与 project 安装位置分离。

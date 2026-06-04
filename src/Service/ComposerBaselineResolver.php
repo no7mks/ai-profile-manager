@@ -15,6 +15,8 @@ final class ComposerBaselineResolver
     public function __construct(
         private readonly string $packageName = 'no7mks/ai-profile-manager',
         private readonly ?string $overrideInstallPath = null,
+        private readonly UserHomeResolver $userHomeResolver = new UserHomeResolver(),
+        private readonly ?bool $isWindows = null,
     ) {
     }
 
@@ -109,14 +111,18 @@ final class ComposerBaselineResolver
      */
     public function candidateComposerHomes(): array
     {
-        $home = (string) getenv('HOME');
-
         $composerHome = rtrim((string) (getenv('COMPOSER_HOME') ?: ''), DIRECTORY_SEPARATOR);
         if ($composerHome !== '') {
             return [$composerHome];
         }
 
-        if ($home === '') {
+        if ($this->isWindowsPlatform()) {
+            return $this->windowsComposerHomeCandidates();
+        }
+
+        try {
+            $home = $this->userHomeResolver->resolve();
+        } catch (\RuntimeException) {
             return [];
         }
 
@@ -124,6 +130,33 @@ final class ComposerBaselineResolver
             $home . DIRECTORY_SEPARATOR . '.composer',
             $home . DIRECTORY_SEPARATOR . '.config' . DIRECTORY_SEPARATOR . 'composer',
         ];
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function windowsComposerHomeCandidates(): array
+    {
+        $candidates = [];
+
+        $appData = rtrim((string) (getenv('APPDATA') ?: ''), DIRECTORY_SEPARATOR);
+        if ($appData !== '') {
+            $candidates[] = $appData . DIRECTORY_SEPARATOR . 'Composer';
+        }
+
+        try {
+            $userHome = $this->userHomeResolver->resolve();
+            $candidates[] = $userHome . DIRECTORY_SEPARATOR . '.composer';
+        } catch (\RuntimeException) {
+            // USERPROFILE / HOMEDRIVE+HOMEPATH unavailable — APPDATA-only fallback remains.
+        }
+
+        return $candidates;
+    }
+
+    private function isWindowsPlatform(): bool
+    {
+        return $this->isWindows ?? PHP_OS_FAMILY === 'Windows';
     }
 
     private function installedJsonPath(): ?string

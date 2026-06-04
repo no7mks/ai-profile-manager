@@ -11,6 +11,8 @@ composer global require no7mks/ai-profile-manager -W
 apm --help
 ```
 
+Windows（PowerShell + Scoop Composer）：见 `docs/manual/install-windows.md`（`$env:Path`、`COMPOSER_HOME`、`Get-Command apm`、三阶段首装）。
+
 ---
 
 ## 三阶段首装（新用户）

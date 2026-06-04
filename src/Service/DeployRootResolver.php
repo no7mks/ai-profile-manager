@@ -11,6 +11,11 @@ use AiProfileManager\Config\DeployScope;
  */
 final class DeployRootResolver
 {
+    public function __construct(
+        private readonly UserHomeResolver $userHomeResolver = new UserHomeResolver(),
+    ) {
+    }
+
     public function resolve(DeployScope $scope): string
     {
         return match ($scope) {
@@ -58,11 +63,6 @@ final class DeployRootResolver
 
     private function userRoot(): string
     {
-        $home = (string) getenv('HOME');
-        if ($home === '') {
-            throw new \RuntimeException('Unable to resolve user root: HOME is not set.');
-        }
-
-        return $home;
+        return $this->userHomeResolver->resolve();
     }
 }
