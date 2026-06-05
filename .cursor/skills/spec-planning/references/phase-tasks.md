@@ -8,7 +8,6 @@
 
 - [触发条件](#触发条件)
 - [执行步骤](#执行步骤)
-- [前置读取](#前置读取)
 - [关键约束](#关键约束)
 - [产物格式](#产物格式)
   - [文档 Section 结构](#文档-section-结构)
@@ -29,7 +28,11 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 design、Architecture Decision 回答、requirements
+1. **读取前置文件**：
+   - i. `<spec-dir>/<name>/design.md`
+   - ii. design Gatekeep Log 中已回答的 Architecture Decision
+   - iii. `<spec-dir>/<name>/requirements.md`
+   - iv. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
 2. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
 3. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
 4. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
@@ -42,15 +45,6 @@
 11. **写入产物**：按文档结构写入 `tasks.md`
 12. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
 13. **输出完成报告**：按「完成后输出」格式报告
-
----
-
-## 前置读取
-
-1. `<spec-dir>/<name>/design.md`
-2. design Gatekeep Log 中已回答的 Architecture Decision
-3. `<spec-dir>/<name>/requirements.md`
-4. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
 
 ---
 

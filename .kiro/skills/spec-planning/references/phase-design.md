@@ -8,7 +8,6 @@
 
 - [触发条件](#触发条件)
 - [执行步骤](#执行步骤)
-- [前置读取](#前置读取)
 - [关键约束](#关键约束)
 - [产物格式](#产物格式)
 - [质量要求](#质量要求)
@@ -24,7 +23,11 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 requirements、Requirement Discussion 回答、SSOT
+1. **读取前置文件**：
+   - i. `<spec-dir>/<name>/requirements.md`
+   - ii. requirements Gatekeep Log 中已回答的 Requirement Discussion
+   - iii. 相关 SSOT（`docs/state/`）
+   - iv. 知识图谱（若项目维护了持久化图谱）：查询模块依赖、调用链、影响面
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 design spec 子代理，将 requirements 内容与本文件的产物格式约束作为输入，由其生成 design.md 初稿
 3. **若委托成功** → 跳至步骤 12（Socratic Review）
 4. **若委托不可用或失败** → 继续以下手动步骤：
@@ -37,15 +40,6 @@
 11. **诊断检查**：对写入的 `design.md` 执行 `getDiagnostics`，有问题则修正
 12. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
 13. **输出完成报告**：按「完成后输出」格式报告
-
----
-
-## 前置读取
-
-1. `<spec-dir>/<name>/requirements.md`
-2. requirements Gatekeep Log 中已回答的 Requirement Discussion
-3. 相关 SSOT（`docs/state/`）
-4. 知识图谱（若项目维护了持久化图谱）：查询模块依赖、调用链、影响面
 
 ---
 

@@ -8,7 +8,6 @@
 
 - [触发条件](#触发条件)
 - [执行步骤](#执行步骤)
-- [前置读取](#前置读取)
 - [关键约束](#关键约束)
 - [产物格式](#产物格式)
   - [文档 Section 结构](#文档-section-结构)
@@ -29,7 +28,11 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 design、Architecture Decision 回答、requirements
+1. **读取前置文件**：
+   - i. `<spec-dir>/<name>/design.md`
+   - ii. design Gatekeep Log 中已回答的 Architecture Decision
+   - iii. `<spec-dir>/<name>/requirements.md`
+   - iv. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 create tasks spec 子代理（注意：不是 spec-task-execution），将 design 内容与本文件的产物格式约束作为输入，由其生成 tasks.md 初稿
 3. **若委托成功** → 跳至步骤 16（Socratic Review）
 4. **若委托不可用或失败** → 继续以下手动步骤：
@@ -46,15 +49,6 @@
 15. **诊断检查**：对写入的 `tasks.md` 执行 `getDiagnostics`，有问题则修正
 16. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
 17. **输出完成报告**：按「完成后输出」格式报告
-
----
-
-## 前置读取
-
-1. `<spec-dir>/<name>/design.md`
-2. design Gatekeep Log 中已回答的 Architecture Decision
-3. `<spec-dir>/<name>/requirements.md`
-4. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
 
 ---
 
