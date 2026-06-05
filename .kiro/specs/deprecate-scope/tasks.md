@@ -69,27 +69,27 @@
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(bootstrap) deprecate-scope: ability install phase`
 
-- [-] 3. 废弃 --scope 参数
-  - [ ] 3.1 `HandlesDeployScopeOption` trait 重构
+- [x] 3. 废弃 --scope 参数
+  - [x] 3.1 `HandlesDeployScopeOption` trait 重构
     - 保留 `configureDeployScopeOption()` 注册 --scope 选项
     - 新增 `rejectIfScopeOptionPresent(InputInterface $input)` 检测并抛废弃异常
     - 移除 `resolveDeployScopeOption()`、`guardInstallBatch()`、`guardPresetInstall()`
     - RED → GREEN：`./vendor/bin/phpunit --filter HandlesDeployScopeOptionTest`
     - _Ref: Requirement 1, AC 1-6; Requirement 8, AC 7_
-  - [ ] 3.2 `InvalidScopeException::scopeOptionDeprecated()` factory
+  - [x] 3.2 `InvalidScopeException::scopeOptionDeprecated()` factory
     - 消息含 `--scope` 已移除 + 所有操作仅针对 project scope
     - RED → GREEN：`./vendor/bin/phpunit --filter InvalidScopeExceptionTest`
     - _Ref: Requirement 1, AC 5_
-  - [ ] 3.3 各命令 `handle()` 顶部集成 `rejectIfScopeOptionPresent()`
+  - [x] 3.3 各命令 `handle()` 顶部集成 `rejectIfScopeOptionPresent()`
     - 涉及命令：InstallCommand、ShowCommand、Typed Install 命令、Typed Uninstall 命令
     - 传入 `--scope` 任何值立即报错，不执行业务逻辑
     - RED → GREEN：`./vendor/bin/phpunit --filter "InstallCommandTest|ShowCommandTest|SkillInstallCommandTest|RuleInstallCommandTest|AgentInstallCommandTest|SkillUninstallCommandTest|RuleUninstallCommandTest|AgentUninstallCommandTest|PresetUninstallCommandTest"`
     - _Ref: Requirement 1, AC 1-4, 6_
-  - [ ] 3.4 Property 1 属性测试
+  - [x] 3.4 Property 1 属性测试
     - **Property 1: --scope 参数全面拒绝** — 随机字符串作为 scope 值，验证所有命令 reject
     - 标签：`Feature: deprecate-scope, Property 1`
     - _Ref: Requirement 1, AC 1-6_
-  - [ ] 3.5 Checkpoint
+  - [x] 3.5 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(cli) deprecate-scope: reject --scope option`
 
