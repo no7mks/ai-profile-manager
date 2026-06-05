@@ -126,31 +126,85 @@
 
 ## Tasks Phase — Socratic Review
 
-**日期**: 2026-06-05 13:35
+**日期**: 2026-06-05 15:14
 
 ### Q&A
 
-> **Q1**: tasks 是否完整覆盖了 design 中的所有实现项（14 个 Components/Interfaces）？
-> **A1**: 是。Task 1 → InvalidScopeException + DeployScope；Task 2 → DeployRootResolver；Task 3 → HandlesDeployScopeOption；Task 4 → AbilityEntry + AbilityRegistry；Task 5 → Installer + InstallationProbe；Task 6 → CheckService + AbilityUpdateService；Task 7 → ShowStatusPresenter；Task 8 → GlobalSetupCommand + CleanupCommand；Task 9 → BootstrapCommand；Task 10 → 删除模块（ScopeGuard、UserHomeResolver、GlobalSetupService、GlobalInstallDetector）；Task 11 → abilities.yaml 迁移。
+> **Q1**: tasks 是否完整覆盖了 design 中的所有组件和接口变更？
+> **A1**: 是。Design 列出 14 个组件变更：InvalidScopeException（1.1）、HandlesDeployScopeOption（3.1）、DeployScope（1.2）、DeployRootResolver（6.1）、AbilityRegistry（2.1-2.3）、AbilityEntry（1.3）、InstallationProbe（6.2）、Installer（6.3）、BootstrapCommand（7.1-7.3）、CheckService（6.4）、AbilityUpdateService（6.5）、ShowStatusPresenter（6.6）、GlobalSetupCommand（5.1）、CleanupCommand（6.7）。全部覆盖。另外 4 个需删除的模块在 Task 8 中处理。
 
 > **Q2**: task 之间的依赖顺序是否正确？
-> **A2**: 是。底层先行：Task 1（枚举+异常）→ Task 2（DeployRootResolver 依赖枚举简化）→ Task 3（trait 依赖新异常方法）→ Task 4（registry 依赖 AbilityEntry 变更）→ Task 5/6（service 依赖 resolver 和 registry）→ Task 7/8（命令层依赖 service）→ Task 9（bootstrap 依赖 installer + registry）→ Task 10（删除在所有解耦后）→ Task 11（yaml 迁移在 registry 支持新格式后）。
+> **A2**: 是。Task 1 改基础类型（Exception/Enum/Entry），Task 2 改 Registry（依赖 Entry 变更），Task 3 改 trait（依赖 Exception），Task 4-5 改 Command（依赖 trait），Task 6 改 Service（依赖 DeployScope/Resolver 简化），Task 7 扩展 Bootstrap（依赖 Registry + Installer），Task 8 删除废弃模块（需确认无引用），Task 9 改配置文件（需代码已就位），Task 10 E2E（需全功能就位），Task 11 文档，Task 12 Code Review。顺序正确。
 
-> **Q3**: 每个 task 的粒度是否合适？
-> **A3**: 是。每个 sub-task 满足单一职责原则：修改一个类/接口或一组紧密耦合改动。最大的 top-level task（Task 4 有 4 个功能 sub-task + 1 checkpoint = 5 个）未超过 8 个上限。Task 9（4 个功能 sub-task + 1 checkpoint = 5 个）、Task 10（4 个删除 sub-task + 1 checkpoint = 5 个）均在合理范围。
+> **Q3**: 每个 task 的粒度是否合适，是否存在过粗需拆分的 sub-task？
+> **A3**: Task 6 有 7 个实现 sub-task + 1 checkpoint = 8，在原则上限内。Task 4 有 4 个实现 sub-task + 1 checkpoint = 5，合理。Task 11（文档收敛）有 7 个实现 sub-task + 1 checkpoint = 8，在上限内。各 sub-task 均满足单一职责。
 
 > **Q4**: checkpoint 是否覆盖了关键阶段？
-> **A4**: 是。每个 top-level task 均以 checkpoint 结尾，包含静态分析 + 单元测试验证命令和 commit 动作。
+> **A4**: 是。每个 top-level task 末尾都有 checkpoint，包含 phpstan + phpunit 验证和 commit。E2E task 的 checkpoint 使用 `--testsuite e2e`。文档收敛 checkpoint 包含对 state 文件的同步更新。
 
-> **Q5**: 并行标注是否满足并行条件？
-> **A5**: 是。同一 wave 内的 sub-task 不修改同一文件：wave 0（1.1 改 DeployScope.php、1.2 改 InvalidScopeException.php）；wave 8（4.1 改 AbilityEntry.php、4.4 改 AbilityRegistry.php 中的 projectOnlyPaths）；wave 11（5.1 改 InstallationProbe.php、5.2 改 Installer.php）等。Checkpoint 均独占 wave。
+> **Q5**: TDG 并行标注是否满足并行条件？
+> **A5**: 是。Wave 0 中 1.1/1.2/1.3 修改不同文件（InvalidScopeException / DeployScope / AbilityEntry）且无数据依赖。Wave 6 中 4.1-4.4 修改不同 Command 文件且互不依赖。Wave 11 中 6.2-6.5 修改不同 Service 文件。Wave 17 中 8.1-8.4 删除不同文件。Wave 23 中 11.1-11.6 修改不同文档文件。均满足并行安全条件。
 
 > **Q6**: E2E 测试是否覆盖了关键用户场景？
-> **A6**: 是。4 个 E2E sub-task 覆盖：--scope 拒绝（多命令、多值）、global-setup 拒绝（含 flags）、bootstrap 完整流程（首次+幂等+force）、abilities.yaml 遗留字段检测。与 design Testing Strategy 的 E2E 表一致。
+> **A6**: 是。覆盖了：deprecated global-setup（10.1）、install --scope（10.2）、show --scope（10.3）、typed install --scope（10.4）、bootstrap 正常执行（10.5）、bootstrap 幂等（10.6）、show 无 scope 标签（10.7）。覆盖了 design Testing Strategy 中列出的全部 4 个 E2E 场景并增加了 3 个补充场景。
 
-> **Q7**: Requirement 追溯是否完整？
-> **A7**: 是。逐条检查：Req 1 → Task 1.2, 2.1, 3.1, 3.2, 5.1, 5.2, 6.1, 10.1-10.4, 12.1；Req 2 → Task 1.2, 8.1, 10.3, 12.2；Req 3 → Task 9.1-9.4, 12.3；Req 4 → Task 4.1, 4.2, 4.4, 12.4；Req 5 → Task 4.3, 9.2, 9.4；Req 6 → Task 7.1, 7.2；Req 7 → Task 6.2；Req 8 → Task 8.2；Req 9 → Task 13.1-13.7。每条 requirement 至少被一个 task 引用。
+> **Q7**: requirements 中的每条 requirement 是否至少被一个 task 引用？
+> **A7**: Req 1 → Task 1.1, 1.2, 3.1, 4.1-4.4；Req 2 → Task 1.1, 5.1；Req 3 → Task 6.3, 7.1-7.3；Req 4 → Task 1.3, 2.1-2.3；Req 5 → Task 2.2；Req 6 → Task 6.6；Req 7 → Task 6.5；Req 8 → Task 6.7；Req 9 → Task 11.1-11.7。全部覆盖。
 
 ### 结论
 
-通过。tasks.md 完整覆盖 design 全部实现项，依赖顺序正确，粒度合适（每 top-level task ≤ 8 sub-task），并行条件成立，E2E 覆盖充分，Requirement 追溯完整。可进入 GK 校验。
+通过。tasks.md 完整覆盖 design 全部组件和接口，依赖顺序正确，粒度适中，TDG 并行标注安全，E2E 场景充分，Requirement 追溯完整。可进入 GK 校验。
+
+
+
+## Tasks Phase — Gatekeep Log
+
+**校验时间**: 2026-06-05 15:36
+**校验结果**: ⚠️ 已修正后通过
+
+### 修正项
+
+- [结构] Task 4.4 原修改 4 个文件（SkillUninstallCommand、RuleUninstallCommand、AgentUninstallCommand、PresetUninstallCommand），超过 3 文件粒度上限。拆分为 4.4（前三者）和 4.5（PresetUninstallCommand），原 4.5 Checkpoint 重编号为 4.6。
+- [结构] 文档收敛 Task 11 缺少 migration guide sub-task。新增 11.7 Migration Guide，原 11.7/11.8 重编号为 11.8/11.9。
+- [格式] TDG Wave 2 原将 2.1、2.2、2.3 并行，三者均修改 AbilityRegistry.php，违反文件冲突规则。改为逐 wave 串行（Wave 2→3→4）。
+- [格式] TDG Wave 15 原将 7.2、7.3 并行，两者均修改 BootstrapCommand.php，违反文件冲突规则。改为串行（Wave 17→18）。
+- [格式] TDG E2E 测试 wave 原将 10.1-10.7 全部并行。10.5 和 10.6 均测试 bootstrap 命令，可能写入同一测试文件。拆分为 Wave 24（10.1-10.4）、Wave 25（10.5）、Wave 26（10.6+10.7）。
+
+### 合规检查
+
+- [x] 无 TBD / TODO / 待定 / 占位符
+- [x] 无空 section 或不完整的列表
+- [x] 内部引用一致（requirement 编号、design 模块名）
+- [x] checkbox 语法正确
+- [x] 无 markdown 格式错误
+- [x] 一级标题为 `# Implementation Plan: deprecate-scope`
+- [x] Overview section 存在
+- [x] Tasks section 存在
+- [x] 倒数第一个 top-level task 是 Code Review
+- [x] 倒数第二个是文档收敛
+- [x] 倒数第三个是 E2E 测试
+- [x] top-level task 有序号，sub-task 有层级序号，连续无跳号
+- [x] 每个实现类 sub-task 引用了对应 Requirement 编号
+- [x] requirements.md 中每条 requirement 至少被一个 task 引用
+- [x] 引用的编号在 requirements.md 中确实存在
+- [x] top-level task 按依赖关系排序，无循环依赖
+- [x] checkpoint 作为每个 top-level task 的最后一个 sub-task
+- [x] 验证命令包含 phpstan + phpunit 完整 shell 命令
+- [x] checkpoint 包含 commit 动作，commit message 符合 git-conventions
+- [x] 每个 sub-task 满足单一职责
+- [x] 无 sub-task 修改超过 3 个文件（修正后）
+- [x] 所有 task 均为 mandatory
+- [x] 每个 top-level task 的 sub-task 数量不超过 10 个（不含 Checkpoint）
+- [x] E2E 测试 top-level task 存在，覆盖关键用户场景
+- [x] Code Review 是最后一个 top-level task，描述为委托 sub-agent
+- [x] Notes section 存在，明确提到 spec-execution 流程和 commit 随 checkpoint 执行
+- [x] Socratic Review 已存在于 gk-logs.md
+- [x] Design CR 决策在 tasks 编排中体现
+- [x] Design 全覆盖
+- [x] TDG section 存在，使用 JSON 格式和 json 代码块
+- [x] TDG task ID 与 sub-task 编号一致
+- [x] wave 顺序反映正确的依赖关系
+- [x] 所有 leaf sub-task 都出现在 TDG 中
+- [x] 同一 wave 内 sub-task 满足并行安全条件（修正后）
+- [x] 文档收敛 top-level task 包含 state/manual/migration guide/checkpoint sub-task
+- [x] 文档收敛内容与 design.md Impact Analysis 一致
