@@ -50,6 +50,7 @@
 1. `<spec-dir>/<name>/design.md`
 2. design Gatekeep Log 中已回答的 Clarification
 3. `<spec-dir>/<name>/requirements.md`
+4. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
 
 ---
 

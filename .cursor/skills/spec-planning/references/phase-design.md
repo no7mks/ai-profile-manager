@@ -41,6 +41,7 @@
 1. `<spec-dir>/<name>/requirements.md`
 2. requirements Gatekeep Log 中已回答的 Clarification
 3. 相关 SSOT（`docs/state/`）
+4. 知识图谱（若项目维护了持久化图谱）：查询模块依赖、调用链、影响面
 
 ---
 
