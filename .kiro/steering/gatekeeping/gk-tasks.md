@@ -230,7 +230,8 @@ Feature / Hotfix spec 必须包含文档收敛 top-level task。
 - [ ] 文档收敛 top-level task 存在
 - [ ] 包含 state 文档更新 sub-task
 - [ ] 包含 manual 文档更新 sub-task
-- [ ] 包含 migration guide sub-task
+- [ ] 包含 migration guide sub-task（当有不兼容的变化时）
+- [ ] 若项目维护了知识图谱，包含知识图谱更新 sub-task
 - [ ] 包含 checkpoint sub-task
 - [ ] 文档收敛内容与 design.md 的 Impact Analysis 一致
 

@@ -28,27 +28,24 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：
-   - i. `<spec-dir>/<name>/design.md`
-   - ii. design Gatekeep Log 中已回答的 Architecture Decision
-   - iii. `<spec-dir>/<name>/requirements.md`
-   - iv. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
-2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 create tasks spec 子代理（注意：不是 spec-task-execution），将 design 内容与本文件的产物格式约束作为输入，由其生成 tasks.md 初稿
-3. **若委托成功** → 跳至步骤 16（Socratic Review）
-4. **若委托不可用或失败** → 继续以下手动步骤：
-5. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
-6. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
-7. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
-8. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
-9. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
-10. **添加 E2E 测试 task**：覆盖关键用户场景
-11. **添加文档收敛 task**：与 design Impact Analysis 一致
-12. **添加 Code Review task**：委托给 code-reviewer sub-agent
-13. **生成 Task Dependency Graph**：JSON waves 格式
-14. **写入产物**：按文档结构写入 `tasks.md`
-15. **诊断检查**：对写入的 `tasks.md` 执行 `getDiagnostics`，有问题则修正
-16. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
-17. **输出完成报告**：按「完成后输出」格式报告
+1. **读取前序产出**：读取前序步骤的产出物（`goal.md`, `requirements.md`, `design.md`, `gk-logs.md`），了解当前状态
+2. **知识图谱分析**：若项目维护了持久化的知识图谱，必须通过相关查询模块依赖、调用链、影响面等
+3. **尝试委托系统 sub-agent**：调用 Kiro 内置的 create tasks spec 子代理（注意：不是 spec-task-execution），将 design 内容与本文件的产物格式约束作为输入，由其生成 tasks.md 初稿
+4. **若委托成功** → 跳至步骤 17（Socratic Review）
+5. **若委托不可用或失败** → 继续以下手动步骤：
+6. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
+7. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
+8. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
+9. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
+10. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
+11. **添加 E2E 测试 task**：覆盖关键用户场景
+12. **添加文档收敛 task**：与 design Impact Analysis 一致
+13. **添加 Code Review task**：委托给 code-reviewer sub-agent
+14. **生成 Task Dependency Graph**：JSON waves 格式
+15. **写入产物**：按文档结构写入 `tasks.md`
+16. **诊断检查**：对写入的 `tasks.md` 执行 `getDiagnostics`，有问题则修正
+17. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+18. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 
@@ -97,6 +94,7 @@
 - 包含 state 文档更新 sub-task（与 design Impact Analysis 一致）
 - 包含 manual 文档更新 sub-task（如适用）
 - 包含 migration guide sub-task（如适用）
+- 若项目维护了知识图谱，包含知识图谱更新 sub-task（增量更新变更文件）
 - 包含 checkpoint sub-task
 
 #### Code Review task 要求
@@ -241,7 +239,8 @@
 
 - [ ] N+2. 文档收敛
   - [ ] N+2.1 更新 state 文档
-  - [ ] N+2.2 Checkpoint
+  - [ ] N+2.2 更新知识图谱（若项目支持）
+  - [ ] N+2.3 Checkpoint
 
 - [ ] Last. Code Review
   - 委托给 code-reviewer sub-agent 执行

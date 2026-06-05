@@ -93,6 +93,7 @@
 - 包含 state 文档更新 sub-task（与 design Impact Analysis 一致）
 - 包含 manual 文档更新 sub-task（如适用）
 - 包含 migration guide sub-task（如适用）
+- 若项目维护了知识图谱，包含知识图谱更新 sub-task（增量更新变更文件）
 - 包含 checkpoint sub-task
 
 #### Code Review task 要求
@@ -237,7 +238,8 @@
 
 - [ ] N+2. 文档收敛
   - [ ] N+2.1 更新 state 文档
-  - [ ] N+2.2 Checkpoint
+  - [ ] N+2.2 更新知识图谱（若项目支持）
+  - [ ] N+2.3 Checkpoint
 
 - [ ] Last. Code Review
   - 委托给 code-reviewer sub-agent 执行
