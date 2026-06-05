@@ -33,9 +33,26 @@ Kiro 侧已拆为 `quick-plan` 和 `build-plan` 两个 Skill，体验明显更�
 
 ---
 
+## 依赖
+
+- **PRP-003**（Deprecate Scope）：PRP-003 将 `global-setup` section 改名为 `bootstrap`。本 note 落地时需修改 `bootstrap.includes`，因此须在 PRP-003 实现之后执行。
+
+---
+
+## `abilities.yaml` 变更
+
+| 操作 | 对象 |
+|------|------|
+| 删除 | `rules` section 中 `path: plan:quick-plan-conventions` 条目 |
+| 新增 | `skills` section 中 `path: quick-plan`，targets 含 `cursor: .cursor/skills/quick-plan/` |
+| 新增 | `skills` section 中 `path: build-plan`，targets 含 `cursor: .cursor/skills/build-plan/` |
+| 修改 | `bootstrap.includes`：移除 `rule:plan:quick-plan-conventions`，添加 `skill:quick-plan` 和 `skill:build-plan` |
+
+---
+
 ## 待定事项
 
-- plan.md 归档路径是否统一为 `changes/unreleased/specs/`（与 Kiro 侧一致）。
+- plan.md 归档由 gitflow finish 统一处理（与 Kiro 侧行为一致），不单独设计归档路径。
 
 ---
 
@@ -43,5 +60,5 @@ Kiro 侧已拆为 `quick-plan` 和 `build-plan` 两个 Skill，体验明显更�
 
 | 项 | 决策 |
 |----|------|
-| mode 不匹配时的行为 | Skill 检测到运行在错误 mode 下时直接报错退出，不尝试降级或继续 |
+| mode 不匹配时的行为 | Skill 在 SKILL.md 开头声明所需 mode；Agent 识别当前 mode 不匹配时拒绝执行 |
 | old rule 处理 | 直接删除 `quick-plan-conventions.mdc`，不保留 fallback |
