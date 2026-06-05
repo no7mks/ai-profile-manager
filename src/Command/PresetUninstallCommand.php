@@ -8,6 +8,7 @@ use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
+use AiProfileManager\Service\InvalidScopeException;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -41,6 +42,14 @@ final class PresetUninstallCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        try {
+            $this->rejectIfScopeOptionPresent($input);
+        } catch (InvalidScopeException $e) {
+            $io->error($e->getMessage());
+            return Command::FAILURE;
+        }
+
         /** @var string $preset */
         $preset = $input->getArgument('preset');
         /** @var array<int, string> $targets */
@@ -66,15 +75,10 @@ final class PresetUninstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $scope = $this->resolveDeployScopeOption($input, $io);
-        if ($scope === null) {
-            return Command::FAILURE;
-        }
-
         $spec = PresetRegistry::toTypedSpec($presetSpec);
         $io->writeln(sprintf('Preset: %s', $preset));
 
-        $check = $this->checker->checkTypedForScope($spec, $targets, $scope);
+        $check = $this->checker->checkTyped($spec, $targets);
         if (!$input->getOption('force') && $this->checker->hasModified($check)) {
             foreach ($this->checker->renderResults(array_values(array_filter($check, static fn (array $r): bool => $r['status'] === 'modified'))) as $line) {
                 $io->writeln($line);
@@ -84,7 +88,7 @@ final class PresetUninstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $result = $this->installer->uninstallTyped($spec, $targets, (bool) $input->getOption('force'), $scope);
+        $result = $this->installer->uninstallTyped($spec, $targets, (bool) $input->getOption('force'));
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

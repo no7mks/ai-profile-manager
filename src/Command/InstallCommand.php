@@ -7,6 +7,7 @@ namespace AiProfileManager\Command;
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
+use AiProfileManager\Service\InvalidScopeException;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -70,6 +71,13 @@ MSG;
     {
         $io = new SymfonyStyle($input, $output);
 
+        try {
+            $this->rejectIfScopeOptionPresent($input);
+        } catch (InvalidScopeException $e) {
+            $io->error($e->getMessage());
+            return Command::FAILURE;
+        }
+
         /** @var string|null $preset */
         $preset = $input->getArgument('preset');
         /** @var array<int, string> $targets */
@@ -111,11 +119,6 @@ MSG;
             return Command::FAILURE;
         }
 
-        $scope = $this->resolveDeployScopeOption($input, $io);
-        if ($scope === null) {
-            return Command::FAILURE;
-        }
-
         $validationErrors = $this->presetRegistry->validatePresetInstall($presetSpec, $targets);
         if ($validationErrors !== []) {
             $io->error($validationErrors[0]);
@@ -123,13 +126,9 @@ MSG;
             return Command::FAILURE;
         }
 
-        if (!$this->guardPresetInstall($this->installer, $scope, $presetSpec, $io)) {
-            return Command::FAILURE;
-        }
-
         $items = PresetRegistry::toTypedSpec($presetSpec);
         $io->writeln("Preset: {$preset}");
-        $result = $this->installer->installTyped($items, $targets, $preset, $scope);
+        $result = $this->installer->installTyped($items, $targets, $preset);
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

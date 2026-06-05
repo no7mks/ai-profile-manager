@@ -4,17 +4,32 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests\Property;
 
+use AiProfileManager\Command\AgentInstallCommand;
+use AiProfileManager\Command\AgentUninstallCommand;
 use AiProfileManager\Command\BootstrapCommand;
+use AiProfileManager\Command\InstallCommand;
+use AiProfileManager\Command\PresetUninstallCommand;
+use AiProfileManager\Command\RuleInstallCommand;
+use AiProfileManager\Command\RuleUninstallCommand;
+use AiProfileManager\Command\ShowCommand;
+use AiProfileManager\Command\SkillInstallCommand;
+use AiProfileManager\Command\SkillUninstallCommand;
 use AiProfileManager\Service\AbilityRegistry;
+use AiProfileManager\Service\CheckService;
+use AiProfileManager\Service\DeployRootResolver;
 use AiProfileManager\Service\DirectoryMirrorService;
 use AiProfileManager\Service\GitIgnoreTemplateService;
+use AiProfileManager\Service\InstallationProbe;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\InvalidScopeException;
+use AiProfileManager\Service\PresetRegistry;
 use AiProfileManager\Service\ProjectInitializer;
+use AiProfileManager\Service\ShowStatusPresenter;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
 use Eris\Generators;
 use Eris\TestTrait;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 /**
@@ -535,5 +550,108 @@ final class DeprecateScopePropertyTest extends TestCase
                 @unlink($filePath);
             }
         });
+    }
+
+    // ─── Property 1 ──────────────────────────────────────────────────
+
+    /**
+     * Property 1: --scope 参数全面拒绝
+     *
+     * For any command that uses HandlesDeployScopeOption trait, and for any string value
+     * passed as --scope (including "project", "user", empty string, arbitrary text),
+     * the command SHALL reject with a deprecation error containing both removal notice
+     * and project-only guidance, and SHALL NOT execute any business logic.
+     *
+     * **Validates: Requirements 1.2**
+     *
+     * @group Feature: deprecate-scope, Property 1
+     */
+    public function testScopeOptionRejection(): void
+    {
+        $this->limitTo(100);
+
+        // Generator: random scope values including known ones and arbitrary strings
+        $scopeGenerator = Generators::oneOf(
+            Generators::constant('project'),
+            Generators::constant('user'),
+            Generators::string(),
+            Generators::suchThat(
+                fn (string $s): bool => $s !== '',
+                Generators::string(),
+            ),
+        );
+
+        $this->forAll($scopeGenerator)->then(function (string $scope): void {
+            $commands = $this->buildAllScopeCommands();
+
+            foreach ($commands as $name => $inputFactory) {
+                [$command, $baseInput] = $inputFactory;
+                $input = array_merge($baseInput, ['--scope' => $scope]);
+                $tester = new CommandTester($command);
+                $exit = $tester->execute($input);
+                $display = $tester->getDisplay();
+
+                self::assertSame(
+                    Command::FAILURE,
+                    $exit,
+                    "Command '$name' with --scope='$scope' should return FAILURE but returned $exit. Output: $display",
+                );
+                self::assertStringContainsString(
+                    '--scope option has been removed',
+                    $display,
+                    "Command '$name' with --scope='$scope' should mention removal. Output: $display",
+                );
+                self::assertStringContainsString(
+                    'project scope only',
+                    $display,
+                    "Command '$name' with --scope='$scope' should mention project-only. Output: $display",
+                );
+            }
+        });
+    }
+
+    /**
+     * Build all 9 commands that use HandlesDeployScopeOption trait.
+     *
+     * Returns [commandName => [Command, baseInput]] where baseInput provides
+     * any required arguments to pass Symfony Console input validation.
+     *
+     * @return array<string, array{0: Command, 1: array<string, mixed>}>
+     */
+    private function buildAllScopeCommands(): array
+    {
+        $registryPath = $this->tmpDir . '/abilities.yaml';
+        if (!is_file($registryPath)) {
+            file_put_contents($registryPath, "skills: []\nrules: []\nagents: []\nhooks: []\n");
+        }
+
+        $registry = new AbilityRegistry($registryPath);
+        $rootResolver = new DeployRootResolver();
+        $installer = new Installer(
+            registry: $registry,
+            packageRoot: $this->tmpDir,
+        );
+        $checker = new CheckService(rootResolver: $rootResolver);
+        $presetRegistry = new PresetRegistry($registry);
+        $probe = new InstallationProbe($registry, $rootResolver);
+        $presenter = new ShowStatusPresenter(
+            $registry,
+            $checker,
+            $probe,
+            $this->tmpDir,
+            $rootResolver,
+        );
+
+        return [
+            'install' => [new InstallCommand($installer, $presetRegistry), ['preset' => 'dummy']],
+            'show' => [new ShowCommand($presenter), []],
+            'skill:install' => [new SkillInstallCommand($installer), []],
+            'rule:install' => [new RuleInstallCommand($installer), []],
+            'agent:install' => [new AgentInstallCommand($installer), []],
+            'skill:uninstall' => [new SkillUninstallCommand($installer, $checker), []],
+            'rule:uninstall' => [new RuleUninstallCommand($installer, $checker), []],
+            'agent:uninstall' => [new AgentUninstallCommand($installer, $checker), []],
+            'preset:uninstall' => [new PresetUninstallCommand($installer, $checker, $presetRegistry), ['preset' => 'dummy']],
+        ];
     }
 }

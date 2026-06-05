@@ -7,6 +7,7 @@ namespace AiProfileManager\Command;
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\Installer;
+use AiProfileManager\Service\InvalidScopeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -38,6 +39,14 @@ final class RuleUninstallCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        try {
+            $this->rejectIfScopeOptionPresent($input);
+        } catch (InvalidScopeException $e) {
+            $io->error($e->getMessage());
+            return Command::FAILURE;
+        }
+
         /** @var array<int, string> $rules */
         $rules = $input->getArgument('rules');
         /** @var array<int, string> $targets */
@@ -52,13 +61,8 @@ final class RuleUninstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $scope = $this->resolveDeployScopeOption($input, $io);
-        if ($scope === null) {
-            return Command::FAILURE;
-        }
-
         $items = ['skills' => [], 'rules' => $rules, 'agents' => []];
-        $check = $this->checker->checkTypedForScope($items, $targets, $scope);
+        $check = $this->checker->checkTyped($items, $targets);
         if (!$input->getOption('force') && $this->checker->hasModified($check)) {
             foreach ($this->checker->renderResults(array_values(array_filter($check, static fn (array $r): bool => $r['status'] === 'modified'))) as $line) {
                 $io->writeln($line);
@@ -68,7 +72,7 @@ final class RuleUninstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $result = $this->installer->uninstallTyped($items, $targets, (bool) $input->getOption('force'), $scope);
+        $result = $this->installer->uninstallTyped($items, $targets, (bool) $input->getOption('force'));
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

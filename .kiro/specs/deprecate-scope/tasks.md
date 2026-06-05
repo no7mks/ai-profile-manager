@@ -47,7 +47,7 @@
     - 更新 `docs/state/abilities-model.md`：移除 `scopes` 字段文档
     - commit: `+(registry) deprecate-scope: abilities.yaml format migration`
 
-- [-] 2. Bootstrap 命令扩展
+- [x] 2. Bootstrap 命令扩展
   - [x] 2.1 `Installer` 新增 `$skipExisting` 参数支持
     - `installTyped()` 增加 `bool $skipExisting = false` 参数
     - 已安装且 `$skipExisting = true` 时输出 `[skip]` 标记
@@ -65,11 +65,11 @@
     - **Property 4: Bootstrap 部分失败容错** — 随机失败位置验证剩余项仍尝试
     - 标签：`Feature: deprecate-scope, Property 3/4`
     - _Ref: Requirement 3, AC 3-5, 7_
-  - [-] 2.4 Checkpoint
+  - [x] 2.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(bootstrap) deprecate-scope: ability install phase`
 
-- [ ] 3. 废弃 --scope 参数
+- [-] 3. 废弃 --scope 参数
   - [ ] 3.1 `HandlesDeployScopeOption` trait 重构
     - 保留 `configureDeployScopeOption()` 注册 --scope 选项
     - 新增 `rejectIfScopeOptionPresent(InputInterface $input)` 检测并抛废弃异常
