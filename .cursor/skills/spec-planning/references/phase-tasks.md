@@ -28,23 +28,20 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：
-   - i. `<spec-dir>/<name>/design.md`
-   - ii. design Gatekeep Log 中已回答的 Architecture Decision
-   - iii. `<spec-dir>/<name>/requirements.md`
-   - iv. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
-2. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
-3. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
-4. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
-5. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
-6. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
-7. **添加 E2E 测试 task**：覆盖关键用户场景
-8. **添加文档收敛 task**：与 design Impact Analysis 一致
-9. **添加 Code Review task**：委托给 code-reviewer sub-agent
-10. **生成 Task Dependency Graph**：JSON waves 格式
-11. **写入产物**：按文档结构写入 `tasks.md`
-12. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
-13. **输出完成报告**：按「完成后输出」格式报告
+1. **读取前序产出**：读取前序步骤的产出物（`goal.md`, `requirements.md`, `design.md`, `gk-logs.md`），了解当前状态
+2. **知识图谱分析**：若项目维护了持久化的知识图谱，必须通过相关查询模块依赖、调用链、影响面等
+3. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
+4. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
+5. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
+6. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
+7. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
+8. **添加 E2E 测试 task**：覆盖关键用户场景
+9. **添加文档收敛 task**：与 design Impact Analysis 一致
+10. **添加 Code Review task**：委托给 code-reviewer sub-agent
+11. **生成 Task Dependency Graph**：JSON waves 格式
+12. **写入产物**：按文档结构写入 `tasks.md`
+13. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
+14. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 
