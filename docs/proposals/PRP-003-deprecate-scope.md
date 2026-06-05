@@ -1,6 +1,6 @@
 # PRP: Deprecate Scope
 
-**Status**: accepted
+**Status**: in-progress
 
 废弃 `--scope` 参数、`user` scope 概念和 `global-setup` 命令。逻辑上只保留 project scope。
 
