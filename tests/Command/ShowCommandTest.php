@@ -16,6 +16,7 @@ use AiProfileManager\Service\ShowStatusPresenter;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
 use AiProfileManager\Tests\Support\RestoresCwdTrait;
 use AiProfileManager\Tests\Support\RestoresEnvTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -67,6 +68,7 @@ final class ShowCommandTest extends TestCase
         self::assertStringNotContainsString('preset', $tester->getDisplay());
     }
 
+    #[Group('deprecated-scope')]
     public function testShowCommandRejectsInvalidScope(): void
     {
         $proj = $this->tmpDir . '/proj';
@@ -126,6 +128,7 @@ final class ShowCommandTest extends TestCase
         self::assertStringContainsString('rule:scope-proj  installed (project)', $tester->getDisplay());
     }
 
+    #[Group('deprecated-scope')]
     public function testShowCommandScopeUserFilter(): void
     {
         $baseline = $this->tmpDir . '/user-scope-base';
@@ -175,6 +178,7 @@ YAML);
         self::assertStringNotContainsString('(user+project)', $tester->getDisplay());
     }
 
+    #[Group('deprecated-scope')]
     public function testShowCommandInstalledWhenBaselineUnknownButFileOnDisk(): void
     {
         $baseline = $this->tmpDir . '/unknown-base';

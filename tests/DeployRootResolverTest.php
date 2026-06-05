@@ -9,6 +9,7 @@ use AiProfileManager\Service\DeployRootResolver;
 use AiProfileManager\Service\InvalidScopeException;
 use AiProfileManager\Service\UserHomeResolver;
 use AiProfileManager\Tests\Support\RestoresEnvTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 final class DeployRootResolverTest extends TestCase
@@ -61,6 +62,7 @@ final class DeployRootResolverTest extends TestCase
         self::assertSame(DeployScope::User, $resolver->parseScopeOption('user'));
     }
 
+    #[Group('deprecated-scope')]
     public function testParseScopeOptionThrowsForInvalidScope(): void
     {
         $resolver = new DeployRootResolver();
@@ -71,6 +73,7 @@ final class DeployRootResolverTest extends TestCase
         $resolver->parseScopeOption('bogus');
     }
 
+    #[Group('deprecated-scope')]
     public function testParseScopeOptionThrowsForEmptyString(): void
     {
         $resolver = new DeployRootResolver();

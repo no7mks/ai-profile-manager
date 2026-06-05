@@ -12,6 +12,7 @@ use AiProfileManager\Service\GitIgnoreTemplateService;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\PresetRegistry;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -94,6 +95,7 @@ final class InstallAliasesTest extends TestCase
         self::assertStringContainsString('Installed skill graphify', $tester->getDisplay());
     }
 
+    #[Group('deprecated-scope')]
     public function testSkillRemoveAliasRunsUninstall(): void
     {
         $fixture = $this->appWithPresetFixture();

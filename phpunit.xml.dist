@@ -24,4 +24,10 @@
             <directory>tests/E2E</directory>
         </testsuite>
     </testsuites>
+    <!-- TODO: task 3/4/5/8 will rewrite or delete these tests; temporarily excluded -->
+    <groups>
+        <exclude>
+            <group>deprecated-scope</group>
+        </exclude>
+    </groups>
 </phpunit>

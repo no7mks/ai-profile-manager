@@ -6,7 +6,7 @@ ability 语义与 `abilities.yaml` 格式；界定何者不是 ability。
 
 ## Ability 定义
 
-**Ability**：在 registry 登记、**可安装**（`add`/`install`/preset/`global-setup`）且 **可卸载**（`remove`/`uninstall` 或 project 上 `cleanup`）的条目（skill / rule / agent / hook / gitignore / prompt）。`show`/`check`/`update` 只操作 ability；**preset 名不是 ability**。
+**Ability**：在 registry 登记、**可安装**（`add`/`install`/preset/`bootstrap`）且 **可卸载**（`remove`/`uninstall` 或 project 上 `cleanup`）的条目（skill / rule / agent / hook / gitignore / prompt）。`show`/`check`/`update` 只操作 ability；**preset 名不是 ability**。
 
 **不是 ability**：bootstrap/scaffold（`apm bootstrap` → `ProjectInitializer`，**不进 yaml**，cleanup 不卸）；`PROJECT.md` 与 `docs/state|manual` 内容由 init Agent 写。Deploy scope 根解析见 `docs/state/deploy-scope.md`。
 
@@ -18,7 +18,7 @@ ability 语义与 `abilities.yaml` 格式；界定何者不是 ability。
 
 ```yaml
 version: "1"
-global-setup:
+bootstrap:
   includes:
     - skill:apm
     - rule:git:git-conventions
@@ -28,12 +28,17 @@ rules:
 ```
 
 - `version`: 必填 `"1"`
-- 已知 section: `global-setup`、`rules`、`agents`、`skills`、`hooks`、`gitignore`、`presets`、`prompts`
+- 已知 section: `bootstrap`、`rules`、`agents`、`skills`、`hooks`、`gitignore`、`presets`、`prompts`
 - 未知 section: 解析时忽略
+- 所有 entry 均为 project-only（无 `scopes` 字段）
 
-### global-setup section
+### bootstrap section
 
-顶层 `global-setup.includes` 为 **Global Setup List**（`type:path`），仅供 `apm global-setup`；**不是** preset。`AbilityRegistry::globalSetupIncludes()` 解析；条目须存在于 registry 且 `scopes` 含 `user`。
+顶层 `bootstrap.includes` 为 **Bootstrap Include List**（`type:path` 格式），供 `apm bootstrap` 安装阶段使用。
+
+- `AbilityRegistry::bootstrapIncludes()` 解析 `bootstrap.includes`，返回 `list<array{type: string, path: string}>`
+- `bootstrap` section 不存在或 `includes` 为空时返回空数组
+- `AbilityRegistry::validateBootstrapIncludes()` 校验所有引用在 registry 中存在，否则抛 `AbilityRegistryException::invalidBootstrapReference()`
 
 ---
 
@@ -44,12 +49,6 @@ rules:
 | path | string | 是 | ability 标识名 |
 | description | string | 是 | 人类可读描述 |
 | targets | mapping | 是 | 平台 → 安装路径，非空 |
-| scopes | list | 否 | `project` / `user`；省略为 `[project]` |
-
-### scopes
-
-- 合法值：`project`、`user`（`DeployScope`）。非法或空列表 → `validationErrors`。
-- **Project-only**：`scopes` 仅 `[project]` 的 rules/agents/skills/hooks，及全部 gitignore、prompts。`projectOnlyPaths()` 返回 path/marker/name 列表（当前含 `cursor-scope`、`kiro-scope`、`plugin:superpowers-integration`、`tga-query`、`lark-sheets`、gitignore markers、`graphify:project-section`）。
 
 ### targets
 
@@ -80,7 +79,7 @@ gitignore:
 | marker | string | gitignore 模板 key |
 | description | string | 人类可读描述 |
 
-gitignore / prompts 恒为 project-only（无 `scopes` 字段）。
+gitignore / prompts 恒为 project-only。
 
 ---
 
@@ -103,7 +102,7 @@ presets:
 
 ### 已移除 preset `default`
 
-PRP-002 起无 `default` preset。首装：`apm global-setup` → 进仓 init/bootstrap → `add preset <name>`。其余 preset（`gitflow`、`spec-core`、`graphify`、`php` 等）保留。
+PRP-002 起无 `default` preset。首装：`apm bootstrap` → 进仓 init/bootstrap → `add preset <name>`。其余 preset（`gitflow`、`spec-core`、`graphify`、`php` 等）保留。
 
 ### Preset 存储
 
@@ -121,3 +120,6 @@ PRP-002 起无 `default` preset。首装：`apm global-setup` → 进仓 init/bo
 | fileNotFound | yaml 不存在或不可读 |
 | invalidYaml | 解析失败或根非 mapping |
 | validationErrors | 字段校验失败 |
+| invalidBootstrapReference | `bootstrap.includes` 引用的 ability 不存在 |
+| legacyScopesField | entry 含遗留 `scopes` 字段（fail-fast） |
+| legacyGlobalSetupKey | 含遗留 `global-setup` 顶层 key（fail-fast） |

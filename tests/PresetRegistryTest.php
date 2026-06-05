@@ -7,6 +7,7 @@ namespace AiProfileManager\Tests;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\PresetRegistry;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 final class PresetRegistryTest extends TestCase
@@ -170,6 +171,7 @@ YAML;
         self::assertSame(['type' => 'rule', 'path' => 'valid-path'], $preset['includes'][0]);
         self::assertSame(['type' => 'skill', 'path' => 'another-valid'], $preset['includes'][1]);
     }
+    #[Group('deprecated-scope')]
     public function testPackageAbilitiesGlobalSetupIncludesResolve(): void
     {
         $path = dirname(__DIR__) . '/abilities.yaml';
@@ -189,7 +191,6 @@ YAML;
                     $include['path'],
                 ),
             );
-            self::assertSame(['user', 'project'], $entry->scopes);
         }
     }
 

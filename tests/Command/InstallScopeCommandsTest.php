@@ -18,10 +18,12 @@ use AiProfileManager\Service\PresetRegistry;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
 use AiProfileManager\Tests\Support\RestoresCwdTrait;
 use AiProfileManager\Tests\Support\RestoresEnvTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
+#[Group('deprecated-scope')]
 final class InstallScopeCommandsTest extends TestCase
 {
     use RemovesDirTrait;

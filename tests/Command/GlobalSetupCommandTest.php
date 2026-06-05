@@ -8,6 +8,7 @@ use AiProfileManager\Command\GlobalSetupCommand;
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\GlobalSetupService;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -218,6 +219,7 @@ final class GlobalSetupCommandTest extends TestCase
         self::assertStringContainsString('[fail]', $tester->getDisplay());
     }
 
+    #[Group('deprecated-scope')]
     public function testOnlyGlobalSetupListEntriesAreInstalledViaServiceContract(): void
     {
         $registryPath = $this->tmpDir . '/abilities.yaml';

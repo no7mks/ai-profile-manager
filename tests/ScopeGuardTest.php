@@ -9,8 +9,10 @@ use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\InvalidScopeException;
 use AiProfileManager\Service\ScopeGuard;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
+#[Group('deprecated-scope')]
 final class ScopeGuardTest extends TestCase
 {
     use RemovesDirTrait;

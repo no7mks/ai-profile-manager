@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
-use AiProfileManager\Config\DeployScope;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -60,6 +59,11 @@ final class AbilityRegistry
             throw AbilityRegistryException::invalidYaml($this->registryPath, 'Root element must be a mapping');
         }
 
+        // Fail-fast: reject legacy 'global-setup' top-level key
+        if (array_key_exists('global-setup', $data)) {
+            throw InvalidScopeException::legacyGlobalSetupKey();
+        }
+
         $result = [
             'rules' => [],
             'agents' => [],
@@ -93,6 +97,11 @@ final class AbilityRegistry
                     continue;
                 }
 
+                // Fail-fast: reject legacy 'scopes' field
+                if (array_key_exists('scopes', $entry)) {
+                    throw InvalidScopeException::legacyScopesField($entry['path'] ?? "#{$index}");
+                }
+
                 $missing = [];
                 if (!isset($entry['path']) || !is_string($entry['path'])) {
                     $missing[] = 'path';
@@ -111,18 +120,11 @@ final class AbilityRegistry
                     continue;
                 }
 
-                $scopesResult = self::resolveScopes($entry);
-                if (isset($scopesResult['error'])) {
-                    $errors[] = "{$section}[{$entryId}]: {$scopesResult['error']}";
-                    continue;
-                }
-
                 $result[$section][] = new AbilityEntry(
                     path: $entry['path'],
                     description: $entry['description'],
                     targets: $entry['targets'],
                     type: $type,
-                    scopes: $scopesResult['scopes'],
                 );
             }
         }
@@ -145,98 +147,19 @@ final class AbilityRegistry
     }
 
     /**
+     * 读取 bootstrap.includes 列表。
+     * 从 bootstrap section 的 includes 字段解析 type:path 条目。
+     * bootstrap section 不存在或 includes 为空时返回空数组。
+     *
      * @return list<array{type: string, path: string}>
      */
-    public function globalSetupIncludes(): array
-    {
-        return $this->parseTypedIncludesFromSection('global-setup');
-    }
-
-    /**
-     * @return list<string>
-     */
-    public function projectOnlyPaths(): array
-    {
-        $data = $this->parse();
-        $paths = [];
-        foreach (['rules', 'agents', 'skills', 'hooks'] as $section) {
-            foreach ($data[$section] as $entry) {
-                if ($entry->scopes === ['project']) {
-                    $paths[] = $entry->path;
-                }
-            }
-        }
-        foreach ($data['gitignore'] as $gi) {
-            if (is_string($gi['marker'] ?? null)) {
-                $paths[] = $gi['marker'];
-            }
-        }
-        foreach ($data['prompts'] as $prompt) {
-            if (is_string($prompt['name'] ?? null)) {
-                $paths[] = $prompt['name'];
-            }
-        }
-        return $paths;
-    }
-
-    public function getEntry(string $type, string $path): ?AbilityEntry
-    {
-        $section = match ($type) {
-            'rule' => 'rules', 'agent' => 'agents', 'skill' => 'skills', 'hook' => 'hooks',
-            default => null,
-        };
-        if ($section === null) {
-            return null;
-        }
-        foreach ($this->parse()[$section] as $entry) {
-            if ($entry->path === $path && $entry->type === $type) {
-                return $entry;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param array<string, mixed> $entry
-     * @return array{scopes: list<string>}|array{error: string}
-     */
-    private static function resolveScopes(array $entry): array
-    {
-        if (!isset($entry['scopes'])) {
-            return ['scopes' => ['project']];
-        }
-
-        $scopes = $entry['scopes'];
-        if (!is_array($scopes) || $scopes === []) {
-            return ['error' => 'scopes must be a non-empty list'];
-        }
-
-        $allowed = implode(', ', array_map(static fn (DeployScope $s): string => $s->value, DeployScope::cases()));
-        $resolved = [];
-
-        foreach ($scopes as $scopeIndex => $scope) {
-            if (!is_string($scope)) {
-                return ['error' => "scopes[{$scopeIndex}] must be a string"];
-            }
-
-            if (DeployScope::tryFrom($scope) === null) {
-                return ['error' => "invalid scope '{$scope}' in scopes (allowed: {$allowed})"];
-            }
-
-            $resolved[] = $scope;
-        }
-
-        return ['scopes' => $resolved];
-    }
-
-    /** @return list<array{type: string, path: string}> */
-    private function parseTypedIncludesFromSection(string $sectionKey): array
+    public function bootstrapIncludes(): array
     {
         $data = $this->readRawYaml();
-        if (!is_array($data[$sectionKey] ?? null)) {
+        if (!is_array($data['bootstrap'] ?? null)) {
             return [];
         }
-        if (!is_array($includes = $data[$sectionKey]['includes'] ?? null)) {
+        if (!is_array($includes = $data['bootstrap']['includes'] ?? null)) {
             return [];
         }
         $result = [];
@@ -257,24 +180,68 @@ final class AbilityRegistry
         return $result;
     }
 
-    /** @return array<string, mixed> */
+    /**
+     * 读取并解析 YAML 文件，返回原始数组数据。
+     *
+     * @return array<string, mixed>
+     * @throws AbilityRegistryException
+     */
     private function readRawYaml(): array
     {
         if (!is_file($this->registryPath)) {
             throw AbilityRegistryException::fileNotFound($this->registryPath);
         }
+
         $content = file_get_contents($this->registryPath);
         if ($content === false) {
             throw AbilityRegistryException::fileNotFound($this->registryPath);
         }
+
         try {
             $data = Yaml::parse($content);
         } catch (ParseException $e) {
             throw AbilityRegistryException::invalidYaml($this->registryPath, $e->getMessage());
         }
+
         if (!is_array($data)) {
             throw AbilityRegistryException::invalidYaml($this->registryPath, 'Root element must be a mapping');
         }
+
         return $data;
     }
+
+    /**
+     * 校验 bootstrap.includes 中所有引用在 registry 中存在。
+     * 任一引用不存在则抛出异常（fail-fast）。
+     *
+     * @param list<array{type: string, path: string}> $includes
+     * @throws AbilityRegistryException 当引用的 ability 不存在时
+     */
+    public function validateBootstrapIncludes(array $includes): void
+    {
+        foreach ($includes as $include) {
+            $entry = $this->getEntry($include['type'], $include['path']);
+            if ($entry === null) {
+                throw AbilityRegistryException::invalidBootstrapReference($include['type'], $include['path']);
+            }
+        }
+    }
+
+    public function getEntry(string $type, string $path): ?AbilityEntry
+    {
+        $section = match ($type) {
+            'rule' => 'rules', 'agent' => 'agents', 'skill' => 'skills', 'hook' => 'hooks',
+            default => null,
+        };
+        if ($section === null) {
+            return null;
+        }
+        foreach ($this->parse()[$section] as $entry) {
+            if ($entry->path === $path && $entry->type === $type) {
+                return $entry;
+            }
+        }
+        return null;
+    }
+
 }

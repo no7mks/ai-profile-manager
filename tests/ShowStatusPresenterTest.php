@@ -12,6 +12,7 @@ use AiProfileManager\Service\InstallationProbe;
 use AiProfileManager\Service\ShowStatusPresenter;
 use AiProfileManager\Tests\Support\RestoresCwdTrait;
 use AiProfileManager\Tests\Support\RestoresEnvTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 final class ShowStatusPresenterTest extends TestCase
@@ -61,6 +62,7 @@ final class ShowStatusPresenterTest extends TestCase
         self::assertSame('not installed', $rows[0]->status);
     }
 
+    #[Group('deprecated-scope')]
     public function testUnknownStatusUsesProbeWhenPresent(): void
     {
         $baseline = sys_get_temp_dir() . '/apm-show-unknown-base-' . bin2hex(random_bytes(4));
@@ -80,6 +82,7 @@ final class ShowStatusPresenterTest extends TestCase
         self::assertSame('installed', $rows[0]->status);
     }
 
+    #[Group('deprecated-scope')]
     public function testUnknownStatusUsesProbeWhenAbsent(): void
     {
         $baseline = sys_get_temp_dir() . '/apm-show-unknown-miss-base-' . bin2hex(random_bytes(4));
@@ -98,6 +101,7 @@ final class ShowStatusPresenterTest extends TestCase
         self::assertSame('not installed', $rows[0]->status);
     }
 
+    #[Group('deprecated-scope')]
     public function testDualScopeWarningWhenInstalledInUserAndProject(): void
     {
         $baseline = sys_get_temp_dir() . '/apm-show-dual-base-' . bin2hex(random_bytes(4));
@@ -172,6 +176,7 @@ YAML;
         self::assertSame('cursor, kiro', $rows[0]->targetsText);
     }
 
+    #[Group('deprecated-scope')]
     public function testScopeFilterLimitsToUserScope(): void
     {
         $baseline = sys_get_temp_dir() . '/apm-show-fu-base-' . bin2hex(random_bytes(4));

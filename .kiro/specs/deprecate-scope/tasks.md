@@ -6,43 +6,43 @@
 
 ## Tasks
 
-- [~] 1. abilities.yaml 格式变更与验证
-  - [ ] 1.1 `InvalidScopeException` 新增 factory methods
+- [-] 1. abilities.yaml 格式变更与验证
+  - [x] 1.1 `InvalidScopeException` 新增 factory methods
     - 新增 `legacyScopesField(string $path)` 和 `legacyGlobalSetupKey()` factory methods
     - 移除 `unknownScope()` 和 `projectOnlyInUserScope()`，仅保留废弃消息工厂
     - RED → GREEN：`./vendor/bin/phpunit --filter InvalidScopeExceptionTest`
     - _Ref: Requirement 4, AC 1-2; Requirement 8, AC 9_
-  - [ ] 1.2 `AbilityEntry` 移除 `$scopes` 属性
+  - [x] 1.2 `AbilityEntry` 移除 `$scopes` 属性
     - 移除构造函数中的 `$scopes` 参数和属性声明
     - 更新所有测试中 AbilityEntry 的构造调用
     - RED → GREEN：`./vendor/bin/phpunit --filter AbilityEntryTest`
     - _Ref: Requirement 4, AC 1; Requirement 8, AC 10_
-  - [ ] 1.3 `AbilityRegistry::parse()` fail-fast 验证
+  - [x] 1.3 `AbilityRegistry::parse()` fail-fast 验证
     - 检测 entry 含 `scopes` 字段时抛 `InvalidScopeException::legacyScopesField()`
     - 检测 `global-setup` 顶层 key 时抛 `InvalidScopeException::legacyGlobalSetupKey()`
     - 首个违规即终止（fail-fast）
     - RED → GREEN：`./vendor/bin/phpunit --filter AbilityRegistryTest`
     - _Ref: Requirement 4, AC 1-2, 5_
-  - [ ] 1.4 `AbilityRegistry::bootstrapIncludes()` 实现
+  - [x] 1.4 `AbilityRegistry::bootstrapIncludes()` 实现
     - 从 `bootstrap.includes` 读取 `type:path` 条目列表
     - `bootstrap` section 不存在或 `includes` 为空时返回空数组
     - RED → GREEN：`./vendor/bin/phpunit --filter AbilityRegistryTest`
     - _Ref: Requirement 4, AC 3-4_
-  - [ ] 1.5 `AbilityRegistry::validateBootstrapIncludes()` 实现
+  - [x] 1.5 `AbilityRegistry::validateBootstrapIncludes()` 实现
     - 校验 `bootstrap.includes` 中所有引用在 registry 中存在
     - 任一引用不存在则抛 `AbilityRegistryException::invalidBootstrapReference()`
     - RED → GREEN：`./vendor/bin/phpunit --filter AbilityRegistryTest`
     - _Ref: Requirement 3, AC 2（前置校验）_
-  - [ ] 1.6 迁移项目 `abilities.yaml` 文件
+  - [x] 1.6 迁移项目 `abilities.yaml` 文件
     - 将 `global-setup` section 改名为 `bootstrap`
     - 移除所有 entry 的 `scopes` 字段
     - _Ref: Requirement 4, AC 1-3_
-  - [ ] 1.7 Property 2 + Property 5 属性测试
+  - [x] 1.7 Property 2 + Property 5 属性测试
     - **Property 2: Bootstrap includes 解析正确性** — 随机 `type:path` 组合验证 round-trip
     - **Property 5: 遗留字段 fail-fast 终止** — 随机违规位置验证仅首个报错
     - 标签：`Feature: deprecate-scope, Property 2/5`
     - _Ref: Requirement 4, AC 1-5_
-  - [ ] 1.8 Checkpoint
+  - [-] 1.8 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - 更新 `docs/state/abilities-model.md`：移除 `scopes` 字段文档
     - commit: `+(registry) deprecate-scope: abilities.yaml format migration`
