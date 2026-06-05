@@ -7,7 +7,7 @@ description: Kiro 平台专属规则，始终生效
 
 ## 项目相关信息
 
-项目特有信息见 #[[file:/PROJECT.md]]
+每个对话必须先载入项目特有信息见 #[[file:/PROJECT.md]]
 
 ## Intent Mapping
 
