@@ -40,6 +40,7 @@ final class Installer
         array $targets,
         ?string $presetName = null,
         DeployScope $scope = DeployScope::Project,
+        bool $skipExisting = false,
     ): array
     {
         $hooks = $items['hooks'] ?? [];
@@ -59,6 +60,10 @@ final class Installer
 
         foreach ($targets as $target) {
             foreach ($items['skills'] as $name) {
+                if ($skipExisting && $this->isInstalledOnTarget('skill', $name, $target)) {
+                    $lines[] = sprintf('[skip] skill:%s (%s)', $name, $target);
+                    continue;
+                }
                 $r = $this->installAbilityBundle('skill', $name, $target, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {
@@ -66,6 +71,10 @@ final class Installer
                 }
             }
             foreach ($items['rules'] as $name) {
+                if ($skipExisting && $this->isInstalledOnTarget('rule', $name, $target)) {
+                    $lines[] = sprintf('[skip] rule:%s (%s)', $name, $target);
+                    continue;
+                }
                 $r = $this->installAbilityBundle('rule', $name, $target, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {
@@ -73,6 +82,10 @@ final class Installer
                 }
             }
             foreach ($items['agents'] as $name) {
+                if ($skipExisting && $this->isInstalledOnTarget('agent', $name, $target)) {
+                    $lines[] = sprintf('[skip] agent:%s (%s)', $name, $target);
+                    continue;
+                }
                 $r = $this->installAbilityBundle('agent', $name, $target, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {
@@ -81,6 +94,10 @@ final class Installer
             }
             // hooks: dispatch to HookInstaller per target
             foreach ($hooks as $hookName) {
+                if ($skipExisting && $this->isInstalledOnTarget('hook', $hookName, $target)) {
+                    $lines[] = sprintf('[skip] hook:%s (%s)', $hookName, $target);
+                    continue;
+                }
                 $r = $this->installHook($hookName, $target, $scope);
                 $lines = array_merge($lines, $r['lines']);
                 if ($r['failed']) {

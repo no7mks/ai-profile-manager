@@ -6,7 +6,7 @@
 
 ## Tasks
 
-- [-] 1. abilities.yaml 格式变更与验证
+- [x] 1. abilities.yaml 格式变更与验证
   - [x] 1.1 `InvalidScopeException` 新增 factory methods
     - 新增 `legacyScopesField(string $path)` 和 `legacyGlobalSetupKey()` factory methods
     - 移除 `unknownScope()` 和 `projectOnlyInUserScope()`，仅保留废弃消息工厂
@@ -42,30 +42,30 @@
     - **Property 5: 遗留字段 fail-fast 终止** — 随机违规位置验证仅首个报错
     - 标签：`Feature: deprecate-scope, Property 2/5`
     - _Ref: Requirement 4, AC 1-5_
-  - [-] 1.8 Checkpoint
+  - [x] 1.8 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - 更新 `docs/state/abilities-model.md`：移除 `scopes` 字段文档
     - commit: `+(registry) deprecate-scope: abilities.yaml format migration`
 
-- [ ] 2. Bootstrap 命令扩展
-  - [ ] 2.1 `Installer` 新增 `$skipExisting` 参数支持
+- [-] 2. Bootstrap 命令扩展
+  - [x] 2.1 `Installer` 新增 `$skipExisting` 参数支持
     - `installTyped()` 增加 `bool $skipExisting = false` 参数
     - 已安装且 `$skipExisting = true` 时输出 `[skip]` 标记
     - RED → GREEN：`./vendor/bin/phpunit --filter InstallerTest`
     - _Ref: Requirement 3, AC 3_
-  - [ ] 2.2 `BootstrapCommand` 扩展 ability 安装阶段
+  - [x] 2.2 `BootstrapCommand` 扩展 ability 安装阶段
     - scaffold 完成后读取 `bootstrapIncludes()`，调用 `validateBootstrapIncludes()`
     - 逐项安装到 project scope；`--force` 覆盖已安装项
     - 失败项输出 `[fail]` 并继续剩余；存在失败则 exit 1
     - 空 includes 仅 scaffold，exit 0
     - RED → GREEN：`./vendor/bin/phpunit --filter BootstrapCommandTest`
     - _Ref: Requirement 3, AC 1-9_
-  - [ ] 2.3 Property 3 + Property 4 属性测试
+  - [x] 2.3 Property 3 + Property 4 属性测试
     - **Property 3: Bootstrap 幂等性** — 预装/未装 × force/no-force 组合验证
     - **Property 4: Bootstrap 部分失败容错** — 随机失败位置验证剩余项仍尝试
     - 标签：`Feature: deprecate-scope, Property 3/4`
     - _Ref: Requirement 3, AC 3-5, 7_
-  - [ ] 2.4 Checkpoint
+  - [-] 2.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(bootstrap) deprecate-scope: ability install phase`
 

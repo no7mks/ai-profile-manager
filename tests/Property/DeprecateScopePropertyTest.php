@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests\Property;
 
+use AiProfileManager\Command\BootstrapCommand;
 use AiProfileManager\Service\AbilityRegistry;
+use AiProfileManager\Service\DirectoryMirrorService;
+use AiProfileManager\Service\GitIgnoreTemplateService;
+use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\InvalidScopeException;
+use AiProfileManager\Service\ProjectInitializer;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
 use Eris\Generators;
 use Eris\TestTrait;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * Property-based tests for the deprecate-scope feature.
@@ -55,10 +61,18 @@ final class DeprecateScopePropertyTest extends TestCase
         $this->limitTo(100);
 
         $typeGenerator = Generators::elements(['skill', 'rule', 'agent', 'hook']);
-        $pathSegmentGenerator = Generators::suchThat(
-            fn (string $s): bool => preg_match('/^[a-z][a-z0-9]{2,7}$/', $s) === 1,
-            Generators::string(),
-            1000,
+        // Build path segments by mapping over a length generator and constructing from valid chars
+        $lowercaseLetters = range('a', 'z');
+        $alphanumeric = array_merge(range('a', 'z'), range('0', '9'));
+        $pathSegmentGenerator = Generators::map(
+            function (int $len) use ($lowercaseLetters, $alphanumeric): string {
+                $result = $lowercaseLetters[array_rand($lowercaseLetters)];
+                for ($i = 1; $i < $len; $i++) {
+                    $result .= $alphanumeric[array_rand($alphanumeric)];
+                }
+                return $result;
+            },
+            Generators::choose(3, 8),
         );
 
         $this->forAll(
@@ -186,6 +200,286 @@ final class DeprecateScopePropertyTest extends TestCase
             }
         });
     }
+
+    // ─── Property 3 ──────────────────────────────────────────────────
+
+    /**
+     * Property 3: Bootstrap 幂等性
+     *
+     * For any ability in bootstrap.includes that is already installed on disk at
+     * the target path, executing bootstrap without --force SHALL skip that ability
+     * (output contains [skip]), and executing bootstrap with --force SHALL overwrite it.
+     * In both cases the final disk state for that ability SHALL be valid.
+     *
+     * **Validates: Requirements 3.3, 3.4**
+     *
+     * @group Feature: deprecate-scope, Property 3
+     */
+    public function testBootstrapIdempotency(): void
+    {
+        $this->limitTo(100);
+
+        $this->forAll(
+            Generators::choose(1, 5),   // number of abilities
+            Generators::bool(),          // force flag
+        )->then(function (int $abilityCount, bool $force): void {
+            $types = ['skill', 'rule'];
+            $abilities = [];
+            $preInstalled = [];
+
+            for ($i = 0; $i < $abilityCount; $i++) {
+                $type = $types[array_rand($types)];
+                $name = 'ab-' . bin2hex(random_bytes(3)) . '-' . $i;
+                $abilities[] = ['type' => $type, 'name' => $name];
+                // Randomly choose whether this ability is pre-installed
+                $preInstalled[] = (bool) random_int(0, 1);
+            }
+
+            $pkg = $this->buildPackageForAbilities($abilities);
+            $proj = $this->tmpDir . '/proj-' . bin2hex(random_bytes(4));
+            mkdir($proj, 0775, true);
+            chdir($proj);
+
+            // Pre-install some abilities on disk
+            foreach ($abilities as $i => $ability) {
+                if ($preInstalled[$i]) {
+                    $this->preInstallAbility($proj, $ability['type'], $ability['name']);
+                }
+            }
+
+            $initializer = new ProjectInitializer($pkg);
+            $registry = new AbilityRegistry($pkg . '/abilities.yaml');
+            $installer = new Installer(
+                registry: $registry,
+                gitIgnore: new GitIgnoreTemplateService(),
+                packageRoot: $pkg,
+                mirror: new DirectoryMirrorService(),
+            );
+
+            $cmd = new BootstrapCommand($initializer, $registry, $installer);
+            $tester = new CommandTester($cmd);
+            $options = ['--target' => ['cursor']];
+            if ($force) {
+                $options['--force'] = true;
+            }
+            $exit = $tester->execute($options);
+            $display = $tester->getDisplay();
+
+            // All should succeed (exit 0) since all source files exist
+            self::assertSame(0, $exit, 'Expected exit 0 but got: ' . $display);
+
+            foreach ($abilities as $i => $ability) {
+                $marker = sprintf('[skip] %s:%s', $ability['type'], $ability['name']);
+                if ($preInstalled[$i] && !$force) {
+                    // Already installed + no force → must be skipped
+                    self::assertStringContainsString($marker, $display,
+                        "Pre-installed {$ability['type']}:{$ability['name']} should be skipped without --force");
+                } elseif ($preInstalled[$i] && $force) {
+                    // Already installed + force → overwrite (no [skip])
+                    self::assertStringNotContainsString($marker, $display,
+                        "Pre-installed {$ability['type']}:{$ability['name']} should be overwritten with --force");
+                    self::assertStringContainsString("Installed {$ability['type']} {$ability['name']}", $display);
+                } else {
+                    // Not pre-installed → installed normally
+                    self::assertStringContainsString("Installed {$ability['type']} {$ability['name']}", $display);
+                }
+
+                // In all cases, the final disk state for the ability should be valid
+                $this->assertAbilityOnDisk($proj, $ability['type'], $ability['name']);
+            }
+        });
+    }
+
+    // ─── Property 4 ──────────────────────────────────────────────────
+
+    /**
+     * Property 4: Bootstrap 部分失败容错
+     *
+     * For any bootstrap.includes list containing N items where item K (1 ≤ K ≤ N)
+     * fails installation, all items at positions ≠ K SHALL still be attempted,
+     * and the scaffold SHALL remain intact on disk.
+     *
+     * **Validates: Requirements 3.5, 3.7**
+     *
+     * @group Feature: deprecate-scope, Property 4
+     */
+    public function testBootstrapPartialFailureTolerance(): void
+    {
+        $this->limitTo(100);
+
+        $this->forAll(
+            Generators::choose(2, 6),   // total ability count (need at least 2 for partial failure)
+        )->then(function (int $totalCount): void {
+            $types = ['skill', 'rule'];
+            $abilities = [];
+
+            for ($i = 0; $i < $totalCount; $i++) {
+                $type = $types[array_rand($types)];
+                $name = 'pf-' . bin2hex(random_bytes(3)) . '-' . $i;
+                $abilities[] = ['type' => $type, 'name' => $name];
+            }
+
+            // Randomly choose which positions will fail (at least 1, at most totalCount-1)
+            $failCount = random_int(1, $totalCount - 1);
+            $allPositions = range(0, $totalCount - 1);
+            shuffle($allPositions);
+            $failPositions = array_slice($allPositions, 0, $failCount);
+
+            $pkg = $this->buildPackageForAbilities($abilities, $failPositions);
+            $proj = $this->tmpDir . '/proj-' . bin2hex(random_bytes(4));
+            mkdir($proj, 0775, true);
+            chdir($proj);
+
+            $initializer = new ProjectInitializer($pkg);
+            $registry = new AbilityRegistry($pkg . '/abilities.yaml');
+            $installer = new Installer(
+                registry: $registry,
+                gitIgnore: new GitIgnoreTemplateService(),
+                packageRoot: $pkg,
+                mirror: new DirectoryMirrorService(),
+            );
+
+            $cmd = new BootstrapCommand($initializer, $registry, $installer);
+            $tester = new CommandTester($cmd);
+            $exit = $tester->execute(['--target' => ['cursor']]);
+            $display = $tester->getDisplay();
+
+            // Must exit with failure code since at least one item failed
+            self::assertSame(1, $exit, 'Expected exit 1 with partial failure but got 0: ' . $display);
+
+            // Failed positions have [fail] marker
+            foreach ($failPositions as $pos) {
+                $ability = $abilities[$pos];
+                self::assertStringContainsString('[fail]', $display,
+                    "Expected [fail] for {$ability['type']}:{$ability['name']}");
+            }
+
+            // Non-failed positions should be attempted (have [ok] Installed or [skip])
+            foreach ($abilities as $i => $ability) {
+                if (!in_array($i, $failPositions, true)) {
+                    $installMsg = sprintf('Installed %s %s', $ability['type'], $ability['name']);
+                    self::assertStringContainsString($installMsg, $display,
+                        "Non-failed {$ability['type']}:{$ability['name']} should be attempted");
+                }
+            }
+
+            // Scaffold remains intact (not rolled back)
+            self::assertFileExists($proj . '/docs/README.md', 'Scaffold docs/README.md must survive partial failure');
+            self::assertFileExists($proj . '/AGENTS.md', 'Scaffold AGENTS.md must survive partial failure');
+        });
+    }
+
+    // ─── Property 3/4 Helpers ────────────────────────────────────────
+
+    /**
+     * Build a package directory with scaffold files, abilities, and bootstrap.includes.
+     *
+     * @param list<array{type: string, name: string}> $abilities
+     * @param list<int>                               $failPositions Positions where source files should NOT exist (causes install failure)
+     */
+    private function buildPackageForAbilities(array $abilities, array $failPositions = []): string
+    {
+        $pkg = $this->tmpDir . '/pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/docs', 0775, true);
+        file_put_contents($pkg . '/docs/README.md', "# Docs\n");
+        mkdir($pkg . '/issues', 0775, true);
+        file_put_contents($pkg . '/issues/README.md', "# Issues\n");
+        file_put_contents($pkg . '/AGENTS.md', "# Agents\n");
+
+        // Group abilities by section for YAML
+        $sections = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => []];
+        $includeLines = [];
+
+        foreach ($abilities as $i => $ability) {
+            $type = $ability['type'];
+            $name = $ability['name'];
+            $section = $type . 's';
+            $shouldFail = in_array($i, $failPositions, true);
+
+            if ($type === 'skill') {
+                $targetPath = '.cursor/skills/' . $name;
+                if (!$shouldFail) {
+                    mkdir($pkg . '/' . $targetPath, 0775, true);
+                    file_put_contents($pkg . '/' . $targetPath . '/SKILL.md', "# $name content\n");
+                }
+            } else {
+                // rule
+                $targetPath = '.cursor/rules/' . $name . '/' . $name . '.mdc';
+                if (!$shouldFail) {
+                    mkdir($pkg . '/.cursor/rules/' . $name, 0775, true);
+                    file_put_contents($pkg . '/' . $targetPath, "# $name content\n");
+                }
+            }
+
+            $sections[$section][] = [
+                'path' => $name,
+                'description' => "$name ability",
+                'targets' => ['cursor' => $targetPath],
+            ];
+            $includeLines[] = "    - $type:$name";
+        }
+
+        // Build abilities.yaml
+        $yamlLines = [];
+        foreach (['skills', 'rules', 'agents', 'hooks'] as $sec) {
+            if ($sections[$sec] === []) {
+                $yamlLines[] = "$sec: []";
+            } else {
+                $yamlLines[] = "$sec:";
+                foreach ($sections[$sec] as $entry) {
+                    $yamlLines[] = '  - path: ' . $entry['path'];
+                    $yamlLines[] = '    description: ' . $entry['description'];
+                    $yamlLines[] = '    targets:';
+                    foreach ($entry['targets'] as $platform => $target) {
+                        $yamlLines[] = '      ' . $platform . ': ' . $target;
+                    }
+                }
+            }
+        }
+        $yamlLines[] = 'bootstrap:';
+        $yamlLines[] = '  includes:';
+        foreach ($includeLines as $line) {
+            $yamlLines[] = $line;
+        }
+
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", $yamlLines) . "\n");
+
+        return $pkg;
+    }
+
+    /**
+     * Pre-install an ability on disk at the project's target path.
+     */
+    private function preInstallAbility(string $proj, string $type, string $name): void
+    {
+        if ($type === 'skill') {
+            $dir = $proj . '/.cursor/skills/' . $name;
+            mkdir($dir, 0775, true);
+            file_put_contents($dir . '/SKILL.md', "# pre-installed $name\n");
+        } else {
+            // rule
+            $dir = $proj . '/.cursor/rules/' . $name;
+            mkdir($dir, 0775, true);
+            file_put_contents($dir . '/' . $name . '.mdc', "# pre-installed $name\n");
+        }
+    }
+
+    /**
+     * Assert that an ability's files exist on disk in the project.
+     */
+    private function assertAbilityOnDisk(string $proj, string $type, string $name): void
+    {
+        if ($type === 'skill') {
+            self::assertDirectoryExists($proj . '/.cursor/skills/' . $name,
+                "Skill $name should exist on disk");
+        } else {
+            // rule
+            self::assertFileExists($proj . '/.cursor/rules/' . $name . '/' . $name . '.mdc',
+                "Rule $name should exist on disk");
+        }
+    }
+
+    // ─── Property 5 ──────────────────────────────────────────────────
 
     /**
      * Property 5 (supplemental): global-setup key fail-fast
