@@ -23,23 +23,22 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：
-   - i. `<spec-dir>/<name>/requirements.md`
-   - ii. requirements Gatekeep Log 中已回答的 Requirement Discussion
-   - iii. 相关 SSOT（`docs/state/`）
-   - iv. 知识图谱（若项目维护了持久化图谱）：查询模块依赖、调用链、影响面
-2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 design spec 子代理，将 requirements 内容与本文件的产物格式约束作为输入，由其生成 design.md 初稿
-3. **若委托成功** → 跳至步骤 12（Socratic Review）
-4. **若委托不可用或失败** → 继续以下手动步骤：
-5. **设计架构**：确定模块划分、依赖关系、数据流
-6. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
-7. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
-8. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
-9. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
-10. **写入产物**：按文档结构写入 `design.md`
-11. **诊断检查**：对写入的 `design.md` 执行 `getDiagnostics`，有问题则修正
-12. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
-13. **输出完成报告**：按「完成后输出」格式报告
+1. **读取前序产出**：读取前序步骤的产出物（`goal.md`, `requirements.md`, `gk-logs.md`），了解当前状态
+2. **设计分析**：
+   - i. 知识图谱分析：若项目维护了持久化的知识图谱，必须通过相关查询模块依赖、调用链、影响面等
+   - ii. 读取相关 SSOT（`docs/state/`）
+3. **尝试委托系统 sub-agent**：调用 Kiro 内置的 design spec 子代理，将 requirements 内容与本文件的产物格式约束作为输入，由其生成 design.md 初稿
+4. **若委托成功** → 跳至步骤 13（Socratic Review）
+5. **若委托不可用或失败** → 继续以下手动步骤：
+6. **设计架构**：确定模块划分、依赖关系、数据流
+7. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
+8. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
+9. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
+10. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
+11. **写入产物**：按文档结构写入 `design.md`
+12. **诊断检查**：对写入的 `design.md` 执行 `getDiagnostics`，有问题则修正
+13. **Socratic Review**：读取 steering `gatekeeping/gk-log-format.md` 获取格式，自检写入 `gk-logs.md`
+14. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 

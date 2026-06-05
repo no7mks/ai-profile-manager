@@ -60,6 +60,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ### 检查项
 
+- [ ] `## Overview` section 存在
 - [ ] `## Tasks` section 存在
 - [ ] 倒数第一个 top-level task 是 Code Review
 - [ ] 倒数第二个是文档收敛（feature / hotfix）
@@ -77,7 +78,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 
 ## 4. Requirement 追溯校验
 
-- [ ] 每个实现类 sub-task 引用了 `Ref: Requirement X, AC Y`
+- [ ] 每个实现类 sub-task 引用了对应的 Requirement 编号（引用到 AC 是 bonus，不强制）
 - [ ] requirements.md 中的每条 requirement 至少被一个 task 引用
 - [ ] 引用的编号在 requirements.md 中确实存在
 
@@ -230,7 +231,7 @@ Feature / Hotfix spec 必须包含文档收敛 top-level task。
 - [ ] 文档收敛 top-level task 存在
 - [ ] 包含 state 文档更新 sub-task
 - [ ] 包含 manual 文档更新 sub-task
-- [ ] 包含 migration guide sub-task
+- [ ] 包含 migration guide sub-task（当有不兼容的变化时）
 - [ ] 若项目维护了知识图谱，包含知识图谱更新 sub-task
 - [ ] 包含 checkpoint sub-task
 - [ ] 文档收敛内容与 design.md 的 Impact Analysis 一致
@@ -239,7 +240,7 @@ Feature / Hotfix spec 必须包含文档收敛 top-level task。
 
 ## 16. Gatekeep Log
 
-将校验过程中的修正项写入 tasks.md 末尾的 `## Gatekeep Log` section。
+将校验过程中的修正项写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Tasks Gatekeep Log` section（不写在 tasks.md 中）。
 
 ---
 

@@ -38,15 +38,19 @@ alwaysApply: false
 
 ## 2. 结构校验
 
-Feature / Hotfix 的 design.md 应包含以下关键 section：
+Feature / Hotfix 的 design.md 必须包含以下 section：
 
-| Section | 必要性 | 说明 |
-|---------|--------|------|
-| 一级标题 | 必须 | 说明本文件定位 |
-| 技术方案主体 | 必须 | 承接 requirements，给出具体技术方案 |
-| 接口 / 数据模型定义 | 必须 | 接口签名、数据模型、模块划分 |
-| `## Impact Analysis` | 必须 | 影响分析 |
-| `## Alternatives Considered` | 推荐 | 备选方案及落选理由 |
+| Section | 必要性 |
+|---------|--------|
+| `## Overview` | 必须 |
+| `## Architecture` | 必须 |
+| `## Components and Interfaces` | 必须 |
+| `## Data Models` | 必须 |
+| `## Correctness Properties` | 推荐 |
+| `## Error Handling` | 推荐 |
+| `## Testing Strategy` | 推荐 |
+| `## Impact Analysis` | 必须 |
+| `## Alternatives Considered` | 推荐 |
 
 Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、测试策略、收敛计划。
 
@@ -54,9 +58,12 @@ Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、�
 
 ### 检查项
 
-- [ ] 一级标题存在
-- [ ] 技术方案主体存在，且承接了 requirements 中的需求
-- [ ] 接口签名 / 数据模型有明确定义
+- [ ] 一级标题存在（格式不约束）
+- [ ] `## Overview` section 存在
+- [ ] `## Architecture` section 存在
+- [ ] `## Components and Interfaces` section 存在
+- [ ] `## Data Models` section 存在
+- [ ] `## Impact Analysis` section 存在
 - [ ] 各 section 之间使用 `---` 分隔
 
 ---
@@ -123,13 +130,15 @@ Design 的核心目的是：**让读者清楚地知道用什么技术方案实�
 
 ## 8. Gatekeep Log
 
-将校验过程中的修正项写入 design.md 末尾的 `## Gatekeep Log` section。
+将校验过程中的修正项写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Design Gatekeep Log` section（不写在 design.md 中）。
 
 ---
 
 ## 9. Architecture Decision (AD)
 
 校验完成后，生成面向 tasks 阶段的 Architecture Decision 问题（**3 个以上**）。
+
+Architecture Decision 写入 design.md 末尾的 `## Architecture Decision` section（保留在源文件中，不写入 gk-logs.md）。
 
 Architecture Decision 聚焦 **design 到 tasks 的衔接**——哪些技术决策在拆分为具体 task 时可能存在歧义。
 

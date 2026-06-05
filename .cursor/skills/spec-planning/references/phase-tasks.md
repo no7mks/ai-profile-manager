@@ -151,7 +151,7 @@
 - [ ] 1.N Checkpoint
   - 运行验证：`<具体命令>`（至少静态分析 + 单元测试）
   - （如本 task 改变了系统事实）更新 `docs/state/<相关文件>.md`
-  - commit: `<scope>: <描述>`
+  - commit: `<改动范围>` & 符合 `git-conventions` 的 message
 ```
 
 ### Task Dependency Graph
@@ -231,7 +231,7 @@
   - [ ] 1.2 Checkpoint
     - 运行验证：`<具体命令>`（至少静态分析 + 单元测试；见 `PROJECT.md`）
     - （如有系统事实变化）更新 `docs/state/<file>.md`
-    - commit: `<scope>: <描述>`
+    - commit: `<改动范围>` & 符合 `git-conventions` 的 message
 
 - [ ] N+1. E2E 测试
   - [ ] N+1.1 <场景>

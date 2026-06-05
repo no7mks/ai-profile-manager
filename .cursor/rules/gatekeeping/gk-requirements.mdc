@@ -119,13 +119,15 @@ Requirements 的核心目的是：**让读者清楚地知道要做什么、不�
 
 ## 7. Gatekeep Log
 
-将校验过程中的修正项写入 requirements.md 末尾的 `## Gatekeep Log` section。
+将校验过程中的修正项写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Requirements Gatekeep Log` section（不写在 requirements.md 中）。
 
 ---
 
 ## 8. Requirement Discussion (RD)
 
 校验完成后，生成面向 design 阶段的 Requirement Discussion 问题（**3 个以上**）。
+
+Requirement Discussion 写入 requirements.md 末尾的 `## Requirement Discussion` section（保留在源文件中，不写入 gk-logs.md）。
 
 Requirement Discussion 聚焦 **requirements 到 design 的衔接**——哪些行为描述存在多种合理的实现路径，需要用户在进入 design 前做出决策。
 
