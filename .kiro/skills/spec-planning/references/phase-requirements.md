@@ -37,12 +37,12 @@
 
 ### Feature 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 goal、Clarification 回答、SSOT
+1. **读取前置文件**：按「前置读取」清单获取 goal、Goal Clarification 回答、SSOT
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 requirement-first feature spec 子代理，将 goal 内容与本文件的产物格式约束作为输入，由其生成 requirements.md 初稿
 3. **若委托成功** → 跳至步骤 13（调用 requirement-detailer 分析需求）
 4. **若委托不可用或失败** → 继续以下手动步骤：
 5. **生成 .config.kiro**：在 `<spec-dir>/<name>/` 下写入 `.config.kiro`，内容为 `{"specId": "<uuid>", "workflowType": "requirements-first", "specType": "feature"}`
-6. **提取需求要素**：从 goal 的目标、决策、Clarification 中识别外部可观察行为
+6. **提取需求要素**：从 goal 的目标、决策、Goal Clarification 中识别外部可观察行为
 7. **建立术语表**：识别领域概念，撰写 Glossary
 8. **撰写 Introduction**：说明 feature 范围，明确 Non-scope
 9. **逐条撰写 Requirement**：每条包含 User Story + AC（EARS 格式）
@@ -56,7 +56,7 @@
 ### Feature 前置读取
 
 1. `<spec-dir>/<name>/goal.md`
-2. Goal 中 Clarification 已回答项（必须反映到 requirements）
+2. Goal 中 Goal Clarification 已回答项（必须反映到 requirements）
 3. 相关 SSOT（`docs/state/`）
 
 ### Feature 关键约束
@@ -135,7 +135,7 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 
 ### Bugfix 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 goal、Clarification 回答、SSOT、相关源代码
+1. **读取前置文件**：按「前置读取」清单获取 goal、Goal Clarification 回答、SSOT、相关源代码
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 requirement-first bugfix spec 子代理，将 goal 内容、相关源代码与本文件的 Bugfix 产物格式约束作为输入，由其生成 bugfix.md 初稿
 3. **若委托成功** → 跳至步骤 13（调用 requirement-detailer 分析需求）
 4. **若委托不可用或失败** → 继续以下手动步骤：
@@ -154,7 +154,7 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 ### Bugfix 前置读取
 
 1. `<spec-dir>/<name>/goal.md`
-2. Goal 中 Clarification 已回答项
+2. Goal 中 Goal Clarification 已回答项
 3. 相关 SSOT（`docs/state/`）
 4. 相关源代码（复现路径涉及的模块）
 

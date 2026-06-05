@@ -24,7 +24,7 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 requirements、GK Clarification、SSOT
+1. **读取前置文件**：按「前置读取」清单获取 requirements、Requirement Discussion 回答、SSOT
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 design spec 子代理，将 requirements 内容与本文件的产物格式约束作为输入，由其生成 design.md 初稿
 3. **若委托成功** → 跳至步骤 12（Socratic Review）
 4. **若委托不可用或失败** → 继续以下手动步骤：
@@ -43,7 +43,7 @@
 ## 前置读取
 
 1. `<spec-dir>/<name>/requirements.md`
-2. requirements Gatekeep Log 中已回答的 Clarification
+2. requirements Gatekeep Log 中已回答的 Requirement Discussion
 3. 相关 SSOT（`docs/state/`）
 4. 知识图谱（若项目维护了持久化图谱）：查询模块依赖、调用链、影响面
 

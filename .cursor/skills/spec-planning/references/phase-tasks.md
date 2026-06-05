@@ -29,7 +29,7 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 design、GK Clarification、requirements
+1. **读取前置文件**：按「前置读取」清单获取 design、Architecture Decision 回答、requirements
 2. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
 3. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
 4. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
@@ -48,7 +48,7 @@
 ## 前置读取
 
 1. `<spec-dir>/<name>/design.md`
-2. design Gatekeep Log 中已回答的 Clarification
+2. design Gatekeep Log 中已回答的 Architecture Decision
 3. `<spec-dir>/<name>/requirements.md`
 4. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
 

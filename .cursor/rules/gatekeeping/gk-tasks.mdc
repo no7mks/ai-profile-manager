@@ -174,7 +174,7 @@ Tasks 的核心目的是：**提供一份可直接执行的实现计划，让执
 
 ### 审查清单
 
-- [ ] **Design CR 回应**：用户在 design GK CR 中的决策是否在 tasks 编排中体现。
+- [ ] **Architecture Decision 回应**：用户在 design GK Architecture Decision 中的决策是否在 tasks 编排中体现。
 - [ ] **Design 全覆盖**：tasks 是否覆盖了 design 中的所有模块、接口和实现项？
 - [ ] **可独立执行**：每个 sub-task 的描述是否足够自包含？
 - [ ] **验收闭环**：checkpoint + E2E 测试 + 文档收敛 + code review 是否构成完整验收闭环？

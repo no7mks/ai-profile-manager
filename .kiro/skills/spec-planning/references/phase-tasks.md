@@ -29,7 +29,7 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 design、GK Clarification、requirements
+1. **读取前置文件**：按「前置读取」清单获取 design、Architecture Decision 回答、requirements
 2. **尝试委托系统 sub-agent**：调用 Kiro 内置的 create tasks spec 子代理（注意：不是 spec-task-execution），将 design 内容与本文件的产物格式约束作为输入，由其生成 tasks.md 初稿
 3. **若委托成功** → 跳至步骤 16（Socratic Review）
 4. **若委托不可用或失败** → 继续以下手动步骤：
@@ -52,7 +52,7 @@
 ## 前置读取
 
 1. `<spec-dir>/<name>/design.md`
-2. design Gatekeep Log 中已回答的 Clarification
+2. design Gatekeep Log 中已回答的 Architecture Decision
 3. `<spec-dir>/<name>/requirements.md`
 4. 知识图谱（若项目维护了持久化图谱）：查询依赖顺序、变更边界、受影响模块
 
@@ -160,7 +160,7 @@
 - [ ] 1.N Checkpoint
   - 运行验证：`<具体命令>`（至少静态分析 + 单元测试）
   - （如本 task 改变了系统事实）更新 `docs/state/<相关文件>.md`
-  - commit: `<scope>: <描述>`
+  - commit: `<改动范围>` & 符合 `git-conventions` 的 message
 ```
 
 ### Task Dependency Graph
@@ -240,7 +240,7 @@
   - [ ] 1.2 Checkpoint
     - 运行验证：`<具体命令>`（至少静态分析 + 单元测试；见 `PROJECT.md`）
     - （如有系统事实变化）更新 `docs/state/<file>.md`
-    - commit: `<scope>: <描述>`
+    - commit: `<改动范围>` & 符合 `git-conventions` 的 message
 
 - [ ] N+1. E2E 测试
   - [ ] N+1.1 <场景>

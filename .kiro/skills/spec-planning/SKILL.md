@@ -47,5 +47,5 @@ description: 当用户提到 spec、planning、goal、requirements、design、ta
 每次阶段完成后统一报告：
 
 - 当前阶段与产物路径
-- 关键决策摘要（含 CR/GK 相关输入）
+- 关键决策摘要（含 Discussion/GK 相关输入）
 - 下一阶段建议（且明确"未执行下一阶段"）

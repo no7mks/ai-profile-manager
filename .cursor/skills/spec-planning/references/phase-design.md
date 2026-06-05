@@ -24,7 +24,7 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 requirements、GK Clarification、SSOT
+1. **读取前置文件**：按「前置读取」清单获取 requirements、Requirement Discussion 回答、SSOT
 2. **设计架构**：确定模块划分、依赖关系、数据流
 3. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
 4. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
@@ -39,7 +39,7 @@
 ## 前置读取
 
 1. `<spec-dir>/<name>/requirements.md`
-2. requirements Gatekeep Log 中已回答的 Clarification
+2. requirements Gatekeep Log 中已回答的 Requirement Discussion
 3. 相关 SSOT（`docs/state/`）
 4. 知识图谱（若项目维护了持久化图谱）：查询模块依赖、调用链、影响面
 
