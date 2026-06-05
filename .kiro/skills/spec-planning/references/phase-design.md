@@ -87,7 +87,7 @@
 ```markdown
 ### Property N: <名称>
 
-- **Validates**: Requirements X.Y, X.Z（X = Requirement 编号，Y/Z = AC 编号；仅引用到 Requirement 级别时可省略 .Y）
+- **Validates: Requirements X.Y, X.Z**（X = Requirement 编号，Y/Z = AC 编号；仅引用到 Requirement 级别时可省略 .Y）
 - **条件**: <何时成立>
 - **保证**: <系统保证什么>
 - **违反后果**: <如果违反会怎样>
