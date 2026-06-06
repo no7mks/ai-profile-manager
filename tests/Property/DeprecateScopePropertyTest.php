@@ -7,6 +7,7 @@ namespace AiProfileManager\Tests\Property;
 use AiProfileManager\Command\AgentInstallCommand;
 use AiProfileManager\Command\AgentUninstallCommand;
 use AiProfileManager\Command\BootstrapCommand;
+use AiProfileManager\Command\CleanupCommand;
 use AiProfileManager\Command\InstallCommand;
 use AiProfileManager\Command\PresetUninstallCommand;
 use AiProfileManager\Command\RuleInstallCommand;
@@ -1378,5 +1379,159 @@ final class DeprecateScopePropertyTest extends TestCase
             'agent:uninstall' => [new AgentUninstallCommand($installer, $checker), []],
             'preset:uninstall' => [new PresetUninstallCommand($installer, $checker, $presetRegistry), ['preset' => 'dummy']],
         ];
+    }
+
+    // ─── Property 10 ─────────────────────────────────────────────────
+
+    /**
+     * Property 10: Cleanup 输出无遗留用语
+     *
+     * For any execution of `cleanup` command (success or failure), the complete
+     * output SHALL NOT contain the strings "user-scope", "user scope", or "global-setup".
+     *
+     * **Validates: Requirements 7**
+     *
+     * @group Feature: deprecate-scope, Property 10
+     */
+    public function testCleanupOutputHasNoLegacyWording(): void
+    {
+        $this->limitTo(100);
+
+        $typeGenerator = Generators::elements(['skill', 'rule']);
+
+        $this->forAll(
+            Generators::choose(1, 5),
+            Generators::elements([true, false]),
+        )->then(function (int $abilityCount, bool $isFailureScenario) use ($typeGenerator): void {
+            // Generate random abilities
+            $abilities = [];
+            for ($i = 0; $i < $abilityCount; $i++) {
+                $type = $this->sample($typeGenerator, 1)->collected()[0];
+                $name = 'p10-' . $type[0] . bin2hex(random_bytes(3)) . '-' . $i;
+                $abilities[] = ['type' => $type, 'name' => $name];
+            }
+
+            // Set up package root with abilities.yaml
+            $pkg = $this->tmpDir . '/p10-pkg-' . bin2hex(random_bytes(4));
+            $workspace = $this->tmpDir . '/p10-ws-' . bin2hex(random_bytes(4));
+            mkdir($pkg, 0775, true);
+            mkdir($workspace, 0775, true);
+
+            // Build abilities.yaml with skill/rule entries
+            $sections = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => []];
+
+            foreach ($abilities as $ability) {
+                $type = $ability['type'];
+                $name = $ability['name'];
+                $section = $type . 's';
+
+                if ($type === 'skill') {
+                    $targetPath = '.cursor/skills/' . $name;
+                    mkdir($pkg . '/' . $targetPath, 0775, true);
+                    file_put_contents($pkg . '/' . $targetPath . '/SKILL.md', "# $name\n");
+                } else {
+                    $targetPath = '.cursor/rules/' . $name . '/' . $name . '.mdc';
+                    mkdir($pkg . '/.cursor/rules/' . $name, 0775, true);
+                    file_put_contents($pkg . '/' . $targetPath, "# $name rule\n");
+                }
+
+                $sections[$section][] = [
+                    'path' => $name,
+                    'description' => "$name ability",
+                    'targets' => ['cursor' => $targetPath],
+                ];
+            }
+
+            // For failure scenario, add a hook entry pointing to a read-only dir
+            if ($isFailureScenario) {
+                $hookName = 'p10-hook-' . bin2hex(random_bytes(3));
+                $hookTargetPath = '.cursor/hooks/' . $hookName;
+                mkdir($pkg . '/' . $hookTargetPath, 0775, true);
+                file_put_contents($pkg . '/' . $hookTargetPath . '/hook.json', '{}');
+                $sections['hooks'][] = [
+                    'path' => $hookName,
+                    'description' => "$hookName hook",
+                    'targets' => ['cursor' => $hookTargetPath],
+                ];
+
+                // Install hook in workspace then make parent directory read-only
+                $hookDir = $workspace . '/.cursor/hooks/' . $hookName;
+                mkdir($hookDir, 0775, true);
+                file_put_contents($hookDir . '/hook.json', '{}');
+                chmod($workspace . '/.cursor/hooks', 0555);
+            }
+
+            // Build abilities.yaml
+            $yamlLines = [];
+            foreach (['skills', 'rules', 'agents', 'hooks'] as $sec) {
+                if ($sections[$sec] === []) {
+                    $yamlLines[] = "$sec: []";
+                } else {
+                    $yamlLines[] = "$sec:";
+                    foreach ($sections[$sec] as $entry) {
+                        $yamlLines[] = '  - path: ' . $entry['path'];
+                        $yamlLines[] = '    description: ' . $entry['description'];
+                        $yamlLines[] = '    targets:';
+                        foreach ($entry['targets'] as $platform => $target) {
+                            $yamlLines[] = '      ' . $platform . ': ' . $target;
+                        }
+                    }
+                }
+            }
+
+            file_put_contents($pkg . '/abilities.yaml', implode("\n", $yamlLines) . "\n");
+
+            // Install abilities in workspace (so cleanup has something to uninstall)
+            foreach ($abilities as $ability) {
+                $this->installAbilityFromBaseline($pkg, $workspace, $ability['type'], $ability['name']);
+            }
+
+            $oldCwd = (string) getcwd();
+            chdir($workspace);
+
+            try {
+                $registry = new AbilityRegistry($pkg . '/abilities.yaml');
+                $installer = new Installer(
+                    registry: $registry,
+                    packageRoot: $pkg,
+                );
+
+                $cmd = new CleanupCommand($installer);
+                $tester = new CommandTester($cmd);
+
+                // Suppress PHP warnings from chmod-induced rmdir failures
+                set_error_handler(static fn (): bool => true);
+                try {
+                    $tester->execute([]);
+                } finally {
+                    restore_error_handler();
+                }
+
+                $output = $tester->getDisplay();
+
+                // Assert no legacy wording in complete output
+                self::assertStringNotContainsString(
+                    'user-scope',
+                    $output,
+                    "Cleanup output must not contain 'user-scope'. Got: $output",
+                );
+                self::assertStringNotContainsString(
+                    'user scope',
+                    $output,
+                    "Cleanup output must not contain 'user scope'. Got: $output",
+                );
+                self::assertStringNotContainsString(
+                    'global-setup',
+                    $output,
+                    "Cleanup output must not contain 'global-setup'. Got: $output",
+                );
+            } finally {
+                chdir($oldCwd);
+                // Restore permissions for cleanup
+                if ($isFailureScenario && is_dir($workspace . '/.cursor/hooks')) {
+                    chmod($workspace . '/.cursor/hooks', 0775);
+                }
+            }
+        });
     }
 }

@@ -129,7 +129,7 @@
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(show) deprecate-scope: project-only presenter`
 
-- [-] 6. Update 命令简化
+- [x] 6. Update 命令简化
   - [x] 6.1 `AbilityUpdateService` 仅遍历 project scope
     - `reportChanges()` 仅检查 project scope 已安装 ability
     - 移除 `DeployScope::User` 遍历循环
@@ -145,26 +145,26 @@
     - **Property 9: Update 输出格式无 scope 标签** — 随机 changed 项验证格式
     - 标签：`Feature: deprecate-scope, Property 8/9`
     - _Ref: Requirement 6, AC 1-4_
-  - [-] 6.4 Checkpoint
+  - [x] 6.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(update) deprecate-scope: project-only traversal`
 
-- [ ] 7. Cleanup 命令文案清理
-  - [~] 7.1 `CleanupCommand` 移除遗留用语
+- [-] 7. Cleanup 命令文案清理
+  - [x] 7.1 `CleanupCommand` 移除遗留用语
     - 移除输出中 "user-scope global-setup is unchanged" 文案
     - 成功时输出 `/apm init` 引导提示
     - 失败时不输出引导提示
     - RED → GREEN：`./vendor/bin/phpunit --filter CleanupCommandTest`
     - _Ref: Requirement 7, AC 1-3_
-  - [~] 7.2 Property 10 属性测试
+  - [x] 7.2 Property 10 属性测试
     - **Property 10: Cleanup 输出无遗留用语** — 随机执行结果验证无禁用字符串
     - 标签：`Feature: deprecate-scope, Property 10`
     - _Ref: Requirement 7, AC 1_
-  - [~] 7.3 Checkpoint
+  - [-] 7.3 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(cleanup) deprecate-scope: remove scope wording`
 
-- [ ] 8. 代码清理（单一 task，AD-3）
+- [~] 8. 代码清理（单一 task，AD-3）
   - [~] 8.1 删除废弃类文件
     - 删除 `UserHomeResolver.php` 及其测试
     - 删除 `ScopeGuard.php` 及其测试
@@ -202,7 +202,7 @@
     - 更新 `docs/state/deploy-scope.md`：移除 user scope 全部内容
     - commit: `+(cleanup) deprecate-scope: remove user scope internals`
 
-- [ ] 9. E2E 测试
+- [~] 9. E2E 测试
   - [~] 9.1 _脚本_ `tests/test-task-9a.sh`：--scope 参数拒绝 + global-setup 废弃
     - 验证 install/show/typed-install/typed-uninstall 传入 --scope 时 exit 1
     - 验证 global-setup 命令输出废弃消息并 exit 1
