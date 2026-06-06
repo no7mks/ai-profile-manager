@@ -18,34 +18,38 @@ final class ShowStatusPresenter
     ) {}
 
     /**
+     * 仅评估 project scope，返回行列表。
+     * 输出格式: {type}:{name}  {status}   {targets}
+     * 无 scope 标签、无 dual-scope 警告。
+     *
+     * @param array<int, string> $targets
+     * @return list<string>
+     */
+    public function lines(array $targets, ?string $typeFilter): array
+    {
+        return array_map(
+            static fn (ShowAbilityRow $row): string => $row->formatLine(),
+            $this->rows($targets, $typeFilter),
+        );
+    }
+
+    /**
      * @param array<int, string> $targets
      * @return list<ShowAbilityRow>
      */
-    public function rows(?DeployScope $scopeFilter, array $targets, ?string $typeFilter): array
+    public function rows(array $targets, ?string $typeFilter): array
     {
         $abilities = $this->enumerateAbilities($typeFilter);
         $rows = [];
 
         foreach ($abilities as $ability) {
-            $row = $this->buildRow($ability, $scopeFilter, $targets);
+            $row = $this->buildRow($ability, $targets);
             if ($row !== null) {
                 $rows[] = $row;
             }
         }
 
         return $rows;
-    }
-
-    /**
-     * @param array<int, string> $targets
-     * @return list<string>
-     */
-    public function lines(?DeployScope $scopeFilter, array $targets, ?string $typeFilter): array
-    {
-        return array_map(
-            static fn (ShowAbilityRow $row): string => $row->formatLine(),
-            $this->rows($scopeFilter, $targets, $typeFilter),
-        );
     }
 
     /**
@@ -102,7 +106,7 @@ final class ShowStatusPresenter
      * @param array{type: string, name: string, registryTargets: list<string>} $ability
      * @param array<int, string> $targets
      */
-    private function buildRow(array $ability, ?DeployScope $scopeFilter, array $targets): ?ShowAbilityRow
+    private function buildRow(array $ability, array $targets): ?ShowAbilityRow
     {
         $applicableTargets = array_values(array_intersect($targets, $ability['registryTargets']));
         if ($applicableTargets === [] && !in_array($ability['type'], ['gitignore', 'prompt'], true)) {
@@ -110,66 +114,12 @@ final class ShowStatusPresenter
         }
 
         $targetsText = $this->formatTargetsText($ability['registryTargets'], $targets);
-
-        if ($scopeFilter !== null) {
-            $status = $this->resolveScopeStatus($ability, $scopeFilter, $targets);
-
-            return new ShowAbilityRow(
-                type: $ability['type'],
-                name: $ability['name'],
-                status: $status,
-                scopeLabel: '(' . $scopeFilter->value . ')',
-                dualScopeWarning: false,
-                targetsText: $targetsText,
-            );
-        }
-
-        $userStatus = $this->resolveScopeStatus($ability, DeployScope::User, $targets);
-        $projectStatus = $this->resolveScopeStatus($ability, DeployScope::Project, $targets);
-        $userInstalled = $this->isInstalledStatus($userStatus);
-        $projectInstalled = $this->isInstalledStatus($projectStatus);
-
-        if ($userInstalled && $projectInstalled) {
-            $status = $this->mergeStatuses($userStatus, $projectStatus);
-
-            return new ShowAbilityRow(
-                type: $ability['type'],
-                name: $ability['name'],
-                status: $status,
-                scopeLabel: '(user+project)',
-                dualScopeWarning: true,
-                targetsText: $targetsText,
-            );
-        }
-
-        if ($userInstalled) {
-            return new ShowAbilityRow(
-                type: $ability['type'],
-                name: $ability['name'],
-                status: $userStatus,
-                scopeLabel: '(user)',
-                dualScopeWarning: false,
-                targetsText: $targetsText,
-            );
-        }
-
-        if ($projectInstalled) {
-            return new ShowAbilityRow(
-                type: $ability['type'],
-                name: $ability['name'],
-                status: $projectStatus,
-                scopeLabel: '(project)',
-                dualScopeWarning: false,
-                targetsText: $targetsText,
-            );
-        }
+        $status = $this->resolveProjectStatus($ability, $targets);
 
         return new ShowAbilityRow(
             type: $ability['type'],
             name: $ability['name'],
-            status: 'not installed',
-            scopeLabel: '',
-            dualScopeWarning: false,
+            status: $status,
             targetsText: $targetsText,
         );
     }
@@ -178,10 +128,10 @@ final class ShowStatusPresenter
      * @param array{type: string, name: string, registryTargets: list<string>} $ability
      * @param array<int, string> $targets
      */
-    private function resolveScopeStatus(array $ability, DeployScope $scope, array $targets): string
+    private function resolveProjectStatus(array $ability, array $targets): string
     {
         if ($ability['type'] === 'gitignore') {
-            return $this->isGitignorePresent($ability['name'], $scope) ? 'installed' : 'not installed';
+            return $this->isGitignorePresent($ability['name']) ? 'installed' : 'not installed';
         }
 
         if ($ability['type'] === 'prompt') {
@@ -194,13 +144,13 @@ final class ShowStatusPresenter
         }
 
         $items = $this->itemsForCheck($ability['type'], $ability['name']);
-        $results = $this->checkService->checkTypedForScope($items, $checkTargets, $scope);
+        $results = $this->checkService->checkTyped($items, $checkTargets);
         $relevant = array_values(array_filter(
             $results,
             fn (array $r): bool => $r['type'] === $ability['type'] && $r['name'] === $ability['name'],
         ));
 
-        return $this->aggregateCheckResults($relevant, $ability['type'], $ability['name'], $checkTargets, $scope);
+        return $this->aggregateCheckResults($relevant, $ability['type'], $ability['name'], $checkTargets);
     }
 
     /**
@@ -212,13 +162,12 @@ final class ShowStatusPresenter
         string $type,
         string $name,
         array $checkTargets,
-        DeployScope $scope,
     ): string {
         $hasModified = false;
         $hasInstalled = false;
 
         foreach ($results as $result) {
-            $mapped = $this->mapCheckStatus($result['status'], $type, $name, $result['target'], $scope);
+            $mapped = $this->mapCheckStatus($result['status'], $type, $name, $result['target']);
             if ($mapped === 'installed with local change') {
                 $hasModified = true;
             }
@@ -236,7 +185,7 @@ final class ShowStatusPresenter
         }
 
         foreach ($checkTargets as $target) {
-            if ($this->probe->isPresent($type, $name, $target, $scope)) {
+            if ($this->probe->isPresent($type, $name, $target, DeployScope::Project)) {
                 return 'installed';
             }
         }
@@ -249,23 +198,18 @@ final class ShowStatusPresenter
         string $type,
         string $name,
         string $target,
-        DeployScope $scope,
     ): string {
         return match ($internalStatus) {
             'unchanged' => 'installed',
             'modified' => 'installed with local change',
             'missing' => 'not installed',
-            'unknown' => $this->probe->isPresent($type, $name, $target, $scope) ? 'installed' : 'not installed',
+            'unknown' => $this->probe->isPresent($type, $name, $target, DeployScope::Project) ? 'installed' : 'not installed',
             default => 'not installed',
         };
     }
 
-    private function isGitignorePresent(string $marker, DeployScope $scope): bool
+    private function isGitignorePresent(string $marker): bool
     {
-        if ($scope !== DeployScope::Project) {
-            return false;
-        }
-
         $templatePath = $this->packageRoot . '/.gitignore';
         $rendered = $this->gitIgnore->renderManagedBlock($templatePath, [$marker], ['cursor', 'kiro']);
         if (trim($rendered) === '') {
@@ -322,19 +266,5 @@ final class ShowStatusPresenter
         }
 
         return implode(', ', $shown);
-    }
-
-    private function isInstalledStatus(string $status): bool
-    {
-        return $status === 'installed' || $status === 'installed with local change';
-    }
-
-    private function mergeStatuses(string $userStatus, string $projectStatus): string
-    {
-        if ($userStatus === 'installed with local change' || $projectStatus === 'installed with local change') {
-            return 'installed with local change';
-        }
-
-        return 'installed';
     }
 }

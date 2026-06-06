@@ -93,155 +93,155 @@
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(cli) deprecate-scope: reject --scope option`
 
-- [ ] 4. 废弃 global-setup 命令
-  - [ ] 4.1 `GlobalSetupCommand` 改为废弃壳
+- [x] 4. 废弃 global-setup 命令
+  - [x] 4.1 `GlobalSetupCommand` 改为废弃壳
     - 移除 `DefaultGlobalSetupService` 注入
     - `execute()` 输出废弃消息（含命令名 `global-setup` + 替代命令 `apm bootstrap`）到 stderr
     - 以非零退出码退出；不写文件、不创目录、不发网络请求
     - RED → GREEN：`./vendor/bin/phpunit --filter GlobalSetupCommandTest`
     - _Ref: Requirement 2, AC 1-3_
-  - [ ] 4.2 `InvalidScopeException::globalSetupDeprecated()` factory
+  - [x] 4.2 `InvalidScopeException::globalSetupDeprecated()` factory
     - 消息含已移除命令名称和替代命令名称
     - RED → GREEN：`./vendor/bin/phpunit --filter InvalidScopeExceptionTest`
     - _Ref: Requirement 2, AC 2_
-  - [ ] 4.3 Checkpoint
+  - [x] 4.3 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(cli) deprecate-scope: global-setup deprecated shell`
 
-- [ ] 5. Show 命令简化
-  - [ ] 5.1 `ShowStatusPresenter` 移除 scope 合并逻辑
+- [-] 5. Show 命令简化
+  - [x] 5.1 `ShowStatusPresenter` 移除 scope 合并逻辑
     - `lines()` 仅评估 project scope，输出格式 `{type}:{name}  {status}   {targets}`
     - 移除 `dualScopeWarning`、`scopeLabel`、多 scope 状态聚合
     - 移除 `?DeployScope $scopeFilter` 参数
     - RED → GREEN：`./vendor/bin/phpunit --filter ShowStatusPresenterTest`
     - _Ref: Requirement 5, AC 1-3; Requirement 8, AC 8_
-  - [ ] 5.2 `ShowCommand` 集成简化后的 presenter
+  - [x] 5.2 `ShowCommand` 集成简化后的 presenter
     - `--type` 过滤正常传递
     - 空 registry 输出空列表且 exit 0
     - RED → GREEN：`./vendor/bin/phpunit --filter ShowCommandTest`
     - _Ref: Requirement 5, AC 4-5_
-  - [ ] 5.3 Property 6 + Property 7 属性测试
+  - [x] 5.3 Property 6 + Property 7 属性测试
     - **Property 6: Show 输出无 scope 标记** — 随机 registry 内容验证无 scope 标签
     - **Property 7: Show type 过滤器正确性** — 随机 type 过滤验证输出一致性
     - 标签：`Feature: deprecate-scope, Property 6/7`
     - _Ref: Requirement 5, AC 1-5_
-  - [ ] 5.4 Checkpoint
+  - [-] 5.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(show) deprecate-scope: project-only presenter`
 
 - [ ] 6. Update 命令简化
-  - [ ] 6.1 `AbilityUpdateService` 仅遍历 project scope
+  - [~] 6.1 `AbilityUpdateService` 仅遍历 project scope
     - `reportChanges()` 仅检查 project scope 已安装 ability
     - 移除 `DeployScope::User` 遍历循环
     - 输出格式 `changed: {type}:{name} {target}`（无 scope 标签）
     - RED → GREEN：`./vendor/bin/phpunit --filter AbilityUpdateServiceTest`
     - _Ref: Requirement 6, AC 1-3_
-  - [ ] 6.2 `UpdateCommand` 集成简化后的 service
+  - [~] 6.2 `UpdateCommand` 集成简化后的 service
     - `--force` 时使用 baseline 覆盖 project scope 文件
     - RED → GREEN：`./vendor/bin/phpunit --filter UpdateCommandTest`
     - _Ref: Requirement 6, AC 4_
-  - [ ] 6.3 Property 8 + Property 9 属性测试
+  - [~] 6.3 Property 8 + Property 9 属性测试
     - **Property 8: Update 仅遍历 project scope** — 验证不访问 user home 路径
     - **Property 9: Update 输出格式无 scope 标签** — 随机 changed 项验证格式
     - 标签：`Feature: deprecate-scope, Property 8/9`
     - _Ref: Requirement 6, AC 1-4_
-  - [ ] 6.4 Checkpoint
+  - [~] 6.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(update) deprecate-scope: project-only traversal`
 
 - [ ] 7. Cleanup 命令文案清理
-  - [ ] 7.1 `CleanupCommand` 移除遗留用语
+  - [~] 7.1 `CleanupCommand` 移除遗留用语
     - 移除输出中 "user-scope global-setup is unchanged" 文案
     - 成功时输出 `/apm init` 引导提示
     - 失败时不输出引导提示
     - RED → GREEN：`./vendor/bin/phpunit --filter CleanupCommandTest`
     - _Ref: Requirement 7, AC 1-3_
-  - [ ] 7.2 Property 10 属性测试
+  - [~] 7.2 Property 10 属性测试
     - **Property 10: Cleanup 输出无遗留用语** — 随机执行结果验证无禁用字符串
     - 标签：`Feature: deprecate-scope, Property 10`
     - _Ref: Requirement 7, AC 1_
-  - [ ] 7.3 Checkpoint
+  - [~] 7.3 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(cleanup) deprecate-scope: remove scope wording`
 
 - [ ] 8. 代码清理（单一 task，AD-3）
-  - [ ] 8.1 删除废弃类文件
+  - [~] 8.1 删除废弃类文件
     - 删除 `UserHomeResolver.php` 及其测试
     - 删除 `ScopeGuard.php` 及其测试
     - 删除 `DefaultGlobalSetupService.php` / `GlobalSetupService.php` 及其测试
     - 移除源码中所有对上述类的 `use` 声明和实例化
     - _Ref: Requirement 8, AC 1-3_
-  - [ ] 8.2 `DeployRootResolver` 简化
+  - [~] 8.2 `DeployRootResolver` 简化
     - 构造函数注入 `?string $rootPath = null`（默认 `getcwd()`）
     - `resolve()` 仅返回 project root
     - 移除 `parseScopeOption()`、`resolve(DeployScope)` 方法
     - 不接受 `DeployScope` 参数
     - RED → GREEN：`./vendor/bin/phpunit --filter DeployRootResolverTest`
     - _Ref: Requirement 8, AC 4_
-  - [ ] 8.3 `DeployScope` 枚举简化
+  - [~] 8.3 `DeployScope` 枚举简化
     - 移除 `User` case，仅保留 `Project` 单值
     - RED → GREEN：`./vendor/bin/phpunit --filter DeployScopeTest`
     - _Ref: Requirement 8, AC 11_
-  - [ ] 8.4 `InstallationProbe` / `Installer` 移除 `$scope` 参数
+  - [~] 8.4 `InstallationProbe` / `Installer` 移除 `$scope` 参数
     - 所有方法硬编码使用 project scope
     - 更新调用方
     - RED → GREEN：`./vendor/bin/phpunit --filter "InstallationProbeTest|InstallerTest"`
     - _Ref: Requirement 8, AC 5_
-  - [ ] 8.5 `CheckService` 移除 `checkTypedForScope()` 方法
+  - [~] 8.5 `CheckService` 移除 `checkTypedForScope()` 方法
     - `checkTyped()` 直接使用 project root
     - 更新调用方
     - RED → GREEN：`./vendor/bin/phpunit --filter CheckServiceTest`
     - _Ref: Requirement 8, AC 6_
-  - [ ] 8.6 集成验证：源码无废弃引用
+  - [~] 8.6 集成验证：源码无废弃引用
     - 验证源码中无 `UserHomeResolver`、`ScopeGuard`、`DefaultGlobalSetupService`、`GlobalSetupService` 引用
     - 验证 `AbilityEntry` 无 `$scopes` 属性
     - 验证 `DeployScope` 仅含 `Project`
     - _Ref: Requirement 8, AC 1-11_
-  - [ ] 8.7 Checkpoint
+  - [~] 8.7 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - 更新 `docs/state/deploy-scope.md`：移除 user scope 全部内容
     - commit: `+(cleanup) deprecate-scope: remove user scope internals`
 
 - [ ] 9. E2E 测试
-  - [ ] 9.1 _脚本_ `tests/test-task-9a.sh`：--scope 参数拒绝 + global-setup 废弃
+  - [~] 9.1 _脚本_ `tests/test-task-9a.sh`：--scope 参数拒绝 + global-setup 废弃
     - 验证 install/show/typed-install/typed-uninstall 传入 --scope 时 exit 1
     - 验证 global-setup 命令输出废弃消息并 exit 1
     - _Ref: Requirement 1, 2_
-  - [ ] 9.2 _脚本_ `tests/test-task-9b.sh`：bootstrap 完整流程
+  - [~] 9.2 _脚本_ `tests/test-task-9b.sh`：bootstrap 完整流程
     - 验证 scaffold + ability 安装、skip 逻辑、force 覆盖、部分失败
     - _Ref: Requirement 3_
-  - [ ] 9.3 _脚本_ `tests/test-task-9c.sh`：show/update/cleanup 简化行为
+  - [~] 9.3 _脚本_ `tests/test-task-9c.sh`：show/update/cleanup 简化行为
     - 验证 show 无 scope 标签、update 仅 project、cleanup 无遗留用语
     - _Ref: Requirement 5, 6, 7_
-  - [ ] 9.4 Checkpoint
+  - [~] 9.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；`./vendor/bin/phpunit --testsuite e2e`
     - commit: `+(e2e) deprecate-scope: scope deprecation flows`
 
 - [ ] 10. 文档收敛
-  - [ ] 10.1 SSOT 文档更新
+  - [~] 10.1 SSOT 文档更新
     - 重写 `docs/state/deploy-scope.md`：仅描述 project scope
     - 更新 `docs/state/cli-commands.md`：移除 `--scope` 参数，标注 global-setup 废弃
     - 更新 `docs/state/abilities-model.md`：移除 scopes 字段文档
     - 更新 `docs/state/install-behavior.md`：移除 user scope 路径解析内容
     - _Ref: Requirement 9, AC 1-4_
-  - [ ] 10.2 Manual 文档更新
+  - [~] 10.2 Manual 文档更新
     - 更新 `docs/manual/usage.md`：三阶段改两阶段首装，移除 --scope 示例
     - _Ref: Requirement 9, AC 5_
-  - [ ] 10.3 APM skill + init-workflow 更新
+  - [~] 10.3 APM skill + init-workflow 更新
     - 更新 `.cursor/skills/apm/references/init-workflow.md`
     - 更新 `.kiro/skills/apm/references/init-workflow.md`
     - 移除 global-setup 引用，调整为两阶段首装
     - _Ref: Requirement 9, AC 6_
-  - [ ] 10.4 零残留验证
+  - [~] 10.4 零残留验证
     - grep 全部文档确认无 `user` scope、`--scope` 参数、`global-setup`（非 deprecated 标注）残留引用
     - _Ref: Requirement 9, AC 7_
-  - [ ] 10.5 知识图谱更新
+  - [~] 10.5 知识图谱更新
     - `/graphify update`：增量更新本次变更涉及的文件
-  - [ ] 10.6 Checkpoint
+  - [~] 10.6 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(docs) deprecate-scope: documentation convergence`
 
-- [ ] 11. Code Review
+- [~] 11. Code Review
   - 委托给 code-reviewer sub-agent 执行
 
 ## Notes

@@ -610,6 +610,384 @@ final class DeprecateScopePropertyTest extends TestCase
         });
     }
 
+    // ─── Property 6 ──────────────────────────────────────────────────
+
+    /**
+     * Property 6: Show 输出无 scope 标记
+     *
+     * For any set of registered abilities (installed or not), the output of show command
+     * SHALL contain only lines in format {type}:{name}  {status}   {targets} with no
+     * scope labels ((user), (project), (user+project)) and no dual-scope warning text.
+     *
+     * **Validates: Requirements 5.1, 5.2, 5.3**
+     *
+     * @group Feature: deprecate-scope, Property 6
+     */
+    public function testShowOutputHasNoScopeLabels(): void
+    {
+        $this->limitTo(100);
+
+        $this->forAll(
+            Generators::choose(0, 20),
+        )->then(function (int $entryCount): void {
+            $types = ['skill', 'rule', 'agent', 'hook', 'gitignore', 'prompt'];
+            $entries = [];
+
+            for ($i = 0; $i < $entryCount; $i++) {
+                $type = $types[array_rand($types)];
+                $name = 'p6-' . $type[0] . bin2hex(random_bytes(3)) . '-' . $i;
+                $entries[] = ['type' => $type, 'name' => $name];
+            }
+
+            $pkg = $this->buildShowPackage($entries);
+            $proj = $this->tmpDir . '/proj6-' . bin2hex(random_bytes(4));
+            mkdir($proj, 0775, true);
+
+            // Install some abilities on disk to get varied statuses
+            foreach ($entries as $entry) {
+                if (random_int(0, 1) === 1) {
+                    $this->preInstallShowAbility($proj, $entry['type'], $entry['name']);
+                }
+            }
+
+            $registryPath = $pkg . '/abilities.yaml';
+            $registry = new AbilityRegistry($registryPath);
+            $rootResolver = new DeployRootResolver();
+            $presenter = new ShowStatusPresenter(
+                $registry,
+                new CheckService(rootResolver: $rootResolver),
+                new InstallationProbe($registry, $rootResolver),
+                $pkg,
+                $rootResolver,
+            );
+
+            $oldCwd = (string) getcwd();
+            chdir($proj);
+            try {
+                $lines = $presenter->lines(['cursor'], null);
+            } finally {
+                chdir($oldCwd);
+            }
+
+            $joined = implode("\n", $lines);
+
+            // No scope labels
+            self::assertStringNotContainsString('(user)', $joined,
+                'Output must not contain (user) scope label');
+            self::assertStringNotContainsString('(project)', $joined,
+                'Output must not contain (project) scope label');
+            self::assertStringNotContainsString('(user+project)', $joined,
+                'Output must not contain (user+project) scope label');
+
+            // No dual-scope warning text
+            self::assertStringNotContainsString('[warn]', $joined,
+                'Output must not contain [warn] dual-scope warning');
+            self::assertStringNotContainsString('installed in both', $joined,
+                'Output must not contain "installed in both" dual-scope text');
+
+            // Every line matches the expected format
+            foreach ($lines as $line) {
+                self::assertMatchesRegularExpression(
+                    '/^(skill|rule|agent|hook|gitignore|prompt):.+  (not installed|installed|installed with local change)   .+$/',
+                    $line,
+                    "Line does not match expected format: $line",
+                );
+            }
+        });
+    }
+
+    // ─── Property 7 ──────────────────────────────────────────────────
+
+    /**
+     * Property 7: Show type 过滤器正确性
+     *
+     * For any valid --type filter value and for any registry content, all lines in
+     * show output SHALL have a type prefix matching the filter value, and no lines
+     * with a different type SHALL appear.
+     *
+     * **Validates: Requirements 5.4**
+     *
+     * @group Feature: deprecate-scope, Property 7
+     */
+    public function testShowTypeFilterCorrectness(): void
+    {
+        $this->limitTo(100);
+
+        $knownTypes = ['skill', 'rule', 'agent', 'hook', 'gitignore', 'prompt'];
+        $typeGenerator = Generators::elements($knownTypes);
+
+        $this->forAll(
+            $typeGenerator,
+            Generators::choose(1, 15),
+        )->then(function (string $filterType, int $entryCount) use ($knownTypes): void {
+            $entries = [];
+
+            // Generate a mix of types to ensure filter actually needs to work
+            for ($i = 0; $i < $entryCount; $i++) {
+                $type = $knownTypes[array_rand($knownTypes)];
+                $name = 'p7-' . $type[0] . bin2hex(random_bytes(3)) . '-' . $i;
+                $entries[] = ['type' => $type, 'name' => $name];
+            }
+
+            $pkg = $this->buildShowPackage($entries);
+            $proj = $this->tmpDir . '/proj7-' . bin2hex(random_bytes(4));
+            mkdir($proj, 0775, true);
+
+            // Pre-install some to get output lines
+            foreach ($entries as $entry) {
+                $this->preInstallShowAbility($proj, $entry['type'], $entry['name']);
+            }
+
+            $registryPath = $pkg . '/abilities.yaml';
+            $registry = new AbilityRegistry($registryPath);
+            $rootResolver = new DeployRootResolver();
+            $presenter = new ShowStatusPresenter(
+                $registry,
+                new CheckService(rootResolver: $rootResolver),
+                new InstallationProbe($registry, $rootResolver),
+                $pkg,
+                $rootResolver,
+            );
+
+            $oldCwd = (string) getcwd();
+            chdir($proj);
+            try {
+                $lines = $presenter->lines(['cursor'], $filterType);
+            } finally {
+                chdir($oldCwd);
+            }
+
+            // All output lines must start with the filter type prefix
+            foreach ($lines as $line) {
+                self::assertStringStartsWith(
+                    $filterType . ':',
+                    $line,
+                    "Line should start with '$filterType:' when filtered, got: $line",
+                );
+            }
+
+            // No lines with a different type should appear
+            foreach ($knownTypes as $otherType) {
+                if ($otherType === $filterType) {
+                    continue;
+                }
+                foreach ($lines as $line) {
+                    self::assertStringStartsNotWith(
+                        $otherType . ':',
+                        $line,
+                        "Line should NOT start with '$otherType:' when filter is '$filterType', got: $line",
+                    );
+                }
+            }
+        });
+    }
+
+    // ─── Property 6/7 Helpers ────────────────────────────────────────
+
+    /**
+     * Build a package directory with abilities.yaml for show PBT tests.
+     *
+     * @param list<array{type: string, name: string}> $entries
+     */
+    private function buildShowPackage(array $entries): string
+    {
+        $pkg = $this->tmpDir . '/show-pkg-' . bin2hex(random_bytes(4));
+        mkdir($pkg, 0775, true);
+
+        // Group entries by YAML section
+        $sections = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => []];
+        $gitignoreEntries = [];
+        $promptEntries = [];
+
+        foreach ($entries as $entry) {
+            $type = $entry['type'];
+            $name = $entry['name'];
+
+            if ($type === 'gitignore') {
+                $gitignoreEntries[] = $name;
+                // Create a .gitignore template file in package
+                file_put_contents(
+                    $pkg . '/.gitignore',
+                    ($pkg . '/.gitignore' !== '' && is_file($pkg . '/.gitignore')
+                        ? (string) file_get_contents($pkg . '/.gitignore')
+                        : '')
+                    . "## @apm:block ability=$name target=*\n/$name/\n## @apm:end\n",
+                );
+            } elseif ($type === 'prompt') {
+                $promptEntries[] = $name;
+            } else {
+                $section = $type . 's';
+                $targetPath = $this->buildShowSourceFile($pkg, $type, $name);
+                $sections[$section][] = [
+                    'path' => $name,
+                    'description' => "$name ability",
+                    'targets' => ['cursor' => $targetPath],
+                ];
+            }
+        }
+
+        // Build YAML
+        $yamlLines = ['version: "1"'];
+        foreach (['skills', 'rules', 'agents', 'hooks'] as $sec) {
+            if ($sections[$sec] === []) {
+                $yamlLines[] = "$sec: []";
+            } else {
+                $yamlLines[] = "$sec:";
+                foreach ($sections[$sec] as $e) {
+                    $yamlLines[] = '  - path: ' . $e['path'];
+                    $yamlLines[] = '    description: ' . $e['description'];
+                    $yamlLines[] = '    targets:';
+                    foreach ($e['targets'] as $platform => $target) {
+                        $yamlLines[] = '      ' . $platform . ': ' . $target;
+                    }
+                }
+            }
+        }
+
+        if ($gitignoreEntries !== []) {
+            $yamlLines[] = 'gitignore:';
+            foreach ($gitignoreEntries as $marker) {
+                $yamlLines[] = '  - marker: ' . $marker;
+                $yamlLines[] = '    description: ' . $marker . ' gitignore';
+            }
+        } else {
+            $yamlLines[] = 'gitignore: []';
+        }
+
+        if ($promptEntries !== []) {
+            $yamlLines[] = 'prompts:';
+            foreach ($promptEntries as $pName) {
+                $yamlLines[] = '  - name: ' . $pName;
+                $yamlLines[] = '    message: Hello from ' . $pName;
+            }
+        } else {
+            $yamlLines[] = 'prompts: []';
+        }
+
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", $yamlLines) . "\n");
+
+        return $pkg;
+    }
+
+    /**
+     * Build source file for a given ability type in the package.
+     * Returns the relative target path used in abilities.yaml.
+     */
+    private function buildShowSourceFile(string $pkg, string $type, string $name): string
+    {
+        return match ($type) {
+            'skill' => $this->buildShowSkillSource($pkg, $name),
+            'rule' => $this->buildShowRuleSource($pkg, $name),
+            'agent' => $this->buildShowAgentSource($pkg, $name),
+            'hook' => $this->buildShowHookSource($pkg, $name),
+            default => throw new \InvalidArgumentException("Unknown type: $type"),
+        };
+    }
+
+    private function buildShowSkillSource(string $pkg, string $name): string
+    {
+        $dir = $pkg . '/.cursor/skills/' . $name;
+        mkdir($dir, 0775, true);
+        file_put_contents($dir . '/SKILL.md', "# $name skill\n");
+
+        return '.cursor/skills/' . $name . '/';
+    }
+
+    private function buildShowRuleSource(string $pkg, string $name): string
+    {
+        $dir = $pkg . '/.cursor/rules/' . $name;
+        mkdir($dir, 0775, true);
+        file_put_contents($dir . '/' . $name . '.mdc', "# $name rule\n");
+
+        return '.cursor/rules/' . $name . '/' . $name . '.mdc';
+    }
+
+    private function buildShowAgentSource(string $pkg, string $name): string
+    {
+        $dir = $pkg . '/.cursor/agents';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        file_put_contents($dir . '/' . $name . '.md', "# $name agent\n");
+
+        return '.cursor/agents/' . $name . '.md';
+    }
+
+    private function buildShowHookSource(string $pkg, string $name): string
+    {
+        $dir = $pkg . '/.cursor/hooks/' . $name;
+        mkdir($dir, 0775, true);
+        file_put_contents($dir . '/' . $name . '.json', '{}');
+
+        return '.cursor/hooks/' . $name . '/';
+    }
+
+    /**
+     * Pre-install an ability in the project workspace for show tests.
+     */
+    private function preInstallShowAbility(string $proj, string $type, string $name): void
+    {
+        match ($type) {
+            'skill' => $this->preInstallShowSkill($proj, $name),
+            'rule' => $this->preInstallShowRule($proj, $name),
+            'agent' => $this->preInstallShowAgent($proj, $name),
+            'hook' => $this->preInstallShowHook($proj, $name),
+            'gitignore' => $this->preInstallShowGitignore($proj, $name),
+            'prompt' => null, // prompts are not "installed" on disk
+        };
+    }
+
+    private function preInstallShowSkill(string $proj, string $name): void
+    {
+        $dir = $proj . '/.cursor/skills/' . $name;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        file_put_contents($dir . '/SKILL.md', "# $name skill\n");
+    }
+
+    private function preInstallShowRule(string $proj, string $name): void
+    {
+        $dir = $proj . '/.cursor/rules/' . $name;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        file_put_contents($dir . '/' . $name . '.mdc', "# $name rule\n");
+    }
+
+    private function preInstallShowAgent(string $proj, string $name): void
+    {
+        $dir = $proj . '/.cursor/agents';
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        file_put_contents($dir . '/' . $name . '.md', "# $name agent\n");
+    }
+
+    private function preInstallShowHook(string $proj, string $name): void
+    {
+        $dir = $proj . '/.cursor/hooks/' . $name;
+        if (!is_dir($dir)) {
+            mkdir($dir, 0775, true);
+        }
+        file_put_contents($dir . '/' . $name . '.json', '{}');
+    }
+
+    private function preInstallShowGitignore(string $proj, string $name): void
+    {
+        $content = "# BEGIN apm-managed-gitignore v1\n/$name/\n# END apm-managed-gitignore v1\n";
+        $path = $proj . '/.gitignore';
+        if (is_file($path)) {
+            file_put_contents($path, (string) file_get_contents($path) . $content);
+        } else {
+            file_put_contents($path, $content);
+        }
+    }
+
+
+
+    // ─── Property 1 Helpers ──────────────────────────────────────────
+
     /**
      * Build all 9 commands that use HandlesDeployScopeOption trait.
      *

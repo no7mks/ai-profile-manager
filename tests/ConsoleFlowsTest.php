@@ -369,7 +369,8 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
-        self::assertStringContainsString('skill:graphify  installed (project)', $display);
+        self::assertStringContainsString('skill:graphify  installed', $display);
+        self::assertStringNotContainsString('(project)', $display);
         self::assertStringContainsString('skill:gitflow  not installed', $display);
         self::assertStringContainsString('rule:spec-goal  not installed', $display);
         self::assertStringContainsString('agent:code-reviewer  not installed', $display);
@@ -428,7 +429,8 @@ final class ConsoleFlowsTest extends TestCase
         }
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('skill:graphify  installed (project)', $tester->getDisplay());
+        self::assertStringContainsString('skill:graphify  installed', $tester->getDisplay());
+        self::assertStringNotContainsString('(project)', $tester->getDisplay());
         self::assertStringNotContainsString('[installed]', $tester->getDisplay());
     }
 
@@ -469,7 +471,8 @@ final class ConsoleFlowsTest extends TestCase
 
         self::assertSame(Command::SUCCESS, $exit);
         $display = $tester->getDisplay();
-        self::assertStringContainsString('skill:graphify  installed (project)', $display);
+        self::assertStringContainsString('skill:graphify  installed', $display);
+        self::assertStringNotContainsString('(project)', $display);
         self::assertStringContainsString('cursor, kiro', $display);
         self::assertStringNotContainsString('[installed]', $display);
     }

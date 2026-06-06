@@ -147,8 +147,9 @@ final class ShowCommandTest extends TestCase
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'rule']);
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('rule:merged-one  installed (project)', $tester->getDisplay());
+        self::assertStringContainsString('rule:merged-one  installed   cursor', $tester->getDisplay());
         self::assertStringNotContainsString('(user+project)', $tester->getDisplay());
+        self::assertStringNotContainsString('(project)', $tester->getDisplay());
     }
 
     public function testShowCommandInstalledWhenBaselineUnknownButFileOnDisk(): void
@@ -182,6 +183,54 @@ final class ShowCommandTest extends TestCase
         self::assertStringContainsString('rule:ability-only', $display);
         self::assertStringNotContainsString('gitflow', $display);
         self::assertStringNotContainsString('presets:', $display);
+    }
+
+    public function testShowCommandEmptyRegistryOutputsEmptyListAndExitsZero(): void
+    {
+        $proj = $this->tmpDir . '/empty-reg';
+        mkdir($proj, 0775, true);
+        chdir($proj);
+
+        $tester = new CommandTester($this->command($proj));
+        $exit = $tester->execute([]);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        self::assertSame('', trim($tester->getDisplay()));
+    }
+
+    public function testShowCommandTypeFilterPassedToPresenter(): void
+    {
+        $pkg = $this->tmpDir . '/type-filter';
+        mkdir($pkg, 0775, true);
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'version: "1"',
+            'skills:',
+            '  - path: my-skill',
+            '    description: A skill',
+            '    targets:',
+            '      cursor: .cursor/skills/my-skill',
+            'rules:',
+            '  - path: my-rule',
+            '    description: A rule',
+            '    targets:',
+            '      cursor: .cursor/rules/my-rule.mdc',
+            'agents: []',
+            'hooks: []',
+        ]) . "\n");
+
+        $proj = $this->tmpDir . '/type-filter-ws';
+        mkdir($proj, 0775, true);
+        $this->withEnv('APM_BASELINE_ROOT', $pkg);
+        chdir($proj);
+
+        $tester = new CommandTester($this->command($pkg, $pkg . '/abilities.yaml'));
+
+        // Filter by rule — should show only rule, not skill
+        $exit = $tester->execute(['--type' => 'rule', '--target' => ['cursor']]);
+        self::assertSame(Command::SUCCESS, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('rule:my-rule', $display);
+        self::assertStringNotContainsString('skill:my-skill', $display);
     }
 
     public function testShowCommandCreateFactory(): void

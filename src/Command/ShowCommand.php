@@ -84,7 +84,7 @@ final class ShowCommand extends Command
             return Command::FAILURE;
         }
 
-        foreach ($this->presenter->lines(null, $targets, $typeFilter) as $line) {
+        foreach ($this->presenter->lines($targets, $typeFilter) as $line) {
             $io->writeln($line);
         }
 
