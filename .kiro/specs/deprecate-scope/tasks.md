@@ -149,7 +149,7 @@
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(update) deprecate-scope: project-only traversal`
 
-- [-] 7. Cleanup 命令文案清理
+- [x] 7. Cleanup 命令文案清理
   - [x] 7.1 `CleanupCommand` 移除遗留用语
     - 移除输出中 "user-scope global-setup is unchanged" 文案
     - 成功时输出 `/apm init` 引导提示
@@ -160,11 +160,11 @@
     - **Property 10: Cleanup 输出无遗留用语** — 随机执行结果验证无禁用字符串
     - 标签：`Feature: deprecate-scope, Property 10`
     - _Ref: Requirement 7, AC 1_
-  - [-] 7.3 Checkpoint
+  - [x] 7.3 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(cleanup) deprecate-scope: remove scope wording`
 
-- [~] 8. 代码清理（单一 task，AD-3）
+- [-] 8. 代码清理（单一 task，AD-3）
   - [~] 8.1 删除废弃类文件
     - 删除 `UserHomeResolver.php` 及其测试
     - 删除 `ScopeGuard.php` 及其测试

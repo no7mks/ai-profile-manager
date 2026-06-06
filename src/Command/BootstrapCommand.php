@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
-use AiProfileManager\Config\DeployScope;
 use AiProfileManager\Config\PackagePaths;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
@@ -116,7 +115,6 @@ final class BootstrapCommand extends Command
                 $items,
                 $targets,
                 null,
-                DeployScope::Project,
                 skipExisting: !$force,
             );
 

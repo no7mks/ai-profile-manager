@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
-use AiProfileManager\Config\DeployScope;
-
 final class ShowStatusPresenter
 {
     public function __construct(
@@ -185,7 +183,7 @@ final class ShowStatusPresenter
         }
 
         foreach ($checkTargets as $target) {
-            if ($this->probe->isPresent($type, $name, $target, DeployScope::Project)) {
+            if ($this->probe->isPresent($type, $name, $target)) {
                 return 'installed';
             }
         }
@@ -203,7 +201,7 @@ final class ShowStatusPresenter
             'unchanged' => 'installed',
             'modified' => 'installed with local change',
             'missing' => 'not installed',
-            'unknown' => $this->probe->isPresent($type, $name, $target, DeployScope::Project) ? 'installed' : 'not installed',
+            'unknown' => $this->probe->isPresent($type, $name, $target) ? 'installed' : 'not installed',
             default => 'not installed',
         };
     }
@@ -216,7 +214,7 @@ final class ShowStatusPresenter
             return false;
         }
 
-        $gitignorePath = $this->rootResolver->resolve(DeployScope::Project) . '/.gitignore';
+        $gitignorePath = $this->rootResolver->resolve() . '/.gitignore';
         if (!is_file($gitignorePath)) {
             return false;
         }

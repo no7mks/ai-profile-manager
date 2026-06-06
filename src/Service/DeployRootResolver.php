@@ -4,53 +4,22 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
-use AiProfileManager\Config\DeployScope;
-
 /**
- * Resolves deploy roots for project (workspace) and user scopes.
+ * Resolves deploy root for project scope (workspace root).
  */
 final class DeployRootResolver
 {
     public function __construct(
-        private readonly UserHomeResolver $userHomeResolver = new UserHomeResolver(),
+        private readonly ?string $rootPath = null,
     ) {
     }
 
-    public function resolve(DeployScope $scope): string
+    public function resolve(): string
     {
-        return match ($scope) {
-            DeployScope::Project => $this->projectRoot(),
-            DeployScope::User => $this->userRoot(),
-        };
-    }
-
-    public function parseScopeOption(?string $value): DeployScope
-    {
-        if ($value === null) {
-            return DeployScope::Project;
+        if ($this->rootPath !== null) {
+            return $this->rootPath;
         }
 
-        return match ($value) {
-            'project' => DeployScope::Project,
-            'user' => DeployScope::User,
-            default => throw InvalidScopeException::unknownScope($value),
-        };
-    }
-
-    public function absoluteTargetPath(DeployScope $scope, string $relativeTarget): string
-    {
-        $root = $this->resolve($scope);
-        $normalized = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, trim($relativeTarget, "/\\"));
-
-        if ($normalized === '') {
-            return $root;
-        }
-
-        return $root . DIRECTORY_SEPARATOR . $normalized;
-    }
-
-    private function projectRoot(): string
-    {
         $cwd = getcwd();
         if ($cwd === false) {
             throw new \RuntimeException('Unable to resolve project root: working directory unavailable.');
@@ -61,8 +30,15 @@ final class DeployRootResolver
         return $real !== false ? $real : $cwd;
     }
 
-    private function userRoot(): string
+    public function absoluteTargetPath(string $relativeTarget): string
     {
-        return $this->userHomeResolver->resolve();
+        $root = $this->resolve();
+        $normalized = str_replace(['/', '\\'], DIRECTORY_SEPARATOR, trim($relativeTarget, "/\\"));
+
+        if ($normalized === '') {
+            return $root;
+        }
+
+        return $root . DIRECTORY_SEPARATOR . $normalized;
     }
 }

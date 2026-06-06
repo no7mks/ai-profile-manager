@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace AiProfileManager\Service;
 
 use AiProfileManager\Config\AppConfig;
-use AiProfileManager\Config\DeployScope;
 
 /**
  * Reports and optionally applies baseline updates for installed conventional abilities in project scope.
@@ -54,7 +53,7 @@ class AbilityUpdateService
             ];
         }
 
-        $results = $this->checkService->checkTypedForScope($items, $targets, DeployScope::Project);
+        $results = $this->checkService->checkTyped($items, $targets);
         $changed = [];
         foreach ($results as $result) {
             if ($result['status'] !== 'modified') {
@@ -164,7 +163,7 @@ class AbilityUpdateService
         array $targets,
     ): bool {
         foreach ($targets as $target) {
-            if ($this->probe->isPresent($type, $name, $target, DeployScope::Project)) {
+            if ($this->probe->isPresent($type, $name, $target)) {
                 return true;
             }
         }
@@ -188,14 +187,14 @@ class AbilityUpdateService
         }
 
         $relativePath = $entry->targets[$target];
-        $workspaceRoot = $this->rootResolver->resolve(DeployScope::Project);
+        $workspaceRoot = $this->rootResolver->resolve();
 
         if ($type === 'hook') {
             return $this->applyHookOverwrite($baselineRoot, $name, $target, $workspaceRoot);
         }
 
         $src = $baselineRoot . '/' . $relativePath;
-        $dst = $this->rootResolver->absoluteTargetPath(DeployScope::Project, $relativePath);
+        $dst = $this->rootResolver->absoluteTargetPath($relativePath);
 
         try {
             if ($type === 'skill') {
