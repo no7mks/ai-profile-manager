@@ -42,6 +42,9 @@ abstract class EndToEndTestCase extends TestCase
         mkdir($this->packageRoot, 0775, true);
         mkdir($this->fakeHome, 0775, true);
 
+        // Ensure a minimal abilities.yaml exists so BootstrapCommand uses the test registry
+        file_put_contents($this->packageRoot . '/abilities.yaml', "{}\n");
+
         // Generate a wrapper script that uses the real autoloader but overrides package root
         $this->wrapperScript = $base . '/apm-e2e.php';
         $vendorAutoload = dirname(__DIR__, 2) . '/vendor/autoload.php';
@@ -52,14 +55,17 @@ declare(strict_types=1);
 
 require '{$vendorAutoload}';
 
+use AiProfileManager\Command\BootstrapCommand;
 use AiProfileManager\Core\Application;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\PresetRegistry;
+use AiProfileManager\Service\ProjectInitializer;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
 
 \$packageRoot = getenv('APM_PACKAGE_ROOT') ?: __DIR__;
+\$baselineRoot = getenv('APM_BASELINE_ROOT') ?: \$packageRoot;
 \$registryPath = \$packageRoot . '/abilities.yaml';
 \$registry = file_exists(\$registryPath) ? new AbilityRegistry(\$registryPath) : null;
 \$installerArgs = ['packageRoot' => \$packageRoot];
@@ -69,6 +75,12 @@ if (\$registry !== null) {
 \$installer = new Installer(...\$installerArgs);
 \$presetRegistry = \$registry !== null ? new PresetRegistry(\$registry) : null;
 \$app = Application::createSymfonyApplication(\$installer, \$presetRegistry);
+
+// Override BootstrapCommand with injected registry/installer from test package root
+\$initializer = new ProjectInitializer(\$baselineRoot);
+\$bootstrapCmd = new BootstrapCommand(\$initializer, \$registry, \$installer);
+\$app->addCommand(\$bootstrapCmd);
+
 exit(\$app->run(new ArgvInput(\$argv), new ConsoleOutput()));
 PHP;
         file_put_contents($this->wrapperScript, $script);
