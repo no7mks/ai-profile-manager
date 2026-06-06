@@ -15,7 +15,9 @@ use AiProfileManager\Command\ShowCommand;
 use AiProfileManager\Command\SkillInstallCommand;
 use AiProfileManager\Command\SkillUninstallCommand;
 use AiProfileManager\Service\AbilityRegistry;
+use AiProfileManager\Service\AbilityUpdateService;
 use AiProfileManager\Service\CheckService;
+use AiProfileManager\Service\ComposerBaselineResolver;
 use AiProfileManager\Service\DeployRootResolver;
 use AiProfileManager\Service\DirectoryMirrorService;
 use AiProfileManager\Service\GitIgnoreTemplateService;
@@ -985,6 +987,351 @@ final class DeprecateScopePropertyTest extends TestCase
     }
 
 
+
+    // ─── Property 1 Helpers ──────────────────────────────────────────
+
+    // ─── Property 8 ──────────────────────────────────────────────────
+
+    /**
+     * Property 8: Update 仅遍历 project scope
+     *
+     * For any set of installed abilities, AbilityUpdateService::reportChanges() SHALL only
+     * check abilities present in project scope (via DeployRootResolver::resolve() as workspace root),
+     * and SHALL NOT attempt to resolve or check user home directory paths.
+     *
+     * **Validates: Requirements 6, AC 1-4**
+     *
+     * @group Feature: deprecate-scope, Property 8
+     */
+    public function testUpdateOnlyTraversesProjectScope(): void
+    {
+        $this->limitTo(100);
+
+        $typeGenerator = Generators::elements(['skill', 'rule']);
+
+        $this->forAll(
+            Generators::choose(1, 5),
+        )->then(function (int $abilityCount) use ($typeGenerator): void {
+            // Generate random abilities
+            $abilities = [];
+            for ($i = 0; $i < $abilityCount; $i++) {
+                $type = $this->sample($typeGenerator, 1)->collected()[0];
+                $name = 'p8-' . $type[0] . bin2hex(random_bytes(3)) . '-' . $i;
+                $abilities[] = ['type' => $type, 'name' => $name];
+            }
+
+            // Randomly decide which abilities are installed in project scope and which only in user home
+            $inProject = [];
+            $inUserOnly = [];
+            foreach ($abilities as $ability) {
+                if (random_int(0, 1) === 1) {
+                    $inProject[] = $ability;
+                } else {
+                    $inUserOnly[] = $ability;
+                }
+            }
+
+            // Set up baseline
+            $baseline = $this->tmpDir . '/p8-bl-' . bin2hex(random_bytes(4));
+            $workspace = $this->tmpDir . '/p8-ws-' . bin2hex(random_bytes(4));
+            $userHome = $this->tmpDir . '/p8-home-' . bin2hex(random_bytes(4));
+            mkdir($baseline, 0775, true);
+            mkdir($workspace, 0775, true);
+            mkdir($userHome, 0775, true);
+
+            // Build abilities.yaml and baseline source files
+            $this->buildUpdateBaseline($baseline, $abilities);
+
+            // Install abilities in project scope (from baseline — unchanged)
+            foreach ($inProject as $ability) {
+                $this->installAbilityFromBaseline($baseline, $workspace, $ability['type'], $ability['name']);
+            }
+
+            // Install abilities in user home (with drift to provoke detection if traversed)
+            foreach ($inUserOnly as $ability) {
+                $this->installAbilityWithDrift($userHome, $ability['type'], $ability['name']);
+            }
+
+            // Also install in project scope with drift for those that are in project
+            // to ensure we get some output (but only project items should show up)
+            foreach ($inProject as $ability) {
+                $this->modifyInstalledAbility($workspace, $ability['type'], $ability['name']);
+            }
+
+            $oldCwd = (string) getcwd();
+            $oldEnvBaseline = getenv('APM_BASELINE_ROOT');
+            $oldEnvHome = getenv('HOME');
+
+            putenv('APM_BASELINE_ROOT=' . $baseline);
+            putenv('HOME=' . $userHome);
+            chdir($workspace);
+
+            try {
+                $registry = new AbilityRegistry($baseline . '/abilities.yaml');
+                $resolver = new DeployRootResolver();
+                $service = new AbilityUpdateService(
+                    $registry,
+                    new ComposerBaselineResolver(overrideInstallPath: $baseline),
+                    new CheckService(new ComposerBaselineResolver(overrideInstallPath: $baseline)),
+                    new InstallationProbe($registry, $resolver),
+                    $resolver,
+                    new DirectoryMirrorService(),
+                );
+
+                $result = $service->reportChanges(false);
+                $output = implode("\n", $result['lines']);
+
+                // Verify: output must NOT contain user home path
+                self::assertStringNotContainsString($userHome, $output,
+                    'Output must not reference user home directory');
+
+                // Verify: output must NOT contain "(user)" scope label
+                self::assertStringNotContainsString('(user)', $output,
+                    'Output must not contain (user) scope label');
+
+                // Verify: any "changed:" lines must only reference abilities installed in project scope
+                foreach ($result['lines'] as $line) {
+                    if (!str_starts_with($line, 'changed:')) {
+                        continue;
+                    }
+                    // Extract the name from the line: "changed: {type}:{name} {target}"
+                    if (preg_match('/^changed: (\w+):(\S+) (\S+)$/', $line, $m)) {
+                        $detectedName = $m[2];
+                        $projectNames = array_map(fn (array $a) => $a['name'], $inProject);
+                        self::assertContains($detectedName, $projectNames,
+                            "Detected change '$detectedName' is not in project scope, but appeared in output");
+                    }
+                }
+
+                // User-only abilities must NOT appear in the output
+                foreach ($inUserOnly as $ability) {
+                    self::assertStringNotContainsString($ability['name'], $output,
+                        "User-only ability '{$ability['name']}' should not appear in output");
+                }
+            } finally {
+                chdir($oldCwd);
+                if ($oldEnvBaseline === false) {
+                    putenv('APM_BASELINE_ROOT');
+                } else {
+                    putenv('APM_BASELINE_ROOT=' . $oldEnvBaseline);
+                }
+                if ($oldEnvHome === false) {
+                    putenv('HOME');
+                } else {
+                    putenv('HOME=' . $oldEnvHome);
+                }
+            }
+        });
+    }
+
+    // ─── Property 9 ──────────────────────────────────────────────────
+
+    /**
+     * Property 9: Update 输出格式无 scope 标签
+     *
+     * For any ability detected as changed by update, the output line SHALL match format
+     * `changed: {type}:{name} {target}` without any parenthesized scope label.
+     *
+     * **Validates: Requirements 6, AC 1-4**
+     *
+     * @group Feature: deprecate-scope, Property 9
+     */
+    public function testUpdateOutputFormatNoScopeLabel(): void
+    {
+        $this->limitTo(100);
+
+        $typeGenerator = Generators::elements(['skill', 'rule']);
+
+        $this->forAll(
+            Generators::choose(1, 5),
+        )->then(function (int $abilityCount) use ($typeGenerator): void {
+            // Generate random abilities
+            $abilities = [];
+            for ($i = 0; $i < $abilityCount; $i++) {
+                $type = $this->sample($typeGenerator, 1)->collected()[0];
+                $name = 'p9-' . $type[0] . bin2hex(random_bytes(3)) . '-' . $i;
+                $abilities[] = ['type' => $type, 'name' => $name];
+            }
+
+            // Set up baseline and workspace
+            $baseline = $this->tmpDir . '/p9-bl-' . bin2hex(random_bytes(4));
+            $workspace = $this->tmpDir . '/p9-ws-' . bin2hex(random_bytes(4));
+            mkdir($baseline, 0775, true);
+            mkdir($workspace, 0775, true);
+
+            // Build abilities.yaml and baseline source files
+            $this->buildUpdateBaseline($baseline, $abilities);
+
+            // Install all abilities in project scope then modify to create drift
+            foreach ($abilities as $ability) {
+                $this->installAbilityFromBaseline($baseline, $workspace, $ability['type'], $ability['name']);
+                $this->modifyInstalledAbility($workspace, $ability['type'], $ability['name']);
+            }
+
+            $oldCwd = (string) getcwd();
+            $oldEnvBaseline = getenv('APM_BASELINE_ROOT');
+
+            putenv('APM_BASELINE_ROOT=' . $baseline);
+            chdir($workspace);
+
+            try {
+                $registry = new AbilityRegistry($baseline . '/abilities.yaml');
+                $resolver = new DeployRootResolver();
+                $service = new AbilityUpdateService(
+                    $registry,
+                    new ComposerBaselineResolver(overrideInstallPath: $baseline),
+                    new CheckService(new ComposerBaselineResolver(overrideInstallPath: $baseline)),
+                    new InstallationProbe($registry, $resolver),
+                    $resolver,
+                    new DirectoryMirrorService(),
+                );
+
+                $result = $service->reportChanges(false);
+
+                // Every line starting with "changed:" must match the expected format
+                $changedLines = array_filter(
+                    $result['lines'],
+                    static fn (string $line): bool => str_starts_with($line, 'changed:'),
+                );
+
+                // We expect at least one changed line since all abilities have drift
+                self::assertNotEmpty($changedLines, 'Expected at least one changed line');
+
+                foreach ($changedLines as $line) {
+                    // Must match: changed: {type}:{name} {target}
+                    self::assertMatchesRegularExpression(
+                        '/^changed: \w+:\S+ \S+$/',
+                        $line,
+                        "Line does not match expected format: $line",
+                    );
+
+                    // Must NOT contain any parenthesized scope label
+                    self::assertDoesNotMatchRegularExpression(
+                        '/\(project\)|\(user\)|\(user\+project\)/',
+                        $line,
+                        "Line contains scope label: $line",
+                    );
+                }
+            } finally {
+                chdir($oldCwd);
+                if ($oldEnvBaseline === false) {
+                    putenv('APM_BASELINE_ROOT');
+                } else {
+                    putenv('APM_BASELINE_ROOT=' . $oldEnvBaseline);
+                }
+            }
+        });
+    }
+
+    // ─── Property 8/9 Helpers ────────────────────────────────────────
+
+    /**
+     * Build a baseline directory with abilities.yaml and source files for update tests.
+     *
+     * @param list<array{type: string, name: string}> $abilities
+     */
+    private function buildUpdateBaseline(string $baseline, array $abilities): void
+    {
+        $sections = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => []];
+
+        foreach ($abilities as $ability) {
+            $type = $ability['type'];
+            $name = $ability['name'];
+            $section = $type . 's';
+
+            if ($type === 'skill') {
+                $targetPath = '.cursor/skills/' . $name;
+                mkdir($baseline . '/' . $targetPath, 0775, true);
+                file_put_contents($baseline . '/' . $targetPath . '/SKILL.md', "# Baseline $name\n");
+            } else {
+                // rule
+                $targetPath = '.cursor/rules/' . $name . '/' . $name . '.mdc';
+                mkdir($baseline . '/.cursor/rules/' . $name, 0775, true);
+                file_put_contents($baseline . '/' . $targetPath, "# Baseline $name rule\n");
+            }
+
+            $sections[$section][] = [
+                'path' => $name,
+                'description' => "$name ability",
+                'targets' => ['cursor' => $targetPath],
+            ];
+        }
+
+        // Build abilities.yaml
+        $yamlLines = [];
+        foreach (['skills', 'rules', 'agents', 'hooks'] as $sec) {
+            if ($sections[$sec] === []) {
+                $yamlLines[] = "$sec: []";
+            } else {
+                $yamlLines[] = "$sec:";
+                foreach ($sections[$sec] as $entry) {
+                    $yamlLines[] = '  - path: ' . $entry['path'];
+                    $yamlLines[] = '    description: ' . $entry['description'];
+                    $yamlLines[] = '    targets:';
+                    foreach ($entry['targets'] as $platform => $target) {
+                        $yamlLines[] = '      ' . $platform . ': ' . $target;
+                    }
+                }
+            }
+        }
+
+        file_put_contents($baseline . '/abilities.yaml', implode("\n", $yamlLines) . "\n");
+    }
+
+    /**
+     * Install an ability from baseline to workspace (unchanged copy).
+     */
+    private function installAbilityFromBaseline(string $baseline, string $workspace, string $type, string $name): void
+    {
+        if ($type === 'skill') {
+            $dir = $workspace . '/.cursor/skills/' . $name;
+            mkdir($dir, 0775, true);
+            copy(
+                $baseline . '/.cursor/skills/' . $name . '/SKILL.md',
+                $dir . '/SKILL.md',
+            );
+        } else {
+            // rule
+            $dir = $workspace . '/.cursor/rules/' . $name;
+            mkdir($dir, 0775, true);
+            copy(
+                $baseline . '/.cursor/rules/' . $name . '/' . $name . '.mdc',
+                $dir . '/' . $name . '.mdc',
+            );
+        }
+    }
+
+    /**
+     * Modify an installed ability to create drift (content differs from baseline).
+     */
+    private function modifyInstalledAbility(string $workspace, string $type, string $name): void
+    {
+        if ($type === 'skill') {
+            $path = $workspace . '/.cursor/skills/' . $name . '/SKILL.md';
+            file_put_contents($path, "# Local edit $name\n");
+        } else {
+            // rule
+            $path = $workspace . '/.cursor/rules/' . $name . '/' . $name . '.mdc';
+            file_put_contents($path, "# Local edit $name\n");
+        }
+    }
+
+    /**
+     * Install an ability in user home with drift (different content from baseline).
+     */
+    private function installAbilityWithDrift(string $userHome, string $type, string $name): void
+    {
+        if ($type === 'skill') {
+            $dir = $userHome . '/.cursor/skills/' . $name;
+            mkdir($dir, 0775, true);
+            file_put_contents($dir . '/SKILL.md', "# User drift $name\n");
+        } else {
+            // rule
+            $dir = $userHome . '/.cursor/rules/' . $name;
+            mkdir($dir, 0775, true);
+            file_put_contents($dir . '/' . $name . '.mdc', "# User drift $name\n");
+        }
+    }
 
     // ─── Property 1 Helpers ──────────────────────────────────────────
 

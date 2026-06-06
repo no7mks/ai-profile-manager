@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Config\DeployScope;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\AbilityUpdateService;
 use AiProfileManager\Service\CheckService;
@@ -80,12 +79,19 @@ final class AbilityUpdateServiceTest extends TestCase
         $result = $service->reportChanges(false);
 
         self::assertSame(0, $result['exit_code']);
+        // Verify output contains changed line with new format (no scope label)
         self::assertTrue(
             (bool) array_filter(
                 $result['lines'],
-                static fn (string $line): bool => str_contains($line, 'changed: skill:demo-skill'),
+                static fn (string $line): bool => str_contains($line, 'changed: skill:demo-skill cursor'),
             ),
+            'Expected output line: changed: skill:demo-skill cursor',
         );
+        // No scope labels anywhere
+        $allLines = implode("\n", $result['lines']);
+        self::assertStringNotContainsString('(project)', $allLines);
+        self::assertStringNotContainsString('(user)', $allLines);
+
         self::assertContains('Run with --force to overwrite local changes from baseline.', $result['lines']);
     }
 
@@ -108,7 +114,7 @@ final class AbilityUpdateServiceTest extends TestCase
         );
     }
 
-    public function testReportsUserAndProjectScopeSeparately(): void
+    public function testDoesNotTraverseUserScope(): void
     {
         [$baseline, $workspace] = $this->createBaselineWithSkill('shared-skill');
         $home = $this->tmpDir . '/home';
@@ -119,14 +125,38 @@ final class AbilityUpdateServiceTest extends TestCase
         putenv('HOME=' . $home);
         chdir($workspace);
 
-        file_put_contents($workspace . '/.cursor/skills/shared-skill/SKILL.md', "# Project drift\n");
-
+        // Project scope is unchanged (copy from baseline)
+        // User scope has drift but should NOT be detected
         $service = $this->service($baseline);
         $result = $service->reportChanges(false);
 
         $lines = implode("\n", $result['lines']);
-        self::assertStringContainsString('(user)', $lines);
-        self::assertStringContainsString('(project)', $lines);
+        // User scope drift should not appear
+        self::assertStringNotContainsString('(user)', $lines);
+        // Should report "up to date" since project scope has no drift
+        self::assertStringContainsString('All installed abilities are up to date.', $lines);
+    }
+
+    public function testOutputFormatHasNoScopeLabel(): void
+    {
+        [$baseline, $workspace] = $this->createBaselineWithSkill('demo-skill');
+        putenv('APM_BASELINE_ROOT=' . $baseline);
+        chdir($workspace);
+
+        $installed = $workspace . '/.cursor/skills/demo-skill/SKILL.md';
+        file_put_contents($installed, "# Local edit\n");
+
+        $service = $this->service($baseline);
+        $result = $service->reportChanges(false);
+
+        foreach ($result['lines'] as $line) {
+            if (str_starts_with($line, 'changed:')) {
+                // Format should be: changed: {type}:{name} {target} — no scope label
+                self::assertDoesNotMatchRegularExpression('/\(project\)|\(user\)/', $line);
+                // Verify the format matches expected pattern
+                self::assertMatchesRegularExpression('/^changed: \w+:\S+ \S+$/', $line);
+            }
+        }
     }
 
     private function service(string $baselineRoot): AbilityUpdateService

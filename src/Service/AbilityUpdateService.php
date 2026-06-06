@@ -8,7 +8,7 @@ use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Config\DeployScope;
 
 /**
- * Reports and optionally applies baseline updates for installed conventional abilities in user and project scope.
+ * Reports and optionally applies baseline updates for installed conventional abilities in project scope.
  */
 class AbilityUpdateService
 {
@@ -27,6 +27,9 @@ class AbilityUpdateService
     }
 
     /**
+     * 仅遍历 project scope 已安装 ability。
+     * 输出格式: changed: {type}:{name} {target}（无 scope 标签）
+     *
      * @return array{lines: list<string>, exit_code: int}
      */
     public function reportChanges(bool $force): array
@@ -43,25 +46,25 @@ class AbilityUpdateService
         $baselineRegistry = new AbilityRegistry($baselineRoot . '/abilities.yaml');
         $targets = AppConfig::DEFAULT_TARGETS;
 
+        $items = $this->collectInstalledItems($targets);
+        if ($this->isItemsEmpty($items)) {
+            return [
+                'lines' => ['All installed abilities are up to date.'],
+                'exit_code' => 0,
+            ];
+        }
+
+        $results = $this->checkService->checkTypedForScope($items, $targets, DeployScope::Project);
         $changed = [];
-        foreach ([DeployScope::User, DeployScope::Project] as $scope) {
-            $items = $this->collectInstalledItems($this->probe, $scope, $targets);
-            if ($this->isItemsEmpty($items)) {
+        foreach ($results as $result) {
+            if ($result['status'] !== 'modified') {
                 continue;
             }
-
-            $results = $this->checkService->checkTypedForScope($items, $targets, $scope);
-            foreach ($results as $result) {
-                if ($result['status'] !== 'modified') {
-                    continue;
-                }
-                $changed[] = [
-                    'scope' => $scope,
-                    'type' => $result['type'],
-                    'name' => $result['name'],
-                    'target' => $result['target'],
-                ];
-            }
+            $changed[] = [
+                'type' => $result['type'],
+                'name' => $result['name'],
+                'target' => $result['target'],
+            ];
         }
 
         if ($changed === []) {
@@ -74,10 +77,9 @@ class AbilityUpdateService
         $lines = [];
         foreach ($changed as $entry) {
             $lines[] = sprintf(
-                'changed: %s:%s (%s) %s',
+                'changed: %s:%s %s',
                 $entry['type'],
                 $entry['name'],
-                $entry['scope']->value,
                 $entry['target'],
             );
         }
@@ -94,7 +96,6 @@ class AbilityUpdateService
             $applyLines = $this->applyOverwrite(
                 $baselineRoot,
                 $baselineRegistry,
-                $entry['scope'],
                 $entry['type'],
                 $entry['name'],
                 $entry['target'],
@@ -114,28 +115,28 @@ class AbilityUpdateService
      * @param array<int, string> $targets
      * @return array{skills: list<string>, rules: list<string>, agents: list<string>, hooks: list<string>}
      */
-    private function collectInstalledItems(InstallationProbe $probe, DeployScope $scope, array $targets): array
+    private function collectInstalledItems(array $targets): array
     {
         $parsed = $this->registry->parse();
         $items = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => []];
 
         foreach ($parsed['skills'] as $entry) {
-            if ($this->isPresentOnAnyTarget($probe, 'skill', $entry->path, $targets, $scope)) {
+            if ($this->isPresentOnAnyTarget('skill', $entry->path, $targets)) {
                 $items['skills'][] = $entry->path;
             }
         }
         foreach ($parsed['rules'] as $entry) {
-            if ($this->isPresentOnAnyTarget($probe, 'rule', $entry->path, $targets, $scope)) {
+            if ($this->isPresentOnAnyTarget('rule', $entry->path, $targets)) {
                 $items['rules'][] = $entry->path;
             }
         }
         foreach ($parsed['agents'] as $entry) {
-            if ($this->isPresentOnAnyTarget($probe, 'agent', $entry->path, $targets, $scope)) {
+            if ($this->isPresentOnAnyTarget('agent', $entry->path, $targets)) {
                 $items['agents'][] = $entry->path;
             }
         }
         foreach ($parsed['hooks'] as $entry) {
-            if ($this->isPresentOnAnyTarget($probe, 'hook', $entry->path, $targets, $scope)) {
+            if ($this->isPresentOnAnyTarget('hook', $entry->path, $targets)) {
                 $items['hooks'][] = $entry->path;
             }
         }
@@ -158,14 +159,12 @@ class AbilityUpdateService
      * @param array<int, string> $targets
      */
     private function isPresentOnAnyTarget(
-        InstallationProbe $probe,
         string $type,
         string $name,
         array $targets,
-        DeployScope $scope,
     ): bool {
         foreach ($targets as $target) {
-            if ($probe->isPresent($type, $name, $target, $scope)) {
+            if ($this->probe->isPresent($type, $name, $target, DeployScope::Project)) {
                 return true;
             }
         }
@@ -179,7 +178,6 @@ class AbilityUpdateService
     private function applyOverwrite(
         string $baselineRoot,
         AbilityRegistry $baselineRegistry,
-        DeployScope $scope,
         string $type,
         string $name,
         string $target,
@@ -190,14 +188,14 @@ class AbilityUpdateService
         }
 
         $relativePath = $entry->targets[$target];
-        $workspaceRoot = $this->rootResolver->resolve($scope);
+        $workspaceRoot = $this->rootResolver->resolve(DeployScope::Project);
 
         if ($type === 'hook') {
             return $this->applyHookOverwrite($baselineRoot, $name, $target, $workspaceRoot);
         }
 
         $src = $baselineRoot . '/' . $relativePath;
-        $dst = $this->rootResolver->absoluteTargetPath($scope, $relativePath);
+        $dst = $this->rootResolver->absoluteTargetPath(DeployScope::Project, $relativePath);
 
         try {
             if ($type === 'skill') {
@@ -213,10 +211,10 @@ class AbilityUpdateService
                 $this->mirror->copyFile($src, $dst, true);
             }
         } catch (\Throwable $e) {
-            return [sprintf('[fail] Update %s:%s (%s) %s: %s', $type, $name, $scope->value, $target, $e->getMessage())];
+            return [sprintf('[fail] Update %s:%s %s: %s', $type, $name, $target, $e->getMessage())];
         }
 
-        return [sprintf('[ok] Updated %s:%s (%s) %s', $type, $name, $scope->value, $target)];
+        return [sprintf('[ok] Updated %s:%s %s', $type, $name, $target)];
     }
 
     /**

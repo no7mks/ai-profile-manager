@@ -108,7 +108,7 @@
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(cli) deprecate-scope: global-setup deprecated shell`
 
-- [-] 5. Show 命令简化
+- [x] 5. Show 命令简化
   - [x] 5.1 `ShowStatusPresenter` 移除 scope 合并逻辑
     - `lines()` 仅评估 project scope，输出格式 `{type}:{name}  {status}   {targets}`
     - 移除 `dualScopeWarning`、`scopeLabel`、多 scope 状态聚合
@@ -125,27 +125,27 @@
     - **Property 7: Show type 过滤器正确性** — 随机 type 过滤验证输出一致性
     - 标签：`Feature: deprecate-scope, Property 6/7`
     - _Ref: Requirement 5, AC 1-5_
-  - [-] 5.4 Checkpoint
+  - [x] 5.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(show) deprecate-scope: project-only presenter`
 
-- [ ] 6. Update 命令简化
-  - [~] 6.1 `AbilityUpdateService` 仅遍历 project scope
+- [-] 6. Update 命令简化
+  - [x] 6.1 `AbilityUpdateService` 仅遍历 project scope
     - `reportChanges()` 仅检查 project scope 已安装 ability
     - 移除 `DeployScope::User` 遍历循环
     - 输出格式 `changed: {type}:{name} {target}`（无 scope 标签）
     - RED → GREEN：`./vendor/bin/phpunit --filter AbilityUpdateServiceTest`
     - _Ref: Requirement 6, AC 1-3_
-  - [~] 6.2 `UpdateCommand` 集成简化后的 service
+  - [x] 6.2 `UpdateCommand` 集成简化后的 service
     - `--force` 时使用 baseline 覆盖 project scope 文件
     - RED → GREEN：`./vendor/bin/phpunit --filter UpdateCommandTest`
     - _Ref: Requirement 6, AC 4_
-  - [~] 6.3 Property 8 + Property 9 属性测试
+  - [x] 6.3 Property 8 + Property 9 属性测试
     - **Property 8: Update 仅遍历 project scope** — 验证不访问 user home 路径
     - **Property 9: Update 输出格式无 scope 标签** — 随机 changed 项验证格式
     - 标签：`Feature: deprecate-scope, Property 8/9`
     - _Ref: Requirement 6, AC 1-4_
-  - [~] 6.4 Checkpoint
+  - [-] 6.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(update) deprecate-scope: project-only traversal`
 
