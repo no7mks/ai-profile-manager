@@ -168,7 +168,6 @@ final class ConsoleFlowsTest extends TestCase
         self::assertSame(Command::FAILURE, $exit);
         $display = $tester->getDisplay();
         self::assertStringContainsString('Install requires a preset name', $display);
-        self::assertStringContainsString('apm global-setup', $display);
         self::assertStringContainsString('apm bootstrap', $display);
         self::assertStringContainsString('apm add skill|rule|agent|preset', $display);
         self::assertStringNotContainsString('Installing scaffold', $display);

@@ -49,7 +49,7 @@ final class ShowCommand extends Command
     protected function configure(): void
     {
         $this->setName('show');
-        $this->setDescription('Show conventional abilities with install status per deploy scope.');
+        $this->setDescription('Show conventional abilities with install status.');
         $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
         $this->configureDeployScopeOption();
         $this->addOption('type', null, InputOption::VALUE_REQUIRED, 'Filter by ability type (rule, agent, skill, hook, gitignore, prompt).');

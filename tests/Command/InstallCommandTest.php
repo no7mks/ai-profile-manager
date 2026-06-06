@@ -92,7 +92,6 @@ final class InstallCommandTest extends TestCase
         self::assertSame(Command::FAILURE, $exit);
         $display = $tester->getDisplay();
         self::assertStringContainsString('Install requires a preset name', $display);
-        self::assertStringContainsString('apm global-setup', $display);
         self::assertStringContainsString('apm bootstrap', $display);
         self::assertStringContainsString('apm add skill|rule|agent|preset', $display);
         self::assertStringNotContainsString('Installing default preset', $display);
@@ -130,7 +129,6 @@ final class InstallCommandTest extends TestCase
         self::assertSame(Command::FAILURE, $exit);
         $display = $tester->getDisplay();
         self::assertStringContainsString('Preset "default" was removed', $display);
-        self::assertStringContainsString('apm global-setup', $display);
         self::assertStringContainsString('apm bootstrap', $display);
         self::assertStringContainsString('apm add preset', $display);
         self::assertStringNotContainsString('Unknown preset', $display);

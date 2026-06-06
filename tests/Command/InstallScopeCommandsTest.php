@@ -61,45 +61,37 @@ final class InstallScopeCommandsTest extends TestCase
         self::assertFileDoesNotExist($home . '/.cursor/skills/apm/SKILL.md');
     }
 
-    public function testUserScopeInstallsUnderFakeHome(): void
+    public function testScopeUserIsRejectedOnSkillInstall(): void
     {
-        $home = $this->tmpDir . '/home-user';
         $workspace = $this->tmpDir . '/workspace-user';
-        mkdir($home, 0775, true);
         mkdir($workspace, 0775, true);
-        $this->withEnv('HOME', $home);
         chdir($workspace);
 
         $installer = $this->packageInstaller();
         $tester = new CommandTester(new SkillInstallCommand($installer));
         $exit = $tester->execute(['skills' => ['apm'], '--target' => ['cursor'], '--scope' => 'user']);
 
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertFileExists($home . '/.cursor/skills/apm/SKILL.md');
-        self::assertFileDoesNotExist($workspace . '/.cursor/skills/apm/SKILL.md');
+        self::assertSame(Command::FAILURE, $exit);
+        $display = preg_replace('/\s+/', ' ', $tester->getDisplay());
+        self::assertStringContainsString('--scope option has been removed', $display);
+        self::assertStringContainsString('project scope only', $display);
     }
 
-    public function testUserScopeProjectOnlyRuleFailsWithZeroWrites(): void
+    public function testScopeProjectIsRejectedOnRuleInstall(): void
     {
-        $home = $this->tmpDir . '/home-po';
         $workspace = $this->tmpDir . '/workspace-po';
-        mkdir($home, 0775, true);
         mkdir($workspace, 0775, true);
-        $this->withEnv('HOME', $home);
         chdir($workspace);
 
         $installer = $this->packageInstaller();
         $tester = new CommandTester(new RuleInstallCommand($installer));
-        $exit = $tester->execute(['rules' => ['cursor-scope'], '--target' => ['cursor'], '--scope' => 'user']);
+        $exit = $tester->execute(['rules' => ['cursor-scope'], '--target' => ['cursor'], '--scope' => 'project']);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('cursor-scope', $tester->getDisplay());
-        self::assertStringContainsString('cannot be deployed to user', $tester->getDisplay());
-        self::assertFileDoesNotExist($home . '/.cursor/rules/cursor-scope.mdc');
-        self::assertFileDoesNotExist($workspace . '/.cursor/rules/cursor-scope.mdc');
+        self::assertStringContainsString('--scope option has been removed', $tester->getDisplay());
     }
 
-    public function testInvalidScopeFails(): void
+    public function testArbitraryScopeValueIsRejected(): void
     {
         $workspace = $this->tmpDir . '/workspace-bogus';
         mkdir($workspace, 0775, true);
@@ -109,16 +101,13 @@ final class InstallScopeCommandsTest extends TestCase
         $exit = $tester->execute(['skills' => ['apm'], '--scope' => 'bogus']);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Invalid deploy scope', $tester->getDisplay());
+        self::assertStringContainsString('--scope option has been removed', $tester->getDisplay());
     }
 
-    public function testPresetInstallUserScopeWithIllegalIncludeFailsBeforeWrites(): void
+    public function testScopeRejectedOnPresetInstall(): void
     {
-        $home = $this->tmpDir . '/home-preset';
         $workspace = $this->tmpDir . '/workspace-preset';
-        mkdir($home, 0775, true);
         mkdir($workspace, 0775, true);
-        $this->withEnv('HOME', $home);
         chdir($workspace);
 
         $pkg = PackagePaths::packageRoot();
@@ -132,33 +121,16 @@ final class InstallScopeCommandsTest extends TestCase
         $exit = $tester->execute(['preset' => 'gitflow', '--target' => ['cursor'], '--scope' => 'user']);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Project-only ability', $tester->getDisplay());
-        self::assertStringContainsString('git:branch-overview', $tester->getDisplay());
-        self::assertFileDoesNotExist($home . '/.cursor/rules/git/git-conventions.mdc');
-        self::assertFileDoesNotExist($workspace . '/.cursor/rules/git/git-conventions.mdc');
+        self::assertStringContainsString('--scope option has been removed', $tester->getDisplay());
     }
 
-    public function testUninstallUserScopeOnlyTouchesUserPaths(): void
+    public function testScopeRejectedOnSkillUninstall(): void
     {
-        $home = $this->tmpDir . '/home-un';
         $workspace = $this->tmpDir . '/workspace-un';
-        mkdir($home, 0775, true);
         mkdir($workspace, 0775, true);
-        $this->withEnv('HOME', $home);
         chdir($workspace);
 
         $installer = $this->packageInstaller();
-        $installTester = new CommandTester(new SkillInstallCommand($installer));
-        self::assertSame(
-            Command::SUCCESS,
-            $installTester->execute(['skills' => ['apm'], '--target' => ['cursor'], '--scope' => 'user']),
-        );
-        self::assertFileExists($home . '/.cursor/skills/apm/SKILL.md');
-
-        $projectCopy = $workspace . '/.cursor/skills/apm';
-        mkdir($projectCopy, 0775, true);
-        file_put_contents($projectCopy . '/SKILL.md', "stays\n");
-
         $uninstallTester = new CommandTester(new SkillUninstallCommand($installer, new CheckService()));
         $exit = $uninstallTester->execute([
             'skills' => ['apm'],
@@ -167,9 +139,8 @@ final class InstallScopeCommandsTest extends TestCase
             '--force' => true,
         ]);
 
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertFileDoesNotExist($home . '/.cursor/skills/apm/SKILL.md');
-        self::assertFileExists($workspace . '/.cursor/skills/apm/SKILL.md');
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('--scope option has been removed', $uninstallTester->getDisplay());
     }
 
     private function packageInstaller(): Installer

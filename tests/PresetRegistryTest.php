@@ -172,11 +172,11 @@ YAML;
         self::assertSame(['type' => 'skill', 'path' => 'another-valid'], $preset['includes'][1]);
     }
     #[Group('deprecated-scope')]
-    public function testPackageAbilitiesGlobalSetupIncludesResolve(): void
+    public function testPackageAbilitiesBootstrapIncludesResolve(): void
     {
         $path = dirname(__DIR__) . '/abilities.yaml';
         $registry = new AbilityRegistry($path);
-        $includes = $registry->globalSetupIncludes();
+        $includes = $registry->bootstrapIncludes();
 
         self::assertNotEmpty($includes);
 
@@ -186,7 +186,7 @@ YAML;
             self::assertNotNull(
                 $entry,
                 sprintf(
-                    "Ability '%s:%s' in global-setup not found in abilities.yaml",
+                    "Ability '%s:%s' in bootstrap.includes not found in abilities.yaml",
                     $include['type'],
                     $include['path'],
                 ),

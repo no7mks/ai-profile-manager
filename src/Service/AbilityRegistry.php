@@ -243,5 +243,4 @@ final class AbilityRegistry
         }
         return null;
     }
-
 }

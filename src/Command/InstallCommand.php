@@ -23,8 +23,7 @@ final class InstallCommand extends Command
 Install requires a preset name. Bare `apm install` is no longer supported.
 
 Use instead:
-  apm global-setup                         # user-scope abilities (once after composer global install)
-  apm bootstrap                            # project scaffold (in your repository)
+  apm bootstrap                            # project scaffold + bootstrap abilities
   apm add skill|rule|agent|preset <name>   # install specific abilities
 MSG;
 
@@ -39,10 +38,9 @@ Use instead:
 MSG;
 
     private const DEFAULT_PRESET_MIGRATION = <<<'MSG'
-Preset "default" was removed. Use the three-step flow instead:
-  1. apm global-setup              # user-scope abilities
-  2. apm bootstrap                 # project scaffold (in your repository)
-  3. apm add preset <name>         # project abilities as needed
+Preset "default" was removed. Use the two-step flow instead:
+  1. apm bootstrap                 # project scaffold + bootstrap abilities
+  2. apm add preset <name>         # project abilities as needed
 MSG;
 
     public function __construct(

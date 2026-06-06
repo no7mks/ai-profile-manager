@@ -35,7 +35,7 @@ final class ShowStatusPresenter
      * @param array<int, string> $targets
      * @return list<ShowAbilityRow>
      */
-    public function rows(array $targets, ?string $typeFilter): array
+    private function rows(array $targets, ?string $typeFilter): array
     {
         $abilities = $this->enumerateAbilities($typeFilter);
         $rows = [];
