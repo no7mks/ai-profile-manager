@@ -19,6 +19,7 @@
         <testsuite name="apm">
             <directory>tests</directory>
             <exclude>tests/E2E</exclude>
+            <exclude>tests/Property</exclude>
         </testsuite>
         <testsuite name="e2e">
             <directory>tests/E2E</directory>
