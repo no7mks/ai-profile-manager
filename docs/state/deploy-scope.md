@@ -1,6 +1,6 @@
 # Deploy Scope
 
-Deploy scope 路径根解析与 CLI 默认行为（SSOT）；registry `scopes`、Global Setup、Project-Only 见 `abilities-model.md`。
+Deploy scope 路径根解析与 CLI 默认行为（SSOT）。
 
 ---
 

@@ -21,7 +21,7 @@ apm 所有已注册命令的签名、行为与错误条件。
 |------|------|
 | 传入 `--scope` 参数 | 输出废弃错误消息（`--scope` 已移除，仅 project scope），exit FAILURE |
 | 未提供 preset（裸 `apm install` / `apm add`） | 输出迁移指引（`bootstrap` / typed `add`），exit FAILURE |
-| preset 为 `default` | 输出三步迁移文案，exit FAILURE |
+| preset 为 `default` | 输出两步迁移文案（bootstrap + add preset），exit FAILURE |
 | target 不在 KNOWN_TARGETS 中 | 输出错误信息，exit FAILURE |
 | 参数名不在已知 preset 列表 | 输出 typed add 指引（`apm add skill|rule|agent|preset <name>`），exit FAILURE |
 | validatePresetInstall 失败（如缺失 bundle） | 输出校验错误，exit FAILURE（无磁盘写入） |
