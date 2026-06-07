@@ -164,84 +164,84 @@
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(cleanup) deprecate-scope: remove scope wording`
 
-- [-] 8. 代码清理（单一 task，AD-3）
-  - [~] 8.1 删除废弃类文件
+- [x] 8. 代码清理（单一 task，AD-3）
+  - [x] 8.1 删除废弃类文件
     - 删除 `UserHomeResolver.php` 及其测试
     - 删除 `ScopeGuard.php` 及其测试
     - 删除 `DefaultGlobalSetupService.php` / `GlobalSetupService.php` 及其测试
     - 移除源码中所有对上述类的 `use` 声明和实例化
     - _Ref: Requirement 8, AC 1-3_
-  - [~] 8.2 `DeployRootResolver` 简化
+  - [x] 8.2 `DeployRootResolver` 简化
     - 构造函数注入 `?string $rootPath = null`（默认 `getcwd()`）
     - `resolve()` 仅返回 project root
     - 移除 `parseScopeOption()`、`resolve(DeployScope)` 方法
     - 不接受 `DeployScope` 参数
     - RED → GREEN：`./vendor/bin/phpunit --filter DeployRootResolverTest`
     - _Ref: Requirement 8, AC 4_
-  - [~] 8.3 `DeployScope` 枚举简化
+  - [x] 8.3 `DeployScope` 枚举简化
     - 移除 `User` case，仅保留 `Project` 单值
     - RED → GREEN：`./vendor/bin/phpunit --filter DeployScopeTest`
     - _Ref: Requirement 8, AC 11_
-  - [~] 8.4 `InstallationProbe` / `Installer` 移除 `$scope` 参数
+  - [x] 8.4 `InstallationProbe` / `Installer` 移除 `$scope` 参数
     - 所有方法硬编码使用 project scope
     - 更新调用方
     - RED → GREEN：`./vendor/bin/phpunit --filter "InstallationProbeTest|InstallerTest"`
     - _Ref: Requirement 8, AC 5_
-  - [~] 8.5 `CheckService` 移除 `checkTypedForScope()` 方法
+  - [x] 8.5 `CheckService` 移除 `checkTypedForScope()` 方法
     - `checkTyped()` 直接使用 project root
     - 更新调用方
     - RED → GREEN：`./vendor/bin/phpunit --filter CheckServiceTest`
     - _Ref: Requirement 8, AC 6_
-  - [~] 8.6 集成验证：源码无废弃引用
+  - [x] 8.6 集成验证：源码无废弃引用
     - 验证源码中无 `UserHomeResolver`、`ScopeGuard`、`DefaultGlobalSetupService`、`GlobalSetupService` 引用
     - 验证 `AbilityEntry` 无 `$scopes` 属性
     - 验证 `DeployScope` 仅含 `Project`
     - _Ref: Requirement 8, AC 1-11_
-  - [~] 8.7 Checkpoint
+  - [x] 8.7 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - 更新 `docs/state/deploy-scope.md`：移除 user scope 全部内容
     - commit: `+(cleanup) deprecate-scope: remove user scope internals`
 
-- [~] 9. E2E 测试
-  - [~] 9.1 _脚本_ `tests/test-task-9a.sh`：--scope 参数拒绝 + global-setup 废弃
+- [x] 9. E2E 测试
+  - [x] 9.1 _脚本_ `tests/test-task-9a.sh`：--scope 参数拒绝 + global-setup 废弃
     - 验证 install/show/typed-install/typed-uninstall 传入 --scope 时 exit 1
     - 验证 global-setup 命令输出废弃消息并 exit 1
     - _Ref: Requirement 1, 2_
-  - [~] 9.2 _脚本_ `tests/test-task-9b.sh`：bootstrap 完整流程
+  - [x] 9.2 _脚本_ `tests/test-task-9b.sh`：bootstrap 完整流程
     - 验证 scaffold + ability 安装、skip 逻辑、force 覆盖、部分失败
     - _Ref: Requirement 3_
-  - [~] 9.3 _脚本_ `tests/test-task-9c.sh`：show/update/cleanup 简化行为
+  - [x] 9.3 _脚本_ `tests/test-task-9c.sh`：show/update/cleanup 简化行为
     - 验证 show 无 scope 标签、update 仅 project、cleanup 无遗留用语
     - _Ref: Requirement 5, 6, 7_
-  - [~] 9.4 Checkpoint
+  - [x] 9.4 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`；`./vendor/bin/phpunit --testsuite e2e`
     - commit: `+(e2e) deprecate-scope: scope deprecation flows`
 
-- [ ] 10. 文档收敛
-  - [~] 10.1 SSOT 文档更新
+- [x] 10. 文档收敛
+  - [x] 10.1 SSOT 文档更新
     - 重写 `docs/state/deploy-scope.md`：仅描述 project scope
     - 更新 `docs/state/cli-commands.md`：移除 `--scope` 参数，标注 global-setup 废弃
     - 更新 `docs/state/abilities-model.md`：移除 scopes 字段文档
     - 更新 `docs/state/install-behavior.md`：移除 user scope 路径解析内容
     - _Ref: Requirement 9, AC 1-4_
-  - [~] 10.2 Manual 文档更新
+  - [x] 10.2 Manual 文档更新
     - 更新 `docs/manual/usage.md`：三阶段改两阶段首装，移除 --scope 示例
     - _Ref: Requirement 9, AC 5_
-  - [~] 10.3 APM skill + init-workflow 更新
+  - [x] 10.3 APM skill + init-workflow 更新
     - 更新 `.cursor/skills/apm/references/init-workflow.md`
     - 更新 `.kiro/skills/apm/references/init-workflow.md`
     - 移除 global-setup 引用，调整为两阶段首装
     - _Ref: Requirement 9, AC 6_
-  - [~] 10.4 零残留验证
+  - [x] 10.4 零残留验证
     - grep 全部文档确认无 `user` scope、`--scope` 参数、`global-setup`（非 deprecated 标注）残留引用
     - _Ref: Requirement 9, AC 7_
-  - [~] 10.5 知识图谱更新
+  - [x] 10.5 知识图谱更新
     - `/graphify update`：增量更新本次变更涉及的文件
-  - [~] 10.6 Checkpoint
+  - [x] 10.6 Checkpoint
     - 运行验证：`./vendor/bin/phpstan analyse`；`./vendor/bin/phpunit`
     - commit: `+(docs) deprecate-scope: documentation convergence`
 
-- [~] 11. Code Review
+- [x] 11. Code Review
   - 委托给 code-reviewer sub-agent 执行
 
 ## Notes
