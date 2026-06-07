@@ -7,6 +7,7 @@ namespace AiProfileManager\Command;
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\Installer;
+use AiProfileManager\Service\InvalidScopeException;
 use AiProfileManager\Service\PresetRegistry;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
@@ -22,8 +23,7 @@ final class InstallCommand extends Command
 Install requires a preset name. Bare `apm install` is no longer supported.
 
 Use instead:
-  apm global-setup                         # user-scope abilities (once after composer global install)
-  apm bootstrap                            # project scaffold (in your repository)
+  apm bootstrap                            # project scaffold + bootstrap abilities
   apm add skill|rule|agent|preset <name>   # install specific abilities
 MSG;
 
@@ -38,10 +38,9 @@ Use instead:
 MSG;
 
     private const DEFAULT_PRESET_MIGRATION = <<<'MSG'
-Preset "default" was removed. Use the three-step flow instead:
-  1. apm global-setup              # user-scope abilities
-  2. apm bootstrap                 # project scaffold (in your repository)
-  3. apm add preset <name>         # project abilities as needed
+Preset "default" was removed. Use the two-step flow instead:
+  1. apm bootstrap                 # project scaffold + bootstrap abilities
+  2. apm add preset <name>         # project abilities as needed
 MSG;
 
     public function __construct(
@@ -69,6 +68,13 @@ MSG;
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        try {
+            $this->rejectIfScopeOptionPresent($input);
+        } catch (InvalidScopeException $e) {
+            $io->error($e->getMessage());
+            return Command::FAILURE;
+        }
 
         /** @var string|null $preset */
         $preset = $input->getArgument('preset');
@@ -111,11 +117,6 @@ MSG;
             return Command::FAILURE;
         }
 
-        $scope = $this->resolveDeployScopeOption($input, $io);
-        if ($scope === null) {
-            return Command::FAILURE;
-        }
-
         $validationErrors = $this->presetRegistry->validatePresetInstall($presetSpec, $targets);
         if ($validationErrors !== []) {
             $io->error($validationErrors[0]);
@@ -123,13 +124,9 @@ MSG;
             return Command::FAILURE;
         }
 
-        if (!$this->guardPresetInstall($this->installer, $scope, $presetSpec, $io)) {
-            return Command::FAILURE;
-        }
-
         $items = PresetRegistry::toTypedSpec($presetSpec);
         $io->writeln("Preset: {$preset}");
-        $result = $this->installer->installTyped($items, $targets, $preset, $scope);
+        $result = $this->installer->installTyped($items, $targets, $preset);
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

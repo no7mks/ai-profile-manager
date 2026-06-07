@@ -14,13 +14,11 @@ final readonly class AbilityEntry
      * @param string $description 描述
      * @param array<string, string> $targets platform => target_path 映射
      * @param string $type 类型（rule|agent|skill|hook）
-     * @param list<string> $scopes 可部署的 Deploy Scope 列表（project|user）
      */
     public function __construct(
         public string $path,
         public string $description,
         public array $targets,
         public string $type,
-        public array $scopes = ['project'],
     ) {}
 }

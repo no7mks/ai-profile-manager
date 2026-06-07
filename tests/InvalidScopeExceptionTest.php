@@ -9,37 +9,47 @@ use PHPUnit\Framework\TestCase;
 
 final class InvalidScopeExceptionTest extends TestCase
 {
-    public function testUnknownScopeIncludesInvalidValueAndValidScopes(): void
+    public function testScopeOptionDeprecatedMessage(): void
     {
-        $exception = InvalidScopeException::unknownScope('bogus');
+        $exception = InvalidScopeException::scopeOptionDeprecated();
 
-        self::assertStringContainsString('Invalid deploy scope: bogus', $exception->getMessage());
-        self::assertStringContainsString('Valid scopes: project, user', $exception->getMessage());
+        self::assertSame(
+            'The --scope option has been removed. All operations now target project scope only.',
+            $exception->getMessage(),
+        );
+        self::assertInstanceOf(\InvalidArgumentException::class, $exception);
     }
 
-    public function testUnknownScopeEmptyStringShowsEmptyPlaceholder(): void
+    public function testGlobalSetupDeprecatedMessage(): void
     {
-        $exception = InvalidScopeException::unknownScope('');
+        $exception = InvalidScopeException::globalSetupDeprecated();
 
-        self::assertStringContainsString('Invalid deploy scope: (empty)', $exception->getMessage());
-        self::assertStringContainsString('Valid scopes: project, user', $exception->getMessage());
+        self::assertSame(
+            "The global-setup command has been removed. Use 'apm bootstrap' instead.",
+            $exception->getMessage(),
+        );
+        self::assertInstanceOf(\InvalidArgumentException::class, $exception);
     }
 
-    public function testUnknownScopeNullShowsEmptyPlaceholder(): void
+    public function testLegacyScopesFieldIncludesEntryPath(): void
     {
-        $exception = InvalidScopeException::unknownScope(null);
+        $exception = InvalidScopeException::legacyScopesField('skill:my-skill');
 
-        self::assertStringContainsString('Invalid deploy scope: (empty)', $exception->getMessage());
-        self::assertStringContainsString('Valid scopes: project, user', $exception->getMessage());
+        self::assertSame(
+            "Legacy 'scopes' field found on entry 'skill:my-skill'. Remove the scopes field — all entries are now project-only.",
+            $exception->getMessage(),
+        );
+        self::assertInstanceOf(\InvalidArgumentException::class, $exception);
     }
 
-    public function testProjectOnlyInUserScopeNamesAbilityAndValidScopes(): void
+    public function testLegacyGlobalSetupKeyMessage(): void
     {
-        $exception = InvalidScopeException::projectOnlyInUserScope('cursor-scope');
+        $exception = InvalidScopeException::legacyGlobalSetupKey();
 
-        self::assertStringContainsString('cursor-scope', $exception->getMessage());
-        self::assertStringContainsString('Valid scopes: project, user', $exception->getMessage());
-        self::assertStringContainsString('user', $exception->getMessage());
-        self::assertStringContainsString('Project-only', $exception->getMessage());
+        self::assertSame(
+            "Legacy 'global-setup' key found. Rename to 'bootstrap'.",
+            $exception->getMessage(),
+        );
+        self::assertInstanceOf(\InvalidArgumentException::class, $exception);
     }
 }

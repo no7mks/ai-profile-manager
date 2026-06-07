@@ -7,5 +7,4 @@ namespace AiProfileManager\Config;
 enum DeployScope: string
 {
     case Project = 'project';
-    case User = 'user';
 }

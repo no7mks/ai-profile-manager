@@ -47,7 +47,7 @@ final class UpdateCommand extends Command
     protected function configure(): void
     {
         $this->setName('update');
-        $this->setDescription('Report or apply baseline updates for installed conventional abilities in user and project scope.');
+        $this->setDescription('Report or apply baseline updates for installed conventional abilities.');
         $this->addOption('force', 'f', InputOption::VALUE_NONE, 'Overwrite differing installed files from baseline.');
     }
 

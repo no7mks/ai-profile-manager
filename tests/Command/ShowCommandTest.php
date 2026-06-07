@@ -8,8 +8,6 @@ use AiProfileManager\Command\ShowCommand;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\CheckService;
 use AiProfileManager\Service\DeployRootResolver;
-use AiProfileManager\Service\DirectoryMirrorService;
-use AiProfileManager\Service\GitIgnoreTemplateService;
 use AiProfileManager\Service\InstallationProbe;
 use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\ShowStatusPresenter;
@@ -77,7 +75,7 @@ final class ShowCommandTest extends TestCase
         $exit = $tester->execute(['--scope' => 'bogus']);
 
         self::assertSame(Command::FAILURE, $exit);
-        self::assertStringContainsString('Invalid deploy scope', $tester->getDisplay());
+        self::assertStringContainsString('--scope option has been removed', $tester->getDisplay());
     }
 
     public function testShowCommandFiltersTypeWithPresenterLineFormat(): void
@@ -122,43 +120,21 @@ final class ShowCommandTest extends TestCase
         $tester = new CommandTester($this->command($baseline, $registryPath));
         $exit = $tester->execute(['--scope' => 'project', '--target' => ['cursor'], '--type' => 'rule']);
 
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('rule:scope-proj  installed (project)', $tester->getDisplay());
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('--scope option has been removed', $tester->getDisplay());
     }
 
     public function testShowCommandScopeUserFilter(): void
     {
-        $baseline = $this->tmpDir . '/user-scope-base';
-        $home = $this->tmpDir . '/user-scope-home';
-        $workspace = $this->tmpDir . '/user-scope-ws';
-        mkdir($baseline . '/.cursor/rules/git', 0775, true);
-        mkdir($home . '/.cursor/rules/git', 0775, true);
-        mkdir($workspace, 0775, true);
-        file_put_contents($baseline . '/.cursor/rules/git/u.mdc', "b\n");
-        file_put_contents($home . '/.cursor/rules/git/u.mdc', "b\n");
-        $registryPath = $baseline . '/abilities.yaml';
-        file_put_contents($registryPath, <<<'YAML'
-version: "1"
-rules:
-  - path: u
-    description: u
-    scopes: [user, project]
-    targets:
-      cursor: .cursor/rules/git/u.mdc
-agents: []
-skills: []
-hooks: []
-YAML);
+        $proj = $this->tmpDir . '/user-scope-ws';
+        mkdir($proj, 0775, true);
+        chdir($proj);
 
-        $this->withEnv('APM_BASELINE_ROOT', $baseline);
-        $this->withEnv('HOME', $home);
-        chdir($workspace);
-
-        $tester = new CommandTester($this->command($baseline, $registryPath));
+        $tester = new CommandTester($this->command($proj));
         $exit = $tester->execute(['--scope' => 'user', '--target' => ['cursor'], '--type' => 'rule']);
 
-        self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('rule:u  installed (user)', $tester->getDisplay());
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('--scope option has been removed', $tester->getDisplay());
     }
 
     public function testShowCommandMergedViewWithoutScope(): void
@@ -171,40 +147,22 @@ YAML);
         $exit = $tester->execute(['--target' => ['cursor'], '--type' => 'rule']);
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertStringContainsString('rule:merged-one  installed (project)', $tester->getDisplay());
+        self::assertStringContainsString('rule:merged-one  installed   cursor', $tester->getDisplay());
         self::assertStringNotContainsString('(user+project)', $tester->getDisplay());
+        self::assertStringNotContainsString('(project)', $tester->getDisplay());
     }
 
     public function testShowCommandInstalledWhenBaselineUnknownButFileOnDisk(): void
     {
-        $baseline = $this->tmpDir . '/unknown-base';
-        $workspace = $this->tmpDir . '/unknown-ws';
-        mkdir($baseline, 0775, true);
-        mkdir($workspace . '/.cursor/rules/git', 0775, true);
-        file_put_contents($workspace . '/.cursor/rules/git/probe.mdc', "local\n");
-        $registryPath = $baseline . '/abilities.yaml';
-        file_put_contents($registryPath, <<<'YAML'
-version: "1"
-rules:
-  - path: probe
-    description: probe
-    targets:
-      cursor: .cursor/rules/git/probe.mdc
-agents: []
-skills: []
-hooks: []
-YAML);
+        $proj = $this->tmpDir . '/unknown-ws';
+        mkdir($proj, 0775, true);
+        chdir($proj);
 
-        $this->withEnv('APM_BASELINE_ROOT', '');
-        chdir($workspace);
-
-        $tester = new CommandTester($this->command($baseline, $registryPath));
+        $tester = new CommandTester($this->command($proj));
         $exit = $tester->execute(['--scope' => 'project', '--target' => ['cursor'], '--type' => 'rule']);
 
-        self::assertSame(Command::SUCCESS, $exit);
-        $display = $tester->getDisplay();
-        self::assertStringContainsString('rule:probe  installed (project)', $display);
-        self::assertStringNotContainsString('not installed', $display);
+        self::assertSame(Command::FAILURE, $exit);
+        self::assertStringContainsString('--scope option has been removed', $tester->getDisplay());
     }
 
     public function testShowCommandExcludesPresetNamesFromOutput(): void
@@ -225,6 +183,54 @@ YAML);
         self::assertStringContainsString('rule:ability-only', $display);
         self::assertStringNotContainsString('gitflow', $display);
         self::assertStringNotContainsString('presets:', $display);
+    }
+
+    public function testShowCommandEmptyRegistryOutputsEmptyListAndExitsZero(): void
+    {
+        $proj = $this->tmpDir . '/empty-reg';
+        mkdir($proj, 0775, true);
+        chdir($proj);
+
+        $tester = new CommandTester($this->command($proj));
+        $exit = $tester->execute([]);
+
+        self::assertSame(Command::SUCCESS, $exit);
+        self::assertSame('', trim($tester->getDisplay()));
+    }
+
+    public function testShowCommandTypeFilterPassedToPresenter(): void
+    {
+        $pkg = $this->tmpDir . '/type-filter';
+        mkdir($pkg, 0775, true);
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'version: "1"',
+            'skills:',
+            '  - path: my-skill',
+            '    description: A skill',
+            '    targets:',
+            '      cursor: .cursor/skills/my-skill',
+            'rules:',
+            '  - path: my-rule',
+            '    description: A rule',
+            '    targets:',
+            '      cursor: .cursor/rules/my-rule.mdc',
+            'agents: []',
+            'hooks: []',
+        ]) . "\n");
+
+        $proj = $this->tmpDir . '/type-filter-ws';
+        mkdir($proj, 0775, true);
+        $this->withEnv('APM_BASELINE_ROOT', $pkg);
+        chdir($proj);
+
+        $tester = new CommandTester($this->command($pkg, $pkg . '/abilities.yaml'));
+
+        // Filter by rule — should show only rule, not skill
+        $exit = $tester->execute(['--type' => 'rule', '--target' => ['cursor']]);
+        self::assertSame(Command::SUCCESS, $exit);
+        $display = $tester->getDisplay();
+        self::assertStringContainsString('rule:my-rule', $display);
+        self::assertStringNotContainsString('skill:my-skill', $display);
     }
 
     public function testShowCommandCreateFactory(): void
@@ -288,6 +294,6 @@ YAML);
             $packageRoot,
         );
 
-        return new ShowCommand($presenter, $resolver);
+        return new ShowCommand($presenter);
     }
 }

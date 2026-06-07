@@ -18,7 +18,7 @@ description: Spec gatekeeper 校验 requirements 阶段的详细指引。由 spe
 5. Socratic Review 校验
 6. 目的性审查
 7. 将修正项写入 Gatekeep Log
-8. 生成 Clarification Round（为 design 阶段准备）
+8. 生成 Requirement Discussion（为 design 阶段准备）
 9. Completion：向 main-agent 返回结果
 
 ---
@@ -107,7 +107,7 @@ Requirements 的核心目的是：**让读者清楚地知道要做什么、不�
 
 ### 审查清单
 
-- [ ] **Goal CR 回应**：goal.md 中 Clarification Round 的用户决策是否在 requirements 中体现。
+- [ ] **Goal Clarification 回应**：goal.md 中 Goal Clarification 的用户决策是否在 requirements 中体现。
 - [ ] **Goal 清晰度**：读完 Introduction 后能否一句话概括 feature 目标？
 - [ ] **Non-goal / Scope 边界**：是否明确了不涉及的内容？
 - [ ] **完成标准**：AC 整体是否构成充分的验收条件？
@@ -123,13 +123,13 @@ Requirements 的核心目的是：**让读者清楚地知道要做什么、不�
 
 ---
 
-## 8. Clarification Round (CR)
+## 8. Requirement Discussion (RD)
 
-校验完成后，生成面向 design 阶段的 CR 问题（**3 个以上**）。
+校验完成后，生成面向 design 阶段的 Requirement Discussion 问题（**3 个以上**）。
 
-CR 写入 requirements.md 末尾的 `## Clarification Round` section（保留在源文件中，不写入 gk-logs.md）。
+Requirement Discussion 写入 requirements.md 末尾的 `## Requirement Discussion` section（保留在源文件中，不写入 gk-logs.md）。
 
-CR 聚焦 **requirements 到 design 的衔接**——哪些行为描述存在多种合理的实现路径，需要用户在进入 design 前做出决策。
+Requirement Discussion 聚焦 **requirements 到 design 的衔接**——哪些行为描述存在多种合理的实现路径，需要用户在进入 design 前做出决策。
 
 聚焦方向：
 - AC 中是否存在多种合理的 design 路径？
@@ -138,9 +138,9 @@ CR 聚焦 **requirements 到 design 的衔接**——哪些行为描述存在多
 - 是否有隐含的技术约束需要确认？
 - 边界条件的处理策略是否需要用户决策？
 
-**不应涉及**：scope 边界的"做不做"问题（属于 goal CR）、实现顺序/task 拆分（属于 gk-design CR）。
+**不应涉及**：scope 边界的"做不做"问题（属于 Goal Clarification）、实现顺序/task 拆分（属于 Architecture Decision）。
 
-每个问题提供 **至少 3 个选项**，写入 Gatekeep Log 的 `### Clarification Round` 小节。
+每个问题提供 **至少 3 个选项**，写入 Gatekeep Log 的 `### Requirement Discussion` 小节。
 
 ---
 
@@ -149,6 +149,6 @@ CR 聚焦 **requirements 到 design 的衔接**——哪些行为描述存在多
 向 main-agent 返回：
 
 1. **校验结果摘要**：通过 / 已修正后通过，列出修正项
-2. **CR 待确认**：告知有待用户回答的 CR 问题
+2. **RD 待确认**：告知有待用户回答的 Requirement Discussion 问题
 
 Main-agent 收到后逐题与用户交互，将回答写入对应的 `**A:**` 行。

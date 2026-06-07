@@ -37,8 +37,8 @@
 
 ### Feature 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 goal、Clarification 回答、SSOT
-2. **提取需求要素**：从 goal 的目标、决策、Clarification 中识别外部可观察行为
+1. **读取前置文件**：按「前置读取」清单获取 goal、Goal Clarification 回答、SSOT
+2. **提取需求要素**：从 goal 的目标、决策、Goal Clarification 中识别外部可观察行为
 3. **建立术语表**：识别领域概念，撰写 Glossary
 4. **撰写 Introduction**：说明 feature 范围，明确 Non-scope
 5. **逐条撰写 Requirement**：每条包含 User Story + AC（EARS 格式）
@@ -50,7 +50,7 @@
 ### Feature 前置读取
 
 1. `<spec-dir>/<name>/goal.md`
-2. Goal 中 Clarification 已回答项（必须反映到 requirements）
+2. Goal 中 Goal Clarification 已回答项（必须反映到 requirements）
 3. 相关 SSOT（`docs/state/`）
 
 ### Feature 关键约束
@@ -129,7 +129,7 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 
 ### Bugfix 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 goal、Clarification 回答、SSOT、相关源代码
+1. **读取前置文件**：按「前置读取」清单获取 goal、Goal Clarification 回答、SSOT、相关源代码
 2. **复现分析**：阅读源代码，理解 bug 触发路径，撰写 Reproduction Steps
 3. **描述当前行为**：用 EARS 格式（不含 SHALL）描述 defect 行为
 4. **描述期望行为**：用 EARS 格式（含 SHALL）描述修复后正确行为
@@ -142,7 +142,7 @@ Requirements 聚焦外部可观察行为，不应包含实现细节。
 ### Bugfix 前置读取
 
 1. `<spec-dir>/<name>/goal.md`
-2. Goal 中 Clarification 已回答项
+2. Goal 中 Goal Clarification 已回答项
 3. 相关 SSOT（`docs/state/`）
 4. 相关源代码（复现路径涉及的模块）
 

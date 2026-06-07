@@ -7,6 +7,7 @@ namespace AiProfileManager\Tests;
 use AiProfileManager\Service\AbilityEntry;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\AbilityRegistryException;
+use AiProfileManager\Service\InvalidScopeException;
 use PHPUnit\Framework\TestCase;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
 
@@ -69,7 +70,6 @@ YAML;
         self::assertSame('A test rule', $result['rules'][0]->description);
         self::assertSame(['cursor' => '.cursor/rules/my-rule.mdc', 'kiro' => '.kiro/steering/my-rule.md'], $result['rules'][0]->targets);
         self::assertSame('rule', $result['rules'][0]->type);
-        self::assertSame(['project'], $result['rules'][0]->scopes);
 
         self::assertCount(1, $result['agents']);
         self::assertSame('my-agent', $result['agents'][0]->path);
@@ -237,6 +237,271 @@ YAML;
         self::assertCount(2, $result['hooks']);
         self::assertSame(['kiro' => '.kiro/hooks/kiro-only.kiro.hook'], $result['hooks'][0]->targets);
         self::assertSame(['cursor' => '.cursor/hooks/cursor-only/'], $result['hooks'][1]->targets);
+    }
+
+    public function testParseThrowsInvalidScopeExceptionForLegacyGlobalSetupKey(): void
+    {
+        $yaml = <<<'YAML'
+global-setup:
+  includes:
+    - skill:apm
+
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+
+        $this->expectException(InvalidScopeException::class);
+        $this->expectExceptionMessageMatches('/Rename.*bootstrap/i');
+        $registry->parse();
+    }
+
+    public function testParseThrowsInvalidScopeExceptionForLegacyScopesField(): void
+    {
+        $yaml = <<<'YAML'
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+    scopes:
+      - project
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+
+        $this->expectException(InvalidScopeException::class);
+        $this->expectExceptionMessageMatches('/Remove the scopes field/i');
+        $registry->parse();
+    }
+
+    public function testParseFailFastOnFirstViolation(): void
+    {
+        // Both global-setup key AND scopes field present — only first violation throws
+        $yaml = <<<'YAML'
+global-setup:
+  includes:
+    - skill:apm
+
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+    scopes:
+      - project
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+
+        try {
+            $registry->parse();
+            self::fail('Expected InvalidScopeException was not thrown');
+        } catch (InvalidScopeException $e) {
+            // global-setup is checked first, so that's what should throw
+            self::assertStringContainsString('global-setup', $e->getMessage());
+            self::assertStringNotContainsString('scopes field', $e->getMessage());
+        }
+    }
+
+    public function testBootstrapIncludesReturnsTypedEntries(): void
+    {
+        $yaml = <<<'YAML'
+bootstrap:
+  includes:
+    - skill:apm
+    - rule:git:git-conventions
+    - agent:code-reviewer
+
+rules:
+  - path: git:git-conventions
+    description: Git conventions
+    targets:
+      cursor: .cursor/rules/git.mdc
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+        $result = $registry->bootstrapIncludes();
+
+        self::assertCount(3, $result);
+        self::assertSame(['type' => 'skill', 'path' => 'apm'], $result[0]);
+        self::assertSame(['type' => 'rule', 'path' => 'git:git-conventions'], $result[1]);
+        self::assertSame(['type' => 'agent', 'path' => 'code-reviewer'], $result[2]);
+    }
+
+    public function testBootstrapIncludesReturnsEmptyWhenSectionMissing(): void
+    {
+        $yaml = <<<'YAML'
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+        $result = $registry->bootstrapIncludes();
+
+        self::assertSame([], $result);
+    }
+
+    public function testBootstrapIncludesReturnsEmptyWhenIncludesEmpty(): void
+    {
+        $yaml = <<<'YAML'
+bootstrap:
+  includes: []
+
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+        $result = $registry->bootstrapIncludes();
+
+        self::assertSame([], $result);
+    }
+
+    public function testBootstrapIncludesSkipsInvalidEntries(): void
+    {
+        $yaml = <<<'YAML'
+bootstrap:
+  includes:
+    - skill:apm
+    - 12345
+    - no-colon-here
+    - ""
+    - "rule:"
+    - ":no-type"
+    - agent:valid-agent
+
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+        $result = $registry->bootstrapIncludes();
+
+        // Only valid entries with non-empty type AND path: skill:apm, agent:valid-agent
+        self::assertCount(2, $result);
+        self::assertSame(['type' => 'skill', 'path' => 'apm'], $result[0]);
+        self::assertSame(['type' => 'agent', 'path' => 'valid-agent'], $result[1]);
+    }
+
+    public function testValidateBootstrapIncludesPassesWhenAllRefsExist(): void
+    {
+        $yaml = <<<'YAML'
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+
+skills:
+  - path: apm
+    description: APM skill
+    targets:
+      cursor: .cursor/skills/apm/
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+
+        // All references exist — no exception should be thrown
+        $registry->validateBootstrapIncludes([
+            ['type' => 'rule', 'path' => 'my-rule'],
+            ['type' => 'skill', 'path' => 'apm'],
+        ]);
+
+        // If we reach here, the method did not throw
+        $this->addToAssertionCount(1);
+    }
+
+    public function testValidateBootstrapIncludesThrowsOnInvalidRef(): void
+    {
+        $yaml = <<<'YAML'
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+
+        try {
+            $registry->validateBootstrapIncludes([
+                ['type' => 'skill', 'path' => 'nonexistent'],
+            ]);
+            self::fail('Expected AbilityRegistryException was not thrown');
+        } catch (AbilityRegistryException $e) {
+            self::assertStringContainsString('skill', $e->getMessage());
+            self::assertStringContainsString('nonexistent', $e->getMessage());
+            self::assertStringContainsString('bootstrap.includes', $e->getMessage());
+        }
+    }
+
+    public function testValidateBootstrapIncludesFailFastOnFirst(): void
+    {
+        $yaml = <<<'YAML'
+rules:
+  - path: my-rule
+    description: A rule
+    targets:
+      cursor: .cursor/rules/my-rule.mdc
+YAML;
+
+        $path = $this->tmpDir . '/abilities.yaml';
+        file_put_contents($path, $yaml);
+
+        $registry = new AbilityRegistry($path);
+
+        try {
+            $registry->validateBootstrapIncludes([
+                ['type' => 'skill', 'path' => 'first-invalid'],
+                ['type' => 'agent', 'path' => 'second-invalid'],
+            ]);
+            self::fail('Expected AbilityRegistryException was not thrown');
+        } catch (AbilityRegistryException $e) {
+            // Fail-fast: only first invalid reference appears
+            self::assertStringContainsString('first-invalid', $e->getMessage());
+            self::assertStringNotContainsString('second-invalid', $e->getMessage());
+        }
     }
 
 }

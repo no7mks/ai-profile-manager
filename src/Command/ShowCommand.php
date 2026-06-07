@@ -19,12 +19,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 final class ShowCommand extends Command
 {
+    use HandlesDeployScopeOption;
+
     /** @var list<string> */
     private const KNOWN_TYPES = ['rule', 'agent', 'skill', 'hook', 'gitignore', 'prompt'];
 
     public function __construct(
         private readonly ShowStatusPresenter $presenter,
-        private readonly DeployRootResolver $scopeResolver = new DeployRootResolver(),
     ) {
         parent::__construct();
     }
@@ -42,22 +43,29 @@ final class ShowCommand extends Command
                 $installer->packageRoot(),
                 $scopeResolver,
             ),
-            $scopeResolver,
         );
     }
 
     protected function configure(): void
     {
         $this->setName('show');
-        $this->setDescription('Show conventional abilities with install status per deploy scope.');
+        $this->setDescription('Show conventional abilities with install status.');
         $this->addOption('target', 't', InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY, 'Target IDE/CLI tool.');
-        $this->addOption('scope', null, InputOption::VALUE_REQUIRED, 'Filter by deploy scope (project or user). Omit for merged user+project view.');
+        $this->configureDeployScopeOption();
         $this->addOption('type', null, InputOption::VALUE_REQUIRED, 'Filter by ability type (rule, agent, skill, hook, gitignore, prompt).');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
+
+        try {
+            $this->rejectIfScopeOptionPresent($input);
+        } catch (InvalidScopeException $e) {
+            $io->error($e->getMessage());
+            return Command::FAILURE;
+        }
+
         /** @var array<int, string> $targets */
         $targets = $input->getOption('target');
         $targets = $targets === [] ? AppConfig::DEFAULT_TARGETS : array_values(array_unique($targets));
@@ -76,20 +84,7 @@ final class ShowCommand extends Command
             return Command::FAILURE;
         }
 
-        /** @var string|null $scopeOption */
-        $scopeOption = $input->getOption('scope');
-        $scopeFilter = null;
-        if ($scopeOption !== null) {
-            try {
-                $scopeFilter = $this->scopeResolver->parseScopeOption($scopeOption);
-            } catch (InvalidScopeException $e) {
-                $io->error($e->getMessage());
-
-                return Command::FAILURE;
-            }
-        }
-
-        foreach ($this->presenter->lines($scopeFilter, $targets, $typeFilter) as $line) {
+        foreach ($this->presenter->lines($targets, $typeFilter) as $line) {
             $io->writeln($line);
         }
 

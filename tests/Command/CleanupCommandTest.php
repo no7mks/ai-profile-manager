@@ -193,7 +193,70 @@ final class CleanupCommandTest extends TestCase
         $exit = $tester->execute([]);
 
         self::assertSame(Command::SUCCESS, $exit);
-        self::assertMatchesRegularExpression('#/apm\s+init#i', $tester->getDisplay());
+        $display = $tester->getDisplay();
+        self::assertMatchesRegularExpression('#/apm\s+init#i', $display);
+
+        // AC 1: 不包含遗留用语
+        self::assertStringNotContainsString('user-scope', $display);
+        self::assertStringNotContainsString('user scope', $display);
+        self::assertStringNotContainsString('global-setup', $display);
+    }
+
+    public function testFailureOutputDoesNotContainReinstallHint(): void
+    {
+        // 构造一个包含 kiro hook 的 package，利用目录权限使 unlink 失败
+        $pkg = $this->tmpDir . '/pkg-fail';
+        mkdir($pkg . '/hooks', 0775, true);
+        file_put_contents($pkg . '/hooks/bad-hook.kiro.hook', 'hook content');
+
+        $yaml = implode("\n", [
+            'skills: []',
+            'rules: []',
+            'agents: []',
+            'hooks:',
+            '  - path: bad-hook',
+            '    description: Hook that will fail unlink',
+            '    targets:',
+            '      kiro: .kiro/hooks/bad-hook.kiro.hook',
+        ]) . "\n";
+        file_put_contents($pkg . '/abilities.yaml', $yaml);
+
+        $proj = $this->tmpDir . '/proj-fail';
+        mkdir($proj . '/.kiro/hooks', 0775, true);
+        file_put_contents($proj . '/.kiro/hooks/bad-hook.kiro.hook', 'hook content');
+        // 将目录设为只读使得 unlink 失败
+        chmod($proj . '/.kiro/hooks', 0555);
+        chdir($proj);
+
+        $registry = new AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(
+            registry: $registry,
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+
+        // 抑制 unlink permission denied warning（预期行为）
+        set_error_handler(static fn(): bool => true, E_WARNING);
+        try {
+            $tester = new CommandTester(new CleanupCommand($installer));
+            $exit = $tester->execute([]);
+        } finally {
+            restore_error_handler();
+            // 恢复权限便于清理
+            chmod($proj . '/.kiro/hooks', 0775);
+        }
+
+        $display = $tester->getDisplay();
+        if ($exit === Command::SUCCESS) {
+            self::markTestIncomplete('Cannot reliably produce failure in this environment (running as root?)');
+
+            return;
+        }
+
+        self::assertSame(Command::FAILURE, $exit);
+        // AC 3: 失败时不输出引导提示
+        self::assertStringNotContainsString('To reinstall project abilities', $display);
     }
 
     public function testExecuteDelegatesToInstallerUninstallProjectScope(): void

@@ -5,9 +5,11 @@ description: "当用户提到 graphify、知识图谱、依赖分析、模块耦
 
 # /graphify
 
-将任意文件夹（代码、文档、论文、图片、视频）转化为可查询的知识图谱，输出交互式 HTML、GraphRAG-ready JSON 和 GRAPH_REPORT.md。
+Graphify 可以将任意文件夹（代码、文档、论文、图片、视频）转化为可查询的知识图谱。
 
 ## 用法速查
+
+用户应使用如下命令方式查询 Graphify 提供的知识图谱，而不是直接读取 `graphify-out/` 目录下的文件。
 
 ```
 /graphify init                                        # 等同于 /graphify .（首次构建）
@@ -32,16 +34,9 @@ description: "当用户提到 graphify、知识图谱、依赖分析、模块耦
 /graphify explain "X"                                 # 单节点的邻居与上下文解释
 ```
 
-## 调用规则
+## 路由规则
 
-- 若用户输入 `/graphify --help` 或 `-h`，直接打印上方用法速查并停止，不执行任何命令
-- 若未提供路径，默认使用 `.`（当前目录），不要询问用户
-- `/graphify init` 等同于 `/graphify .`（首次构建的语义别名）
-- `/graphify update` 等同于 `/graphify . --update`（增量更新的语义别名）
-
-## 任务路由
-
-根据用户意图选择对应流程，所有路由平级：
+根据用户意图选择对应流程，进入相应子路由。
 
 ### 构建图谱
 

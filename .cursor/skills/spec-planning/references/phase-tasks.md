@@ -8,7 +8,6 @@
 
 - [触发条件](#触发条件)
 - [执行步骤](#执行步骤)
-- [前置读取](#前置读取)
 - [关键约束](#关键约束)
 - [产物格式](#产物格式)
   - [文档 Section 结构](#文档-section-结构)
@@ -29,27 +28,20 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 design、GK Clarification、requirements
-2. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
-3. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
-4. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
-5. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
-6. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
-7. **添加 E2E 测试 task**：覆盖关键用户场景
-8. **添加文档收敛 task**：与 design Impact Analysis 一致
-9. **添加 Code Review task**：委托给 code-reviewer sub-agent
-10. **生成 Task Dependency Graph**：JSON waves 格式
-11. **写入产物**：按文档结构写入 `tasks.md`
-12. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
-13. **输出完成报告**：按「完成后输出」格式报告
-
----
-
-## 前置读取
-
-1. `<spec-dir>/<name>/design.md`
-2. design Gatekeep Log 中已回答的 Clarification
-3. `<spec-dir>/<name>/requirements.md`
+1. **读取前序产出**：读取前序步骤的产出物（`goal.md`, `requirements.md`, `design.md`, `gk-logs.md`），了解当前状态
+2. **知识图谱分析**：若项目维护了持久化的知识图谱，必须通过相关查询模块依赖、调用链、影响面等
+3. **识别实现单元**：从 design 的 Components/Interfaces 中提取可独立实现的单元
+4. **编排任务顺序**：根据依赖关系确定 top-level task 顺序，遵循「顶层结构约束」
+5. **拆分 sub-task**：每个 top-level task 拆分为 sub-task，每个 sub-task 引用对应 Requirement
+6. **编排 Test First**：每个功能 sub-task 内部按 RED → GREEN 顺序编排
+7. **添加 Checkpoint**：每个 top-level task 末尾添加 checkpoint sub-task
+8. **添加 E2E 测试 task**：覆盖关键用户场景
+9. **添加文档收敛 task**：与 design Impact Analysis 一致
+10. **添加 Code Review task**：委托给 code-reviewer sub-agent
+11. **生成 Task Dependency Graph**：JSON waves 格式
+12. **写入产物**：按文档结构写入 `tasks.md`
+13. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
+14. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 
@@ -98,6 +90,7 @@
 - 包含 state 文档更新 sub-task（与 design Impact Analysis 一致）
 - 包含 manual 文档更新 sub-task（如适用）
 - 包含 migration guide sub-task（如适用）
+- 若项目维护了知识图谱，包含知识图谱更新 sub-task（增量更新变更文件）
 - 包含 checkpoint sub-task
 
 #### Code Review task 要求
@@ -155,7 +148,7 @@
 - [ ] 1.N Checkpoint
   - 运行验证：`<具体命令>`（至少静态分析 + 单元测试）
   - （如本 task 改变了系统事实）更新 `docs/state/<相关文件>.md`
-  - commit: `<scope>: <描述>`
+  - commit: `<改动范围>` & 符合 `git-conventions` 的 message
 ```
 
 ### Task Dependency Graph
@@ -235,14 +228,15 @@
   - [ ] 1.2 Checkpoint
     - 运行验证：`<具体命令>`（至少静态分析 + 单元测试；见 `PROJECT.md`）
     - （如有系统事实变化）更新 `docs/state/<file>.md`
-    - commit: `<scope>: <描述>`
+    - commit: `<改动范围>` & 符合 `git-conventions` 的 message
 
 - [ ] N+1. E2E 测试
   - [ ] N+1.1 <场景>
 
 - [ ] N+2. 文档收敛
   - [ ] N+2.1 更新 state 文档
-  - [ ] N+2.2 Checkpoint
+  - [ ] N+2.2 更新知识图谱（若项目支持）
+  - [ ] N+2.3 Checkpoint
 
 - [ ] Last. Code Review
   - 委托给 code-reviewer sub-agent 执行

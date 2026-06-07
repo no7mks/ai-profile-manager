@@ -6,6 +6,7 @@ namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
 use AiProfileManager\Service\Installer;
+use AiProfileManager\Service\InvalidScopeException;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -40,6 +41,13 @@ final class AgentInstallCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
+        try {
+            $this->rejectIfScopeOptionPresent($input);
+        } catch (InvalidScopeException $e) {
+            $io->error($e->getMessage());
+            return Command::FAILURE;
+        }
+
         /** @var array<int, string> $agents */
         $agents = $input->getArgument('agents');
         /** @var array<int, string> $targets */
@@ -58,17 +66,9 @@ final class AgentInstallCommand extends Command
             return Command::FAILURE;
         }
 
-        $scope = $this->resolveDeployScopeOption($input, $io);
-        if ($scope === null) {
-            return Command::FAILURE;
-        }
-
         $typed = ['skills' => [], 'rules' => [], 'agents' => $agents];
-        if (!$this->guardInstallBatch($this->installer, $scope, $typed, $io)) {
-            return Command::FAILURE;
-        }
 
-        $result = $this->installer->installTyped($typed, $targets, null, $scope);
+        $result = $this->installer->installTyped($typed, $targets);
         foreach ($result['lines'] as $line) {
             $io->writeln($line);
         }

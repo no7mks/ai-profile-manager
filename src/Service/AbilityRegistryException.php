@@ -21,4 +21,9 @@ final class AbilityRegistryException extends \RuntimeException
     {
         return new self("Invalid YAML in {$path}: {$reason}");
     }
+
+    public static function invalidBootstrapReference(string $type, string $path): self
+    {
+        return new self("bootstrap.includes references non-existent {$type} '{$path}'. Fix abilities.yaml before running bootstrap.");
+    }
 }

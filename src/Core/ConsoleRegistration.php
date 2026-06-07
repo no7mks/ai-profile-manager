@@ -73,7 +73,7 @@ final class ConsoleRegistration
         $app->addCommand(new PresetRemoveAbilityCommand($presetRegistry));
         $app->addCommand(new PresetDeleteCommand($presetRegistry));
         $app->addCommand(UpdateCommand::create($installer));
-        $app->addCommand(GlobalSetupCommand::create($installer));
+        $app->addCommand(new GlobalSetupCommand());
         $app->addCommand(new CleanupCommand($installer));
     }
 }

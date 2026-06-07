@@ -4,18 +4,15 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Tests;
 
-use AiProfileManager\Config\DeployScope;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\DeployRootResolver;
 use AiProfileManager\Service\InstallationProbe;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
-use AiProfileManager\Tests\Support\RestoresEnvTrait;
 use PHPUnit\Framework\TestCase;
 
 final class InstallationProbeTest extends TestCase
 {
     use RemovesDirTrait;
-    use RestoresEnvTrait;
 
     private string $tmpDir;
 
@@ -43,7 +40,7 @@ final class InstallationProbeTest extends TestCase
         $probe = $this->createProbe();
 
         self::assertTrue(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor', DeployScope::Project),
+            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor'),
         );
     }
 
@@ -54,7 +51,7 @@ final class InstallationProbeTest extends TestCase
         $probe = $this->createProbe();
 
         self::assertFalse(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor', DeployScope::Project),
+            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor'),
         );
     }
 
@@ -65,19 +62,19 @@ final class InstallationProbeTest extends TestCase
         $probe = $this->createProbe();
 
         self::assertTrue(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor', DeployScope::Project),
+            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor'),
         );
         self::assertFalse(
-            $probe->isPresent('rule', 'safety:writing-conventions', 'cursor', DeployScope::Project),
+            $probe->isPresent('rule', 'safety:writing-conventions', 'cursor'),
         );
 
         $this->mkdirForFile('.cursor/rules/safety/writing-conventions.mdc', '# safety rule');
 
         self::assertTrue(
-            $probe->isPresent('rule', 'safety:writing-conventions', 'cursor', DeployScope::Project),
+            $probe->isPresent('rule', 'safety:writing-conventions', 'cursor'),
         );
         self::assertTrue(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor', DeployScope::Project),
+            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor'),
         );
     }
 
@@ -89,41 +86,7 @@ final class InstallationProbeTest extends TestCase
         $probe = $this->createProbe();
 
         self::assertTrue(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor', DeployScope::Project),
-        );
-    }
-
-    public function testUserScopeUsesHomeRoot(): void
-    {
-        $home = $this->tmpDir . '/home';
-        mkdir($home, 0775, true);
-        $this->withEnv('HOME', $home);
-
-        $rulePath = '.cursor/rules/doc/writing-conventions.mdc';
-        $this->mkdirForFileUnder($home, $rulePath, '# user rule');
-
-        $probe = $this->createProbe();
-
-        self::assertTrue(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor', DeployScope::User),
-        );
-    }
-
-    public function testUserScopeFalseWhenFileOnlyInProjectWorkspace(): void
-    {
-        $home = $this->tmpDir . '/home';
-        mkdir($home, 0775, true);
-        $this->withEnv('HOME', $home);
-
-        $this->mkdirForFile('.cursor/rules/doc/writing-conventions.mdc', '# project only');
-
-        $probe = $this->createProbe();
-
-        self::assertTrue(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor', DeployScope::Project),
-        );
-        self::assertFalse(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor', DeployScope::User),
+            $probe->isPresent('rule', 'doc:writing-conventions', 'cursor'),
         );
     }
 
@@ -132,7 +95,7 @@ final class InstallationProbeTest extends TestCase
         $probe = $this->createProbe();
 
         self::assertFalse(
-            $probe->isPresent('rule', 'missing:rule', 'cursor', DeployScope::Project),
+            $probe->isPresent('rule', 'missing:rule', 'cursor'),
         );
     }
 
@@ -141,7 +104,7 @@ final class InstallationProbeTest extends TestCase
         $probe = $this->createProbe();
 
         self::assertFalse(
-            $probe->isPresent('rule', 'doc:writing-conventions', 'kiro', DeployScope::Project),
+            $probe->isPresent('rule', 'doc:writing-conventions', 'kiro'),
         );
     }
 

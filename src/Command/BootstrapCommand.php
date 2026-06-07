@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace AiProfileManager\Command;
 
 use AiProfileManager\Config\AppConfig;
+use AiProfileManager\Config\PackagePaths;
+use AiProfileManager\Service\AbilityRegistry;
+use AiProfileManager\Service\Installer;
 use AiProfileManager\Service\ProjectInitializer;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -16,6 +19,8 @@ final class BootstrapCommand extends Command
 {
     public function __construct(
         private readonly ?ProjectInitializer $initializer = null,
+        private readonly ?AbilityRegistry $registry = null,
+        private readonly ?Installer $installer = null,
     ) {
         parent::__construct();
     }
@@ -23,7 +28,7 @@ final class BootstrapCommand extends Command
     protected function configure(): void
     {
         $this->setName('bootstrap');
-        $this->setDescription('Install project scaffold (docs/, issues/, AGENTS.md) only.');
+        $this->setDescription('Install project scaffold and bootstrap abilities.');
         $this->addOption(
             'target',
             't',
@@ -34,7 +39,7 @@ final class BootstrapCommand extends Command
             'force',
             'f',
             InputOption::VALUE_NONE,
-            'Overwrite existing scaffold files when docs/, issues/, or AGENTS.md already exist.'
+            'Overwrite existing scaffold files and force-reinstall abilities.'
         );
     }
 
@@ -59,6 +64,7 @@ final class BootstrapCommand extends Command
 
         $force = (bool) $input->getOption('force');
 
+        // --- Phase 1: Scaffold ---
         try {
             $initializer = $this->initializer ?? ProjectInitializer::fromPackageLayout();
             foreach ($initializer->init((string) getcwd(), $force, $targets) as $line) {
@@ -67,6 +73,64 @@ final class BootstrapCommand extends Command
         } catch (\Throwable $e) {
             $io->error($e->getMessage());
 
+            return Command::FAILURE;
+        }
+
+        // --- Phase 2: Ability installation ---
+        $registry = $this->registry ?? new AbilityRegistry(PackagePaths::packageRoot() . '/abilities.yaml');
+        $includes = $registry->bootstrapIncludes();
+
+        // AC 8: empty includes → scaffold only, exit 0
+        if ($includes === []) {
+            $io->success("Bootstrap complete. In your agent chat, run '/apm init' to complete SSOT setup.");
+
+            return Command::SUCCESS;
+        }
+
+        // Validate references exist in registry (fail-fast)
+        try {
+            $registry->validateBootstrapIncludes($includes);
+        } catch (\Throwable $e) {
+            $io->error($e->getMessage());
+
+            return Command::FAILURE;
+        }
+
+        // Install each include item
+        $installer = $this->installer ?? new Installer(registry: $registry);
+        $hasFailure = false;
+
+        foreach ($includes as $include) {
+            $type = $include['type'];
+            $path = $include['path'];
+
+            // Build typed items array with only this entry
+            $items = ['skills' => [], 'rules' => [], 'agents' => [], 'hooks' => []];
+            $section = $type . 's'; // skill → skills, rule → rules, etc.
+            if (isset($items[$section])) {
+                $items[$section] = [$path];
+            }
+
+            $result = $installer->installTyped(
+                $items,
+                $targets,
+                null,
+                skipExisting: !$force,
+            );
+
+            // Output installer lines
+            foreach ($result['lines'] as $line) {
+                $io->writeln($line);
+            }
+
+            // Check for failure
+            if ($result['exit_code'] !== 0) {
+                $io->writeln(sprintf('[fail] %s:%s', $type, $path));
+                $hasFailure = true;
+            }
+        }
+
+        if ($hasFailure) {
             return Command::FAILURE;
         }
 
