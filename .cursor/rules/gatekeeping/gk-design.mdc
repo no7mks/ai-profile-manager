@@ -19,7 +19,7 @@ alwaysApply: false
 6. Socratic Review 校验
 7. 目的性审查
 8. 将修正项写入 Gatekeep Log
-9. 生成 Clarification Round（为 tasks 阶段准备）
+9. 生成 Architecture Decision（为 tasks 阶段准备）
 10. Completion：向 main-agent 返回结果
 
 ---
@@ -38,25 +38,32 @@ alwaysApply: false
 
 ## 2. 结构校验
 
-Feature / Hotfix 的 design.md 应包含以下关键 section：
+Feature / Hotfix 的 design.md 必须包含以下 section：
 
-| Section | 必要性 | 说明 |
-|---------|--------|------|
-| 一级标题 | 必须 | 说明本文件定位 |
-| 技术方案主体 | 必须 | 承接 requirements，给出具体技术方案 |
-| 接口 / 数据模型定义 | 必须 | 接口签名、数据模型、模块划分 |
-| `## Impact Analysis` | 必须 | 影响分析 |
-| `## Alternatives Considered` | 推荐 | 备选方案及落选理由 |
+| Section | 必要性 |
+|---------|--------|
+| `## Overview` | 必须 |
+| `## Architecture` | 必须 |
+| `## Components and Interfaces` | 必须 |
+| `## Data Models` | 必须 |
+| `## Correctness Properties` | 推荐 |
+| `## Error Handling` | 推荐 |
+| `## Testing Strategy` | 推荐 |
+| `## Impact Analysis` | 必须 |
+| `## Alternatives Considered` | 推荐 |
 
 Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、测试策略、收敛计划。
 
-如果包含 `## Correctness Properties`，每条 property 必须使用 `### Property N: <名称>` 格式，包含 Validates（格式 `Requirements X.Y, X.Z`，X = Requirement 编号，Y = AC 编号，可省略 .Y 仅引用 Requirement 级别）、条件、保证、违反后果四项。
+如果包含 `## Correctness Properties`，每条 property 必须使用 `### Property N: <名称>` 格式，包含 `**Validates: Requirements X.Y, X.Z**`（整体加粗，X = Requirement 编号，Y = AC 编号，可省略 .Y 仅引用 Requirement 级别）、条件、保证、违反后果四项。
 
 ### 检查项
 
-- [ ] 一级标题存在
-- [ ] 技术方案主体存在，且承接了 requirements 中的需求
-- [ ] 接口签名 / 数据模型有明确定义
+- [ ] 一级标题存在（格式不约束）
+- [ ] `## Overview` section 存在
+- [ ] `## Architecture` section 存在
+- [ ] `## Components and Interfaces` section 存在
+- [ ] `## Data Models` section 存在
+- [ ] `## Impact Analysis` section 存在
 - [ ] 各 section 之间使用 `---` 分隔
 
 ---
@@ -86,6 +93,7 @@ Release spec 的 design 应包含：技术摘要汇总、Issue 修复方案、�
 - [ ] 模块间依赖关系清晰，无循环依赖
 - [ ] 无过度设计
 - [ ] 与 state 文档中描述的现有架构一致
+- [ ] 若项目维护了知识图谱，模块依赖与图谱中的调用关系一致
 
 ---
 
@@ -109,7 +117,7 @@ Design 的核心目的是：**让读者清楚地知道用什么技术方案实�
 
 ### 审查清单
 
-- [ ] **Requirements CR 回应**：用户在 requirements GK CR 中的决策是否在 design 中体现。
+- [ ] **Requirement Discussion 回应**：用户在 requirements GK Requirement Discussion 中的决策是否在 design 中体现。
 - [ ] **技术选型明确**：所有关键技术选型是否有明确结论和理由？
 - [ ] **接口定义可执行**：接口签名、数据模型是否足够具体？
 - [ ] **Requirements 全覆盖**：每条 requirement 是否都有对应的技术方案？
@@ -122,15 +130,17 @@ Design 的核心目的是：**让读者清楚地知道用什么技术方案实�
 
 ## 8. Gatekeep Log
 
-将校验过程中的修正项写入 design.md 末尾的 `## Gatekeep Log` section。
+将校验过程中的修正项写入 `<spec-dir>/<name>/gk-logs.md` 的 `## Design Gatekeep Log` section（不写在 design.md 中）。
 
 ---
 
-## 9. Clarification Round (CR)
+## 9. Architecture Decision (AD)
 
-校验完成后，生成面向 tasks 阶段的 CR 问题（**3 个以上**）。
+校验完成后，生成面向 tasks 阶段的 Architecture Decision 问题（**3 个以上**）。
 
-CR 聚焦 **design 到 tasks 的衔接**——哪些技术决策在拆分为具体 task 时可能存在歧义。
+Architecture Decision 写入 design.md 末尾的 `## Architecture Decision` section（保留在源文件中，不写入 gk-logs.md）。
+
+Architecture Decision 聚焦 **design 到 tasks 的衔接**——哪些技术决策在拆分为具体 task 时可能存在歧义。
 
 聚焦方向：
 - 实现顺序是否有偏好？
@@ -139,9 +149,9 @@ CR 聚焦 **design 到 tasks 的衔接**——哪些技术决策在拆分为具�
 - 技术方案是否有多种等价的拆分方式？
 - 是否有未最终确定的技术细节？
 
-**不应涉及**：行为层面的 trade-off（属于 requirements 阶段）、非功能约束的有无（属于 requirements 阶段）。
+**不应涉及**：行为层面的 trade-off（属于 Requirement Discussion）、非功能约束的有无（属于 Requirement Discussion）。
 
-每个问题提供 **至少 3 个选项**，写入 Gatekeep Log 的 `### Clarification Round` 小节。
+每个问题提供 **至少 3 个选项**，写入 Gatekeep Log 的 `### Architecture Decision` 小节。
 
 ---
 
@@ -150,6 +160,6 @@ CR 聚焦 **design 到 tasks 的衔接**——哪些技术决策在拆分为具�
 向 main-agent 返回：
 
 1. **校验结果摘要**：通过 / 已修正后通过，列出修正项
-2. **CR 待确认**：告知有待用户回答的 CR 问题
+2. **AD 待确认**：告知有待用户回答的 Architecture Decision 问题
 
 Main-agent 收到后逐题与用户交互，将回答写入对应的 `**A:**` 行。

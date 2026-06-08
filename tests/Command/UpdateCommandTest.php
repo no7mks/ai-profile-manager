@@ -87,7 +87,7 @@ final class UpdateCommandTest extends TestCase
             ->method('reportChanges')
             ->with(true)
             ->willReturn([
-                'lines' => ['[ok] Updated skill:demo (project) cursor'],
+                'lines' => ['[ok] Updated skill:demo cursor'],
                 'exit_code' => 0,
             ]);
 

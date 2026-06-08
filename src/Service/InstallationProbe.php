@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace AiProfileManager\Service;
 
-use AiProfileManager\Config\DeployScope;
-
 /**
  * Detects whether an ability is present on disk at its registry target path.
  */
@@ -16,7 +14,7 @@ final class InstallationProbe
         private readonly DeployRootResolver $rootResolver,
     ) {}
 
-    public function isPresent(string $type, string $name, string $target, DeployScope $scope): bool
+    public function isPresent(string $type, string $name, string $target): bool
     {
         $entry = $this->registry->getEntry($type, $name);
         if ($entry === null) {
@@ -28,7 +26,7 @@ final class InstallationProbe
             return false;
         }
 
-        $absolutePath = $this->rootResolver->absoluteTargetPath($scope, $relativePath);
+        $absolutePath = $this->rootResolver->absoluteTargetPath($relativePath);
 
         if ($type === 'skill') {
             return is_dir($absolutePath);

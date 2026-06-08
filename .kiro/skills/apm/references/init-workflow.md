@@ -78,7 +78,9 @@
 
 1. 确认当前目录为**业务仓库根**（用户目标项目）。
 2. 执行 `apm bootstrap`（默认 `-t cursor -t kiro`，除非用户仅使用单平台）。
-3. bootstrap 仅创建 scaffold（`docs/`、`issues/`、`changes/`、`AGENTS.md` 等），**不**安装 preset 或 ability。
+3. bootstrap 执行两项工作：
+   - 创建 scaffold（`docs/`、`issues/`、`changes/`、`AGENTS.md` 等）
+   - 安装 `abilities.yaml` 中 `bootstrap.includes` 列表定义的 ability 到 project scope
 4. 若 scaffold 已存在且无 `--force`，binary 可能报错——向用户确认是否加 `--force` 或跳过。
 5. 安装平台 scope 规则（必装，无需用户确认）：
    - target 包含 kiro → `apm rule:install kiro-scope -t kiro`
@@ -86,7 +88,6 @@
 
 **禁止**：
 - 用无参 `apm install` 代替 bootstrap
-- 在 init 中将 Global Setup List 中的 ability 以 project scope 安装——这些仅由用户事先执行的 `apm global-setup` 提供
 
 ---
 
@@ -279,8 +280,7 @@ Generation 完成后，Agent 向用户展示生成的文件摘要并询问：
 ### 7.3 安装规则
 
 1. 仅安装 registry 中存在的 preset / typed ability；名称不得臆造
-2. **不**安装 Global Setup List 中的 ability 到 project scope
-3. preset 安装失败（校验或 ScopeGuard）时整单不写入，向用户报告后调整计划
+2. preset 安装失败时整单不写入，向用户报告后调整计划
 
 ### 7.4 用户交互
 

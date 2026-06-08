@@ -87,6 +87,7 @@ Release spec 结构不同：task → sub-task → test item 三级嵌套。
 ## 5. 依赖与排序校验
 
 - [ ] top-level task 按依赖关系排序
+- [ ] 若项目维护了知识图谱，依赖顺序与图谱中的调用链一致
 - [ ] 无循环依赖
 - [ ] 并行计划的并行条件成立
 
@@ -173,7 +174,7 @@ Tasks 的核心目的是：**提供一份可直接执行的实现计划，让执
 
 ### 审查清单
 
-- [ ] **Design CR 回应**：用户在 design GK CR 中的决策是否在 tasks 编排中体现。
+- [ ] **Architecture Decision 回应**：用户在 design GK Architecture Decision 中的决策是否在 tasks 编排中体现。
 - [ ] **Design 全覆盖**：tasks 是否覆盖了 design 中的所有模块、接口和实现项？
 - [ ] **可独立执行**：每个 sub-task 的描述是否足够自包含？
 - [ ] **验收闭环**：checkpoint + E2E 测试 + 文档收敛 + code review 是否构成完整验收闭环？
@@ -229,7 +230,8 @@ Feature / Hotfix spec 必须包含文档收敛 top-level task。
 - [ ] 文档收敛 top-level task 存在
 - [ ] 包含 state 文档更新 sub-task
 - [ ] 包含 manual 文档更新 sub-task
-- [ ] 包含 migration guide sub-task
+- [ ] 包含 migration guide sub-task（当有不兼容的变化时）
+- [ ] 若项目维护了知识图谱，包含知识图谱更新 sub-task
 - [ ] 包含 checkpoint sub-task
 - [ ] 文档收敛内容与 design.md 的 Impact Analysis 一致
 

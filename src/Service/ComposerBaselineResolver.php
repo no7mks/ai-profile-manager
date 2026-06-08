@@ -15,7 +15,6 @@ final class ComposerBaselineResolver
     public function __construct(
         private readonly string $packageName = 'no7mks/ai-profile-manager',
         private readonly ?string $overrideInstallPath = null,
-        private readonly UserHomeResolver $userHomeResolver = new UserHomeResolver(),
         private readonly ?bool $isWindows = null,
     ) {
     }
@@ -120,9 +119,8 @@ final class ComposerBaselineResolver
             return $this->windowsComposerHomeCandidates();
         }
 
-        try {
-            $home = $this->userHomeResolver->resolve();
-        } catch (\RuntimeException) {
+        $home = $this->resolveUserHome();
+        if ($home === null) {
             return [];
         }
 
@@ -145,8 +143,10 @@ final class ComposerBaselineResolver
         }
 
         try {
-            $userHome = $this->userHomeResolver->resolve();
-            $candidates[] = $userHome . DIRECTORY_SEPARATOR . '.composer';
+            $userHome = $this->resolveWindowsUserHome();
+            if ($userHome !== null) {
+                $candidates[] = $userHome . DIRECTORY_SEPARATOR . '.composer';
+            }
         } catch (\RuntimeException) {
             // USERPROFILE / HOMEDRIVE+HOMEPATH unavailable — APPDATA-only fallback remains.
         }
@@ -157,6 +157,43 @@ final class ComposerBaselineResolver
     private function isWindowsPlatform(): bool
     {
         return $this->isWindows ?? PHP_OS_FAMILY === 'Windows';
+    }
+
+    /**
+     * Resolves user home directory (Unix: HOME env; Windows: USERPROFILE or HOMEDRIVE+HOMEPATH).
+     */
+    private function resolveUserHome(): ?string
+    {
+        if ($this->isWindowsPlatform()) {
+            return $this->resolveWindowsUserHome();
+        }
+
+        $home = (string) (getenv('HOME') ?: '');
+
+        return $home !== '' ? $home : null;
+    }
+
+    /**
+     * Resolves user home on Windows (USERPROFILE, then HOMEDRIVE+HOMEPATH).
+     */
+    private function resolveWindowsUserHome(): ?string
+    {
+        $userProfile = rtrim((string) (getenv('USERPROFILE') ?: ''), "\\/");
+        if ($userProfile !== '') {
+            return $userProfile;
+        }
+
+        $drive = rtrim((string) (getenv('HOMEDRIVE') ?: ''), "\\/");
+        $path = (string) (getenv('HOMEPATH') ?: '');
+        if ($drive !== '' && $path !== '') {
+            if ($path[0] !== '\\' && $path[0] !== '/') {
+                $path = '\\' . $path;
+            }
+
+            return $drive . $path;
+        }
+
+        return null;
     }
 
     private function installedJsonPath(): ?string

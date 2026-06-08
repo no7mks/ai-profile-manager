@@ -120,6 +120,6 @@ Bugfix 路径用 `Bugfix Phase` 替代 `Requirements Phase`，其余顺序不变
 
 ---
 
-## CR 不写入 gk-logs
+## Discussion 不写入 gk-logs
 
-**CR（Clarification Round）保留在源文件末尾**（requirements.md / design.md 的 `## Clarification Round` section），不写入 gk-logs.md。
+**Goal Clarification（GC）保留在 goal.md 的 `## Goal Clarification` section**；**Requirement Discussion（RD）保留在 requirements.md / bugfix.md 的 `## Requirement Discussion` section**；**Architecture Decision（AD）保留在 design.md 的 `## Architecture Decision` section**。三者均不写入 gk-logs.md。

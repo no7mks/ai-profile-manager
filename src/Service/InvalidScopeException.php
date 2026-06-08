@@ -6,19 +6,23 @@ namespace AiProfileManager\Service;
 
 final class InvalidScopeException extends \InvalidArgumentException
 {
-    private const VALID_SCOPES = 'Valid scopes: project, user.';
-
-    public static function unknownScope(?string $value): self
+    public static function scopeOptionDeprecated(): self
     {
-        $display = $value === null || $value === '' ? '(empty)' : $value;
-
-        return new self("Invalid deploy scope: {$display}. " . self::VALID_SCOPES);
+        return new self('The --scope option has been removed. All operations now target project scope only.');
     }
 
-    public static function projectOnlyInUserScope(string $abilityRef): self
+    public static function globalSetupDeprecated(): self
     {
-        return new self(
-            "Project-only ability \"{$abilityRef}\" cannot be deployed to user scope. " . self::VALID_SCOPES,
-        );
+        return new self("The global-setup command has been removed. Use 'apm bootstrap' instead.");
+    }
+
+    public static function legacyScopesField(string $entryPath): self
+    {
+        return new self("Legacy 'scopes' field found on entry '{$entryPath}'. Remove the scopes field — all entries are now project-only.");
+    }
+
+    public static function legacyGlobalSetupKey(): self
+    {
+        return new self("Legacy 'global-setup' key found. Rename to 'bootstrap'.");
     }
 }

@@ -48,7 +48,7 @@ final class CleanupCommand extends Command
         if ($result['exit_code'] === 0) {
             $output->writeln('');
             $output->writeln(
-                'To reinstall project abilities, run /apm init (user-scope global-setup is unchanged).',
+                'To reinstall project abilities, run /apm init.',
             );
         }
 

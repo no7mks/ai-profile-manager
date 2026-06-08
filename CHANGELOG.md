@@ -4,6 +4,28 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.10.0] - 2026-06-08
+
+### Breaking
+
+- 废弃 `--scope` 参数。
+- 废弃 `global-setup` 命令。
+
+### Changed
+
+- `bootstrap` 统一 scaffold + ability 安装。
+- 三阶段首装缩减为两阶段。
+
+### Removed
+
+- user scope 概念移除。
+- `quick-plan-conventions` rule 删除。
+
+### Added
+
+- `quick-plan` Cursor Skill。
+- `build-plan` Cursor Skill。
+
 ## [0.9.0] - 2026-06-04
 
 ### Fixed

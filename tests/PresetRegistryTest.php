@@ -7,6 +7,7 @@ namespace AiProfileManager\Tests;
 use AiProfileManager\Service\AbilityRegistry;
 use AiProfileManager\Service\PresetRegistry;
 use AiProfileManager\Tests\Support\RemovesDirTrait;
+use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
 final class PresetRegistryTest extends TestCase
@@ -170,11 +171,12 @@ YAML;
         self::assertSame(['type' => 'rule', 'path' => 'valid-path'], $preset['includes'][0]);
         self::assertSame(['type' => 'skill', 'path' => 'another-valid'], $preset['includes'][1]);
     }
-    public function testPackageAbilitiesGlobalSetupIncludesResolve(): void
+    #[Group('deprecated-scope')]
+    public function testPackageAbilitiesBootstrapIncludesResolve(): void
     {
         $path = dirname(__DIR__) . '/abilities.yaml';
         $registry = new AbilityRegistry($path);
-        $includes = $registry->globalSetupIncludes();
+        $includes = $registry->bootstrapIncludes();
 
         self::assertNotEmpty($includes);
 
@@ -184,12 +186,11 @@ YAML;
             self::assertNotNull(
                 $entry,
                 sprintf(
-                    "Ability '%s:%s' in global-setup not found in abilities.yaml",
+                    "Ability '%s:%s' in bootstrap.includes not found in abilities.yaml",
                     $include['type'],
                     $include['path'],
                 ),
             );
-            self::assertSame(['user', 'project'], $entry->scopes);
         }
     }
 

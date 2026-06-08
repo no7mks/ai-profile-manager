@@ -60,7 +60,7 @@ description: 当用户说 "gatekeep" / "GK" / "校验 spec" / "review spec" 或�
 1. **不重写，只修正**：gatekeeper 的职责是校验和修正，不是重写。
 2. **标准来源**：校验标准来自对应阶段的 rule（`gk-requirements` / `gk-design` / `gk-tasks`）。
 3. **修正即执行**：发现问题直接修正文档，不要只列出问题让用户自己改。
-4. **Gatekeep Log**：校验完成后，将 Socratic Review 和 Gatekeep Log 写入 spec 目录下的 `gk-logs.md`（按阶段分 section），不写在源文件中。CR（Clarification Round）保留在源文件末尾。
+4. **Gatekeep Log**：校验完成后，将 Socratic Review 和 Gatekeep Log 写入 spec 目录下的 `gk-logs.md`（按阶段分 section），不写在源文件中。Discussion（Goal Clarification / Requirement Discussion / Architecture Decision）保留在源文件末尾。
 
 ---
 
@@ -85,5 +85,5 @@ description: 当用户说 "gatekeep" / "GK" / "校验 spec" / "review spec" 或�
 - 校验了哪个阶段
 - 校验结果（通过 / 已修正后通过）
 - 修正项摘要（如有）
-- **CR 问题全文**：如果生成了 Clarification Round 问题，必须将所有 CR 问题逐条列出（含编号、完整问题文本和选项）。主 agent 收到后须**逐个**向用户提问（每次只问一个，等用户回答后再问下一个），不得一次性全部抛出。
+- **Discussion 问题全文**：如果生成了 Discussion 问题（Requirement Discussion 或 Architecture Decision），必须将所有问题逐条列出（含编号、完整问题文本和选项）。主 agent 收到后须**逐个**向用户提问（每次只问一个，等用户回答后再问下一个），不得一次性全部抛出。
 - 下一步建议（如还有未校验的阶段）

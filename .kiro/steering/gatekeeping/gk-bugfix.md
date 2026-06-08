@@ -19,7 +19,7 @@ description: Spec gatekeeper 校验 bugfix 阶段的详细指引。由 spec-gate
 6. Socratic Review 校验
 7. 目的性审查
 8. 将修正项写入 Gatekeep Log
-9. 生成 Clarification Round（为 design 阶段准备）
+9. 生成 Requirement Discussion（为 design 阶段准备）
 10. Completion：向 main-agent 返回结果
 
 ---
@@ -122,7 +122,7 @@ Bugfix 文档的核心目的是：**让读者清楚地知道什么坏了、应�
 
 ### 审查清单
 
-- [ ] **Goal CR 回应**：goal.md 中 Clarification Round 的用户决策是否在 bugfix.md 中体现。
+- [ ] **Goal Clarification 回应**：goal.md 中 Goal Clarification 的用户决策是否在 bugfix.md 中体现。
 - [ ] **Defect 清晰度**：读完 Current Behavior 后能否准确理解 bug 表现？
 - [ ] **Fix 明确性**：Expected Behavior 是否构成充分的修复验收条件？
 - [ ] **防护充分性**：Unchanged Behavior 是否覆盖了关键的相邻功能？
@@ -138,13 +138,13 @@ Bugfix 文档的核心目的是：**让读者清楚地知道什么坏了、应�
 
 ---
 
-## 9. Clarification Round (CR)
+## 9. Requirement Discussion (RD)
 
-校验完成后，生成面向 design 阶段的 CR 问题（**3 个以上**）。
+校验完成后，生成面向 design 阶段的 Requirement Discussion 问题（**3 个以上**）。
 
-CR 写入 bugfix.md 末尾的 `## Clarification Round` section。
+Requirement Discussion 写入 bugfix.md 末尾的 `## Requirement Discussion` section。
 
-CR 聚焦 **bugfix 到 design 的衔接**——修复方案可能存在多种路径，需要用户在进入 design 前做出决策。
+Requirement Discussion 聚焦 **bugfix 到 design 的衔接**——修复方案可能存在多种路径，需要用户在进入 design 前做出决策。
 
 聚焦方向：
 - 修复范围是否需要限定（最小修复 vs 顺带改善）？
@@ -153,7 +153,7 @@ CR 聚焦 **bugfix 到 design 的衔接**——修复方案可能存在多种路
 - 是否需要向后兼容已有的错误数据？
 - 修复是否需要同步到其他分支？
 
-每个问题提供 **至少 3 个选项**，写入 Gatekeep Log 的 `### Clarification Round` 小节。
+每个问题提供 **至少 3 个选项**，写入 Gatekeep Log 的 `### Requirement Discussion` 小节。
 
 ---
 
@@ -162,6 +162,6 @@ CR 聚焦 **bugfix 到 design 的衔接**——修复方案可能存在多种路
 向 main-agent 返回：
 
 1. **校验结果摘要**：通过 / 已修正后通过，列出修正项
-2. **CR 待确认**：告知有待用户回答的 CR 问题
+2. **RD 待确认**：告知有待用户回答的 Requirement Discussion 问题
 
 Main-agent 收到后逐题与用户交互，将回答写入对应的 `**A:**` 行。

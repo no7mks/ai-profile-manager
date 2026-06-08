@@ -1114,6 +1114,167 @@ final class InstallerTest extends TestCase
         self::assertFileDoesNotExist($project . '/.cursor/rules/git/demo-rule.mdc');
     }
 
+    public function testInstallTypedSkipsAlreadyInstalledWhenSkipExistingIsTrue(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-skip-' . bin2hex(random_bytes(4));
+        // Source-is-Target layout
+        mkdir($pkg . '/.cursor/skills/demo-skill', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/demo-skill/SKILL.md', "demo skill\n");
+        mkdir($pkg . '/.cursor/agents', 0775, true);
+        file_put_contents($pkg . '/.cursor/agents/demo-agent.md', "demo agent\n");
+        mkdir($pkg . '/.cursor/rules/doc', 0775, true);
+        file_put_contents($pkg . '/.cursor/rules/doc/writing-conventions.mdc', "rule content\n");
+        // abilities.yaml
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: demo-skill',
+            '    description: Demo skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+            'rules:',
+            '  - path: doc:writing-conventions',
+            '    description: Doc rule',
+            '    targets:',
+            '      cursor: .cursor/rules/doc/writing-conventions.mdc',
+            'agents:',
+            '  - path: demo-agent',
+            '    description: Demo agent',
+            '    targets:',
+            '      cursor: .cursor/agents/demo-agent.md',
+        ]) . "\n");
+
+        $proj = sys_get_temp_dir() . '/apm-inst-skip-proj-' . bin2hex(random_bytes(4));
+        mkdir($proj, 0775, true);
+        // Pre-install skill (already exists)
+        mkdir($proj . '/.cursor/skills/demo-skill', 0775, true);
+        file_put_contents($proj . '/.cursor/skills/demo-skill/SKILL.md', "old content\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($proj);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $result = $installer->installTyped(
+            items: [
+                'skills' => ['demo-skill'],
+                'rules' => ['doc:writing-conventions'],
+                'agents' => ['demo-agent'],
+            ],
+            targets: ['cursor'],
+            skipExisting: true,
+        );
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        // Already installed skill should be skipped
+        self::assertStringContainsString('[skip] skill:demo-skill (cursor)', $output);
+        // Not installed rule and agent should be installed normally
+        self::assertStringContainsString('[ok] Installed rule doc:writing-conventions -> cursor', $output);
+        self::assertStringContainsString('[ok] Installed agent demo-agent -> cursor', $output);
+        // Skill content should remain unchanged (not overwritten)
+        self::assertSame("old content\n", (string) file_get_contents($proj . '/.cursor/skills/demo-skill/SKILL.md'));
+    }
+
+    public function testInstallTypedDoesNotSkipWhenSkipExistingIsFalse(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-noskip-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/.cursor/skills/demo-skill', 0775, true);
+        file_put_contents($pkg . '/.cursor/skills/demo-skill/SKILL.md', "new content\n");
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills:',
+            '  - path: demo-skill',
+            '    description: Demo skill',
+            '    targets:',
+            '      cursor: .cursor/skills/demo-skill',
+        ]) . "\n");
+
+        $proj = sys_get_temp_dir() . '/apm-inst-noskip-proj-' . bin2hex(random_bytes(4));
+        mkdir($proj . '/.cursor/skills/demo-skill', 0775, true);
+        file_put_contents($proj . '/.cursor/skills/demo-skill/SKILL.md', "old content\n");
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($proj);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(registry: $registry, gitIgnore: new GitIgnoreTemplateService(), packageRoot: $pkg, mirror: new DirectoryMirrorService());
+        $result = $installer->installTyped(
+            items: [
+                'skills' => ['demo-skill'],
+                'rules' => [],
+                'agents' => [],
+            ],
+            targets: ['cursor'],
+            skipExisting: false,
+        );
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        // Should NOT skip — should install normally (no [skip] skill: line)
+        self::assertStringNotContainsString('[skip] skill:', $output);
+        self::assertStringContainsString('[ok] Installed skill demo-skill -> cursor', $output);
+        // File should be overwritten
+        self::assertSame("new content\n", (string) file_get_contents($proj . '/.cursor/skills/demo-skill/SKILL.md'));
+    }
+
+    public function testInstallTypedSkipExistingAlsoSkipsHooks(): void
+    {
+        $pkg = sys_get_temp_dir() . '/apm-inst-skip-hook-' . bin2hex(random_bytes(4));
+        mkdir($pkg . '/hooks', 0775, true);
+        file_put_contents($pkg . '/hooks/check-write-length.kiro.hook', '{"name":"check-write-length","version":"1"}');
+        file_put_contents($pkg . '/abilities.yaml', implode("\n", [
+            'skills: []',
+            'rules: []',
+            'agents: []',
+            'hooks:',
+            '  - path: check-write-length',
+            '    description: Check write length hook',
+            '    targets:',
+            '      kiro: .kiro/hooks/check-write-length.kiro.hook',
+        ]) . "\n");
+
+        $proj = sys_get_temp_dir() . '/apm-inst-skip-hook-proj-' . bin2hex(random_bytes(4));
+        mkdir($proj . '/.kiro/hooks', 0775, true);
+        file_put_contents($proj . '/.kiro/hooks/check-write-length.kiro.hook', '{"old":"data"}');
+
+        $old = getcwd();
+        self::assertNotFalse($old);
+        chdir($proj);
+
+        $registry = new \AiProfileManager\Service\AbilityRegistry($pkg . '/abilities.yaml');
+        $installer = new Installer(
+            registry: $registry,
+            hookInstaller: new HookInstaller(),
+            hookChecker: new HookChecker(),
+            gitIgnore: new GitIgnoreTemplateService(),
+            packageRoot: $pkg,
+            mirror: new DirectoryMirrorService(),
+        );
+        $result = $installer->installTyped(
+            items: [
+                'skills' => [],
+                'rules' => [],
+                'agents' => [],
+                'hooks' => ['check-write-length'],
+            ],
+            targets: ['kiro'],
+            skipExisting: true,
+        );
+
+        chdir($old);
+
+        self::assertSame(0, $result['exit_code']);
+        $output = implode("\n", $result['lines']);
+        self::assertStringContainsString('[skip] hook:check-write-length (kiro)', $output);
+        // Content should remain unchanged
+        self::assertSame('{"old":"data"}', (string) file_get_contents($proj . '/.kiro/hooks/check-write-length.kiro.hook'));
+    }
+
     public function testUninstallProjectScopeSkipsAbsentAbilities(): void
     {
         $pkg = sys_get_temp_dir() . '/apm-uninst-scope-empty-' . bin2hex(random_bytes(4));

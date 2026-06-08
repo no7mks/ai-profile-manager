@@ -1,6 +1,6 @@
 {
   "name": "no7mks/ai-profile-manager",
-  "version": "0.9.0",
+  "version": "0.10.0",
   "description": "CLI tool to install and update AI IDE/CLI abilities.",
   "type": "library",
   "license": "MIT",
@@ -19,7 +19,8 @@
   "require-dev": {
     "phpunit/phpunit": "^13.0",
     "symfony/process": "^8.0",
-    "phpstan/phpstan": "^2.2"
+    "phpstan/phpstan": "^2.2",
+    "giorgiosironi/eris": "^1.1"
   },
   "autoload": {
     "psr-4": {

@@ -8,7 +8,6 @@
 
 - [触发条件](#触发条件)
 - [执行步骤](#执行步骤)
-- [前置读取](#前置读取)
 - [关键约束](#关键约束)
 - [产物格式](#产物格式)
 - [质量要求](#质量要求)
@@ -24,23 +23,18 @@
 
 ## 执行步骤
 
-1. **读取前置文件**：按「前置读取」清单获取 requirements、GK Clarification、SSOT
-2. **设计架构**：确定模块划分、依赖关系、数据流
-3. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
-4. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
-5. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
-6. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
-7. **写入产物**：按文档结构写入 `design.md`
-8. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
-9. **输出完成报告**：按「完成后输出」格式报告
-
----
-
-## 前置读取
-
-1. `<spec-dir>/<name>/requirements.md`
-2. requirements Gatekeep Log 中已回答的 Clarification
-3. 相关 SSOT（`docs/state/`）
+1. **读取前序产出**：读取前序步骤的产出物（`goal.md`, `requirements.md`, `gk-logs.md`），了解当前状态
+2. **设计分析**：
+   - i. 知识图谱分析：若项目维护了持久化的知识图谱，必须通过相关查询模块依赖、调用链、影响面等
+   - ii. 读取相关 SSOT（`docs/state/`）
+3. **设计架构**：确定模块划分、依赖关系、数据流
+4. **定义接口与数据模型**：为每个模块设计接口签名（参数类型、返回类型、异常类型）
+5. **覆盖校验**：逐条检查 requirements 中的每条 Requirement/AC 是否都有对应设计
+6. **Impact Analysis**：逐项检查受影响的 state 文档、行为变化、数据模型变更等
+7. **Alternatives Considered**：列出至少 1-2 个备选方案及落选理由
+8. **写入产物**：按文档结构写入 `design.md`
+9. **Socratic Review**：读取 rule `gatekeeping/gk-log-format.mdc` 获取格式，自检写入 `gk-logs.md`
+10. **输出完成报告**：按「完成后输出」格式报告
 
 ---
 
@@ -83,7 +77,7 @@
 ```markdown
 ### Property N: <名称>
 
-- **Validates**: Requirements X.Y, X.Z（X = Requirement 编号，Y/Z = AC 编号；仅引用到 Requirement 级别时可省略 .Y）
+- **Validates: Requirements X.Y, X.Z**（X = Requirement 编号，Y/Z = AC 编号；仅引用到 Requirement 级别时可省略 .Y）
 - **条件**: <何时成立>
 - **保证**: <系统保证什么>
 - **违反后果**: <如果违反会怎样>
