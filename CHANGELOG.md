@@ -4,6 +4,12 @@
 
 格式参考 [Keep a Changelog](https://keepachangelog.com/zh-CN/1.0.0/)，版本号遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.10.1] - 2026-06-09
+
+### Fixed
+
+- 修正 release 0.10.0 遗漏：归档 note 并补全版本 CHANGELOG 中 Cursor Skill 拆分内容
+
 ## [0.10.0] - 2026-06-08
 
 ### Breaking
