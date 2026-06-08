@@ -1,12 +1,12 @@
-# Graph Report - /Users/zhangminhao/git/ai-profile-manager  (2026-06-07)
+# Graph Report - /Users/zhangminhao/git/ai-profile-manager  (2026-06-08)
 
 ## Corpus Check
-- 2127 files · ~950,727 words
+- 2127 files · ~958,482 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 15589 nodes · 27498 edges · 744 communities detected
-- Extraction: 63% EXTRACTED · 37% INFERRED · 0% AMBIGUOUS · INFERRED: 10227 edges (avg confidence: 0.8)
+- 15589 nodes · 27497 edges · 753 communities detected
+- Extraction: 63% EXTRACTED · 37% INFERRED · 0% AMBIGUOUS · INFERRED: 10226 edges (avg confidence: 0.8)
 - Token cost: 0 input · 0 output
 
 ## Community Hubs (Navigation)
@@ -754,6 +754,15 @@
 - [[_COMMUNITY_Community 741|Community 741]]
 - [[_COMMUNITY_Community 742|Community 742]]
 - [[_COMMUNITY_Community 743|Community 743]]
+- [[_COMMUNITY_Community 744|Community 744]]
+- [[_COMMUNITY_Community 745|Community 745]]
+- [[_COMMUNITY_Community 746|Community 746]]
+- [[_COMMUNITY_Community 747|Community 747]]
+- [[_COMMUNITY_Community 748|Community 748]]
+- [[_COMMUNITY_Community 749|Community 749]]
+- [[_COMMUNITY_Community 750|Community 750]]
+- [[_COMMUNITY_Community 751|Community 751]]
+- [[_COMMUNITY_Community 752|Community 752]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `Assert` - 710 edges
@@ -762,8 +771,8 @@
 4. `TestCase` - 150 edges
 5. `Generators` - 148 edges
 6. `Metadata` - 142 edges
-7. `ForAll` - 108 edges
-8. `getDisplay()` - 107 edges
+7. `getDisplay()` - 109 edges
+8. `ForAll` - 108 edges
 9. `File` - 101 edges
 10. `unbox()` - 100 edges
 
@@ -783,31 +792,31 @@
 
 ### Community 0 - "Community 0"
 Cohesion: 0.0
-Nodes (84): AfterLastTestMethodCalled, AfterLastTestMethodErrored, AfterLastTestMethodFailed, AfterLastTestMethodFinished, AfterTestMethodCalled, AfterTestMethodErrored, AfterTestMethodFailed, AfterTestMethodFinished (+76 more)
+Nodes (98): AfterLastTestMethodCalled, AfterLastTestMethodErrored, AfterLastTestMethodFailed, AfterLastTestMethodFinished, AfterTestMethodCalled, AfterTestMethodErrored, AfterTestMethodFailed, AfterTestMethodFinished (+90 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.0
-Nodes (183): AbstractChunkOutputBuilder, AlwaysFailsTest, Antecedents, ArithmeticProgression, associative(), AssociativeArrayGenerator, AssociativeArrayGeneratorTest, AssociativeArrayTest (+175 more)
+Nodes (110): AgentCheckCommand, AgentInstallCommand, AgentUninstallCommand, Application, ApplicationDescription, ApplicationRunTest, ApplicationTest, ApplicationTester (+102 more)
 
 ### Community 2 - "Community 2"
 Cohesion: 0.0
-Nodes (55): AddConsoleCommandPass, BootstrapLoader, BubbleChart, BuildInformation, CodeCoverage, CodeCoverageFilterRegistry, Colors, Configuration (+47 more)
+Nodes (183): AbstractChunkOutputBuilder, AlwaysFailsTest, Antecedents, ArithmeticProgression, associative(), AssociativeArrayGenerator, AssociativeArrayGeneratorTest, AssociativeArrayTest (+175 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.0
-Nodes (290): Assert, u(), CloningVisitor, CodeExporter, ConstantCollection, ConvertLogTypes, CoverageCloverToReport, CoverageCrap4jToReport (+282 more)
+Nodes (54): AddConsoleCommandPass, BootstrapLoader, Builder, BuildInformation, CodeCoverage, CodeCoverageFilterRegistry, Colors, Configuration (+46 more)
 
 ### Community 4 - "Community 4"
 Cohesion: 0.01
-Nodes (70): Application, ApplicationDescription, ApplicationRunTest, ApplicationTest, ApplicationTester, ArgvInput, ArrayInput, BashCompletionOutput (+62 more)
+Nodes (81): AbstractUnicodeString, convertFromHexToAnsiColorCode(), convertFromRGB(), degradeHexColorToAnsi4(), degradeHexColorToAnsi8(), AsciiSlugger, mb_convert_case(), mb_convert_encoding() (+73 more)
 
 ### Community 5 - "Community 5"
 Cohesion: 0.01
-Nodes (76): AbstractUnicodeString, convertFromHexToAnsiColorCode(), convertFromRGB(), degradeHexColorToAnsi4(), degradeHexColorToAnsi8(), AsciiSlugger, mb_convert_case(), mb_convert_encoding() (+68 more)
+Nodes (240): Assert, CodeExporter, DefaultConfiguration, DOMNodeComparator, testCreatedMockObjectForIntersectionOfInterfaces(), anything(), arrayHasKey(), assertArrayHasKey() (+232 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.0
-Nodes (133): ActualValueIsNotAnObjectException, After, AfterClass, AmbiguousOptionException, AndVersionConstraintGroup, Before, BootstrapScriptDoesNotExistException, ByteString (+125 more)
+Nodes (121): ActualValueIsNotAnObjectException, After, AfterClass, AmbiguousOptionException, AndVersionConstraintGroup, Before, BootstrapScriptDoesNotExistException, ByteString (+113 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.01
@@ -815,63 +824,63 @@ Nodes (134): Assign, _(), a(), b(), be(), c(), Ce(), d() (+126 more)
 
 ### Community 8 - "Community 8"
 Cohesion: 0.01
-Nodes (47): AllowMockObjectsWithoutExpectations, AttributeParser, BackupGlobals, BeforeClass, Builder, CachingParser, Callback, ClassesThatImplementInterface (+39 more)
+Nodes (44): AttributeParser, BackupGlobals, BackupStaticProperties, CachingParser, ClassesThatImplementInterface, ComplexityCollection, CoversClass, CoversClassesThatImplementInterface (+36 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.01
-Nodes (58): Argument, ArrayObjectFilter, Ask, AttributeParentConnectingVisitor, CallableType, ClassLike, CliRequest, CommandDataCollector (+50 more)
+Nodes (67): Argument, ArrayObjectFilter, Ask, AttributeParentConnectingVisitor, CallableType, Callback, ClassLike, CommandDataCollector (+59 more)
 
 ### Community 10 - "Community 10"
 Cohesion: 0.01
-Nodes (59): AgentCheckCommand, AgentInstallCommand, AgentUninstallCommand, AssertionFailedError, BootstrapCommand, BufferedOutput, CheckCommand, CheckService (+51 more)
+Nodes (47): AllowMockObjectsWithoutExpectations, BackedUpEnvironmentVariable, ChildProcessFinished, DataFromTestDependency, DependsOnClass, DoesNotPerformAssertions, testCreatedMockObject(), testCreatedPartialMockObject() (+39 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.01
-Nodes (35): BackedUpEnvironmentVariable, BackupStaticProperties, ChildProcessFinished, DataFromTestDependency, DependsOnClass, DoesNotPerformAssertions, testCreatedPartialMockObject(), testMarkedAsIncomplete() (+27 more)
+Nodes (31): AbilityRegistry, AbilityRegistryException, AbilityRegistryMethodsTest, AbilityRegistryTest, AbilityUpdateService, AbilityUpdateServiceTest, j(), CleanupCommand (+23 more)
 
 ### Community 12 - "Community 12"
 Cohesion: 0.01
-Nodes (41): ComposerAutoloaderInit6861e8f77b6303f5a5529cea4004485b, BootstrapCommandTest, CheckCommandTest, CleanupCommandTest, CommandEdgeCasesTest, CommandErrorPathsTest, ComposerBaselineResolver, ComposerBaselineResolverTest (+33 more)
+Nodes (40): ComposerAutoloaderInit6861e8f77b6303f5a5529cea4004485b, BootstrapCommandTest, CheckCommandTest, CleanupCommandTest, CommandEdgeCasesTest, CommandErrorPathsTest, ComposerBaselineResolver, ComposerBaselineResolverTest (+32 more)
 
 ### Community 13 - "Community 13"
 Cohesion: 0.01
-Nodes (29): AbilityRegistry, AbilityRegistryException, AbilityRegistryMethodsTest, AbilityRegistryTest, AbilityUpdateService, AbilityUpdateServiceTest, j(), CleanupCommand (+21 more)
+Nodes (40): ArrayComparator, ArrayComparison, ArrayHasKey, BinaryOperator, Comparator, ComparisonFailure, ComparisonFailureBuilder, Constraint (+32 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.01
-Nodes (41): ArrayComparator, ArrayComparison, ArrayHasKey, BinaryOperator, Comparator, ComparisonFailure, ComparisonFailureBuilder, Constraint (+33 more)
+Nodes (17): BuilderFactory, BuilderHelpers, Class_, ClassConst, Declaration, Enum_, EnumCase, Function_ (+9 more)
 
 ### Community 15 - "Community 15"
 Cohesion: 0.01
-Nodes (17): BuilderFactory, BuilderHelpers, Class_, ClassConst, Declaration, Enum_, EnumCase, Function_ (+9 more)
+Nodes (59): AfterLastTestMethodErroredSubscriber, AfterLastTestMethodFailedSubscriber, AfterTestClassMethodErroredSubscriber, AfterTestClassMethodFailedSubscriber, BeforeFirstTestMethodErroredSubscriber, BeforeFirstTestMethodFailedSubscriber, BeforeTestClassMethodErroredSubscriber, BeforeTestClassMethodFailedSubscriber (+51 more)
 
 ### Community 16 - "Community 16"
-Cohesion: 0.02
-Nodes (10): Collecting, Comment, Emulative, p(), MagicConst, getComments(), NodeDumper, PhpVersion (+2 more)
+Cohesion: 0.01
+Nodes (53): u(), CloningVisitor, ConstantCollection, ConvertLogTypes, CoverageCloverToReport, CoverageCrap4jToReport, CoverageHtmlToReport, CoveragePhpToReport (+45 more)
 
 ### Community 17 - "Community 17"
 Cohesion: 0.01
-Nodes (58): AfterLastTestMethodErroredSubscriber, AfterLastTestMethodFailedSubscriber, AfterTestClassMethodErroredSubscriber, AfterTestClassMethodFailedSubscriber, BeforeFirstTestMethodErroredSubscriber, BeforeFirstTestMethodFailedSubscriber, BeforeTestClassMethodErroredSubscriber, BeforeTestClassMethodFailedSubscriber (+50 more)
+Nodes (26): AbstractNode, mb_check_encoding(), BubbleChart, Clover, Cobertura, Crap4j, Dashboard, Directory (+18 more)
 
 ### Community 18 - "Community 18"
 Cohesion: 0.02
-Nodes (24): AbstractNode, mb_check_encoding(), Clover, Cobertura, Crap4j, Dashboard, Directory, ensureUtf8() (+16 more)
+Nodes (7): Collecting, Emulative, p(), getComments(), PhpVersion, PrettyPrinterAbstract, Standard
 
 ### Community 19 - "Community 19"
 Cohesion: 0.01
-Nodes (41): ApplicationName, AtLeastVersionCommand, AuthorCollectionIterator, BundledComponentCollection, BundledComponentCollectionIterator, ConstraintRequirement, CopyrightInformation, download() (+33 more)
+Nodes (29): AbstractPipes, ArrowFunction, CallLike, ClosureComparator, CodeUnitFindingVisitor, Comment, ComplexityCalculatingVisitor, ExecutableLinesFindingVisitor (+21 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.02
-Nodes (18): AbstractPipes, ArrowFunction, CallLike, ClosureComparator, CodeUnitFindingVisitor, ComplexityCalculatingVisitor, ExecutableLinesFindingVisitor, FullyQualified (+10 more)
+Cohesion: 0.01
+Nodes (43): ApplicationName, AtLeastVersionCommand, AuthorCollectionIterator, BundledComponentCollection, BundledComponentCollectionIterator, ConstraintRequirement, CopyrightInformation, DataProviderTestSuite (+35 more)
 
 ### Community 21 - "Community 21"
-Cohesion: 0.01
-Nodes (21): ConsideredRisky, DeprecationTriggered, Errored, ErrorTriggered, Failed, MarkedIncomplete, NoticeTriggered, Passed (+13 more)
+Cohesion: 0.02
+Nodes (13): BitwiseAnd, ClassMethod, Constant, ConstExprEvaluator, Error, Int_, JsonDecoder, Modifiers (+5 more)
 
 ### Community 22 - "Community 22"
 Cohesion: 0.02
-Nodes (13): BitwiseAnd, ClassMethod, Constant, ConstExprEvaluator, Error, Int_, JsonDecoder, Modifiers (+5 more)
+Nodes (22): AbilityDiffRuleResolutionTest, AbilityDiffService, AbilityDiffServiceExtendedTest, AbilityDirectoryDiff, AbilityDirectoryDiffExtendedTest, AbilityDirectoryDiffTest, AnalysisResult, CacheWarmer (+14 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.03
@@ -879,287 +888,287 @@ Nodes (12): CollectingDispatcher, DirectDispatcher, DispatchingEmitter, IgnorePh
 
 ### Community 24 - "Community 24"
 Cohesion: 0.02
-Nodes (16): Chunk, ConsoleEvent, InputStream, areOpen(), close(), getFiles(), haveReadSupport(), readAndWrite() (+8 more)
+Nodes (19): AbstractInvocationImplementation, CommandIsSuccessful, ConfigurableMethod, ExpectationFailedException, FalseType, IncompatibleReturnValueException, Invocation, InvocationHandler (+11 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.01
-Nodes (1): Metadata
+Cohesion: 0.03
+Nodes (13): ConsoleEvent, areOpen(), close(), getFiles(), haveReadSupport(), readAndWrite(), Process, ProcessFailedException (+5 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.02
-Nodes (16): AbstractInvocationImplementation, CommandIsSuccessful, ExpectationFailedException, Invocation, InvocationHandler, InvocationMockerImplementation, InvocationOrder, InvokedAtLeastCount (+8 more)
-
-### Community 27 - "Community 27"
-Cohesion: 0.02
-Nodes (15): AnalysisResult, CacheWarmer, CachingSourceAnalyser, Duration, FilterProcessor, ProcessedBranchCoverageData, ProcessedCodeCoverageData, ProcessedFunctionCoverageData (+7 more)
-
-### Community 28 - "Community 28"
-Cohesion: 0.03
-Nodes (23): AuthorElement, BundlesElement, Calculator, ComponentElement, ContainsElement, CopyrightElement, Counter, ExtElement (+15 more)
-
-### Community 29 - "Community 29"
 Cohesion: 0.03
 Nodes (10): ChildProcessStarted, Driver, Job, JobRunner, ParserFactory, PcovDriver, Runtime, Selector (+2 more)
 
-### Community 30 - "Community 30"
+### Community 27 - "Community 27"
+Cohesion: 0.03
+Nodes (19): AuthorElement, BundlesElement, Calculator, ComponentElement, ConsoleErrorEvent, ContainsElement, CopyrightElement, Counter (+11 more)
+
+### Community 28 - "Community 28"
 Cohesion: 0.06
 Nodes (8): BootstrapAbilityInstallTest, BootstrapLifecycleTest, EndToEndTestCase, PresetLifecycleTest, ScopeDeprecationTest, ShowAndUpdateTest, SimplifiedCommandsTest, TypedCommandsLifecycleTest
 
-### Community 31 - "Community 31"
-Cohesion: 0.02
-Nodes (14): testCreatedMockObject(), testCreatedStub(), testCreatedStubForIntersectionOfInterfaces(), testRunnerBootstrappedExtension(), testRunnerConfigured(), testRunnerDisabledGarbageCollection(), testRunnerEnabledGarbageCollection(), testRunnerExecutionAborted() (+6 more)
+### Community 29 - "Community 29"
+Cohesion: 0.03
+Nodes (8): Chunk, InputStream, InvalidDataProviderException, ProcessUtils, Reflection, TestCollection, TestSuite, TestSuiteBuilder
 
-### Community 32 - "Community 32"
-Cohesion: 0.04
-Nodes (5): AbstractString, PHPUnitCommand, PHPUnitCommandTest, onNotSuccessfulTest(), TreeNode
-
-### Community 33 - "Community 33"
-Cohesion: 0.06
-Nodes (6): AbilityDiffRuleResolutionTest, AbilityDiffService, AbilityDiffServiceExtendedTest, AbilityDirectoryDiff, AbilityDirectoryDiffExtendedTest, AbilityDirectoryDiffTest
-
-### Community 34 - "Community 34"
+### Community 30 - "Community 30"
 Cohesion: 0.03
 Nodes (70): [0.1.0] - 2026-04-27, [0.1.1] - 2026-04-28, [0.2.0] - 2026-04-28, [0.3.0] - 2026-04-28, [0.4.0] - 2026-04-28, [0.4.1] - 2026-04-28, [0.4.2] - 2026-04-28, [0.4.3] - 2026-04-28 (+62 more)
 
-### Community 35 - "Community 35"
+### Community 31 - "Community 31"
+Cohesion: 0.06
+Nodes (1): AbstractString
+
+### Community 32 - "Community 32"
 Cohesion: 0.09
 Nodes (5): InstallationProbe, InstallationProbeTest, ShowAbilityRow, ShowStatusPresenter, ShowStatusPresenterTest
 
-### Community 36 - "Community 36"
+### Community 33 - "Community 33"
 Cohesion: 0.04
 Nodes (53): Alternative 1: 归档使用 `mv`（重命名）而非 copy→verify→delete, Alternative 2: 代码审查生成报告后人工确认, Alternative 3: CHANGELOG 原样复制而非重写, Alternatives Considered, Architecture, Clarification Round, Components and Interfaces, Correctness Properties (+45 more)
 
-### Community 37 - "Community 37"
+### Community 34 - "Community 34"
 Cohesion: 0.04
 Nodes (48): abilities.yaml 格式（hooks 段）, AbilityRegistry, AbilityRegistry 解析结果内部表示, Alt 1: Hook 安装统一为文件复制（不做 JSON merge）, Alt 2: 在 Installer 内部直接处理 hook 逻辑（不抽取 HookInstaller）, Alternatives Considered, Architecture, CheckService（修改） (+40 more)
 
-### Community 38 - "Community 38"
+### Community 35 - "Community 35"
 Cohesion: 0.04
 Nodes (47): AbilityDiffService（重构）, AbilityDiffService 错误场景, AbilityEntry（不变）, Alternatives Considered, Architecture, Baseline 状态区分, Clarification Round, Components and Interfaces (+39 more)
 
-### Community 39 - "Community 39"
+### Community 36 - "Community 36"
 Cohesion: 0.05
 Nodes (3): mb_convert_encoding(), mb_internal_encoding(), mb_scrub()
 
-### Community 40 - "Community 40"
+### Community 37 - "Community 37"
 Cohesion: 0.06
 Nodes (35): Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria (+27 more)
 
-### Community 41 - "Community 41"
+### Community 38 - "Community 38"
 Cohesion: 0.07
 Nodes (4): DataFromDataProvider, TestData, TestDataCollection, TestMethod
 
-### Community 42 - "Community 42"
+### Community 39 - "Community 39"
 Cohesion: 0.06
 Nodes (33): Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria (+25 more)
 
-### Community 43 - "Community 43"
+### Community 40 - "Community 40"
 Cohesion: 0.08
 Nodes (2): IntersectionType, UnionType
 
-### Community 44 - "Community 44"
+### Community 41 - "Community 41"
 Cohesion: 0.07
 Nodes (26): AC 语体规则, AC 语体规则（EARS 格式）, Bugfix 产物格式, Bugfix 关键约束, Bugfix 前置读取, Bugfix 完成后输出, Bugfix 执行步骤, Bugfix 路径：Bugfix Analysis (+18 more)
 
-### Community 45 - "Community 45"
+### Community 42 - "Community 42"
 Cohesion: 0.07
 Nodes (27): Agent, Baseline 解析, Cursor 平台, Deploy Scope 与路径解析, Exit Code 规则, Gitignore, Hook, Install Behavior (+19 more)
 
-### Community 46 - "Community 46"
+### Community 43 - "Community 43"
 Cohesion: 0.07
 Nodes (25): 1. Target Structure（目标产出）, 2. Bootstrap Phase（硬性前置）, 3. Detection Phase, 4. Routing（路径分支）, 5.1 Confirmation, 5.2 Generation, 5. Path A：检测式路径, 6.1 交互引导（收集选型意图） (+17 more)
 
-### Community 47 - "Community 47"
+### Community 44 - "Community 44"
 Cohesion: 0.07
 Nodes (26): 10. Code Review Task 校验, 11. 执行注意事项校验, 12. Socratic Review 校验, 13. 目的性审查, 14. Task Dependency Graph 校验, 15. 文档收敛 Task 校验, 16. Gatekeep Log, 17. Completion (+18 more)
 
-### Community 48 - "Community 48"
+### Community 45 - "Community 45"
 Cohesion: 0.08
 Nodes (25): agent:check, agent:install, agent:uninstall, bootstrap, check, cleanup, CLI Commands, global-setup (+17 more)
 
-### Community 49 - "Community 49"
+### Community 46 - "Community 46"
 Cohesion: 0.08
 Nodes (23): Checkpoint 格式（强制）, Code Review task 要求, Requirement 追溯（强制）, Skeleton 模板, Sub-task 格式要求, Task Dependency Graph, Tasks 阶段（产物：tasks.md）, Test First 编排规则 (+15 more)
 
-### Community 50 - "Community 50"
+### Community 47 - "Community 47"
 Cohesion: 0.08
 Nodes (24): Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria (+16 more)
 
-### Community 51 - "Community 51"
+### Community 48 - "Community 48"
 Cohesion: 0.08
 Nodes (24): Agent 交互流程, comparator 取值, report_model 取值, TGA（数数系统）数据查询, 分组（groupBy）, 区服组合速查, 参数说明, 响应格式 (+16 more)
 
-### Community 52 - "Community 52"
+### Community 49 - "Community 49"
 Cohesion: 0.08
 Nodes (24): Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria (+16 more)
 
-### Community 53 - "Community 53"
+### Community 50 - "Community 50"
 Cohesion: 0.08
 Nodes (24): Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Acceptance Criteria, Clarification Round (+16 more)
 
-### Community 54 - "Community 54"
+### Community 51 - "Community 51"
 Cohesion: 0.08
 Nodes (23): `abilities.yaml` 设计, Agents, Gitignore, Non-Goals, Phase 1：迁移文件, Phase 2：系统支持新路径, PRP: Abilities Relocation, Rules (+15 more)
 
-### Community 55 - "Community 55"
+### Community 52 - "Community 52"
 Cohesion: 0.08
 Nodes (23): Alternatives Considered, Architecture, Clarification Round, Components and Interfaces, Correctness Properties, Data Models, Design Document: Deploy Scope and CLI Onboarding, Error Handling (+15 more)
 
-### Community 56 - "Community 56"
+### Community 53 - "Community 53"
 Cohesion: 0.08
 Nodes (23): Clarification Round（供 design 前确认）, Clarification Round（供 tasks 前确认，见 design.md）, Design Phase — Gatekeep Log, Design Phase — Socratic Review, GK Logs: deploy-scope-and-cli, Q&A, Q&A, Q&A (+15 more)
 
-### Community 57 - "Community 57"
+### Community 54 - "Community 54"
+Cohesion: 0.08
+Nodes (2): ErrorTriggered, PhpDeprecationTriggered
+
+### Community 55 - "Community 55"
 Cohesion: 0.09
 Nodes (22): Docs, `docs/manual/`, `docs/notes/`, `docs/proposals/`, `docs/state/`, 作用, 作用, 作用 (+14 more)
 
-### Community 58 - "Community 58"
+### Community 56 - "Community 56"
 Cohesion: 0.09
 Nodes (21): Design Phase — Gatekeep Log, Design Phase — Gatekeep Log (Re-validation), Design Phase — Socratic Review, Q&A, Q&A, Q&A, Requirements Phase — Gatekeep Log, Requirements Phase — Socratic Review (+13 more)
 
-### Community 59 - "Community 59"
+### Community 57 - "Community 57"
 Cohesion: 0.1
 Nodes (20): 1. Scope 模型, 2. `abilities.yaml`, 3. 命令：global-setup / bootstrap / cleanup, 4.1 检测式（老项目）, 4.2 规划式（新项目）, 4. `/apm init`（两条路径）, 5. CLI 规则, 6. `apm show` (+12 more)
 
-### Community 60 - "Community 60"
+### Community 58 - "Community 58"
 Cohesion: 0.1
 Nodes (20): 1. CLI 行为变更, 2. `abilities.yaml` 变更, 3. `bootstrap` 命令扩展, 4. 代码清理, 5. `AbilityEntry` 变更, 6. 三阶段首装变更, `apm cleanup`, `apm global-setup` (+12 more)
 
-### Community 61 - "Community 61"
+### Community 59 - "Community 59"
+Cohesion: 0.13
+Nodes (1): Duration
+
+### Community 60 - "Community 60"
 Cohesion: 0.13
 Nodes (4): HRTime, SystemStopWatch, SystemStopWatchWithOffset, Timer
 
-### Community 62 - "Community 62"
+### Community 61 - "Community 61"
 Cohesion: 0.1
 Nodes (19): Design Phase — Gatekeep Log, Design Phase — Socratic Review, GK Logs: prp001-remaining-work, Q&A, Q&A, Q&A, Requirements Phase — Gatekeep Log, Requirements Phase — Socratic Review (+11 more)
 
-### Community 63 - "Community 63"
-Cohesion: 0.12
-Nodes (1): NodeAbstract
-
-### Community 64 - "Community 64"
+### Community 62 - "Community 62"
 Cohesion: 0.11
 Nodes (4): ExtensionBootstrapped, ReturnArgument, ReturnCallback, ReturnValueMap
 
-### Community 65 - "Community 65"
+### Community 63 - "Community 63"
 Cohesion: 0.11
 Nodes (4): AuthorElementCollection, ComponentElementCollection, ElementCollection, ExtElementCollection
 
-### Community 66 - "Community 66"
+### Community 64 - "Community 64"
 Cohesion: 0.11
 Nodes (17): Completion, Quick Release, Step 1: 环境检测, Step 2: 前置检查, Step 3: 确定版本号, Step 4: 文档收敛, Step 5: 更新版本号, Step 6: 构建验证 (+9 more)
 
-### Community 67 - "Community 67"
+### Community 65 - "Community 65"
 Cohesion: 0.11
 Nodes (17): comparator 取值, report_model 取值, TGA Query API Reference, 分组（groupBy）, 参数说明, 响应格式, 字段结构, 完整示例 (+9 more)
 
-### Community 68 - "Community 68"
+### Community 66 - "Community 66"
 Cohesion: 0.11
 Nodes (18): Design Phase — Gatekeep Log, Design Phase — Socratic Review, Q&A, Q&A, Q&A, Requirements Phase — Gatekeep Log, Requirements Phase — Socratic Review, Tasks Phase — Gatekeep Log (+10 more)
 
-### Community 69 - "Community 69"
+### Community 67 - "Community 67"
+Cohesion: 0.12
+Nodes (2): NullOutputFormatterStyle, OutputFormatterStyle
+
+### Community 68 - "Community 68"
 Cohesion: 0.11
 Nodes (16): Build — 完整构建流程, Part A - 代码文件的结构提取（AST）, Part B - 语义提取, Part C - 合并 AST + 语义为最终提取结果, Step 1 - 确保 graphify 已安装, Step 2.5 - 转录视频/音频（仅当检测到 video 文件时）, Step 2 - 检测文件, Step 3 - 提取实体和关系 (+8 more)
 
-### Community 70 - "Community 70"
+### Community 69 - "Community 69"
 Cohesion: 0.11
 Nodes (16): 2.1 Pre-execution Review（Drift 检测）, 2.2 确定执行范围与编排, 2.3 ~ 2.5 逐 wave 循环, 2.3 派发当前 wave, 2.4 Pre-existing Failure Review（当前 wave）, 2.5 Wave 汇总, 2.6 完成与硬停止, 3.1 加载执行模型 (+8 more)
 
-### Community 71 - "Community 71"
+### Community 70 - "Community 70"
 Cohesion: 0.11
 Nodes (17): 10. Completion, 1. 机械扫描, 2. 结构校验, 3. 术语表校验, 4. 行为条款校验, 5. 回归防护校验, 6. Socratic Review 校验, 7. 目的性审查 (+9 more)
 
-### Community 72 - "Community 72"
+### Community 71 - "Community 71"
 Cohesion: 0.12
 Nodes (16): 依赖, 创建应用, 应用创建与权限配置, 敏感信息存储规范, 文档授权, 添加权限, 电子表格接口, 获取 Sheet 列表 (+8 more)
 
-### Community 73 - "Community 73"
+### Community 72 - "Community 72"
 Cohesion: 0.12
 Nodes (14): Blocker Escalation, Bug Fix 测试规则, Checkpoint, Code Review, E2E 测试, Release Stabilize, 关键原则, 关闭 Issue (+6 more)
 
-### Community 74 - "Community 74"
+### Community 73 - "Community 73"
 Cohesion: 0.12
 Nodes (15): 1. 机械扫描, 2. 结构校验, 3. 术语表校验, 4. Requirement 条款校验, 5. Socratic Review 校验, 6. 目的性审查, 7. Gatekeep Log, 8. Requirement Discussion (RD) (+7 more)
 
-### Community 75 - "Community 75"
+### Community 74 - "Community 74"
 Cohesion: 0.13
 Nodes (1): NullOutput
 
-### Community 76 - "Community 76"
+### Community 75 - "Community 75"
 Cohesion: 0.13
 Nodes (13): Wiki 表格 Token 转换, 创建应用, 应用创建与权限配置, 文档授权, 添加权限, 电子表格接口, 获取 Sheet 列表, 覆盖写入 (+5 more)
 
-### Community 77 - "Community 77"
+### Community 76 - "Community 76"
 Cohesion: 0.13
 Nodes (14): Build Plan, Step 1: 声明模式, Step 2: 查找计划, Step 3: 审阅计划, Step 4: 执行计划, Step 5: 验证, Step 6: 更新计划, Step 7: 汇报结果 (+6 more)
 
-### Community 78 - "Community 78"
+### Community 77 - "Community 77"
 Cohesion: 0.13
 Nodes (14): Doc Convergence, Release 归档, 判定标准, 原则, 常见遗漏, 归档 Issues, 归档 Notes, 归档 Proposals (+6 more)
 
-### Community 79 - "Community 79"
+### Community 78 - "Community 78"
 Cohesion: 0.13
 Nodes (14): 10. Completion, 1. 机械扫描, 2. 结构校验, 3. Requirements 覆盖校验, 4. Impact Analysis 校验, 5. 技术方案质量校验, 6. Socratic Review 校验, 7. 目的性审查 (+6 more)
 
-### Community 80 - "Community 80"
+### Community 79 - "Community 79"
 Cohesion: 0.13
 Nodes (14): 1. CLI 代码适配新布局（PRP-001 Phase 2）, 2. 功能精简, 3. Hook Ability 支持, 4. State 文档补写, Clarification 记录, Q1: 三块工作（Phase 2 CLI、hook、state-gap）的组织方式？, Q2: 执行顺序偏好？, Q3: State 文档的内容边界？ (+6 more)
 
-### Community 81 - "Community 81"
+### Community 80 - "Community 80"
 Cohesion: 0.13
 Nodes (14): Abilities Model, abilities.yaml 格式, Ability Entry 格式（rules / agents / skills / hooks）, Ability 定义, gitignore section, global-setup section, hook 源路径, Preset 存储 (+6 more)
 
-### Community 82 - "Community 82"
+### Community 81 - "Community 81"
 Cohesion: 0.14
 Nodes (0): 
 
-### Community 83 - "Community 83"
+### Community 82 - "Community 82"
 Cohesion: 0.22
 Nodes (12): Fix Policy, How to Determine Diff Base, Output Format, Review Checklist, Review Process, Review Result, Review Scope, 变更文件 (+4 more)
 
-### Community 84 - "Community 84"
+### Community 83 - "Community 83"
 Cohesion: 0.14
 Nodes (12): Correctness Properties 格式, Design 阶段（产物：design.md）, Impact Analysis 必须覆盖, TOC, 产物位置, 产物格式, 关键约束, 完成后输出 (+4 more)
 
-### Community 85 - "Community 85"
+### Community 84 - "Community 84"
 Cohesion: 0.14
 Nodes (13): 1. 环境准备（用户确认）, 2. Sub-task 分组与脚本编排, 3. 交互节奏：脚本 → 人工介入 → 脚本, 4. 汇总, E2E Testing, 强约束, 执行流程, 最小介入 (+5 more)
 
-### Community 86 - "Community 86"
+### Community 85 - "Community 85"
 Cohesion: 0.14
 Nodes (13): block 属性, Gitignore, Managed Section 格式, 匹配规则, 插入（首次安装）, 操作规则, 无匹配时, 更新（重复安装） (+5 more)
 
-### Community 87 - "Community 87"
+### Community 86 - "Community 86"
 Cohesion: 0.14
 Nodes (13): Found In / Fixed In 规则, History 格式, Issue ID, Issue Management, Issue 文件规范, Release / Hotfix Finish 时的 Tag Review, Severity, 创建与分流规则 (+5 more)
 
-### Community 88 - "Community 88"
+### Community 87 - "Community 87"
 Cohesion: 0.21
 Nodes (1): VersionConstraintValue
 
-### Community 89 - "Community 89"
+### Community 88 - "Community 88"
 Cohesion: 0.15
 Nodes (0): 
 
-### Community 90 - "Community 90"
+### Community 89 - "Community 89"
 Cohesion: 0.15
 Nodes (11): Bugfix 路径, Feature 路径（默认）, Spec Planning 阶段判定, 产物顺序（不可跳步）, 判定规则, 单步执行约束, 强制自动执行（最高优先级）, 用户显式指定阶段时 (+3 more)
 
-### Community 91 - "Community 91"
+### Community 90 - "Community 90"
 Cohesion: 0.15
 Nodes (11): Agent 交互流程, TGA（数数系统）数据查询, 区服组合速查, 常用过滤片段, 第一步：确认服务地址, 第三步：获取 open_query, 第二步：确认分析模型, 第五步：发起请求并展示结果 (+3 more)
 
-### Community 92 - "Community 92"
+### Community 91 - "Community 91"
 Cohesion: 0.15
 Nodes (12): Quick Plan, Step 1: 声明模式, Step 2: 收集需求, Step 3: Clarification Round, Step 4: 确认计划名称, Step 5: 制定计划, Step 6: 展示计划, Step 7: 等待确认（终止点） (+4 more)
 
-### Community 93 - "Community 93"
+### Community 92 - "Community 92"
 Cohesion: 0.15
 Nodes (12): Clarification 记录, Spec Goal: PRP-001 Remaining Work, 不做的事情（Non-Goals）, 代码层（旧路径引用）, 其他发现, 文档层（SSOT 过时）, 来源, 死代码（capture/ingest 残留） (+4 more)
 
-### Community 94 - "Community 94"
+### Community 93 - "Community 93"
 Cohesion: 0.15
 Nodes (12): 1. 全局能力（任意目录，通常只需一次）, 2. 项目脚手架（业务仓库根目录）, 3. 项目上下文与能力（Agent 或 CLI）, Usage, 三阶段首装（新用户）, 从旧版迁移, 卸载, 安装 ability (+4 more)
+
+### Community 94 - "Community 94"
+Cohesion: 0.17
+Nodes (1): WarningTriggered
 
 ### Community 95 - "Community 95"
 Cohesion: 0.17
@@ -1191,1103 +1200,1103 @@ Nodes (11): 1. 用 Scoop 安装 PHP 与 Composer, 2. 全局安装 apm CLI, 3. �
 
 ### Community 102 - "Community 102"
 Cohesion: 0.18
-Nodes (10): AbilityDiffService, Installer（核心）, PresetRegistry, PRP-001 Phase 2 代码适配未完成, 优先级, 文档同步, 测试影响, 现状 (+2 more)
+Nodes (1): PhpWarningTriggered
 
 ### Community 103 - "Community 103"
 Cohesion: 0.18
-Nodes (10): Clarification 记录, Q1: release 0.7 的范围？, Q2: 版本号？, Q3: notes 状态标注？, Spec Goal: Release 0.7.0, 不做的事情（Non-Goals）, 来源, 目标 (+2 more)
+Nodes (1): PhpNoticeTriggered
 
 ### Community 104 - "Community 104"
-Cohesion: 0.2
-Nodes (1): Closure
+Cohesion: 0.18
+Nodes (10): AbilityDiffService, Installer（核心）, PresetRegistry, PRP-001 Phase 2 代码适配未完成, 优先级, 文档同步, 测试影响, 现状 (+2 more)
 
 ### Community 105 - "Community 105"
-Cohesion: 0.2
-Nodes (9): AI Profile Manager (apm), 使用时机, 命令, 技术栈, 敏感文件, 构建与测试命令, 架构概览, 版本号位置 (+1 more)
+Cohesion: 0.18
+Nodes (10): Clarification 记录, Q1: release 0.7 的范围？, Q2: 版本号？, Q3: notes 状态标注？, Spec Goal: Release 0.7.0, 不做的事情（Non-Goals）, 来源, 目标 (+2 more)
 
 ### Community 106 - "Community 106"
 Cohesion: 0.2
-Nodes (9): apm Windows 支持, Assumptions, Files, Goal, Plan, Risks, Scope, Validation (+1 more)
+Nodes (1): Closure
 
 ### Community 107 - "Community 107"
 Cohesion: 0.2
-Nodes (9): Clarification 记录, Phase 1（先行，可独立验收）, Phase 2（与 PRP-002 一并）, Spec Goal: Deploy Scope and CLI Onboarding, 不做的事情（Non-Goals）, 来源, 目标, 约束与决策 (+1 more)
+Nodes (9): AI Profile Manager (apm), 使用时机, 命令, 技术栈, 敏感文件, 构建与测试命令, 架构概览, 版本号位置 (+1 more)
 
 ### Community 108 - "Community 108"
 Cohesion: 0.2
-Nodes (9): `abilities.yaml` 变更, Cursor Quick Plan Rule 拆分为两个 Skill, 与现有 rule 的关系, 依赖, 关键约束, 已关闭决策, 待定事项, 方案 (+1 more)
+Nodes (9): apm Windows 支持, Assumptions, Files, Goal, Plan, Risks, Scope, Validation (+1 more)
 
 ### Community 109 - "Community 109"
 Cohesion: 0.2
-Nodes (9): `assertBatchAllowed(DeployScope $scope, array $items)`, CheckService, Deploy Scope, InvalidScopeException, Scope 取值, ScopeGuard（批量 scope 校验）, 批量原子性, 相对路径拼接 (+1 more)
+Nodes (9): Clarification 记录, Phase 1（先行，可独立验收）, Phase 2（与 PRP-002 一并）, Spec Goal: Deploy Scope and CLI Onboarding, 不做的事情（Non-Goals）, 来源, 目标, 约束与决策 (+1 more)
 
 ### Community 110 - "Community 110"
+Cohesion: 0.2
+Nodes (9): `abilities.yaml` 变更, Cursor Quick Plan Rule 拆分为两个 Skill, 与现有 rule 的关系, 依赖, 关键约束, 已关闭决策, 待定事项, 方案 (+1 more)
+
+### Community 111 - "Community 111"
+Cohesion: 0.2
+Nodes (9): `assertBatchAllowed(DeployScope $scope, array $items)`, CheckService, Deploy Scope, InvalidScopeException, Scope 取值, ScopeGuard（批量 scope 校验）, 批量原子性, 相对路径拼接 (+1 more)
+
+### Community 112 - "Community 112"
 Cohesion: 0.22
 Nodes (1): TestDirectory
 
-### Community 111 - "Community 111"
+### Community 113 - "Community 113"
 Cohesion: 0.22
 Nodes (1): Result
 
-### Community 112 - "Community 112"
+### Community 114 - "Community 114"
 Cohesion: 0.31
 Nodes (1): PreReleaseSuffix
 
-### Community 113 - "Community 113"
+### Community 115 - "Community 115"
 Cohesion: 0.36
 Nodes (1): Descriptor
 
-### Community 114 - "Community 114"
+### Community 116 - "Community 116"
 Cohesion: 0.22
 Nodes (0): 
 
-### Community 115 - "Community 115"
+### Community 117 - "Community 117"
 Cohesion: 0.36
 Nodes (7): Completion, Error Handling, Gatekeep Log 格式, Phase Detection, Spec 类型与目录, 校验原则, 角色
 
-### Community 116 - "Community 116"
+### Community 118 - "Community 118"
 Cohesion: 0.22
 Nodes (7): Agent 执行原则, apm（AI Profile Manager）, `/apm init` 交付物, 与 README 的边界, 何时使用本 Skill, 命令总览, 常见失败与处理
 
-### Community 117 - "Community 117"
+### Community 119 - "Community 119"
 Cohesion: 0.22
 Nodes (7): Feature Finish, Finish Completion, Finish Flow, Hotfix Finish, Release Finish, Step 0: Branch Detection, 分支保留（强约束）
 
-### Community 118 - "Community 118"
+### Community 120 - "Community 120"
 Cohesion: 0.22
 Nodes (7): Branch Naming, Determine Branch Type, Feature Start, Hotfix Start, Release Start, Start Completion, Start Flow
 
-### Community 119 - "Community 119"
+### Community 121 - "Community 121"
 Cohesion: 0.22
 Nodes (7): Update — 增量更新, 仅删除场景, 判断是否纯代码变更, 合并到已有图谱, 展示图谱 diff, 检测变更, 规则
 
-### Community 120 - "Community 120"
+### Community 122 - "Community 122"
 Cohesion: 0.22
 Nodes (7): Spec Planning, 产物路径, 使用原则, 完成输出要求, 操作步骤, 流程入口, 触发场景
 
-### Community 121 - "Community 121"
+### Community 123 - "Community 123"
 Cohesion: 0.22
 Nodes (8): AI Profile Manager (`apm`), Quick Start, Step 1 安装 apm CLI, Step 2 全局能力（一次性）, Step 3 业务仓库脚手架, Step 4 按需安装 preset / 单项能力, 从旧版迁移, 常用命令
 
-### Community 122 - "Community 122"
+### Community 124 - "Community 124"
 Cohesion: 0.22
 Nodes (8): Assumptions, Files, Goal, Plan, Risks, Scope, Validation, 注册 plan 相关 skill 到 abilities 管理
 
-### Community 123 - "Community 123"
+### Community 125 - "Community 125"
 Cohesion: 0.22
 Nodes (8): Assumptions, Files, Goal, Plan, Risks, Scope, Validation, 新增 lark-sheets 和 tga-query Skills
 
-### Community 124 - "Community 124"
+### Community 126 - "Community 126"
 Cohesion: 0.22
 Nodes (8): Assumptions, Files, Goal, init scaffold 拆分：修复 ISS-32020 + 区分新/旧项目, Plan, Risks, Scope, Validation
 
-### Community 125 - "Community 125"
+### Community 127 - "Community 127"
 Cohesion: 0.22
 Nodes (8): Added, Breaking, Changed, Changelog (Unreleased), Fixed, Proposals, Removed, Specs
 
-### Community 126 - "Community 126"
+### Community 128 - "Community 128"
 Cohesion: 0.22
 Nodes (8): Cursor, Deploy Scope Platform Verification, Dual-scope 场景, Kiro, 前置条件, 结论, 记录, 验证清单
 
-### Community 127 - "Community 127"
+### Community 129 - "Community 129"
 Cohesion: 0.25
 Nodes (1): Identifier
 
-### Community 128 - "Community 128"
-Cohesion: 0.25
-Nodes (1): VariableCollectionIterator
-
-### Community 129 - "Community 129"
-Cohesion: 0.25
-Nodes (1): TestDirectoryCollectionIterator
-
 ### Community 130 - "Community 130"
 Cohesion: 0.25
-Nodes (1): NullResultCache
+Nodes (1): GroupCollectionIterator
 
 ### Community 131 - "Community 131"
 Cohesion: 0.25
-Nodes (0): 
+Nodes (1): VariableCollectionIterator
 
 ### Community 132 - "Community 132"
 Cohesion: 0.25
-Nodes (1): TestDataCollectionIterator
+Nodes (1): TestDirectoryCollectionIterator
 
 ### Community 133 - "Community 133"
-Cohesion: 0.32
-Nodes (1): EventCollection
+Cohesion: 0.25
+Nodes (1): FilterDirectoryCollectionIterator
 
 ### Community 134 - "Community 134"
-Cohesion: 0.29
-Nodes (1): ClassesThatExtendClass
+Cohesion: 0.25
+Nodes (1): DirectoryCollectionIterator
 
 ### Community 135 - "Community 135"
-Cohesion: 0.32
-Nodes (1): SimpleType
+Cohesion: 0.25
+Nodes (1): IniSettingCollectionIterator
 
 ### Community 136 - "Community 136"
 Cohesion: 0.25
-Nodes (6): <Project Name>, 技术栈, 敏感文件, 构建与测试命令, 架构概览, 版本号位置
+Nodes (1): NullResultCache
 
 ### Community 137 - "Community 137"
 Cohesion: 0.25
-Nodes (6): Export — 导出与重组, For --cluster-only, GraphML（仅 `--graphml`）, MCP server（仅 `--mcp`）, Neo4j（仅 `--neo4j` 或 `--neo4j-push`）, SVG（仅 `--svg`）
+Nodes (0): 
 
 ### Community 138 - "Community 138"
 Cohesion: 0.25
-Nodes (6): For git commit hook, For /graphify add, For native CLAUDE.md integration, For --watch, Ingest — 添加内容与自动化, 通用规则
+Nodes (1): TestCollectionIterator
 
 ### Community 139 - "Community 139"
 Cohesion: 0.25
-Nodes (6): For /graphify explain, For /graphify path, For /graphify query, Query — 图谱查询命令, 命令路由, 通用规则
+Nodes (1): EventCollectionIterator
 
 ### Community 140 - "Community 140"
-Cohesion: 0.25
-Nodes (7): Clarification 记录, Spec Goal: Deprecate Scope, 不做的事情（Non-Goals）, 来源, 目标, 约束与决策, 背景摘要
+Cohesion: 0.32
+Nodes (1): EventCollection
 
 ### Community 141 - "Community 141"
 Cohesion: 0.25
-Nodes (7): Commit Message 规范, Commit 范围, Git Conventions, Merge 策略（强约束）, Worktree 规范, 未提交改动保护（强约束）, 非交互约束
+Nodes (1): MetadataCollectionIterator
 
 ### Community 142 - "Community 142"
 Cohesion: 0.25
-Nodes (7): Changes, Release 归档, 初始化, 归档入口, 更新时机, 版本 CHANGELOG 与根 CHANGELOG 的关系, 结构
+Nodes (1): TestResultCollectionIterator
 
 ### Community 143 - "Community 143"
-Cohesion: 0.25
-Nodes (7): Actual Behavior, Analysis, Description, Expected Behavior, History, ISS-01592 isInstalledOnTarget 对带 category 的 rule 匹配失败, Steps to Reproduce
+Cohesion: 0.29
+Nodes (1): ClassesThatExtendClass
 
 ### Community 144 - "Community 144"
-Cohesion: 0.25
-Nodes (7): Actual Behavior, Analysis, Description, Expected Behavior, History, ISS-31532 ComposerBaselineResolver 未兼容 XDG 路径, Steps to Reproduce
+Cohesion: 0.32
+Nodes (1): SimpleType
 
 ### Community 145 - "Community 145"
 Cohesion: 0.25
-Nodes (7): Actual Behavior, Analysis, Description, Expected Behavior, History, ISS-32020 scaffold mirror 将 apm 自身文档复制到用户项目, Steps to Reproduce
+Nodes (6): <Project Name>, 技术栈, 敏感文件, 构建与测试命令, 架构概览, 版本号位置
 
 ### Community 146 - "Community 146"
+Cohesion: 0.25
+Nodes (6): Export — 导出与重组, For --cluster-only, GraphML（仅 `--graphml`）, MCP server（仅 `--mcp`）, Neo4j（仅 `--neo4j` 或 `--neo4j-push`）, SVG（仅 `--svg`）
+
+### Community 147 - "Community 147"
+Cohesion: 0.25
+Nodes (6): For git commit hook, For /graphify add, For native CLAUDE.md integration, For --watch, Ingest — 添加内容与自动化, 通用规则
+
+### Community 148 - "Community 148"
+Cohesion: 0.25
+Nodes (6): For /graphify explain, For /graphify path, For /graphify query, Query — 图谱查询命令, 命令路由, 通用规则
+
+### Community 149 - "Community 149"
+Cohesion: 0.25
+Nodes (7): Clarification 记录, Spec Goal: Deprecate Scope, 不做的事情（Non-Goals）, 来源, 目标, 约束与决策, 背景摘要
+
+### Community 150 - "Community 150"
+Cohesion: 0.25
+Nodes (7): Commit Message 规范, Commit 范围, Git Conventions, Merge 策略（强约束）, Worktree 规范, 未提交改动保护（强约束）, 非交互约束
+
+### Community 151 - "Community 151"
+Cohesion: 0.25
+Nodes (7): Changes, Release 归档, 初始化, 归档入口, 更新时机, 版本 CHANGELOG 与根 CHANGELOG 的关系, 结构
+
+### Community 152 - "Community 152"
+Cohesion: 0.25
+Nodes (7): Actual Behavior, Analysis, Description, Expected Behavior, History, ISS-01592 isInstalledOnTarget 对带 category 的 rule 匹配失败, Steps to Reproduce
+
+### Community 153 - "Community 153"
+Cohesion: 0.25
+Nodes (7): Actual Behavior, Analysis, Description, Expected Behavior, History, ISS-31532 ComposerBaselineResolver 未兼容 XDG 路径, Steps to Reproduce
+
+### Community 154 - "Community 154"
+Cohesion: 0.25
+Nodes (7): Actual Behavior, Analysis, Description, Expected Behavior, History, ISS-32020 scaffold mirror 将 apm 自身文档复制到用户项目, Steps to Reproduce
+
+### Community 155 - "Community 155"
 Cohesion: 0.29
 Nodes (1): EmptyListener
 
-### Community 147 - "Community 147"
+### Community 156 - "Community 156"
 Cohesion: 0.33
 Nodes (1): OneOfGenerator
 
-### Community 148 - "Community 148"
-Cohesion: 0.29
-Nodes (0): 
-
-### Community 149 - "Community 149"
-Cohesion: 0.29
-Nodes (1): StaticAnalysisForCodeCoverageFinished
-
-### Community 150 - "Community 150"
-Cohesion: 0.29
-Nodes (1): AdditionalInformationProvided
-
-### Community 151 - "Community 151"
-Cohesion: 0.29
-Nodes (1): PartialMockObjectCreated
-
-### Community 152 - "Community 152"
-Cohesion: 0.38
-Nodes (1): Author
-
-### Community 153 - "Community 153"
-Cohesion: 0.29
-Nodes (0): 
-
-### Community 154 - "Community 154"
-Cohesion: 0.29
-Nodes (0): 
-
-### Community 155 - "Community 155"
-Cohesion: 0.33
-Nodes (1): Complexity
-
-### Community 156 - "Community 156"
-Cohesion: 0.29
-Nodes (1): GenericObjectType
-
 ### Community 157 - "Community 157"
 Cohesion: 0.29
-Nodes (1): NullType
+Nodes (0): 
 
 ### Community 158 - "Community 158"
 Cohesion: 0.29
-Nodes (1): MixedType
+Nodes (1): StaticAnalysisForCodeCoverageFinished
 
 ### Community 159 - "Community 159"
 Cohesion: 0.29
-Nodes (5): Gitflow, 使用原则, 完成输出要求, 流程入口, 触发场景
+Nodes (1): AdditionalInformationProvided
 
 ### Community 160 - "Community 160"
 Cohesion: 0.29
-Nodes (5): Branch Already Exists, Failure Policy, Git Command Requirements, Worktree and Errors, Worktree Handling
+Nodes (1): PartialMockObjectCreated
 
 ### Community 161 - "Community 161"
-Cohesion: 0.29
-Nodes (6): Q&A, Requirements Phase — Gatekeep Log, Requirements Phase — Socratic Review, 修正项, 合规检查, 结论
+Cohesion: 0.38
+Nodes (1): Author
 
 ### Community 162 - "Community 162"
-Cohesion: 0.33
-Nodes (1): AppConfigTest
+Cohesion: 0.29
+Nodes (0): 
 
 ### Community 163 - "Community 163"
-Cohesion: 0.33
-Nodes (1): NodeVisitorAbstract
+Cohesion: 0.29
+Nodes (0): 
 
 ### Community 164 - "Community 164"
 Cohesion: 0.33
-Nodes (1): StaticVar
+Nodes (1): Complexity
 
 ### Community 165 - "Community 165"
-Cohesion: 0.33
-Nodes (1): Const_
+Cohesion: 0.29
+Nodes (1): GenericObjectType
 
 ### Community 166 - "Community 166"
-Cohesion: 0.33
-Nodes (0): 
+Cohesion: 0.29
+Nodes (1): NullType
 
 ### Community 167 - "Community 167"
-Cohesion: 0.33
-Nodes (1): ArrayItem
+Cohesion: 0.29
+Nodes (1): MixedType
 
 ### Community 168 - "Community 168"
-Cohesion: 0.33
-Nodes (1): ClosureUse
+Cohesion: 0.29
+Nodes (5): Gitflow, 使用原则, 完成输出要求, 流程入口, 触发场景
 
 ### Community 169 - "Community 169"
-Cohesion: 0.33
-Nodes (1): Unset_
+Cohesion: 0.29
+Nodes (5): Branch Already Exists, Failure Policy, Git Command Requirements, Worktree and Errors, Worktree Handling
 
 ### Community 170 - "Community 170"
-Cohesion: 0.33
-Nodes (1): StaticCall
+Cohesion: 0.29
+Nodes (6): Q&A, Requirements Phase — Gatekeep Log, Requirements Phase — Socratic Review, 修正项, 合规检查, 结论
 
 ### Community 171 - "Community 171"
 Cohesion: 0.33
-Nodes (1): MethodCall
+Nodes (1): AppConfigTest
 
 ### Community 172 - "Community 172"
 Cohesion: 0.33
-Nodes (1): New_
+Nodes (1): NodeVisitorAbstract
 
 ### Community 173 - "Community 173"
 Cohesion: 0.33
-Nodes (1): NullsafeMethodCall
+Nodes (1): StaticVar
 
 ### Community 174 - "Community 174"
 Cohesion: 0.33
-Nodes (1): FuncCall
+Nodes (1): Const_
 
 ### Community 175 - "Community 175"
 Cohesion: 0.33
-Nodes (1): Array_
+Nodes (0): 
 
 ### Community 176 - "Community 176"
 Cohesion: 0.33
-Nodes (0): 
+Nodes (1): ArrayItem
 
 ### Community 177 - "Community 177"
 Cohesion: 0.33
-Nodes (1): Unknown
+Nodes (1): ClosureUse
 
 ### Community 178 - "Community 178"
-Cohesion: 0.4
-Nodes (1): Large
+Cohesion: 0.33
+Nodes (1): Unset_
 
 ### Community 179 - "Community 179"
 Cohesion: 0.33
-Nodes (1): Small
+Nodes (1): StaticCall
 
 ### Community 180 - "Community 180"
 Cohesion: 0.33
-Nodes (1): DataProviderExternal
+Nodes (1): MethodCall
 
 ### Community 181 - "Community 181"
 Cohesion: 0.33
-Nodes (1): MethodNameConstraint
+Nodes (1): New_
 
 ### Community 182 - "Community 182"
-Cohesion: 0.47
-Nodes (1): StringEqualsStringIgnoringLineEndings
+Cohesion: 0.33
+Nodes (1): NullsafeMethodCall
 
 ### Community 183 - "Community 183"
 Cohesion: 0.33
-Nodes (1): BootstrapFinished
+Nodes (1): FuncCall
 
 ### Community 184 - "Community 184"
 Cohesion: 0.33
-Nodes (1): PrintedUnexpectedOutput
+Nodes (1): Array_
 
 ### Community 185 - "Community 185"
 Cohesion: 0.33
-Nodes (1): ComparatorRegistered
+Nodes (0): 
 
 ### Community 186 - "Community 186"
 Cohesion: 0.33
-Nodes (1): TestStubCreated
+Nodes (1): Unknown
 
 ### Community 187 - "Community 187"
-Cohesion: 0.33
-Nodes (1): TestStubForIntersectionOfInterfacesCreated
+Cohesion: 0.4
+Nodes (1): Large
 
 ### Community 188 - "Community 188"
 Cohesion: 0.33
-Nodes (1): MockObjectForIntersectionOfInterfacesCreated
+Nodes (1): Small
 
 ### Community 189 - "Community 189"
 Cohesion: 0.33
-Nodes (1): MockObjectCreated
+Nodes (1): DataProviderExternal
 
 ### Community 190 - "Community 190"
-Cohesion: 0.4
-Nodes (1): ComparisonRequirement
+Cohesion: 0.33
+Nodes (1): MethodNameConstraint
 
 ### Community 191 - "Community 191"
-Cohesion: 0.33
-Nodes (0): 
+Cohesion: 0.47
+Nodes (1): StringEqualsStringIgnoringLineEndings
 
 ### Community 192 - "Community 192"
 Cohesion: 0.33
-Nodes (1): AuthorCollection
+Nodes (1): BootstrapFinished
 
 ### Community 193 - "Community 193"
-Cohesion: 0.4
-Nodes (1): Suggestion
+Cohesion: 0.33
+Nodes (1): PrintedUnexpectedOutput
 
 ### Community 194 - "Community 194"
-Cohesion: 0.4
-Nodes (1): ContainerCommandLoader
+Cohesion: 0.33
+Nodes (1): ComparatorRegistered
 
 ### Community 195 - "Community 195"
 Cohesion: 0.33
-Nodes (4): <Project Name>, Quick Start, 常用命令, 文档边界
+Nodes (1): TestStubCreated
 
 ### Community 196 - "Community 196"
 Cohesion: 0.33
-Nodes (5): Added, Changed, Changelog (Unreleased), Fixed, Internal
+Nodes (1): TestStubForIntersectionOfInterfacesCreated
 
 ### Community 197 - "Community 197"
 Cohesion: 0.33
-Nodes (5): init 应区分新项目与已有项目, 实现考虑, 改进方向, 现状问题, 规划式 init 可能的交付物
+Nodes (1): MockObjectForIntersectionOfInterfacesCreated
 
 ### Community 198 - "Community 198"
 Cohesion: 0.33
-Nodes (5): Implementation Plan: abilities-relocation, Notes, Overview, Task Dependency Graph, Tasks
+Nodes (1): MockObjectCreated
 
 ### Community 199 - "Community 199"
-Cohesion: 0.33
-Nodes (5): Implementation Plan: prp001-remaining-work, Notes, Overview, Task Dependency Graph, Tasks
+Cohesion: 0.4
+Nodes (1): ComparisonRequirement
 
 ### Community 200 - "Community 200"
 Cohesion: 0.33
-Nodes (5): Implementation Plan: release-0.7, Notes, Overview, Task Dependency Graph, Tasks
+Nodes (0): 
 
 ### Community 201 - "Community 201"
 Cohesion: 0.33
-Nodes (5): Implementation Plan: deploy-scope-and-cli, Notes, Overview, Task Dependency Graph, Tasks
+Nodes (1): AuthorCollection
 
 ### Community 202 - "Community 202"
-Cohesion: 0.33
-Nodes (5): Architecture, 数据流, 模块结构, 目标平台, 配置常量
+Cohesion: 0.4
+Nodes (1): Suggestion
 
 ### Community 203 - "Community 203"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (1): ContainerCommandLoader
 
 ### Community 204 - "Community 204"
-Cohesion: 0.4
-Nodes (0): 
+Cohesion: 0.33
+Nodes (4): <Project Name>, Quick Start, 常用命令, 文档边界
 
 ### Community 205 - "Community 205"
-Cohesion: 0.4
-Nodes (1): MatchArm
+Cohesion: 0.33
+Nodes (5): Added, Changed, Changelog (Unreleased), Fixed, Internal
 
 ### Community 206 - "Community 206"
-Cohesion: 0.4
-Nodes (1): NullableType
+Cohesion: 0.33
+Nodes (5): init 应区分新项目与已有项目, 实现考虑, 改进方向, 现状问题, 规划式 init 可能的交付物
 
 ### Community 207 - "Community 207"
-Cohesion: 0.4
-Nodes (1): InterpolatedStringPart
+Cohesion: 0.33
+Nodes (5): Implementation Plan: abilities-relocation, Notes, Overview, Task Dependency Graph, Tasks
 
 ### Community 208 - "Community 208"
-Cohesion: 0.4
-Nodes (1): Attribute
+Cohesion: 0.33
+Nodes (5): Implementation Plan: prp001-remaining-work, Notes, Overview, Task Dependency Graph, Tasks
 
 ### Community 209 - "Community 209"
-Cohesion: 0.4
-Nodes (1): AttributeGroup
+Cohesion: 0.33
+Nodes (5): Implementation Plan: release-0.7, Notes, Overview, Task Dependency Graph, Tasks
 
 ### Community 210 - "Community 210"
-Cohesion: 0.4
-Nodes (1): PropertyItem
+Cohesion: 0.33
+Nodes (5): Implementation Plan: deploy-scope-and-cli, Notes, Overview, Task Dependency Graph, Tasks
 
 ### Community 211 - "Community 211"
-Cohesion: 0.4
-Nodes (1): VariadicPlaceholder
+Cohesion: 0.33
+Nodes (5): Architecture, 数据流, 模块结构, 目标平台, 配置常量
 
 ### Community 212 - "Community 212"
 Cohesion: 0.4
-Nodes (1): DeclareItem
+Nodes (0): 
 
 ### Community 213 - "Community 213"
 Cohesion: 0.4
-Nodes (1): Arg
+Nodes (0): 
 
 ### Community 214 - "Community 214"
 Cohesion: 0.4
-Nodes (1): Expression
+Nodes (1): MatchArm
 
 ### Community 215 - "Community 215"
 Cohesion: 0.4
-Nodes (1): Global_
+Nodes (1): NullableType
 
 ### Community 216 - "Community 216"
 Cohesion: 0.4
-Nodes (1): Catch_
+Nodes (1): InterpolatedStringPart
 
 ### Community 217 - "Community 217"
 Cohesion: 0.4
-Nodes (1): Label
+Nodes (1): Attribute
 
 ### Community 218 - "Community 218"
 Cohesion: 0.4
-Nodes (1): Case_
+Nodes (1): AttributeGroup
 
 ### Community 219 - "Community 219"
 Cohesion: 0.4
-Nodes (1): Continue_
+Nodes (1): PropertyItem
 
 ### Community 220 - "Community 220"
 Cohesion: 0.4
-Nodes (1): Finally_
+Nodes (1): VariadicPlaceholder
 
 ### Community 221 - "Community 221"
 Cohesion: 0.4
-Nodes (1): Else_
+Nodes (1): DeclareItem
 
 ### Community 222 - "Community 222"
 Cohesion: 0.4
-Nodes (1): While_
+Nodes (1): Arg
 
 ### Community 223 - "Community 223"
 Cohesion: 0.4
-Nodes (1): HaltCompiler
+Nodes (1): Expression
 
 ### Community 224 - "Community 224"
 Cohesion: 0.4
-Nodes (1): Goto_
+Nodes (1): Global_
 
 ### Community 225 - "Community 225"
 Cohesion: 0.4
-Nodes (1): Static_
+Nodes (1): Catch_
 
 ### Community 226 - "Community 226"
 Cohesion: 0.4
-Nodes (1): Block
+Nodes (1): Label
 
 ### Community 227 - "Community 227"
 Cohesion: 0.4
-Nodes (1): Return_
+Nodes (1): Case_
 
 ### Community 228 - "Community 228"
 Cohesion: 0.4
-Nodes (1): TryCatch
+Nodes (1): Continue_
 
 ### Community 229 - "Community 229"
 Cohesion: 0.4
-Nodes (1): Echo_
+Nodes (1): Finally_
 
 ### Community 230 - "Community 230"
 Cohesion: 0.4
-Nodes (1): Declare_
+Nodes (1): Else_
 
 ### Community 231 - "Community 231"
 Cohesion: 0.4
-Nodes (1): Break_
+Nodes (1): While_
 
 ### Community 232 - "Community 232"
 Cohesion: 0.4
-Nodes (1): If_
+Nodes (1): HaltCompiler
 
 ### Community 233 - "Community 233"
 Cohesion: 0.4
-Nodes (1): Switch_
+Nodes (1): Goto_
 
 ### Community 234 - "Community 234"
 Cohesion: 0.4
-Nodes (1): Foreach_
+Nodes (1): Static_
 
 ### Community 235 - "Community 235"
 Cohesion: 0.4
-Nodes (1): For_
+Nodes (1): Block
 
 ### Community 236 - "Community 236"
 Cohesion: 0.4
-Nodes (1): Do_
+Nodes (1): Return_
 
 ### Community 237 - "Community 237"
 Cohesion: 0.4
-Nodes (1): GroupUse
+Nodes (1): TryCatch
 
 ### Community 238 - "Community 238"
 Cohesion: 0.4
-Nodes (1): InlineHTML
+Nodes (1): Echo_
 
 ### Community 239 - "Community 239"
 Cohesion: 0.4
-Nodes (1): ElseIf_
+Nodes (1): Declare_
 
 ### Community 240 - "Community 240"
 Cohesion: 0.4
-Nodes (1): Precedence
+Nodes (1): Break_
 
 ### Community 241 - "Community 241"
 Cohesion: 0.4
-Nodes (1): Alias
+Nodes (1): If_
 
 ### Community 242 - "Community 242"
 Cohesion: 0.4
-Nodes (1): BinaryOp
+Nodes (1): Switch_
 
 ### Community 243 - "Community 243"
 Cohesion: 0.4
-Nodes (1): List_
+Nodes (1): Foreach_
 
 ### Community 244 - "Community 244"
 Cohesion: 0.4
-Nodes (1): ShellExec
+Nodes (1): For_
 
 ### Community 245 - "Community 245"
 Cohesion: 0.4
-Nodes (1): ConstFetch
+Nodes (1): Do_
 
 ### Community 246 - "Community 246"
 Cohesion: 0.4
-Nodes (1): Include_
+Nodes (1): GroupUse
 
 ### Community 247 - "Community 247"
 Cohesion: 0.4
-Nodes (1): StaticPropertyFetch
+Nodes (1): InlineHTML
 
 ### Community 248 - "Community 248"
 Cohesion: 0.4
-Nodes (1): Print_
+Nodes (1): ElseIf_
 
 ### Community 249 - "Community 249"
 Cohesion: 0.4
-Nodes (1): PreInc
+Nodes (1): Precedence
 
 ### Community 250 - "Community 250"
 Cohesion: 0.4
-Nodes (1): YieldFrom
+Nodes (1): Alias
 
 ### Community 251 - "Community 251"
 Cohesion: 0.4
-Nodes (1): Throw_
+Nodes (1): BinaryOp
 
 ### Community 252 - "Community 252"
 Cohesion: 0.4
-Nodes (1): PostDec
+Nodes (1): List_
 
 ### Community 253 - "Community 253"
 Cohesion: 0.4
-Nodes (1): UnaryMinus
+Nodes (1): ShellExec
 
 ### Community 254 - "Community 254"
 Cohesion: 0.4
-Nodes (1): ClassConstFetch
+Nodes (1): ConstFetch
 
 ### Community 255 - "Community 255"
 Cohesion: 0.4
-Nodes (1): BitwiseNot
+Nodes (1): Include_
 
 ### Community 256 - "Community 256"
 Cohesion: 0.4
-Nodes (1): ErrorSuppress
+Nodes (1): StaticPropertyFetch
 
 ### Community 257 - "Community 257"
 Cohesion: 0.4
-Nodes (1): Eval_
+Nodes (1): Print_
 
 ### Community 258 - "Community 258"
 Cohesion: 0.4
-Nodes (1): NullsafePropertyFetch
+Nodes (1): PreInc
 
 ### Community 259 - "Community 259"
 Cohesion: 0.4
-Nodes (1): ArrayDimFetch
+Nodes (1): YieldFrom
 
 ### Community 260 - "Community 260"
 Cohesion: 0.4
-Nodes (1): PropertyFetch
+Nodes (1): Throw_
 
 ### Community 261 - "Community 261"
 Cohesion: 0.4
-Nodes (1): PostInc
+Nodes (1): PostDec
 
 ### Community 262 - "Community 262"
 Cohesion: 0.4
-Nodes (1): UnaryPlus
+Nodes (1): UnaryMinus
 
 ### Community 263 - "Community 263"
 Cohesion: 0.4
-Nodes (1): Ternary
+Nodes (1): ClassConstFetch
 
 ### Community 264 - "Community 264"
 Cohesion: 0.4
-Nodes (1): Empty_
+Nodes (1): BitwiseNot
 
 ### Community 265 - "Community 265"
 Cohesion: 0.4
-Nodes (1): Yield_
+Nodes (1): ErrorSuppress
 
 ### Community 266 - "Community 266"
 Cohesion: 0.4
-Nodes (1): Exit_
+Nodes (1): Eval_
 
 ### Community 267 - "Community 267"
 Cohesion: 0.4
-Nodes (1): Instanceof_
+Nodes (1): NullsafePropertyFetch
 
 ### Community 268 - "Community 268"
 Cohesion: 0.4
-Nodes (1): BooleanNot
+Nodes (1): ArrayDimFetch
 
 ### Community 269 - "Community 269"
 Cohesion: 0.4
-Nodes (1): Clone_
+Nodes (1): PropertyFetch
 
 ### Community 270 - "Community 270"
 Cohesion: 0.4
-Nodes (1): PreDec
+Nodes (1): PostInc
 
 ### Community 271 - "Community 271"
 Cohesion: 0.4
-Nodes (1): Match_
+Nodes (1): UnaryPlus
 
 ### Community 272 - "Community 272"
 Cohesion: 0.4
-Nodes (1): AssignRef
+Nodes (1): Ternary
 
 ### Community 273 - "Community 273"
 Cohesion: 0.4
-Nodes (1): Isset_
+Nodes (1): Empty_
 
 ### Community 274 - "Community 274"
 Cohesion: 0.4
-Nodes (1): Plus
+Nodes (1): Yield_
 
 ### Community 275 - "Community 275"
 Cohesion: 0.4
-Nodes (1): ShiftRight
+Nodes (1): Exit_
 
 ### Community 276 - "Community 276"
 Cohesion: 0.4
-Nodes (1): Div
+Nodes (1): Instanceof_
 
 ### Community 277 - "Community 277"
 Cohesion: 0.4
-Nodes (1): Mod
+Nodes (1): BooleanNot
 
 ### Community 278 - "Community 278"
 Cohesion: 0.4
-Nodes (1): BitwiseOr
+Nodes (1): Clone_
 
 ### Community 279 - "Community 279"
 Cohesion: 0.4
-Nodes (1): Minus
+Nodes (1): PreDec
 
 ### Community 280 - "Community 280"
 Cohesion: 0.4
-Nodes (1): Mul
+Nodes (1): Match_
 
 ### Community 281 - "Community 281"
 Cohesion: 0.4
-Nodes (1): ShiftLeft
+Nodes (1): AssignRef
 
 ### Community 282 - "Community 282"
 Cohesion: 0.4
-Nodes (1): BitwiseXor
+Nodes (1): Isset_
 
 ### Community 283 - "Community 283"
 Cohesion: 0.4
-Nodes (1): Coalesce
+Nodes (1): Plus
 
 ### Community 284 - "Community 284"
 Cohesion: 0.4
-Nodes (1): InterpolatedString
+Nodes (1): ShiftRight
 
 ### Community 285 - "Community 285"
 Cohesion: 0.4
-Nodes (0): 
+Nodes (1): Div
 
 ### Community 286 - "Community 286"
 Cohesion: 0.4
-Nodes (1): SingleCallbackAntecedent
+Nodes (1): Mod
 
 ### Community 287 - "Community 287"
-Cohesion: 0.5
-Nodes (1): MtRandSource
+Cohesion: 0.4
+Nodes (1): BitwiseOr
 
 ### Community 288 - "Community 288"
 Cohesion: 0.4
-Nodes (1): NoTimeLimit
+Nodes (1): Minus
 
 ### Community 289 - "Community 289"
 Cohesion: 0.4
-Nodes (1): ExtensionBootstrap
+Nodes (1): Mul
 
 ### Community 290 - "Community 290"
 Cohesion: 0.4
-Nodes (1): FilterFile
+Nodes (1): ShiftLeft
 
 ### Community 291 - "Community 291"
 Cohesion: 0.4
-Nodes (1): IniSetting
+Nodes (1): BitwiseXor
 
 ### Community 292 - "Community 292"
-Cohesion: 0.5
-Nodes (1): VersionComparisonOperator
+Cohesion: 0.4
+Nodes (1): Coalesce
 
 ### Community 293 - "Community 293"
 Cohesion: 0.4
-Nodes (1): Known
+Nodes (1): InterpolatedString
 
 ### Community 294 - "Community 294"
 Cohesion: 0.4
-Nodes (1): Warning
+Nodes (0): 
 
 ### Community 295 - "Community 295"
 Cohesion: 0.4
-Nodes (1): Risky
+Nodes (1): SingleCallbackAntecedent
 
 ### Community 296 - "Community 296"
-Cohesion: 0.4
-Nodes (1): Incomplete
+Cohesion: 0.5
+Nodes (1): MtRandSource
 
 ### Community 297 - "Community 297"
 Cohesion: 0.4
-Nodes (1): Success
+Nodes (1): NoTimeLimit
 
 ### Community 298 - "Community 298"
 Cohesion: 0.4
-Nodes (1): Failure
+Nodes (1): ExtensionBootstrap
 
 ### Community 299 - "Community 299"
 Cohesion: 0.4
-Nodes (1): Deprecation
+Nodes (1): FilterFile
 
 ### Community 300 - "Community 300"
 Cohesion: 0.4
-Nodes (1): Notice
+Nodes (1): IniSetting
 
 ### Community 301 - "Community 301"
-Cohesion: 0.4
-Nodes (1): TestDoxFormatterExternal
+Cohesion: 0.5
+Nodes (1): VersionComparisonOperator
 
 ### Community 302 - "Community 302"
 Cohesion: 0.4
-Nodes (1): DependsExternalUsingShallowClone
+Nodes (1): Known
 
 ### Community 303 - "Community 303"
 Cohesion: 0.4
-Nodes (1): DependsExternalUsingDeepClone
+Nodes (1): Warning
 
 ### Community 304 - "Community 304"
 Cohesion: 0.4
-Nodes (1): DependsExternal
+Nodes (1): Risky
 
 ### Community 305 - "Community 305"
 Cohesion: 0.4
-Nodes (1): AnyInvokedCount
+Nodes (1): Incomplete
 
 ### Community 306 - "Community 306"
 Cohesion: 0.4
-Nodes (1): IsAnything
+Nodes (1): Success
 
 ### Community 307 - "Community 307"
 Cohesion: 0.4
-Nodes (1): IsReadable
+Nodes (1): Failure
 
 ### Community 308 - "Community 308"
 Cohesion: 0.4
-Nodes (1): DirectoryExists
+Nodes (1): Deprecation
 
 ### Community 309 - "Community 309"
 Cohesion: 0.4
-Nodes (1): IsWritable
+Nodes (1): Notice
 
 ### Community 310 - "Community 310"
 Cohesion: 0.4
-Nodes (1): FileExists
+Nodes (1): TestDoxFormatterExternal
 
 ### Community 311 - "Community 311"
 Cohesion: 0.4
-Nodes (1): StringStartsWith
+Nodes (1): DependsExternalUsingShallowClone
 
 ### Community 312 - "Community 312"
 Cohesion: 0.4
-Nodes (1): StringEndsWith
+Nodes (1): DependsExternalUsingDeepClone
 
 ### Community 313 - "Community 313"
 Cohesion: 0.4
-Nodes (1): HookMethod
+Nodes (1): DependsExternal
 
 ### Community 314 - "Community 314"
 Cohesion: 0.4
-Nodes (1): OperatingSystem
+Nodes (1): AnyInvokedCount
 
 ### Community 315 - "Community 315"
 Cohesion: 0.4
-Nodes (1): EventFacadeSealed
+Nodes (1): IsAnything
 
 ### Community 316 - "Community 316"
 Cohesion: 0.4
-Nodes (1): StaticAnalysisForCodeCoverageStarted
+Nodes (1): IsReadable
 
 ### Community 317 - "Community 317"
 Cohesion: 0.4
-Nodes (1): ExecutionAborted
+Nodes (1): DirectoryExists
 
 ### Community 318 - "Community 318"
 Cohesion: 0.4
-Nodes (1): GarbageCollectionDisabled
+Nodes (1): IsWritable
 
 ### Community 319 - "Community 319"
 Cohesion: 0.4
-Nodes (1): GarbageCollectionEnabled
+Nodes (1): FileExists
 
 ### Community 320 - "Community 320"
 Cohesion: 0.4
-Nodes (1): GarbageCollectionTriggered
+Nodes (1): StringStartsWith
 
 ### Community 321 - "Community 321"
 Cohesion: 0.4
-Nodes (1): notify()
+Nodes (1): StringEndsWith
 
 ### Community 322 - "Community 322"
-Cohesion: 0.5
-Nodes (1): Email
+Cohesion: 0.4
+Nodes (1): HookMethod
 
 ### Community 323 - "Community 323"
-Cohesion: 0.5
-Nodes (1): Url
+Cohesion: 0.4
+Nodes (1): OperatingSystem
 
 ### Community 324 - "Community 324"
 Cohesion: 0.4
-Nodes (1): License
+Nodes (1): EventFacadeSealed
 
 ### Community 325 - "Community 325"
 Cohesion: 0.4
-Nodes (1): BundledComponent
+Nodes (1): StaticAnalysisForCodeCoverageStarted
 
 ### Community 326 - "Community 326"
-Cohesion: 0.5
-Nodes (1): BuildMetaData
+Cohesion: 0.4
+Nodes (1): ExecutionAborted
 
 ### Community 327 - "Community 327"
 Cohesion: 0.4
-Nodes (1): RunProcessMessage
+Nodes (1): GarbageCollectionDisabled
 
 ### Community 328 - "Community 328"
 Cohesion: 0.4
-Nodes (1): Parameter
+Nodes (1): GarbageCollectionEnabled
 
 ### Community 329 - "Community 329"
 Cohesion: 0.4
-Nodes (3): 判断原则, 并行分析流程, 编排规则
+Nodes (1): GarbageCollectionTriggered
 
 ### Community 330 - "Community 330"
 Cohesion: 0.4
-Nodes (4): Writing Conventions, 内容组织, 引用规则, 语言与格式
+Nodes (1): notify()
 
 ### Community 331 - "Community 331"
-Cohesion: 0.4
-Nodes (4): Config Safety, Git 防护, 敏感信息保护（强约束）, 模板同步
+Cohesion: 0.5
+Nodes (1): Email
 
 ### Community 332 - "Community 332"
-Cohesion: 0.4
-Nodes (4): Agent Instructions, 信息与读取, 协作与表达, 文档与事实来源
+Cohesion: 0.5
+Nodes (1): Url
 
 ### Community 333 - "Community 333"
 Cohesion: 0.4
-Nodes (4): Added, Changed, Changelog (Unreleased → 0.7.5), Fixed
+Nodes (1): License
 
 ### Community 334 - "Community 334"
 Cohesion: 0.4
-Nodes (4): apm init 需要独立 reference file, 优先级, 建议, 问题
+Nodes (1): BundledComponent
 
 ### Community 335 - "Community 335"
-Cohesion: 0.4
-Nodes (4): Hook Ability, 原始调研内容（归档）, 已落地, 设计取舍（有意不做）
+Cohesion: 0.5
+Nodes (1): BuildMetaData
 
 ### Community 336 - "Community 336"
 Cohesion: 0.4
-Nodes (4): State 文档缺口, 建议拆分, 时机, 缺失内容
+Nodes (1): RunProcessMessage
 
 ### Community 337 - "Community 337"
 Cohesion: 0.4
-Nodes (4): Added, Changelog (Unreleased), Docs, Fixed
+Nodes (1): Parameter
 
 ### Community 338 - "Community 338"
-Cohesion: 0.5
-Nodes (1): PropertyMatcher
+Cohesion: 0.4
+Nodes (3): 判断原则, 并行分析流程, 编排规则
 
 ### Community 339 - "Community 339"
-Cohesion: 0.5
-Nodes (1): PropertyNameMatcher
+Cohesion: 0.4
+Nodes (4): Writing Conventions, 内容组织, 引用规则, 语言与格式
 
 ### Community 340 - "Community 340"
-Cohesion: 0.5
-Nodes (1): ChainableFilter
+Cohesion: 0.4
+Nodes (4): Config Safety, Git 防护, 敏感信息保护（强约束）, 模板同步
 
 ### Community 341 - "Community 341"
-Cohesion: 0.5
-Nodes (1): Nop
+Cohesion: 0.4
+Nodes (4): Agent Instructions, 信息与读取, 协作与表达, 文档与事实来源
 
 ### Community 342 - "Community 342"
-Cohesion: 0.5
-Nodes (1): Cast
+Cohesion: 0.4
+Nodes (4): Added, Changed, Changelog (Unreleased → 0.7.5), Fixed
 
 ### Community 343 - "Community 343"
-Cohesion: 0.5
-Nodes (1): AssignOp
+Cohesion: 0.4
+Nodes (4): apm init 需要独立 reference file, 优先级, 建议, 问题
 
 ### Community 344 - "Community 344"
-Cohesion: 0.5
-Nodes (1): Greater
+Cohesion: 0.4
+Nodes (4): Hook Ability, 原始调研内容（归档）, 已落地, 设计取舍（有意不做）
 
 ### Community 345 - "Community 345"
-Cohesion: 0.5
-Nodes (1): Spaceship
+Cohesion: 0.4
+Nodes (4): State 文档缺口, 建议拆分, 时机, 缺失内容
 
 ### Community 346 - "Community 346"
-Cohesion: 0.5
-Nodes (1): Smaller
+Cohesion: 0.4
+Nodes (4): Added, Changelog (Unreleased), Docs, Fixed
 
 ### Community 347 - "Community 347"
 Cohesion: 0.5
-Nodes (1): BooleanOr
+Nodes (1): PropertyMatcher
 
 ### Community 348 - "Community 348"
 Cohesion: 0.5
-Nodes (1): Equal
+Nodes (1): PropertyNameMatcher
 
 ### Community 349 - "Community 349"
 Cohesion: 0.5
-Nodes (1): NotIdentical
+Nodes (1): ChainableFilter
 
 ### Community 350 - "Community 350"
 Cohesion: 0.5
-Nodes (1): SmallerOrEqual
+Nodes (1): Nop
 
 ### Community 351 - "Community 351"
 Cohesion: 0.5
-Nodes (1): BooleanAnd
+Nodes (1): Cast
 
 ### Community 352 - "Community 352"
 Cohesion: 0.5
-Nodes (1): Identical
+Nodes (1): AssignOp
 
 ### Community 353 - "Community 353"
 Cohesion: 0.5
-Nodes (1): GreaterOrEqual
+Nodes (1): Greater
 
 ### Community 354 - "Community 354"
 Cohesion: 0.5
-Nodes (1): Pipe
+Nodes (1): Spaceship
 
 ### Community 355 - "Community 355"
 Cohesion: 0.5
-Nodes (1): NotEqual
+Nodes (1): Smaller
 
 ### Community 356 - "Community 356"
 Cohesion: 0.5
-Nodes (1): Dir
+Nodes (1): BooleanOr
 
 ### Community 357 - "Community 357"
 Cohesion: 0.5
-Nodes (1): ErisShrink
+Nodes (1): Equal
 
 ### Community 358 - "Community 358"
 Cohesion: 0.5
-Nodes (1): ErisDuration
+Nodes (1): NotIdentical
 
 ### Community 359 - "Community 359"
 Cohesion: 0.5
-Nodes (1): ErisRatio
+Nodes (1): SmallerOrEqual
 
 ### Community 360 - "Community 360"
 Cohesion: 0.5
-Nodes (1): ErisRepeat
+Nodes (1): BooleanAnd
 
 ### Community 361 - "Community 361"
 Cohesion: 0.5
-Nodes (1): ErisMethod
+Nodes (1): Identical
 
 ### Community 362 - "Community 362"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): GreaterOrEqual
 
 ### Community 363 - "Community 363"
 Cohesion: 0.5
-Nodes (1): SchemaDetectionResult
+Nodes (1): Pipe
 
 ### Community 364 - "Community 364"
-Cohesion: 0.67
-Nodes (1): RemoveEmptyFilter
+Cohesion: 0.5
+Nodes (1): NotEqual
 
 ### Community 365 - "Community 365"
 Cohesion: 0.5
-Nodes (1): TeamCity
+Nodes (1): Dir
 
 ### Community 366 - "Community 366"
 Cohesion: 0.5
-Nodes (1): Junit
+Nodes (1): ErisShrink
 
 ### Community 367 - "Community 367"
 Cohesion: 0.5
-Nodes (1): NullPrinter
+Nodes (1): ErisDuration
 
 ### Community 368 - "Community 368"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): ErisRatio
 
 ### Community 369 - "Community 369"
 Cohesion: 0.5
-Nodes (1): DependsUsingDeepClone
+Nodes (1): ErisRepeat
 
 ### Community 370 - "Community 370"
 Cohesion: 0.5
-Nodes (1): Ticket
+Nodes (1): ErisMethod
 
 ### Community 371 - "Community 371"
 Cohesion: 0.5
-Nodes (1): RunInSeparateProcess
+Nodes (0): 
 
 ### Community 372 - "Community 372"
 Cohesion: 0.5
-Nodes (1): DependsOnClassUsingDeepClone
+Nodes (1): SchemaDetectionResult
 
 ### Community 373 - "Community 373"
-Cohesion: 0.5
-Nodes (1): Depends
+Cohesion: 0.67
+Nodes (1): RemoveEmptyFilter
 
 ### Community 374 - "Community 374"
 Cohesion: 0.5
-Nodes (1): DependsUsingShallowClone
+Nodes (1): TeamCity
 
 ### Community 375 - "Community 375"
 Cohesion: 0.5
-Nodes (1): DependsOnClassUsingShallowClone
+Nodes (1): Junit
 
 ### Community 376 - "Community 376"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): NullPrinter
 
 ### Community 377 - "Community 377"
 Cohesion: 0.5
@@ -2295,91 +2304,91 @@ Nodes (0):
 
 ### Community 378 - "Community 378"
 Cohesion: 0.5
-Nodes (1): AnyParameters
+Nodes (1): DependsUsingDeepClone
 
 ### Community 379 - "Community 379"
 Cohesion: 0.5
-Nodes (1): ReturnStub
+Nodes (1): Ticket
 
 ### Community 380 - "Community 380"
 Cohesion: 0.5
-Nodes (1): ReturnReference
+Nodes (1): RunInSeparateProcess
 
 ### Community 381 - "Community 381"
 Cohesion: 0.5
-Nodes (1): ArraysAreEqual
+Nodes (1): DependsOnClassUsingDeepClone
 
 ### Community 382 - "Community 382"
 Cohesion: 0.5
-Nodes (1): ArraysAreIdentical
+Nodes (1): Depends
 
 ### Community 383 - "Community 383"
 Cohesion: 0.5
-Nodes (1): IsNan
+Nodes (1): DependsUsingShallowClone
 
 ### Community 384 - "Community 384"
 Cohesion: 0.5
-Nodes (1): IsInfinite
+Nodes (1): DependsOnClassUsingShallowClone
 
 ### Community 385 - "Community 385"
 Cohesion: 0.5
-Nodes (1): IsFinite
+Nodes (0): 
 
 ### Community 386 - "Community 386"
 Cohesion: 0.5
-Nodes (1): IsNull
+Nodes (0): 
 
 ### Community 387 - "Community 387"
 Cohesion: 0.5
-Nodes (1): IsFalse
+Nodes (1): AnyParameters
 
 ### Community 388 - "Community 388"
 Cohesion: 0.5
-Nodes (1): IsTrue
+Nodes (1): ReturnStub
 
 ### Community 389 - "Community 389"
-Cohesion: 0.67
-Nodes (1): SystemMemoryMeter
+Cohesion: 0.5
+Nodes (1): ReturnReference
 
 ### Community 390 - "Community 390"
 Cohesion: 0.5
-Nodes (1): notify()
+Nodes (1): ArraysAreEqual
 
 ### Community 391 - "Community 391"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): ArraysAreIdentical
 
 ### Community 392 - "Community 392"
 Cohesion: 0.5
-Nodes (1): FileAnalyser
+Nodes (1): IsNan
 
 ### Community 393 - "Community 393"
 Cohesion: 0.5
-Nodes (1): Coverage
+Nodes (1): IsInfinite
 
 ### Community 394 - "Community 394"
 Cohesion: 0.5
-Nodes (1): CrapIndex
+Nodes (1): IsFinite
 
 ### Community 395 - "Community 395"
 Cohesion: 0.5
-Nodes (1): PhpVersionRequirement
+Nodes (1): IsNull
 
 ### Community 396 - "Community 396"
 Cohesion: 0.5
-Nodes (1): PhpExtensionRequirement
+Nodes (1): IsFalse
 
 ### Community 397 - "Community 397"
 Cohesion: 0.5
-Nodes (1): AnyVersionConstraint
+Nodes (1): IsTrue
 
 ### Community 398 - "Community 398"
-Cohesion: 0.5
-Nodes (1): AbstractVersionConstraint
+Cohesion: 0.67
+Nodes (1): SystemMemoryMeter
 
 ### Community 399 - "Community 399"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): notify()
 
 ### Community 400 - "Community 400"
 Cohesion: 0.5
@@ -2387,127 +2396,127 @@ Nodes (0):
 
 ### Community 401 - "Community 401"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): FileAnalyser
 
 ### Community 402 - "Community 402"
 Cohesion: 0.5
-Nodes (1): RunCommandMessage
+Nodes (1): Coverage
 
 ### Community 403 - "Community 403"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): CrapIndex
 
 ### Community 404 - "Community 404"
 Cohesion: 0.5
-Nodes (1): TableRows
+Nodes (1): PhpVersionRequirement
 
 ### Community 405 - "Community 405"
 Cohesion: 0.5
-Nodes (0): 
+Nodes (1): PhpExtensionRequirement
 
 ### Community 406 - "Community 406"
 Cohesion: 0.5
-Nodes (1): CyclomaticComplexityCalculatingVisitor
+Nodes (1): AnyVersionConstraint
 
 ### Community 407 - "Community 407"
 Cohesion: 0.5
-Nodes (1): GitCommandRunner
+Nodes (1): AbstractVersionConstraint
 
 ### Community 408 - "Community 408"
 Cohesion: 0.5
-Nodes (2): Changelog, 格式约定
+Nodes (0): 
 
 ### Community 409 - "Community 409"
 Cohesion: 0.5
-Nodes (3): Branch Overview, Git 历史语义, 分支定位
+Nodes (0): 
 
 ### Community 410 - "Community 410"
 Cohesion: 0.5
-Nodes (3): Agent 启动后必须要做的事：, Kiro Agent Rules, 项目目录结构
+Nodes (0): 
 
 ### Community 411 - "Community 411"
 Cohesion: 0.5
-Nodes (3): Command Safety Rules, 禁止直接执行的命令, 需要用户确认的流程
+Nodes (1): RunCommandMessage
 
 ### Community 412 - "Community 412"
 Cohesion: 0.5
-Nodes (3): Added, Changed, Unreleased Changelog
+Nodes (0): 
 
 ### Community 413 - "Community 413"
 Cohesion: 0.5
-Nodes (3): Added, Changed, Unreleased Changelog
+Nodes (1): TableRows
 
 ### Community 414 - "Community 414"
 Cohesion: 0.5
-Nodes (3): Added, Changed, Changelog (Unreleased → 0.8.0)
+Nodes (0): 
 
 ### Community 415 - "Community 415"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 0.5
+Nodes (1): CyclomaticComplexityCalculatingVisitor
 
 ### Community 416 - "Community 416"
-Cohesion: 0.67
-Nodes (1): DoctrineProxyMatcher
+Cohesion: 0.5
+Nodes (1): GitCommandRunner
 
 ### Community 417 - "Community 417"
-Cohesion: 0.67
-Nodes (1): KeepFilter
+Cohesion: 0.5
+Nodes (2): Changelog, 格式约定
 
 ### Community 418 - "Community 418"
-Cohesion: 0.67
-Nodes (1): DoctrineProxyFilter
+Cohesion: 0.5
+Nodes (3): Branch Overview, Git 历史语义, 分支定位
 
 ### Community 419 - "Community 419"
-Cohesion: 0.67
-Nodes (1): ShallowCopyFilter
+Cohesion: 0.5
+Nodes (3): Agent 启动后必须要做的事：, Kiro Agent Rules, 项目目录结构
 
 ### Community 420 - "Community 420"
-Cohesion: 0.67
-Nodes (1): DatePeriodFilter
+Cohesion: 0.5
+Nodes (3): Command Safety Rules, 禁止直接执行的命令, 需要用户确认的流程
 
 ### Community 421 - "Community 421"
-Cohesion: 0.67
-Nodes (1): DateIntervalFilter
+Cohesion: 0.5
+Nodes (3): Added, Changed, Unreleased Changelog
 
 ### Community 422 - "Community 422"
-Cohesion: 0.67
-Nodes (1): SideEffect
+Cohesion: 0.5
+Nodes (3): Added, Changed, Unreleased Changelog
 
 ### Community 423 - "Community 423"
-Cohesion: 0.67
-Nodes (0): 
+Cohesion: 0.5
+Nodes (3): Added, Changed, Changelog (Unreleased → 0.8.0)
 
 ### Community 424 - "Community 424"
 Cohesion: 0.67
-Nodes (1): DiffElem
+Nodes (0): 
 
 ### Community 425 - "Community 425"
 Cohesion: 0.67
-Nodes (1): Throwing
+Nodes (1): DoctrineProxyMatcher
 
 ### Community 426 - "Community 426"
 Cohesion: 0.67
-Nodes (1): VarLikeIdentifier
+Nodes (1): KeepFilter
 
 ### Community 427 - "Community 427"
 Cohesion: 0.67
-Nodes (1): Void_
+Nodes (1): DoctrineProxyFilter
 
 ### Community 428 - "Community 428"
 Cohesion: 0.67
-Nodes (1): Object_
+Nodes (1): ShallowCopyFilter
 
 ### Community 429 - "Community 429"
 Cohesion: 0.67
-Nodes (1): Double
+Nodes (1): DatePeriodFilter
 
 ### Community 430 - "Community 430"
 Cohesion: 0.67
-Nodes (1): Bool_
+Nodes (1): DateIntervalFilter
 
 ### Community 431 - "Community 431"
 Cohesion: 0.67
-Nodes (1): ComposerStaticInit6861e8f77b6303f5a5529cea4004485b
+Nodes (1): SideEffect
 
 ### Community 432 - "Community 432"
 Cohesion: 0.67
@@ -2515,463 +2524,463 @@ Nodes (0):
 
 ### Community 433 - "Community 433"
 Cohesion: 0.67
-Nodes (1): MigrationBuilder
+Nodes (1): DiffElem
 
 ### Community 434 - "Community 434"
 Cohesion: 0.67
-Nodes (1): RemoveTestDoxGroupsElement
+Nodes (1): Throwing
 
 ### Community 435 - "Community 435"
 Cohesion: 0.67
-Nodes (1): IntroduceCoverageElement
+Nodes (1): VarLikeIdentifier
 
 ### Community 436 - "Community 436"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): Void_
 
 ### Community 437 - "Community 437"
 Cohesion: 0.67
-Nodes (1): PhpDownloader
+Nodes (1): Object_
 
 ### Community 438 - "Community 438"
 Cohesion: 0.67
-Nodes (1): XmlException
+Nodes (1): Double
 
 ### Community 439 - "Community 439"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): Bool_
 
 ### Community 440 - "Community 440"
 Cohesion: 0.67
-Nodes (1): ReflectionException
+Nodes (1): ComposerStaticInit6861e8f77b6303f5a5529cea4004485b
 
 ### Community 441 - "Community 441"
 Cohesion: 0.67
-Nodes (1): IncludeGroupFilterIterator
+Nodes (0): 
 
 ### Community 442 - "Community 442"
 Cohesion: 0.67
-Nodes (1): IncludeNameFilterIterator
+Nodes (1): MigrationBuilder
 
 ### Community 443 - "Community 443"
 Cohesion: 0.67
-Nodes (1): ExcludeNameFilterIterator
+Nodes (1): RemoveTestDoxGroupsElement
 
 ### Community 444 - "Community 444"
 Cohesion: 0.67
-Nodes (1): ExcludeGroupFilterIterator
+Nodes (1): IntroduceCoverageElement
 
 ### Community 445 - "Community 445"
 Cohesion: 0.67
-Nodes (1): DefaultResolver
+Nodes (0): 
 
 ### Community 446 - "Community 446"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): PhpDownloader
 
 ### Community 447 - "Community 447"
 Cohesion: 0.67
-Nodes (1): TestSuiteWithName
+Nodes (1): XmlException
 
 ### Community 448 - "Community 448"
 Cohesion: 0.67
-Nodes (1): SystemGarbageCollectorStatusProvider
+Nodes (0): 
 
 ### Community 449 - "Community 449"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): ReflectionException
 
 ### Community 450 - "Community 450"
 Cohesion: 0.67
-Nodes (1): notify()
+Nodes (1): IncludeGroupFilterIterator
 
 ### Community 451 - "Community 451"
 Cohesion: 0.67
-Nodes (1): notify()
+Nodes (1): IncludeNameFilterIterator
 
 ### Community 452 - "Community 452"
 Cohesion: 0.67
-Nodes (1): notify()
+Nodes (1): ExcludeNameFilterIterator
 
 ### Community 453 - "Community 453"
 Cohesion: 0.67
-Nodes (1): notify()
+Nodes (1): ExcludeGroupFilterIterator
 
 ### Community 454 - "Community 454"
 Cohesion: 0.67
-Nodes (1): ProcessedFunctionType
+Nodes (1): DefaultResolver
 
 ### Community 455 - "Community 455"
 Cohesion: 0.67
-Nodes (1): ProcessedTraitType
+Nodes (0): 
 
 ### Community 456 - "Community 456"
 Cohesion: 0.67
-Nodes (1): ProcessedClassType
+Nodes (1): TestSuiteWithName
 
 ### Community 457 - "Community 457"
 Cohesion: 0.67
-Nodes (1): ProcessedMethodType
+Nodes (1): SystemGarbageCollectorStatusProvider
 
 ### Community 458 - "Community 458"
 Cohesion: 0.67
-Nodes (1): Library
+Nodes (0): 
 
 ### Community 459 - "Community 459"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): notify()
 
 ### Community 460 - "Community 460"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): notify()
 
 ### Community 461 - "Community 461"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): notify()
 
 ### Community 462 - "Community 462"
 Cohesion: 0.67
-Nodes (1): SubscribedService
+Nodes (1): notify()
 
 ### Community 463 - "Community 463"
 Cohesion: 0.67
-Nodes (1): LogicException
+Nodes (1): ProcessedFunctionType
 
 ### Community 464 - "Community 464"
 Cohesion: 0.67
-Nodes (1): AsCommand
+Nodes (1): ProcessedTraitType
 
 ### Community 465 - "Community 465"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): ProcessedClassType
 
 ### Community 466 - "Community 466"
 Cohesion: 0.67
-Nodes (1): RunCommandContext
+Nodes (1): ProcessedMethodType
 
 ### Community 467 - "Community 467"
 Cohesion: 0.67
-Nodes (0): 
+Nodes (1): Library
 
 ### Community 468 - "Community 468"
 Cohesion: 0.67
-Nodes (1): AbilityEntry
+Nodes (0): 
 
 ### Community 469 - "Community 469"
 Cohesion: 0.67
-Nodes (2): [0.7.4], Fixed
+Nodes (0): 
 
 ### Community 470 - "Community 470"
 Cohesion: 0.67
-Nodes (2): Changed, Changelog (Unreleased → 0.7.6)
+Nodes (0): 
 
 ### Community 471 - "Community 471"
 Cohesion: 0.67
-Nodes (2): Changed, Changelog (Unreleased → 0.7.7)
+Nodes (1): SubscribedService
 
 ### Community 472 - "Community 472"
-Cohesion: 1.0
-Nodes (0): 
+Cohesion: 0.67
+Nodes (1): LogicException
 
 ### Community 473 - "Community 473"
-Cohesion: 1.0
-Nodes (0): 
+Cohesion: 0.67
+Nodes (1): AsCommand
 
 ### Community 474 - "Community 474"
-Cohesion: 1.0
-Nodes (1): CloneException
+Cohesion: 0.67
+Nodes (0): 
 
 ### Community 475 - "Community 475"
-Cohesion: 1.0
-Nodes (1): PropertyException
+Cohesion: 0.67
+Nodes (1): RunCommandContext
 
 ### Community 476 - "Community 476"
-Cohesion: 1.0
+Cohesion: 0.67
 Nodes (0): 
 
 ### Community 477 - "Community 477"
-Cohesion: 1.0
-Nodes (1): SplDoublyLinkedList
+Cohesion: 0.67
+Nodes (1): AbilityEntry
 
 ### Community 478 - "Community 478"
-Cohesion: 1.0
-Nodes (1): ConstExprEvaluationException
+Cohesion: 0.67
+Nodes (2): [0.7.4], Fixed
 
 ### Community 479 - "Community 479"
-Cohesion: 1.0
-Nodes (0): 
+Cohesion: 0.67
+Nodes (2): Changed, Changelog (Unreleased → 0.7.6)
 
 ### Community 480 - "Community 480"
-Cohesion: 1.0
-Nodes (0): 
+Cohesion: 0.67
+Nodes (2): Changed, Changelog (Unreleased → 0.7.7)
 
 ### Community 481 - "Community 481"
 Cohesion: 1.0
-Nodes (1): Doc
+Nodes (0): 
 
 ### Community 482 - "Community 482"
 Cohesion: 1.0
-Nodes (1): ComplexType
+Nodes (0): 
 
 ### Community 483 - "Community 483"
 Cohesion: 1.0
-Nodes (1): Expr
+Nodes (1): CloneException
 
 ### Community 484 - "Community 484"
 Cohesion: 1.0
-Nodes (1): Scalar
+Nodes (1): PropertyException
 
 ### Community 485 - "Community 485"
 Cohesion: 1.0
-Nodes (1): Stmt
+Nodes (0): 
 
 ### Community 486 - "Community 486"
 Cohesion: 1.0
-Nodes (1): UseUse
+Nodes (1): SplDoublyLinkedList
 
 ### Community 487 - "Community 487"
 Cohesion: 1.0
-Nodes (1): PropertyProperty
+Nodes (1): ConstExprEvaluationException
 
 ### Community 488 - "Community 488"
 Cohesion: 1.0
-Nodes (1): DeclareDeclare
+Nodes (0): 
 
 ### Community 489 - "Community 489"
 Cohesion: 1.0
-Nodes (1): DNumber
+Nodes (0): 
 
 ### Community 490 - "Community 490"
 Cohesion: 1.0
-Nodes (1): LNumber
+Nodes (1): Doc
 
 ### Community 491 - "Community 491"
 Cohesion: 1.0
-Nodes (1): EncapsedStringPart
+Nodes (1): ComplexType
 
 ### Community 492 - "Community 492"
 Cohesion: 1.0
-Nodes (1): Encapsed
+Nodes (1): Expr
 
 ### Community 493 - "Community 493"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Scalar
 
 ### Community 494 - "Community 494"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Stmt
 
 ### Community 495 - "Community 495"
 Cohesion: 1.0
-Nodes (1): SkipValueException
+Nodes (1): UseUse
 
 ### Community 496 - "Community 496"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): PropertyProperty
 
 ### Community 497 - "Community 497"
 Cohesion: 1.0
-Nodes (1): NoActiveTimerException
+Nodes (1): DeclareDeclare
 
 ### Community 498 - "Community 498"
 Cohesion: 1.0
-Nodes (1): TimeSinceStartOfRequestNotAvailableException
+Nodes (1): DNumber
 
 ### Community 499 - "Community 499"
 Cohesion: 1.0
-Nodes (1): FailedSchemaDetectionResult
+Nodes (1): LNumber
 
 ### Community 500 - "Community 500"
 Cohesion: 1.0
-Nodes (1): MigrationException
+Nodes (1): EncapsedStringPart
 
 ### Community 501 - "Community 501"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Encapsed
 
 ### Community 502 - "Community 502"
 Cohesion: 1.0
-Nodes (1): NoBootstrapException
+Nodes (0): 
 
 ### Community 503 - "Community 503"
 Cohesion: 1.0
-Nodes (1): NoCustomCssFileException
+Nodes (0): 
 
 ### Community 504 - "Community 504"
 Cohesion: 1.0
-Nodes (1): ConfigurationCannotBeBuiltException
+Nodes (1): SkipValueException
 
 ### Community 505 - "Community 505"
 Cohesion: 1.0
-Nodes (1): SpecificDeprecationToStopOnNotConfiguredException
+Nodes (0): 
 
 ### Community 506 - "Community 506"
 Cohesion: 1.0
-Nodes (1): BootstrapScriptException
+Nodes (1): NoActiveTimerException
 
 ### Community 507 - "Community 507"
 Cohesion: 1.0
-Nodes (1): CodeCoverageReportNotConfiguredException
+Nodes (1): TimeSinceStartOfRequestNotAvailableException
 
 ### Community 508 - "Community 508"
 Cohesion: 1.0
-Nodes (1): NoPharExtensionDirectoryException
+Nodes (1): FailedSchemaDetectionResult
 
 ### Community 509 - "Community 509"
 Cohesion: 1.0
-Nodes (1): FilterNotConfiguredException
+Nodes (1): MigrationException
 
 ### Community 510 - "Community 510"
 Cohesion: 1.0
-Nodes (1): NoDefaultTestSuiteException
+Nodes (0): 
 
 ### Community 511 - "Community 511"
 Cohesion: 1.0
-Nodes (1): NoHtmlCoverageTargetException
+Nodes (1): NoBootstrapException
 
 ### Community 512 - "Community 512"
 Cohesion: 1.0
-Nodes (1): CannotFindSchemaException
+Nodes (1): NoCustomCssFileException
 
 ### Community 513 - "Community 513"
 Cohesion: 1.0
-Nodes (1): LoggingNotConfiguredException
+Nodes (1): ConfigurationCannotBeBuiltException
 
 ### Community 514 - "Community 514"
 Cohesion: 1.0
-Nodes (1): NoCoverageCacheDirectoryException
+Nodes (1): SpecificDeprecationToStopOnNotConfiguredException
 
 ### Community 515 - "Community 515"
 Cohesion: 1.0
-Nodes (1): NoBaselineException
+Nodes (1): BootstrapScriptException
 
 ### Community 516 - "Community 516"
 Cohesion: 1.0
-Nodes (1): NoCacheDirectoryException
+Nodes (1): CodeCoverageReportNotConfiguredException
 
 ### Community 517 - "Community 517"
 Cohesion: 1.0
-Nodes (1): NoConfigurationFileException
+Nodes (1): NoPharExtensionDirectoryException
 
 ### Community 518 - "Community 518"
 Cohesion: 1.0
-Nodes (1): NoTestFilesFileException
+Nodes (1): FilterNotConfiguredException
 
 ### Community 519 - "Community 519"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): NoDefaultTestSuiteException
 
 ### Community 520 - "Community 520"
 Cohesion: 1.0
-Nodes (1): InvalidJsonException
+Nodes (1): NoHtmlCoverageTargetException
 
 ### Community 521 - "Community 521"
 Cohesion: 1.0
-Nodes (1): PhpProcessException
+Nodes (1): CannotFindSchemaException
 
 ### Community 522 - "Community 522"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): LoggingNotConfiguredException
 
 ### Community 523 - "Community 523"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): NoCoverageCacheDirectoryException
 
 ### Community 524 - "Community 524"
 Cohesion: 1.0
-Nodes (1): InvocationStubberImplementation
+Nodes (1): NoBaselineException
 
 ### Community 525 - "Community 525"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): NoCacheDirectoryException
 
 ### Community 526 - "Community 526"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): NoConfigurationFileException
 
 ### Community 527 - "Community 527"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): NoTestFilesFileException
 
 ### Community 528 - "Community 528"
 Cohesion: 1.0
-Nodes (1): BadMethodCallException
+Nodes (0): 
 
 ### Community 529 - "Community 529"
 Cohesion: 1.0
-Nodes (1): EmptyStringException
+Nodes (1): InvalidJsonException
 
 ### Community 530 - "Community 530"
 Cohesion: 1.0
-Nodes (1): NoChildTestSuiteException
+Nodes (1): PhpProcessException
 
 ### Community 531 - "Community 531"
 Cohesion: 1.0
-Nodes (1): InvalidDependencyException
+Nodes (0): 
 
 ### Community 532 - "Community 532"
 Cohesion: 1.0
-Nodes (1): ProcessIsolationException
+Nodes (0): 
 
 ### Community 533 - "Community 533"
 Cohesion: 1.0
-Nodes (1): IncompleteTestError
+Nodes (1): InvocationStubberImplementation
 
 ### Community 534 - "Community 534"
 Cohesion: 1.0
-Nodes (1): SkippedWithMessageException
+Nodes (0): 
 
 ### Community 535 - "Community 535"
 Cohesion: 1.0
-Nodes (1): SkippedTestSuiteError
+Nodes (0): 
 
 ### Community 536 - "Community 536"
 Cohesion: 1.0
-Nodes (1): InvalidPhptFileException
+Nodes (0): 
 
 ### Community 537 - "Community 537"
 Cohesion: 1.0
-Nodes (1): CannotWriteBaselineException
+Nodes (1): BadMethodCallException
 
 ### Community 538 - "Community 538"
 Cohesion: 1.0
-Nodes (1): CannotLoadBaselineException
+Nodes (1): EmptyStringException
 
 ### Community 539 - "Community 539"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): NoChildTestSuiteException
 
 ### Community 540 - "Community 540"
 Cohesion: 1.0
-Nodes (1): ErrorException
+Nodes (1): InvalidDependencyException
 
 ### Community 541 - "Community 541"
 Cohesion: 1.0
-Nodes (1): CodeCoverageFileExistsException
+Nodes (1): ProcessIsolationException
 
 ### Community 542 - "Community 542"
 Cohesion: 1.0
-Nodes (1): InvalidOrderException
+Nodes (1): IncompleteTestError
 
 ### Community 543 - "Community 543"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): SkippedWithMessageException
 
 ### Community 544 - "Community 544"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): SkippedTestSuiteError
 
 ### Community 545 - "Community 545"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): InvalidPhptFileException
 
 ### Community 546 - "Community 546"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): CannotWriteBaselineException
 
 ### Community 547 - "Community 547"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): CannotLoadBaselineException
 
 ### Community 548 - "Community 548"
 Cohesion: 1.0
@@ -2979,15 +2988,15 @@ Nodes (0):
 
 ### Community 549 - "Community 549"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): ErrorException
 
 ### Community 550 - "Community 550"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): CodeCoverageFileExistsException
 
 ### Community 551 - "Community 551"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): InvalidOrderException
 
 ### Community 552 - "Community 552"
 Cohesion: 1.0
@@ -3255,203 +3264,203 @@ Nodes (0):
 
 ### Community 618 - "Community 618"
 Cohesion: 1.0
-Nodes (1): UnknownEventTypeException
+Nodes (0): 
 
 ### Community 619 - "Community 619"
 Cohesion: 1.0
-Nodes (1): UnknownEventException
+Nodes (0): 
 
 ### Community 620 - "Community 620"
 Cohesion: 1.0
-Nodes (1): InvalidSubscriberException
+Nodes (0): 
 
 ### Community 621 - "Community 621"
 Cohesion: 1.0
-Nodes (1): NoComparisonFailureException
+Nodes (0): 
 
 ### Community 622 - "Community 622"
 Cohesion: 1.0
-Nodes (1): EventFacadeIsSealedException
+Nodes (0): 
 
 ### Community 623 - "Community 623"
 Cohesion: 1.0
-Nodes (1): NoPreviousThrowableException
+Nodes (0): 
 
 ### Community 624 - "Community 624"
 Cohesion: 1.0
-Nodes (1): UnknownSubscriberTypeException
+Nodes (0): 
 
 ### Community 625 - "Community 625"
 Cohesion: 1.0
-Nodes (1): EventAlreadyAssignedException
+Nodes (0): 
 
 ### Community 626 - "Community 626"
 Cohesion: 1.0
-Nodes (1): SubscriberTypeAlreadyRegisteredException
+Nodes (0): 
 
 ### Community 627 - "Community 627"
 Cohesion: 1.0
-Nodes (1): NoDataSetFromDataProviderException
+Nodes (1): UnknownEventTypeException
 
 ### Community 628 - "Community 628"
 Cohesion: 1.0
-Nodes (1): InvalidEventException
+Nodes (1): UnknownEventException
 
 ### Community 629 - "Community 629"
 Cohesion: 1.0
-Nodes (1): MapError
+Nodes (1): InvalidSubscriberException
 
 ### Community 630 - "Community 630"
 Cohesion: 1.0
-Nodes (1): UnknownSubscriberException
+Nodes (1): NoComparisonFailureException
 
 ### Community 631 - "Community 631"
 Cohesion: 1.0
-Nodes (1): InvalidVersionRequirementException
+Nodes (1): EventFacadeIsSealedException
 
 ### Community 632 - "Community 632"
 Cohesion: 1.0
-Nodes (1): NoVersionRequirementException
+Nodes (1): NoPreviousThrowableException
 
 ### Community 633 - "Community 633"
 Cohesion: 1.0
-Nodes (1): CannotOpenUriForWritingException
+Nodes (1): UnknownSubscriberTypeException
 
 ### Community 634 - "Community 634"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): EventAlreadyAssignedException
 
 ### Community 635 - "Community 635"
 Cohesion: 1.0
-Nodes (1): StaticAnalysisCacheNotConfiguredException
+Nodes (1): SubscriberTypeAlreadyRegisteredException
 
 ### Community 636 - "Community 636"
 Cohesion: 1.0
-Nodes (1): DirectoryCouldNotBeCreatedException
+Nodes (1): NoDataSetFromDataProviderException
 
 ### Community 637 - "Community 637"
 Cohesion: 1.0
-Nodes (1): ParserException
+Nodes (1): InvalidEventException
 
 ### Community 638 - "Community 638"
 Cohesion: 1.0
-Nodes (1): BranchAndPathCoverageNotSupportedException
+Nodes (1): MapError
 
 ### Community 639 - "Community 639"
 Cohesion: 1.0
-Nodes (1): FileCouldNotBeWrittenException
+Nodes (1): UnknownSubscriberException
 
 ### Community 640 - "Community 640"
 Cohesion: 1.0
-Nodes (1): MethodNotImplementedException
+Nodes (1): InvalidVersionRequirementException
 
 ### Community 641 - "Community 641"
 Cohesion: 1.0
-Nodes (1): FileCouldNotBeReadException
+Nodes (1): NoVersionRequirementException
 
 ### Community 642 - "Community 642"
 Cohesion: 1.0
-Nodes (1): InvalidCoverageDataException
+Nodes (1): CannotOpenUriForWritingException
 
 ### Community 643 - "Community 643"
 Cohesion: 1.0
-Nodes (1): TimeoutException
+Nodes (0): 
 
 ### Community 644 - "Community 644"
 Cohesion: 1.0
-Nodes (1): ManifestLoaderException
+Nodes (1): StaticAnalysisCacheNotConfiguredException
 
 ### Community 645 - "Community 645"
 Cohesion: 1.0
-Nodes (1): NoEmailAddressException
+Nodes (1): DirectoryCouldNotBeCreatedException
 
 ### Community 646 - "Community 646"
 Cohesion: 1.0
-Nodes (1): ManifestDocumentException
+Nodes (1): ParserException
 
 ### Community 647 - "Community 647"
 Cohesion: 1.0
-Nodes (1): InvalidApplicationNameException
+Nodes (1): BranchAndPathCoverageNotSupportedException
 
 ### Community 648 - "Community 648"
 Cohesion: 1.0
-Nodes (1): ManifestDocumentMapperException
+Nodes (1): FileCouldNotBeWrittenException
 
 ### Community 649 - "Community 649"
 Cohesion: 1.0
-Nodes (1): ManifestElementException
+Nodes (1): MethodNotImplementedException
 
 ### Community 650 - "Community 650"
 Cohesion: 1.0
-Nodes (1): InvalidEmailException
+Nodes (1): FileCouldNotBeReadException
 
 ### Community 651 - "Community 651"
 Cohesion: 1.0
-Nodes (1): InvalidUrlException
+Nodes (1): InvalidCoverageDataException
 
 ### Community 652 - "Community 652"
 Cohesion: 1.0
-Nodes (1): ElementCollectionException
+Nodes (1): TimeoutException
 
 ### Community 653 - "Community 653"
 Cohesion: 1.0
-Nodes (1): InvalidVersionException
+Nodes (1): ManifestLoaderException
 
 ### Community 654 - "Community 654"
 Cohesion: 1.0
-Nodes (1): InvalidPreReleaseSuffixException
+Nodes (1): NoEmailAddressException
 
 ### Community 655 - "Community 655"
 Cohesion: 1.0
-Nodes (1): UnsupportedVersionConstraintException
+Nodes (1): ManifestDocumentException
 
 ### Community 656 - "Community 656"
 Cohesion: 1.0
-Nodes (1): NoPreReleaseSuffixException
+Nodes (1): InvalidApplicationNameException
 
 ### Community 657 - "Community 657"
 Cohesion: 1.0
-Nodes (1): NoBuildMetaDataException
+Nodes (1): ManifestDocumentMapperException
 
 ### Community 658 - "Community 658"
 Cohesion: 1.0
-Nodes (1): DumpException
+Nodes (1): ManifestElementException
 
 ### Community 659 - "Community 659"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): InvalidEmailException
 
 ### Community 660 - "Community 660"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): InvalidUrlException
 
 ### Community 661 - "Community 661"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): ElementCollectionException
 
 ### Community 662 - "Community 662"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): InvalidVersionException
 
 ### Community 663 - "Community 663"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): InvalidPreReleaseSuffixException
 
 ### Community 664 - "Community 664"
 Cohesion: 1.0
-Nodes (1): Required
+Nodes (1): UnsupportedVersionConstraintException
 
 ### Community 665 - "Community 665"
 Cohesion: 1.0
-Nodes (1): ServiceLocatorTest
+Nodes (1): NoPreReleaseSuffixException
 
 ### Community 666 - "Community 666"
 Cohesion: 1.0
-Nodes (1): ConsoleEvents
+Nodes (1): NoBuildMetaDataException
 
 ### Community 667 - "Community 667"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): DumpException
 
 ### Community 668 - "Community 668"
 Cohesion: 1.0
@@ -3467,23 +3476,23 @@ Nodes (0):
 
 ### Community 671 - "Community 671"
 Cohesion: 1.0
-Nodes (1): NamespaceNotFoundException
+Nodes (0): 
 
 ### Community 672 - "Community 672"
 Cohesion: 1.0
-Nodes (1): MissingInputException
+Nodes (0): 
 
 ### Community 673 - "Community 673"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Required
 
 ### Community 674 - "Community 674"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): ServiceLocatorTest
 
 ### Community 675 - "Community 675"
 Cohesion: 1.0
-Nodes (1): IllogicalValuesException
+Nodes (1): ConsoleEvents
 
 ### Community 676 - "Community 676"
 Cohesion: 1.0
@@ -3491,11 +3500,11 @@ Nodes (0):
 
 ### Community 677 - "Community 677"
 Cohesion: 1.0
-Nodes (1): AppConfig
+Nodes (0): 
 
 ### Community 678 - "Community 678"
 Cohesion: 1.0
-Nodes (1): Changelog (Unreleased)
+Nodes (0): 
 
 ### Community 679 - "Community 679"
 Cohesion: 1.0
@@ -3503,11 +3512,11 @@ Nodes (0):
 
 ### Community 680 - "Community 680"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): NamespaceNotFoundException
 
 ### Community 681 - "Community 681"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): MissingInputException
 
 ### Community 682 - "Community 682"
 Cohesion: 1.0
@@ -3519,7 +3528,7 @@ Nodes (0):
 
 ### Community 684 - "Community 684"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): IllogicalValuesException
 
 ### Community 685 - "Community 685"
 Cohesion: 1.0
@@ -3527,11 +3536,11 @@ Nodes (0):
 
 ### Community 686 - "Community 686"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): AppConfig
 
 ### Community 687 - "Community 687"
 Cohesion: 1.0
-Nodes (0): 
+Nodes (1): Changelog (Unreleased)
 
 ### Community 688 - "Community 688"
 Cohesion: 1.0
@@ -3757,563 +3766,599 @@ Nodes (0):
 Cohesion: 1.0
 Nodes (0): 
 
+### Community 744 - "Community 744"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 745 - "Community 745"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 746 - "Community 746"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 747 - "Community 747"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 748 - "Community 748"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 749 - "Community 749"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 750 - "Community 750"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 751 - "Community 751"
+Cohesion: 1.0
+Nodes (0): 
+
+### Community 752 - "Community 752"
+Cohesion: 1.0
+Nodes (0): 
+
 ## Knowledge Gaps
 - **1178 isolated node(s):** `CloneException`, `PropertyException`, `SplDoublyLinkedList`, `ConstExprEvaluationException`, `Doc` (+1173 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **Thin community `Community 472`** (2 nodes): `matches()`, `Matcher.php`
+- **Thin community `Community 481`** (2 nodes): `matches()`, `Matcher.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 473`** (2 nodes): `apply()`, `Filter.php`
+- **Thin community `Community 482`** (2 nodes): `apply()`, `Filter.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 474`** (2 nodes): `CloneException`, `CloneException.php`
+- **Thin community `Community 483`** (2 nodes): `CloneException`, `CloneException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 475`** (2 nodes): `PropertyException`, `PropertyException.php`
+- **Thin community `Community 484`** (2 nodes): `PropertyException`, `PropertyException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 476`** (2 nodes): `apply()`, `TypeFilter.php`
+- **Thin community `Community 485`** (2 nodes): `apply()`, `TypeFilter.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 477`** (2 nodes): `SplDoublyLinkedList`, `SplDoublyLinkedList.php`
+- **Thin community `Community 486`** (2 nodes): `SplDoublyLinkedList`, `SplDoublyLinkedList.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 478`** (2 nodes): `ConstExprEvaluationException`, `ConstExprEvaluationException.php`
+- **Thin community `Community 487`** (2 nodes): `ConstExprEvaluationException`, `ConstExprEvaluationException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 479`** (2 nodes): `getNode()`, `Builder.php`
+- **Thin community `Community 488`** (2 nodes): `getNode()`, `Builder.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 480`** (2 nodes): `handleError()`, `ErrorHandler.php`
+- **Thin community `Community 489`** (2 nodes): `handleError()`, `ErrorHandler.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 481`** (2 nodes): `Doc`, `Doc.php`
+- **Thin community `Community 490`** (2 nodes): `Doc`, `Doc.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 482`** (2 nodes): `ComplexType`, `ComplexType.php`
+- **Thin community `Community 491`** (2 nodes): `ComplexType`, `ComplexType.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 483`** (2 nodes): `Expr`, `Expr.php`
+- **Thin community `Community 492`** (2 nodes): `Expr`, `Expr.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 484`** (2 nodes): `Scalar`, `Scalar.php`
+- **Thin community `Community 493`** (2 nodes): `Scalar`, `Scalar.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 485`** (2 nodes): `Stmt`, `Stmt.php`
+- **Thin community `Community 494`** (2 nodes): `Stmt`, `Stmt.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 486`** (2 nodes): `UseUse.php`, `UseUse`
+- **Thin community `Community 495`** (2 nodes): `UseUse.php`, `UseUse`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 487`** (2 nodes): `PropertyProperty`, `PropertyProperty.php`
+- **Thin community `Community 496`** (2 nodes): `PropertyProperty`, `PropertyProperty.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 488`** (2 nodes): `DeclareDeclare`, `DeclareDeclare.php`
+- **Thin community `Community 497`** (2 nodes): `DeclareDeclare`, `DeclareDeclare.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 489`** (2 nodes): `DNumber`, `DNumber.php`
+- **Thin community `Community 498`** (2 nodes): `DNumber`, `DNumber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 490`** (2 nodes): `LNumber`, `LNumber.php`
+- **Thin community `Community 499`** (2 nodes): `LNumber`, `LNumber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 491`** (2 nodes): `EncapsedStringPart`, `EncapsedStringPart.php`
+- **Thin community `Community 500`** (2 nodes): `EncapsedStringPart`, `EncapsedStringPart.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 492`** (2 nodes): `Encapsed`, `Encapsed.php`
+- **Thin community `Community 501`** (2 nodes): `Encapsed`, `Encapsed.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 493`** (2 nodes): `evaluate()`, `Antecedent.php`
+- **Thin community `Community 502`** (2 nodes): `evaluate()`, `Antecedent.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 494`** (2 nodes): `shouldTerminate()`, `TerminationCondition.php`
+- **Thin community `Community 503`** (2 nodes): `shouldTerminate()`, `TerminationCondition.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 495`** (2 nodes): `SkipValueException`, `SkipValueException.php`
+- **Thin community `Community 504`** (2 nodes): `SkipValueException`, `SkipValueException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 496`** (2 nodes): `getValue()`, `ErisAttribute.php`
+- **Thin community `Community 505`** (2 nodes): `getValue()`, `ErisAttribute.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 497`** (2 nodes): `NoActiveTimerException`, `NoActiveTimerException.php`
+- **Thin community `Community 506`** (2 nodes): `NoActiveTimerException`, `NoActiveTimerException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 498`** (2 nodes): `TimeSinceStartOfRequestNotAvailableException`, `TimeSinceStartOfRequestNotAvailableException.php`
+- **Thin community `Community 507`** (2 nodes): `TimeSinceStartOfRequestNotAvailableException`, `TimeSinceStartOfRequestNotAvailableException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 499`** (2 nodes): `FailedSchemaDetectionResult`, `FailedSchemaDetectionResult.php`
+- **Thin community `Community 508`** (2 nodes): `FailedSchemaDetectionResult`, `FailedSchemaDetectionResult.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 500`** (2 nodes): `MigrationException`, `MigrationException.php`
+- **Thin community `Community 509`** (2 nodes): `MigrationException`, `MigrationException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 501`** (2 nodes): `migrate()`, `Migration.php`
+- **Thin community `Community 510`** (2 nodes): `migrate()`, `Migration.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 502`** (2 nodes): `NoBootstrapException`, `NoBootstrapException.php`
+- **Thin community `Community 511`** (2 nodes): `NoBootstrapException`, `NoBootstrapException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 503`** (2 nodes): `NoCustomCssFileException`, `NoCustomCssFileException.php`
+- **Thin community `Community 512`** (2 nodes): `NoCustomCssFileException`, `NoCustomCssFileException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 504`** (2 nodes): `ConfigurationCannotBeBuiltException`, `ConfigurationCannotBeBuiltException.php`
+- **Thin community `Community 513`** (2 nodes): `ConfigurationCannotBeBuiltException`, `ConfigurationCannotBeBuiltException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 505`** (2 nodes): `SpecificDeprecationToStopOnNotConfiguredException`, `SpecificDeprecationToStopOnNotConfiguredException.php`
+- **Thin community `Community 514`** (2 nodes): `SpecificDeprecationToStopOnNotConfiguredException`, `SpecificDeprecationToStopOnNotConfiguredException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 506`** (2 nodes): `BootstrapScriptException`, `BootstrapScriptException.php`
+- **Thin community `Community 515`** (2 nodes): `BootstrapScriptException`, `BootstrapScriptException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 507`** (2 nodes): `CodeCoverageReportNotConfiguredException`, `CodeCoverageReportNotConfiguredException.php`
+- **Thin community `Community 516`** (2 nodes): `CodeCoverageReportNotConfiguredException`, `CodeCoverageReportNotConfiguredException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 508`** (2 nodes): `NoPharExtensionDirectoryException`, `NoPharExtensionDirectoryException.php`
+- **Thin community `Community 517`** (2 nodes): `NoPharExtensionDirectoryException`, `NoPharExtensionDirectoryException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 509`** (2 nodes): `FilterNotConfiguredException`, `FilterNotConfiguredException.php`
+- **Thin community `Community 518`** (2 nodes): `FilterNotConfiguredException`, `FilterNotConfiguredException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 510`** (2 nodes): `NoDefaultTestSuiteException`, `NoDefaultTestSuiteException.php`
+- **Thin community `Community 519`** (2 nodes): `NoDefaultTestSuiteException`, `NoDefaultTestSuiteException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 511`** (2 nodes): `NoHtmlCoverageTargetException`, `NoHtmlCoverageTargetException.php`
+- **Thin community `Community 520`** (2 nodes): `NoHtmlCoverageTargetException`, `NoHtmlCoverageTargetException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 512`** (2 nodes): `CannotFindSchemaException`, `CannotFindSchemaException.php`
+- **Thin community `Community 521`** (2 nodes): `CannotFindSchemaException`, `CannotFindSchemaException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 513`** (2 nodes): `LoggingNotConfiguredException`, `LoggingNotConfiguredException.php`
+- **Thin community `Community 522`** (2 nodes): `LoggingNotConfiguredException`, `LoggingNotConfiguredException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 514`** (2 nodes): `NoCoverageCacheDirectoryException`, `NoCoverageCacheDirectoryException.php`
+- **Thin community `Community 523`** (2 nodes): `NoCoverageCacheDirectoryException`, `NoCoverageCacheDirectoryException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 515`** (2 nodes): `NoBaselineException`, `NoBaselineException.php`
+- **Thin community `Community 524`** (2 nodes): `NoBaselineException`, `NoBaselineException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 516`** (2 nodes): `NoCacheDirectoryException`, `NoCacheDirectoryException.php`
+- **Thin community `Community 525`** (2 nodes): `NoCacheDirectoryException`, `NoCacheDirectoryException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 517`** (2 nodes): `NoConfigurationFileException`, `NoConfigurationFileException.php`
+- **Thin community `Community 526`** (2 nodes): `NoConfigurationFileException`, `NoConfigurationFileException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 518`** (2 nodes): `NoTestFilesFileException`, `NoTestFilesFileException.php`
+- **Thin community `Community 527`** (2 nodes): `NoTestFilesFileException`, `NoTestFilesFileException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 519`** (2 nodes): `execute()`, `Command.php`
+- **Thin community `Community 528`** (2 nodes): `execute()`, `Command.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 520`** (2 nodes): `InvalidJsonException`, `InvalidJsonException.php`
+- **Thin community `Community 529`** (2 nodes): `InvalidJsonException`, `InvalidJsonException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 521`** (2 nodes): `PhpProcessException`, `PhpProcessException.php`
+- **Thin community `Community 530`** (2 nodes): `PhpProcessException`, `PhpProcessException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 522`** (2 nodes): `toString()`, `SelfDescribing.php`
+- **Thin community `Community 531`** (2 nodes): `toString()`, `SelfDescribing.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 523`** (2 nodes): `run()`, `Test.php`
+- **Thin community `Community 532`** (2 nodes): `run()`, `Test.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 524`** (2 nodes): `InvocationStubberImplementation`, `InvocationStubberImplementation.php`
+- **Thin community `Community 533`** (2 nodes): `InvocationStubberImplementation`, `InvocationStubberImplementation.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 525`** (2 nodes): `expects()`, `MockObject.php`
+- **Thin community `Community 534`** (2 nodes): `expects()`, `MockObject.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 526`** (2 nodes): `method()`, `Stub.php`
+- **Thin community `Community 535`** (2 nodes): `method()`, `Stub.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 527`** (2 nodes): `invoke()`, `Stub.php`
+- **Thin community `Community 536`** (2 nodes): `invoke()`, `Stub.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 528`** (2 nodes): `BadMethodCallException`, `BadMethodCallException.php`
+- **Thin community `Community 537`** (2 nodes): `BadMethodCallException`, `BadMethodCallException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 529`** (2 nodes): `EmptyStringException`, `EmptyStringException.php`
+- **Thin community `Community 538`** (2 nodes): `EmptyStringException`, `EmptyStringException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 530`** (2 nodes): `NoChildTestSuiteException`, `NoChildTestSuiteException.php`
+- **Thin community `Community 539`** (2 nodes): `NoChildTestSuiteException`, `NoChildTestSuiteException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 531`** (2 nodes): `InvalidDependencyException`, `InvalidDependencyException.php`
+- **Thin community `Community 540`** (2 nodes): `InvalidDependencyException`, `InvalidDependencyException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 532`** (2 nodes): `ProcessIsolationException`, `ProcessIsolationException.php`
+- **Thin community `Community 541`** (2 nodes): `ProcessIsolationException`, `ProcessIsolationException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 533`** (2 nodes): `IncompleteTestError`, `IncompleteTestError.php`
+- **Thin community `Community 542`** (2 nodes): `IncompleteTestError`, `IncompleteTestError.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 534`** (2 nodes): `SkippedWithMessageException`, `SkippedWithMessageException.php`
+- **Thin community `Community 543`** (2 nodes): `SkippedWithMessageException`, `SkippedWithMessageException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 535`** (2 nodes): `SkippedTestSuiteError`, `SkippedTestSuiteError.php`
+- **Thin community `Community 544`** (2 nodes): `SkippedTestSuiteError`, `SkippedTestSuiteError.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 536`** (2 nodes): `InvalidPhptFileException`, `InvalidPhptFileException.php`
+- **Thin community `Community 545`** (2 nodes): `InvalidPhptFileException`, `InvalidPhptFileException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 537`** (2 nodes): `CannotWriteBaselineException`, `CannotWriteBaselineException.php`
+- **Thin community `Community 546`** (2 nodes): `CannotWriteBaselineException`, `CannotWriteBaselineException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 538`** (2 nodes): `CannotLoadBaselineException`, `CannotLoadBaselineException.php`
+- **Thin community `Community 547`** (2 nodes): `CannotLoadBaselineException`, `CannotLoadBaselineException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 539`** (2 nodes): `resolve()`, `Resolver.php`
+- **Thin community `Community 548`** (2 nodes): `resolve()`, `Resolver.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 540`** (2 nodes): `ErrorException`, `ErrorException.php`
+- **Thin community `Community 549`** (2 nodes): `ErrorException`, `ErrorException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 541`** (2 nodes): `CodeCoverageFileExistsException`, `CodeCoverageFileExistsException.php`
+- **Thin community `Community 550`** (2 nodes): `CodeCoverageFileExistsException`, `CodeCoverageFileExistsException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 542`** (2 nodes): `InvalidOrderException`, `InvalidOrderException.php`
+- **Thin community `Community 551`** (2 nodes): `InvalidOrderException`, `InvalidOrderException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 543`** (2 nodes): `trace()`, `Tracer.php`
+- **Thin community `Community 552`** (2 nodes): `trace()`, `Tracer.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 544`** (2 nodes): `dispatch()`, `Dispatcher.php`
+- **Thin community `Community 553`** (2 nodes): `dispatch()`, `Dispatcher.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 545`** (2 nodes): `current()`, `StopWatch.php`
+- **Thin community `Community 554`** (2 nodes): `current()`, `StopWatch.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 546`** (2 nodes): `status()`, `GarbageCollectorStatusProvider.php`
+- **Thin community `Community 555`** (2 nodes): `status()`, `GarbageCollectorStatusProvider.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 547`** (2 nodes): `notify()`, `GarbageCollectionEnabledSubscriber.php`
+- **Thin community `Community 556`** (2 nodes): `notify()`, `GarbageCollectionEnabledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 548`** (2 nodes): `notify()`, `StaticAnalysisForCodeCoverageStartedSubscriber.php`
+- **Thin community `Community 557`** (2 nodes): `notify()`, `StaticAnalysisForCodeCoverageStartedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 549`** (2 nodes): `notify()`, `ExecutionAbortedSubscriber.php`
+- **Thin community `Community 558`** (2 nodes): `notify()`, `ExecutionAbortedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 550`** (2 nodes): `notify()`, `StaticAnalysisForCodeCoverageFinishedSubscriber.php`
+- **Thin community `Community 559`** (2 nodes): `notify()`, `StaticAnalysisForCodeCoverageFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 551`** (2 nodes): `notify()`, `ExecutionStartedSubscriber.php`
+- **Thin community `Community 560`** (2 nodes): `notify()`, `ExecutionStartedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 552`** (2 nodes): `notify()`, `BootstrapFinishedSubscriber.php`
+- **Thin community `Community 561`** (2 nodes): `notify()`, `BootstrapFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 553`** (2 nodes): `notify()`, `ChildProcessErroredSubscriber.php`
+- **Thin community `Community 562`** (2 nodes): `notify()`, `ChildProcessErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 554`** (2 nodes): `notify()`, `EventFacadeSealedSubscriber.php`
+- **Thin community `Community 563`** (2 nodes): `notify()`, `EventFacadeSealedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 555`** (2 nodes): `notify()`, `GarbageCollectionTriggeredSubscriber.php`
+- **Thin community `Community 564`** (2 nodes): `notify()`, `GarbageCollectionTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 556`** (2 nodes): `notify()`, `ExecutionFinishedSubscriber.php`
+- **Thin community `Community 565`** (2 nodes): `notify()`, `ExecutionFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 557`** (2 nodes): `notify()`, `ConfiguredSubscriber.php`
+- **Thin community `Community 566`** (2 nodes): `notify()`, `ConfiguredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 558`** (2 nodes): `notify()`, `GarbageCollectionDisabledSubscriber.php`
+- **Thin community `Community 567`** (2 nodes): `notify()`, `GarbageCollectionDisabledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 559`** (2 nodes): `notify()`, `ChildProcessStartedSubscriber.php`
+- **Thin community `Community 568`** (2 nodes): `notify()`, `ChildProcessStartedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 560`** (2 nodes): `notify()`, `ExtensionBootstrappedSubscriber.php`
+- **Thin community `Community 569`** (2 nodes): `notify()`, `ExtensionBootstrappedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 561`** (2 nodes): `notify()`, `ExtensionLoadedFromPharSubscriber.php`
+- **Thin community `Community 570`** (2 nodes): `notify()`, `ExtensionLoadedFromPharSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 562`** (2 nodes): `notify()`, `ChildProcessFinishedSubscriber.php`
+- **Thin community `Community 571`** (2 nodes): `notify()`, `ChildProcessFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 563`** (2 nodes): `notify()`, `PrintedUnexpectedOutputSubscriber.php`
+- **Thin community `Community 572`** (2 nodes): `notify()`, `PrintedUnexpectedOutputSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 564`** (2 nodes): `notify()`, `ComparatorRegisteredSubscriber.php`
+- **Thin community `Community 573`** (2 nodes): `notify()`, `ComparatorRegisteredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 565`** (2 nodes): `notify()`, `CustomTestMethodInvocationUsedSubscriber.php`
+- **Thin community `Community 574`** (2 nodes): `notify()`, `CustomTestMethodInvocationUsedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 566`** (2 nodes): `notify()`, `AdditionalInformationProvidedSubscriber.php`
+- **Thin community `Community 575`** (2 nodes): `notify()`, `AdditionalInformationProvidedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 567`** (2 nodes): `notify()`, `BeforeTestMethodCalledSubscriber.php`
+- **Thin community `Community 576`** (2 nodes): `notify()`, `BeforeTestMethodCalledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 568`** (2 nodes): `notify()`, `PreConditionErroredSubscriber.php`
+- **Thin community `Community 577`** (2 nodes): `notify()`, `PreConditionErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 569`** (2 nodes): `notify()`, `BeforeTestMethodFinishedSubscriber.php`
+- **Thin community `Community 578`** (2 nodes): `notify()`, `BeforeTestMethodFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 570`** (2 nodes): `notify()`, `AfterLastTestMethodErroredSubscriber.php`
+- **Thin community `Community 579`** (2 nodes): `notify()`, `AfterLastTestMethodErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 571`** (2 nodes): `notify()`, `BeforeTestMethodFailedSubscriber.php`
+- **Thin community `Community 580`** (2 nodes): `notify()`, `BeforeTestMethodFailedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 572`** (2 nodes): `notify()`, `BeforeTestMethodErroredSubscriber.php`
+- **Thin community `Community 581`** (2 nodes): `notify()`, `BeforeTestMethodErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 573`** (2 nodes): `notify()`, `PostConditionCalledSubscriber.php`
+- **Thin community `Community 582`** (2 nodes): `notify()`, `PostConditionCalledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 574`** (2 nodes): `notify()`, `PreConditionFinishedSubscriber.php`
+- **Thin community `Community 583`** (2 nodes): `notify()`, `PreConditionFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 575`** (2 nodes): `notify()`, `BeforeFirstTestMethodCalledSubscriber.php`
+- **Thin community `Community 584`** (2 nodes): `notify()`, `BeforeFirstTestMethodCalledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 576`** (2 nodes): `notify()`, `AfterTestMethodFailedSubscriber.php`
+- **Thin community `Community 585`** (2 nodes): `notify()`, `AfterTestMethodFailedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 577`** (2 nodes): `notify()`, `AfterTestMethodFinishedSubscriber.php`
+- **Thin community `Community 586`** (2 nodes): `notify()`, `AfterTestMethodFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 578`** (2 nodes): `notify()`, `BeforeFirstTestMethodFailedSubscriber.php`
+- **Thin community `Community 587`** (2 nodes): `notify()`, `BeforeFirstTestMethodFailedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 579`** (2 nodes): `notify()`, `AfterTestMethodCalledSubscriber.php`
+- **Thin community `Community 588`** (2 nodes): `notify()`, `AfterTestMethodCalledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 580`** (2 nodes): `notify()`, `PostConditionFailedSubscriber.php`
+- **Thin community `Community 589`** (2 nodes): `notify()`, `PostConditionFailedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 581`** (2 nodes): `notify()`, `BeforeFirstTestMethodFinishedSubscriber.php`
+- **Thin community `Community 590`** (2 nodes): `notify()`, `BeforeFirstTestMethodFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 582`** (2 nodes): `notify()`, `BeforeFirstTestMethodErroredSubscriber.php`
+- **Thin community `Community 591`** (2 nodes): `notify()`, `BeforeFirstTestMethodErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 583`** (2 nodes): `notify()`, `AfterLastTestMethodFailedSubscriber.php`
+- **Thin community `Community 592`** (2 nodes): `notify()`, `AfterLastTestMethodFailedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 584`** (2 nodes): `notify()`, `PreConditionFailedSubscriber.php`
+- **Thin community `Community 593`** (2 nodes): `notify()`, `PreConditionFailedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 585`** (2 nodes): `notify()`, `AfterTestMethodErroredSubscriber.php`
+- **Thin community `Community 594`** (2 nodes): `notify()`, `AfterTestMethodErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 586`** (2 nodes): `notify()`, `AfterLastTestMethodCalledSubscriber.php`
+- **Thin community `Community 595`** (2 nodes): `notify()`, `AfterLastTestMethodCalledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 587`** (2 nodes): `notify()`, `PreConditionCalledSubscriber.php`
+- **Thin community `Community 596`** (2 nodes): `notify()`, `PreConditionCalledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 588`** (2 nodes): `notify()`, `AfterLastTestMethodFinishedSubscriber.php`
+- **Thin community `Community 597`** (2 nodes): `notify()`, `AfterLastTestMethodFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 589`** (2 nodes): `notify()`, `PostConditionFinishedSubscriber.php`
+- **Thin community `Community 598`** (2 nodes): `notify()`, `PostConditionFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 590`** (2 nodes): `notify()`, `PostConditionErroredSubscriber.php`
+- **Thin community `Community 599`** (2 nodes): `notify()`, `PostConditionErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 591`** (2 nodes): `notify()`, `PreparationErroredSubscriber.php`
+- **Thin community `Community 600`** (2 nodes): `notify()`, `PreparationErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 592`** (2 nodes): `notify()`, `DataProviderMethodCalledSubscriber.php`
+- **Thin community `Community 601`** (2 nodes): `notify()`, `DataProviderMethodCalledSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 593`** (2 nodes): `notify()`, `PreparationStartedSubscriber.php`
+- **Thin community `Community 602`** (2 nodes): `notify()`, `PreparationStartedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 594`** (2 nodes): `notify()`, `DataProviderMethodFinishedSubscriber.php`
+- **Thin community `Community 603`** (2 nodes): `notify()`, `DataProviderMethodFinishedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 595`** (2 nodes): `notify()`, `PreparedSubscriber.php`
+- **Thin community `Community 604`** (2 nodes): `notify()`, `PreparedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 596`** (2 nodes): `notify()`, `PreparationFailedSubscriber.php`
+- **Thin community `Community 605`** (2 nodes): `notify()`, `PreparationFailedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 597`** (2 nodes): `notify()`, `MarkedIncompleteSubscriber.php`
+- **Thin community `Community 606`** (2 nodes): `notify()`, `MarkedIncompleteSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 598`** (2 nodes): `notify()`, `ErroredSubscriber.php`
+- **Thin community `Community 607`** (2 nodes): `notify()`, `ErroredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 599`** (2 nodes): `notify()`, `FailedSubscriber.php`
+- **Thin community `Community 608`** (2 nodes): `notify()`, `FailedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 600`** (2 nodes): `notify()`, `PassedSubscriber.php`
+- **Thin community `Community 609`** (2 nodes): `notify()`, `PassedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 601`** (2 nodes): `notify()`, `PhpunitErrorTriggeredSubscriber.php`
+- **Thin community `Community 610`** (2 nodes): `notify()`, `PhpunitErrorTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 602`** (2 nodes): `notify()`, `PhpNoticeTriggeredSubscriber.php`
+- **Thin community `Community 611`** (2 nodes): `notify()`, `PhpNoticeTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 603`** (2 nodes): `notify()`, `ErrorTriggeredSubscriber.php`
+- **Thin community `Community 612`** (2 nodes): `notify()`, `ErrorTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 604`** (2 nodes): `notify()`, `PhpunitWarningTriggeredSubscriber.php`
+- **Thin community `Community 613`** (2 nodes): `notify()`, `PhpunitWarningTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 605`** (2 nodes): `notify()`, `PhpunitDeprecationTriggeredSubscriber.php`
+- **Thin community `Community 614`** (2 nodes): `notify()`, `PhpunitDeprecationTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 606`** (2 nodes): `notify()`, `PhpWarningTriggeredSubscriber.php`
+- **Thin community `Community 615`** (2 nodes): `notify()`, `PhpWarningTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 607`** (2 nodes): `notify()`, `ConsideredRiskySubscriber.php`
+- **Thin community `Community 616`** (2 nodes): `notify()`, `ConsideredRiskySubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 608`** (2 nodes): `notify()`, `PhpunitNoticeTriggeredSubscriber.php`
+- **Thin community `Community 617`** (2 nodes): `notify()`, `PhpunitNoticeTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 609`** (2 nodes): `notify()`, `PhpDeprecationTriggeredSubscriber.php`
+- **Thin community `Community 618`** (2 nodes): `notify()`, `PhpDeprecationTriggeredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 610`** (2 nodes): `notify()`, `TestStubForIntersectionOfInterfacesCreatedSubscriber.php`
+- **Thin community `Community 619`** (2 nodes): `notify()`, `TestStubForIntersectionOfInterfacesCreatedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 611`** (2 nodes): `notify()`, `PartialMockObjectCreatedSubscriber.php`
+- **Thin community `Community 620`** (2 nodes): `notify()`, `PartialMockObjectCreatedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 612`** (2 nodes): `notify()`, `MockObjectForIntersectionOfInterfacesCreatedSubscriber.php`
+- **Thin community `Community 621`** (2 nodes): `notify()`, `MockObjectForIntersectionOfInterfacesCreatedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 613`** (2 nodes): `notify()`, `MockObjectCreatedSubscriber.php`
+- **Thin community `Community 622`** (2 nodes): `notify()`, `MockObjectCreatedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 614`** (2 nodes): `notify()`, `TestStubCreatedSubscriber.php`
+- **Thin community `Community 623`** (2 nodes): `notify()`, `TestStubCreatedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 615`** (2 nodes): `notify()`, `SortedSubscriber.php`
+- **Thin community `Community 624`** (2 nodes): `notify()`, `SortedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 616`** (2 nodes): `notify()`, `LoadedSubscriber.php`
+- **Thin community `Community 625`** (2 nodes): `notify()`, `LoadedSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 617`** (2 nodes): `notify()`, `FilteredSubscriber.php`
+- **Thin community `Community 626`** (2 nodes): `notify()`, `FilteredSubscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 618`** (2 nodes): `UnknownEventTypeException`, `UnknownEventTypeException.php`
+- **Thin community `Community 627`** (2 nodes): `UnknownEventTypeException`, `UnknownEventTypeException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 619`** (2 nodes): `UnknownEventException`, `UnknownEventException.php`
+- **Thin community `Community 628`** (2 nodes): `UnknownEventException`, `UnknownEventException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 620`** (2 nodes): `InvalidSubscriberException`, `InvalidSubscriberException.php`
+- **Thin community `Community 629`** (2 nodes): `InvalidSubscriberException`, `InvalidSubscriberException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 621`** (2 nodes): `NoComparisonFailureException`, `NoComparisonFailureException.php`
+- **Thin community `Community 630`** (2 nodes): `NoComparisonFailureException`, `NoComparisonFailureException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 622`** (2 nodes): `EventFacadeIsSealedException`, `EventFacadeIsSealedException.php`
+- **Thin community `Community 631`** (2 nodes): `EventFacadeIsSealedException`, `EventFacadeIsSealedException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 623`** (2 nodes): `NoPreviousThrowableException`, `NoPreviousThrowableException.php`
+- **Thin community `Community 632`** (2 nodes): `NoPreviousThrowableException`, `NoPreviousThrowableException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 624`** (2 nodes): `UnknownSubscriberTypeException`, `UnknownSubscriberTypeException.php`
+- **Thin community `Community 633`** (2 nodes): `UnknownSubscriberTypeException`, `UnknownSubscriberTypeException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 625`** (2 nodes): `EventAlreadyAssignedException`, `EventAlreadyAssignedException.php`
+- **Thin community `Community 634`** (2 nodes): `EventAlreadyAssignedException`, `EventAlreadyAssignedException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 626`** (2 nodes): `SubscriberTypeAlreadyRegisteredException`, `SubscriberTypeAlreadyRegisteredException.php`
+- **Thin community `Community 635`** (2 nodes): `SubscriberTypeAlreadyRegisteredException`, `SubscriberTypeAlreadyRegisteredException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 627`** (2 nodes): `NoDataSetFromDataProviderException`, `NoDataSetFromDataProviderException.php`
+- **Thin community `Community 636`** (2 nodes): `NoDataSetFromDataProviderException`, `NoDataSetFromDataProviderException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 628`** (2 nodes): `InvalidEventException`, `InvalidEventException.php`
+- **Thin community `Community 637`** (2 nodes): `InvalidEventException`, `InvalidEventException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 629`** (2 nodes): `MapError`, `MapError.php`
+- **Thin community `Community 638`** (2 nodes): `MapError`, `MapError.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 630`** (2 nodes): `UnknownSubscriberException`, `UnknownSubscriberException.php`
+- **Thin community `Community 639`** (2 nodes): `UnknownSubscriberException`, `UnknownSubscriberException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 631`** (2 nodes): `InvalidVersionRequirementException`, `InvalidVersionRequirementException.php`
+- **Thin community `Community 640`** (2 nodes): `InvalidVersionRequirementException`, `InvalidVersionRequirementException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 632`** (2 nodes): `NoVersionRequirementException`, `NoVersionRequirementException.php`
+- **Thin community `Community 641`** (2 nodes): `NoVersionRequirementException`, `NoVersionRequirementException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 633`** (2 nodes): `CannotOpenUriForWritingException`, `CannotOpenUriForWritingException.php`
+- **Thin community `Community 642`** (2 nodes): `CannotOpenUriForWritingException`, `CannotOpenUriForWritingException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 634`** (2 nodes): `analyse()`, `SourceAnalyser.php`
+- **Thin community `Community 643`** (2 nodes): `analyse()`, `SourceAnalyser.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 635`** (2 nodes): `StaticAnalysisCacheNotConfiguredException`, `StaticAnalysisCacheNotConfiguredException.php`
+- **Thin community `Community 644`** (2 nodes): `StaticAnalysisCacheNotConfiguredException`, `StaticAnalysisCacheNotConfiguredException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 636`** (2 nodes): `DirectoryCouldNotBeCreatedException`, `DirectoryCouldNotBeCreatedException.php`
+- **Thin community `Community 645`** (2 nodes): `DirectoryCouldNotBeCreatedException`, `DirectoryCouldNotBeCreatedException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 637`** (2 nodes): `ParserException`, `ParserException.php`
+- **Thin community `Community 646`** (2 nodes): `ParserException`, `ParserException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 638`** (2 nodes): `BranchAndPathCoverageNotSupportedException`, `BranchAndPathCoverageNotSupportedException.php`
+- **Thin community `Community 647`** (2 nodes): `BranchAndPathCoverageNotSupportedException`, `BranchAndPathCoverageNotSupportedException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 639`** (2 nodes): `FileCouldNotBeWrittenException`, `FileCouldNotBeWrittenException.php`
+- **Thin community `Community 648`** (2 nodes): `FileCouldNotBeWrittenException`, `FileCouldNotBeWrittenException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 640`** (2 nodes): `MethodNotImplementedException`, `MethodNotImplementedException.php`
+- **Thin community `Community 649`** (2 nodes): `MethodNotImplementedException`, `MethodNotImplementedException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 641`** (2 nodes): `FileCouldNotBeReadException`, `FileCouldNotBeReadException.php`
+- **Thin community `Community 650`** (2 nodes): `FileCouldNotBeReadException`, `FileCouldNotBeReadException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 642`** (2 nodes): `InvalidCoverageDataException`, `InvalidCoverageDataException.php`
+- **Thin community `Community 651`** (2 nodes): `InvalidCoverageDataException`, `InvalidCoverageDataException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 643`** (2 nodes): `TimeoutException`, `TimeoutException.php`
+- **Thin community `Community 652`** (2 nodes): `TimeoutException`, `TimeoutException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 644`** (2 nodes): `ManifestLoaderException`, `ManifestLoaderException.php`
+- **Thin community `Community 653`** (2 nodes): `ManifestLoaderException`, `ManifestLoaderException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 645`** (2 nodes): `NoEmailAddressException`, `NoEmailAddressException.php`
+- **Thin community `Community 654`** (2 nodes): `NoEmailAddressException`, `NoEmailAddressException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 646`** (2 nodes): `ManifestDocumentException`, `ManifestDocumentException.php`
+- **Thin community `Community 655`** (2 nodes): `ManifestDocumentException`, `ManifestDocumentException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 647`** (2 nodes): `InvalidApplicationNameException`, `InvalidApplicationNameException.php`
+- **Thin community `Community 656`** (2 nodes): `InvalidApplicationNameException`, `InvalidApplicationNameException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 648`** (2 nodes): `ManifestDocumentMapperException`, `ManifestDocumentMapperException.php`
+- **Thin community `Community 657`** (2 nodes): `ManifestDocumentMapperException`, `ManifestDocumentMapperException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 649`** (2 nodes): `ManifestElementException`, `ManifestElementException.php`
+- **Thin community `Community 658`** (2 nodes): `ManifestElementException`, `ManifestElementException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 650`** (2 nodes): `InvalidEmailException`, `InvalidEmailException.php`
+- **Thin community `Community 659`** (2 nodes): `InvalidEmailException`, `InvalidEmailException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 651`** (2 nodes): `InvalidUrlException`, `InvalidUrlException.php`
+- **Thin community `Community 660`** (2 nodes): `InvalidUrlException`, `InvalidUrlException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 652`** (2 nodes): `ElementCollectionException`, `ElementCollectionException.php`
+- **Thin community `Community 661`** (2 nodes): `ElementCollectionException`, `ElementCollectionException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 653`** (2 nodes): `InvalidVersionException`, `InvalidVersionException.php`
+- **Thin community `Community 662`** (2 nodes): `InvalidVersionException`, `InvalidVersionException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 654`** (2 nodes): `InvalidPreReleaseSuffixException`, `InvalidPreReleaseSuffixException.php`
+- **Thin community `Community 663`** (2 nodes): `InvalidPreReleaseSuffixException`, `InvalidPreReleaseSuffixException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 655`** (2 nodes): `UnsupportedVersionConstraintException`, `UnsupportedVersionConstraintException.php`
+- **Thin community `Community 664`** (2 nodes): `UnsupportedVersionConstraintException`, `UnsupportedVersionConstraintException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 656`** (2 nodes): `NoPreReleaseSuffixException`, `NoPreReleaseSuffixException.php`
+- **Thin community `Community 665`** (2 nodes): `NoPreReleaseSuffixException`, `NoPreReleaseSuffixException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 657`** (2 nodes): `NoBuildMetaDataException`, `NoBuildMetaDataException.php`
+- **Thin community `Community 666`** (2 nodes): `NoBuildMetaDataException`, `NoBuildMetaDataException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 658`** (2 nodes): `DumpException`, `DumpException.php`
+- **Thin community `Community 667`** (2 nodes): `DumpException`, `DumpException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 659`** (2 nodes): `slug()`, `SluggerInterface.php`
+- **Thin community `Community 668`** (2 nodes): `slug()`, `SluggerInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 660`** (2 nodes): `trigger_deprecation()`, `function.php`
+- **Thin community `Community 669`** (2 nodes): `trigger_deprecation()`, `function.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 661`** (2 nodes): `getSubscribedServices()`, `ServiceSubscriberInterface.php`
+- **Thin community `Community 670`** (2 nodes): `getSubscribedServices()`, `ServiceSubscriberInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 662`** (2 nodes): `reset()`, `ResetInterface.php`
+- **Thin community `Community 671`** (2 nodes): `reset()`, `ResetInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 663`** (2 nodes): `getContainer()`, `ContainerAwareInterface.php`
+- **Thin community `Community 672`** (2 nodes): `getContainer()`, `ContainerAwareInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 664`** (2 nodes): `Required`, `Required.php`
+- **Thin community `Community 673`** (2 nodes): `Required`, `Required.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 665`** (2 nodes): `ServiceLocatorTest`, `ServiceLocatorTest.php`
+- **Thin community `Community 674`** (2 nodes): `ServiceLocatorTest`, `ServiceLocatorTest.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 666`** (2 nodes): `ConsoleEvents`, `ConsoleEvents.php`
+- **Thin community `Community 675`** (2 nodes): `ConsoleEvents`, `ConsoleEvents.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 667`** (2 nodes): `getFunction()`, `InteractiveAttributeInterface.php`
+- **Thin community `Community 676`** (2 nodes): `getFunction()`, `InteractiveAttributeInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 668`** (2 nodes): `setInput()`, `InputAwareInterface.php`
+- **Thin community `Community 677`** (2 nodes): `setInput()`, `InputAwareInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 669`** (2 nodes): `write()`, `CompletionOutputInterface.php`
+- **Thin community `Community 678`** (2 nodes): `write()`, `CompletionOutputInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 670`** (2 nodes): `describe()`, `DescriptorInterface.php`
+- **Thin community `Community 679`** (2 nodes): `describe()`, `DescriptorInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 671`** (2 nodes): `NamespaceNotFoundException`, `NamespaceNotFoundException.php`
+- **Thin community `Community 680`** (2 nodes): `NamespaceNotFoundException`, `NamespaceNotFoundException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 672`** (2 nodes): `MissingInputException`, `MissingInputException.php`
+- **Thin community `Community 681`** (2 nodes): `MissingInputException`, `MissingInputException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 673`** (2 nodes): `calculate()`, `LongestCommonSubsequenceCalculator.php`
+- **Thin community `Community 682`** (2 nodes): `calculate()`, `LongestCommonSubsequenceCalculator.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 674`** (2 nodes): `getDiff()`, `DiffOutputBuilderInterface.php`
+- **Thin community `Community 683`** (2 nodes): `getDiff()`, `DiffOutputBuilderInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 675`** (2 nodes): `IllogicalValuesException`, `IllogicalValuesException.php`
+- **Thin community `Community 684`** (2 nodes): `IllogicalValuesException`, `IllogicalValuesException.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 676`** (2 nodes): `run()`, `ShellCommandRunner.php`
+- **Thin community `Community 685`** (2 nodes): `run()`, `ShellCommandRunner.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 677`** (2 nodes): `AppConfig`, `AppConfig.php`
+- **Thin community `Community 686`** (2 nodes): `AppConfig`, `AppConfig.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 678`** (2 nodes): `Changelog (Unreleased)`, `CHANGELOG.md`
+- **Thin community `Community 687`** (2 nodes): `Changelog (Unreleased)`, `CHANGELOG.md`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 679`** (1 nodes): `autoload.php`
+- **Thin community `Community 688`** (1 nodes): `autoload.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 680`** (1 nodes): `functionMetadata.php`
+- **Thin community `Community 689`** (1 nodes): `functionMetadata.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 681`** (1 nodes): `autoload_namespaces.php`
+- **Thin community `Community 690`** (1 nodes): `autoload_namespaces.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 682`** (1 nodes): `autoload_psr4.php`
+- **Thin community `Community 691`** (1 nodes): `autoload_psr4.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 683`** (1 nodes): `autoload_classmap.php`
+- **Thin community `Community 692`** (1 nodes): `autoload_classmap.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 684`** (1 nodes): `platform_check.php`
+- **Thin community `Community 693`** (1 nodes): `platform_check.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 685`** (1 nodes): `autoload_files.php`
+- **Thin community `Community 694`** (1 nodes): `autoload_files.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 686`** (1 nodes): `installed.php`
+- **Thin community `Community 695`** (1 nodes): `installed.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 687`** (1 nodes): `rector.php`
+- **Thin community `Community 696`** (1 nodes): `rector.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 688`** (1 nodes): `conf.py`
+- **Thin community `Community 697`** (1 nodes): `conf.py`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 689`** (1 nodes): `generating_integers.php`
+- **Thin community `Community 698`** (1 nodes): `generating_integers.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 690`** (1 nodes): `Exception.php`
+- **Thin community `Community 699`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 691`** (1 nodes): `Exception.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 692`** (1 nodes): `Exception.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 693`** (1 nodes): `Exception.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 694`** (1 nodes): `Exception.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 695`** (1 nodes): `NativeType.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 696`** (1 nodes): `Exception.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 697`** (1 nodes): `Exception.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 698`** (1 nodes): `IncompleteTest.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 699`** (1 nodes): `SkippedTest.php`
-  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 700`** (1 nodes): `CodeCoverageInitializationStatus.php`
+- **Thin community `Community 700`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 701`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 702`** (1 nodes): `Subscriber.php`
+- **Thin community `Community 702`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 703`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 704`** (1 nodes): `Level.php`
+- **Thin community `Community 704`** (1 nodes): `NativeType.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 705`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 706`** (1 nodes): `Status.php`
+- **Thin community `Community 706`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 707`** (1 nodes): `Exception.php`
+- **Thin community `Community 707`** (1 nodes): `IncompleteTest.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 708`** (1 nodes): `Exception.php`
+- **Thin community `Community 708`** (1 nodes): `SkippedTest.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 709`** (1 nodes): `Visibility.php`
+- **Thin community `Community 709`** (1 nodes): `CodeCoverageInitializationStatus.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 710`** (1 nodes): `file.js`
+- **Thin community `Community 710`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 711`** (1 nodes): `Exception.php`
+- **Thin community `Community 711`** (1 nodes): `Subscriber.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 712`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 713`** (1 nodes): `Requirement.php`
+- **Thin community `Community 713`** (1 nodes): `Level.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 - **Thin community `Community 714`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 715`** (1 nodes): `Exception.php`
+- **Thin community `Community 715`** (1 nodes): `Status.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 716`** (1 nodes): `NotFoundExceptionInterface.php`
+- **Thin community `Community 716`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 717`** (1 nodes): `ContainerExceptionInterface.php`
+- **Thin community `Community 717`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 718`** (1 nodes): `combiningClass.php`
+- **Thin community `Community 718`** (1 nodes): `Visibility.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 719`** (1 nodes): `rawCompatibilityDecomposition.php`
+- **Thin community `Community 719`** (1 nodes): `file.js`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 720`** (1 nodes): `canonicalDecomposition.php`
+- **Thin community `Community 720`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 721`** (1 nodes): `canonicalComposition.php`
+- **Thin community `Community 721`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 722`** (1 nodes): `compatibilityDecomposition.php`
+- **Thin community `Community 722`** (1 nodes): `Requirement.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 723`** (1 nodes): `rawCanonicalDecomposition.php`
+- **Thin community `Community 723`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 724`** (1 nodes): `ExceptionInterface.php`
+- **Thin community `Community 724`** (1 nodes): `Exception.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 725`** (1 nodes): `TruncateMode.php`
+- **Thin community `Community 725`** (1 nodes): `NotFoundExceptionInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 726`** (1 nodes): `wcswidth_table_zero.php`
+- **Thin community `Community 726`** (1 nodes): `ContainerExceptionInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 727`** (1 nodes): `wcswidth_table_wide.php`
+- **Thin community `Community 727`** (1 nodes): `combiningClass.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 728`** (1 nodes): `ExceptionInterface.php`
+- **Thin community `Community 728`** (1 nodes): `rawCompatibilityDecomposition.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 729`** (1 nodes): `ServiceCollectionInterface.php`
+- **Thin community `Community 729`** (1 nodes): `canonicalDecomposition.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 730`** (1 nodes): `ExceptionInterface.php`
+- **Thin community `Community 730`** (1 nodes): `canonicalComposition.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 731`** (1 nodes): `ExceptionInterface.php`
+- **Thin community `Community 731`** (1 nodes): `compatibilityDecomposition.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 732`** (1 nodes): `caseFolding.php`
+- **Thin community `Community 732`** (1 nodes): `rawCanonicalDecomposition.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 733`** (1 nodes): `lowerCase.php`
+- **Thin community `Community 733`** (1 nodes): `ExceptionInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 734`** (1 nodes): `titleCaseRegexp.php`
+- **Thin community `Community 734`** (1 nodes): `TruncateMode.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 735`** (1 nodes): `upperCase.php`
+- **Thin community `Community 735`** (1 nodes): `wcswidth_table_zero.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 736`** (1 nodes): `Exception.php`
+- **Thin community `Community 736`** (1 nodes): `wcswidth_table_wide.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 737`** (1 nodes): `Exception.php`
+- **Thin community `Community 737`** (1 nodes): `ExceptionInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 738`** (1 nodes): `Exception.php`
+- **Thin community `Community 738`** (1 nodes): `ServiceCollectionInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 739`** (1 nodes): `Exception.php`
+- **Thin community `Community 739`** (1 nodes): `ExceptionInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 740`** (1 nodes): `Exception.php`
+- **Thin community `Community 740`** (1 nodes): `ExceptionInterface.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 741`** (1 nodes): `Exception.php`
+- **Thin community `Community 741`** (1 nodes): `caseFolding.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 742`** (1 nodes): `Exception.php`
+- **Thin community `Community 742`** (1 nodes): `lowerCase.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
-- **Thin community `Community 743`** (1 nodes): `DeployScope.php`
+- **Thin community `Community 743`** (1 nodes): `titleCaseRegexp.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 744`** (1 nodes): `upperCase.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 745`** (1 nodes): `Exception.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 746`** (1 nodes): `Exception.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 747`** (1 nodes): `Exception.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 748`** (1 nodes): `Exception.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 749`** (1 nodes): `Exception.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 750`** (1 nodes): `Exception.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 751`** (1 nodes): `Exception.php`
+  Too small to be a meaningful cluster - may be noise or needs more connections extracted.
+- **Thin community `Community 752`** (1 nodes): `DeployScope.php`
   Too small to be a meaningful cluster - may be noise or needs more connections extracted.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `Assert` connect `Community 3` to `Community 0`, `Community 1`, `Community 2`, `Community 5`, `Community 6`, `Community 8`, `Community 9`, `Community 11`, `Community 12`, `Community 13`, `Community 14`, `Community 16`, `Community 18`, `Community 19`, `Community 20`, `Community 22`, `Community 23`, `Community 26`, `Community 28`, `Community 29`, `Community 31`, `Community 43`?**
-  _High betweenness centrality (0.115) - this node is a cross-community bridge._
-- **Why does `Process` connect `Community 24` to `Community 12`, `Community 5`?**
-  _High betweenness centrality (0.018) - this node is a cross-community bridge._
-- **Why does `BuilderHelpers` connect `Community 15` to `Community 7`, `Community 9`, `Community 16`, `Community 20`, `Community 22`?**
-  _High betweenness centrality (0.014) - this node is a cross-community bridge._
+- **Why does `Assert` connect `Community 5` to `Community 0`, `Community 2`, `Community 3`, `Community 4`, `Community 6`, `Community 8`, `Community 9`, `Community 10`, `Community 11`, `Community 12`, `Community 13`, `Community 16`, `Community 17`, `Community 18`, `Community 19`, `Community 20`, `Community 21`, `Community 23`, `Community 24`, `Community 26`, `Community 27`, `Community 29`, `Community 40`?**
+  _High betweenness centrality (0.157) - this node is a cross-community bridge._
+- **Why does `BuilderHelpers` connect `Community 14` to `Community 7`, `Community 9`, `Community 18`, `Community 19`, `Community 21`?**
+  _High betweenness centrality (0.021) - this node is a cross-community bridge._
+- **Why does `TestCase` connect `Community 10` to `Community 0`, `Community 3`, `Community 4`, `Community 5`, `Community 8`, `Community 9`, `Community 11`, `Community 12`, `Community 14`, `Community 29`?**
+  _High betweenness centrality (0.019) - this node is a cross-community bridge._
 - **Are the 474 inferred relationships involving `Assert` (e.g. with `.parseDocString()` and `.createCommentFromToken()`) actually correct?**
   _`Assert` has 474 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 119 inferred relationships involving `Generators` (e.g. with `.testBootstrapIncludesRoundTripPreservation()` and `.testLegacyScopesFieldFailFastOnFirstViolation()`) actually correct?**
