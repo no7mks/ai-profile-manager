@@ -12,7 +12,6 @@ bootstrap:
     - rule:safety:command-safety
     - rule:safety:config-safety
     - rule:git:git-conventions
-    - rule:plan:quick-plan-conventions
 
 rules:
   - path: cursor-scope
@@ -90,11 +89,6 @@ rules:
       cursor: .cursor/rules/gatekeeping/gk-tasks.mdc
       kiro: .kiro/steering/gatekeeping/gk-tasks.md
 
-  - path: plan:quick-plan-conventions
-    description: Cursor 快速计划（非 Spec）的路径、命名、模板与归档
-    targets:
-      cursor: .cursor/rules/plan/quick-plan-conventions.mdc
-
 agents:
   - path: code-reviewer
     description: 基于 diff 的 code review agent
@@ -154,11 +148,13 @@ skills:
   - path: quick-plan
     description: 快速计划生成（交互式确认 plan.md）
     targets:
+      cursor: .cursor/skills/quick-plan/
       kiro: .kiro/skills/quick-plan/
 
   - path: build-plan
     description: 按已确认 plan.md 执行实施
     targets:
+      cursor: .cursor/skills/build-plan/
       kiro: .kiro/skills/build-plan/
 
   - path: quick-release
