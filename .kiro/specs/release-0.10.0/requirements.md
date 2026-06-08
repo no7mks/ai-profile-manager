@@ -37,7 +37,7 @@ Release 0.10.0 包含两项主要交付：
 
 #### Acceptance Criteria
 
-1. THE Ability_Registry SHALL contain a skills section entry with path `quick-plan` and a targets mapping that includes `cursor: .cursor/skills/quick-plan/` and does not include a `kiro` key
+1. THE Ability_Registry SHALL contain a skills section entry with path `quick-plan` and a targets mapping that includes `cursor: .cursor/skills/quick-plan/`
 2. THE Ability_Registry skills entry for `quick-plan` SHALL include a description field containing at least 5 characters that summarizes the skill's purpose
 3. THE Ability_Registry skills entry for `quick-plan` SHALL contain all three required fields: `path`, `description`, and `targets`
 
@@ -49,7 +49,7 @@ Release 0.10.0 包含两项主要交付：
 
 #### Acceptance Criteria
 
-1. THE Ability_Registry SHALL contain a skills section entry with path `build-plan` and a targets mapping that includes `cursor: .cursor/skills/build-plan/` and does not include a `kiro` key
+1. THE Ability_Registry SHALL contain a skills section entry with path `build-plan` and a targets mapping that includes `cursor: .cursor/skills/build-plan/`
 2. THE Ability_Registry skills entry for `build-plan` SHALL include a description field containing at least 5 characters that summarizes the skill's purpose
 3. THE Ability_Registry skills entry for `build-plan` SHALL contain all three required fields: `path`, `description`, and `targets`
 
