@@ -22,7 +22,7 @@ alwaysApply: true
 | `/docs/` | 活跃文档（state/manual/notes/proposals） | `docs/README.md` |
 | `/changes/` | 归档（已完成文档按版本组织） | `changes/README.md` |
 | `/issues/` | 缺陷管理 | `issues/README.md` |
-| `/.cursor/specs/` | 即 `<spec-dir>`：子目录为进行中 Spec；根下 `<slug>-plan.md` 为快速计划 | `plan/quick-plan-conventions.mdc` |
+| `/.cursor/specs/` | 即 `<spec-dir>`：子目录为进行中 Spec；根下 `<slug>-plan.md` 为快速计划 | — |
 | `/.cursor/rules/` | Cursor agent 规则 | — |
 | `/.cursor/skills/` | Cursor agent skills | — |
 | `/.cursor/agents/` | Cursor agent 定义 | — |
@@ -30,4 +30,7 @@ alwaysApply: true
 
 ## Plan mode / 快速计划
 
-进入 **Plan mode**、**Build Plan**、或创建/执行**非 Spec 四件套**的 plan 时，**必须先读取** `@.cursor/rules/plan/quick-plan-conventions.mdc`。计划 SSOT **仅**为 `.cursor/specs/<slug>-plan.md`。`~/.cursor/plans/` 与 `.cursor/plans/` **禁止**作为计划来源；若 IDE 写入该处，**须在同一轮对话内立即**迁到 `.cursor/specs/`（详见 quick-plan 约定）。
+进入 **Plan mode** 时，参考 `.cursor/skills/quick-plan/`。
+进入 **Build Plan** 时，参考 `.cursor/skills/build-plan/`。
+计划 SSOT **仅**为 `.cursor/specs/<slug>-plan.md`。
+`~/.cursor/plans/` 与 `.cursor/plans/` **禁止**作为计划来源；若 IDE 写入该处，须在同一轮对话内立即迁到 `.cursor/specs/`。

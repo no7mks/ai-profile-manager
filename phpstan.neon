@@ -4,6 +4,6 @@ parameters:
         - src/
     excludePaths:
         # TODO: task 8 will delete/refactor these files; temporarily excluded
-        - src/Service/DefaultGlobalSetupService.php
-        - src/Service/ScopeGuard.php
-        - src/Service/DeployRootResolver.php
+        - src/Service/DefaultGlobalSetupService.php (?)
+        - src/Service/ScopeGuard.php (?)
+        - src/Service/DeployRootResolver.php (?)
